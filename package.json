@@ -8,11 +8,11 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build -w @arrivalos/core && npm run build -w @arrivalos/shared-services && npm run build -w @arrivalos/modules && npm run build -w @arrivalos/api && npm run build -w @arrivalos/web",
+    "build": "npm run build -w @arrivalos/core && npm run build -w @arrivalos/profile && npm run build -w @arrivalos/shared-services && npm run build -w @arrivalos/modules && npm run build -w @arrivalos/api && npm run build -w @arrivalos/web",
     "dev": "concurrently \"npm run dev -w @arrivalos/api\" \"npm run dev -w @arrivalos/web\"",
     "dev:api": "npm run dev -w @arrivalos/api",
     "dev:web": "npm run dev -w @arrivalos/web",
-    "test": "npm run test -w @arrivalos/shared-services && npm run test -w @arrivalos/modules",
+    "test": "npm run test -w @arrivalos/profile && npm run test -w @arrivalos/shared-services && npm run test -w @arrivalos/modules && npm run test -w @arrivalos/api",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },

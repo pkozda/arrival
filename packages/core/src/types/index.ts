@@ -20,11 +20,26 @@ export const SystemStateSchema = z.object({
 
 export type SystemState = z.infer<typeof SystemStateSchema>;
 
+export const DataProvenanceSourceSchema = z.enum(['input', 'profile', 'default', 'override']);
+export type DataProvenanceSource = z.infer<typeof DataProvenanceSourceSchema>;
+
+export const DataProvenanceEntrySchema = z.object({
+  field: z.string(),
+  source: DataProvenanceSourceSchema,
+});
+
+export type DataProvenanceEntry = z.infer<typeof DataProvenanceEntrySchema>;
+
 export const AppContextSchema = z.object({
   userProfile: UserProfileSchema.optional(),
   location: z.string().optional(),
   systemState: SystemStateSchema.optional(),
   sessionId: z.string().optional(),
+  profileId: z.string().optional(),
+  profileVersion: z.number().int().optional(),
+  profileSchemaVersion: z.string().optional(),
+  profileSlice: z.record(z.unknown()).optional(),
+  dataProvenance: z.array(DataProvenanceEntrySchema).optional(),
 });
 
 export type AppContext = z.infer<typeof AppContextSchema>;
