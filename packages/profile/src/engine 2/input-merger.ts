@@ -1,10 +1,6 @@
 import type { DataProvenanceEntry } from '@arrivalos/core';
 import type { ProfileDocument } from '../types/profile-document.js';
 import type { TraceCollector } from '../trace/trace-collector.js';
-import {
-  ensureBenefitsSimulatorEmployments,
-  mergeBenefitsSimulatorInputFromProfile,
-} from './benefits-simulator-input-merge.js';
 
 export interface MergeModuleInputParams {
   requestInput?: Record<string, unknown>;
@@ -83,29 +79,6 @@ export function mergeModuleInput(
   const requestInput = params.requestInput ?? {};
   const requestOverrides = params.requestOverrides ?? {};
   const profile = params.profile ?? null;
-
-  if (moduleId === 'benefits-simulator') {
-    const profileMerged = mergeBenefitsSimulatorInputFromProfile(requestInput, profile);
-    const merged = ensureBenefitsSimulatorEmployments({
-      ...profileMerged,
-      ...requestOverrides,
-    });
-    const provenance: DataProvenanceEntry[] = [];
-
-    if (profile && !requestInput.household && merged.household) {
-      provenance.push({ field: 'household', source: 'profile' });
-    }
-    if (profile && !requestInput.baselineEmployments && merged.baselineEmployments) {
-      provenance.push({ field: 'baselineEmployments', source: 'profile' });
-    }
-    for (const [field, value] of Object.entries(requestInput)) {
-      if (value !== undefined) {
-        provenance.push({ field, source: 'input' });
-      }
-    }
-
-    return { merged, provenance };
-  }
 
   const merged: Record<string, unknown> = { ...requestInput };
   const provenance: DataProvenanceEntry[] = [];

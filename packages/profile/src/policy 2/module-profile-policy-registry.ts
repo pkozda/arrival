@@ -23,25 +23,6 @@ export const HEALTHCARE_NAVIGATION_POLICY: ModuleProfilePolicy = {
   allowedExtensions: ['healthcare-navigation'],
 };
 
-export const BENEFITS_SIMULATOR_POLICY: ModuleProfilePolicy = {
-  moduleId: 'benefits-simulator',
-  allowedFields: [
-    'preferredLanguage',
-    'employment',
-    'household',
-    'housing',
-    'location',
-    'benefits',
-  ],
-  sensitiveFields: [
-    'employment.grossMonthlyIncome',
-    'housing.monthlyColdRent',
-    'benefits.currentBuergergeldAmount',
-  ],
-  allowExtensions: true,
-  allowedExtensions: ['benefits-simulator'],
-};
-
 /** Minimal access when no module-specific policy is registered */
 export const DEFAULT_MODULE_POLICY: ModuleProfilePolicy = {
   moduleId: '*',
@@ -53,7 +34,6 @@ export const DEFAULT_MODULE_POLICY: ModuleProfilePolicy = {
 const REGISTRY = new Map<string, ModuleProfilePolicy>([
   [FINANCIAL_REALITY_POLICY.moduleId, FINANCIAL_REALITY_POLICY],
   [HEALTHCARE_NAVIGATION_POLICY.moduleId, HEALTHCARE_NAVIGATION_POLICY],
-  [BENEFITS_SIMULATOR_POLICY.moduleId, BENEFITS_SIMULATOR_POLICY],
 ]);
 
 export class ModuleProfilePolicyRegistry {

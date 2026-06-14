@@ -11,3 +11,4 @@ export * from './scenarios/comparator.js';
 export * from './decisions/decision-engine.js';
 export * from './pipeline/financial-pipeline.js';
 export * from './adapters/v1-adapter.js';
+export * from './simulator/index.js';
