@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@arrivalos/core": "*",
+    "@arrivalos/shared-services": "*",
     "zod": "^3.24.1"
   },
   "devDependencies": {

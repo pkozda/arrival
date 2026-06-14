@@ -1,0 +1,509 @@
+{
+  "version": "1.0.0",
+  "taxYear": 2025,
+  "fixtures": [
+    {
+      "id": "S01-unemployment-buergergeld-fallback",
+      "description": "Employed baseline loses job → Bürgergeld eligibility increases",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [{ "id": "applicant", "role": "applicant", "age": 30, "taxClass": 1, "churchTax": false }],
+          "housing": { "coldRent": 800, "utilities": 0, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": false }
+        },
+        "baselineEmployments": {
+          "applicant": { "type": "regular", "grossMonthly": 2200, "taxClass": 1, "churchTax": false }
+        },
+        "scenarios": [
+          {
+            "id": "unemployment",
+            "label": "Job loss",
+            "events": [{ "type": "unemployment" }]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 1610.77,
+        "baselineBuergergeld": 0,
+        "scenarioOrder": ["unemployment"],
+        "scenarios": [
+          {
+            "id": "unemployment",
+            "totalHouseholdResources": 1363,
+            "buergergeldDelta": 1363,
+            "deltaFromBaseline": -247.77
+          }
+        ],
+        "hasRiskWarnings": false,
+        "bestScenarioId": "baseline",
+        "spread": 247.77
+      }
+    },
+    {
+      "id": "S02-minijob-450-transition",
+      "description": "Unemployed on Bürgergeld takes Minijob €450",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [{ "id": "applicant", "role": "applicant", "age": 30, "taxClass": 1, "churchTax": false }],
+          "housing": { "coldRent": 800, "utilities": 0, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": true }
+        },
+        "baselineEmployments": { "applicant": { "type": "none" } },
+        "scenarios": [
+          {
+            "id": "minijob-450",
+            "label": "Minijob €450",
+            "events": [{ "type": "minijob", "grossMonthly": 450 }]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 1363,
+        "baselineBuergergeld": 1363,
+        "scenarioOrder": ["minijob-450"],
+        "scenarios": [
+          {
+            "id": "minijob-450",
+            "totalHouseholdResources": 1533,
+            "buergergeldDelta": -280,
+            "deltaFromBaseline": 170
+          }
+        ],
+        "hasRiskWarnings": true,
+        "riskWarningCategories": ["legal", "benefits", "housing"],
+        "bestScenarioId": "minijob-450",
+        "spread": 170
+      }
+    },
+    {
+      "id": "S03-midijob-transition",
+      "description": "Unemployed on Bürgergeld takes Midijob €800",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [{ "id": "applicant", "role": "applicant", "age": 30, "taxClass": 1, "churchTax": false }],
+          "housing": { "coldRent": 800, "utilities": 0, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": true }
+        },
+        "baselineEmployments": { "applicant": { "type": "none" } },
+        "scenarios": [
+          {
+            "id": "midijob-800",
+            "label": "Midijob €800",
+            "events": [{ "type": "midijob", "grossMonthly": 800, "taxClass": 1 }]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 1363,
+        "baselineBuergergeld": 1363,
+        "scenarioOrder": ["midijob-800"],
+        "scenarios": [
+          {
+            "id": "midijob-800",
+            "totalHouseholdResources": 1442.74,
+            "buergergeldDelta": -588,
+            "deltaFromBaseline": 79.74
+          }
+        ],
+        "hasRiskWarnings": true,
+        "riskWarningCategories": ["legal", "benefits", "housing"],
+        "bestScenarioId": "midijob-800",
+        "spread": 79.74
+      }
+    },
+    {
+      "id": "S04-part-time-employment-change",
+      "description": "Full-time employed reduces to part-time €1,200",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [{ "id": "applicant", "role": "applicant", "age": 30, "taxClass": 1, "churchTax": false }],
+          "housing": { "coldRent": 800, "utilities": 0, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": false }
+        },
+        "baselineEmployments": {
+          "applicant": { "type": "regular", "grossMonthly": 2800, "taxClass": 1, "churchTax": false }
+        },
+        "scenarios": [
+          {
+            "id": "part-time-1200",
+            "label": "Part-time €1,200",
+            "events": [
+              {
+                "type": "part-time-employment",
+                "grossMonthly": 1200,
+                "taxClass": 1,
+                "hoursPerWeek": 20
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 1961.9,
+        "baselineBuergergeld": 0,
+        "scenarioOrder": ["part-time-1200"],
+        "scenarios": [
+          {
+            "id": "part-time-1200",
+            "totalHouseholdResources": 1349.6,
+            "buergergeldDelta": 395,
+            "deltaFromBaseline": -612.3
+          }
+        ],
+        "hasRiskWarnings": false,
+        "bestScenarioId": "baseline",
+        "spread": 612.3
+      }
+    },
+    {
+      "id": "S05-child-addition",
+      "description": "Employed single person adds a child (age 3)",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [{ "id": "applicant", "role": "applicant", "age": 35, "taxClass": 1, "churchTax": false }],
+          "housing": { "coldRent": 800, "utilities": 0, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": false }
+        },
+        "baselineEmployments": {
+          "applicant": { "type": "regular", "grossMonthly": 2400, "taxClass": 1 }
+        },
+        "scenarios": [
+          {
+            "id": "add-child",
+            "label": "New child",
+            "events": [{ "type": "child-added", "age": 3 }]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 1728.95,
+        "baselineBuergergeld": 0,
+        "scenarioOrder": ["add-child"],
+        "scenarios": [
+          {
+            "id": "add-child",
+            "totalHouseholdResources": 1728.95,
+            "buergergeldDelta": 0,
+            "deltaFromBaseline": 0
+          }
+        ],
+        "hasRiskWarnings": false,
+        "bestScenarioId": "baseline",
+        "spread": 0
+      }
+    },
+    {
+      "id": "S06-child-removal",
+      "description": "Bürgergeld household with child — child leaves",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [
+            { "id": "applicant", "role": "applicant", "age": 35, "taxClass": 1, "churchTax": false },
+            { "id": "child-1", "role": "child", "age": 8 }
+          ],
+          "housing": { "coldRent": 850, "utilities": 0, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": true }
+        },
+        "baselineEmployments": {
+          "applicant": { "type": "none" },
+          "child-1": { "type": "none" }
+        },
+        "scenarios": [
+          {
+            "id": "remove-child",
+            "label": "Child leaves household",
+            "events": [{ "type": "child-removed", "childIndex": 0 }]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 1553,
+        "baselineBuergergeld": 1553,
+        "scenarioOrder": ["remove-child"],
+        "scenarios": [
+          {
+            "id": "remove-child",
+            "totalHouseholdResources": 1388,
+            "buergergeldDelta": -165,
+            "deltaFromBaseline": -165
+          }
+        ],
+        "hasRiskWarnings": true,
+        "riskWarningCategories": ["benefits"],
+        "bestScenarioId": "baseline",
+        "spread": 165
+      }
+    },
+    {
+      "id": "S07-rent-increase",
+      "description": "Bürgergeld recipient faces rent increase €800 → €1,000",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [{ "id": "applicant", "role": "applicant", "age": 30, "taxClass": 1, "churchTax": false }],
+          "housing": { "coldRent": 800, "utilities": 0, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": true }
+        },
+        "baselineEmployments": { "applicant": { "type": "none" } },
+        "scenarios": [
+          {
+            "id": "rent-up",
+            "label": "Rent +€200",
+            "events": [{ "type": "rent-change", "newColdRent": 1000 }]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 1363,
+        "baselineBuergergeld": 1363,
+        "scenarioOrder": ["rent-up"],
+        "scenarios": [
+          {
+            "id": "rent-up",
+            "totalHouseholdResources": 1388,
+            "buergergeldDelta": 25,
+            "deltaFromBaseline": 25
+          }
+        ],
+        "hasRiskWarnings": true,
+        "riskWarningCategories": ["legal", "benefits"],
+        "bestScenarioId": "rent-up",
+        "spread": 25
+      }
+    },
+    {
+      "id": "S08-rent-decrease",
+      "description": "Bürgergeld recipient rent decreases €1,000 → €800",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [{ "id": "applicant", "role": "applicant", "age": 30, "taxClass": 1, "churchTax": false }],
+          "housing": { "coldRent": 1000, "utilities": 0, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": true }
+        },
+        "baselineEmployments": { "applicant": { "type": "none" } },
+        "scenarios": [
+          {
+            "id": "rent-down",
+            "label": "Rent −€200",
+            "events": [{ "type": "rent-change", "newColdRent": 800 }]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 1388,
+        "baselineBuergergeld": 1388,
+        "scenarioOrder": ["rent-down"],
+        "scenarios": [
+          {
+            "id": "rent-down",
+            "totalHouseholdResources": 1363,
+            "buergergeldDelta": -25,
+            "deltaFromBaseline": -25
+          }
+        ],
+        "hasRiskWarnings": true,
+        "riskWarningCategories": ["benefits"],
+        "bestScenarioId": "baseline",
+        "spread": 25
+      }
+    },
+    {
+      "id": "S09-partner-job-loss",
+      "description": "Married dual income — partner loses job",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [
+            { "id": "applicant", "role": "applicant", "age": 32, "taxClass": 1, "churchTax": false },
+            { "id": "partner", "role": "partner", "age": 30, "taxClass": 5, "churchTax": false }
+          ],
+          "housing": { "coldRent": 900, "utilities": 100, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": false }
+        },
+        "baselineEmployments": {
+          "applicant": { "type": "regular", "grossMonthly": 2600, "taxClass": 1 },
+          "partner": { "type": "regular", "grossMonthly": 1800, "taxClass": 5 }
+        },
+        "scenarios": [
+          {
+            "id": "partner-unemployed",
+            "label": "Partner loses job",
+            "events": [{ "type": "unemployment", "memberId": "partner" }]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 3031.21,
+        "baselineBuergergeld": 0,
+        "scenarioOrder": ["partner-unemployed"],
+        "scenarios": [
+          {
+            "id": "partner-unemployed",
+            "totalHouseholdResources": 1845.97,
+            "buergergeldDelta": 0,
+            "deltaFromBaseline": -1185.24
+          }
+        ],
+        "hasRiskWarnings": false,
+        "bestScenarioId": "baseline",
+        "spread": 1185.24
+      }
+    },
+    {
+      "id": "S10-partner-job-gain",
+      "description": "Married household — partner starts employment",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [
+            { "id": "applicant", "role": "applicant", "age": 32, "taxClass": 1, "churchTax": false },
+            { "id": "partner", "role": "partner", "age": 30, "taxClass": 5, "churchTax": false }
+          ],
+          "housing": { "coldRent": 900, "utilities": 100, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": false }
+        },
+        "baselineEmployments": {
+          "applicant": { "type": "regular", "grossMonthly": 2400, "taxClass": 1 },
+          "partner": { "type": "none" }
+        },
+        "scenarios": [
+          {
+            "id": "partner-employed",
+            "label": "Partner starts job",
+            "events": [
+              {
+                "type": "employment",
+                "memberId": "partner",
+                "grossMonthly": 2000,
+                "taxClass": 5
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 1728.95,
+        "baselineBuergergeld": 0,
+        "scenarioOrder": ["partner-employed"],
+        "scenarios": [
+          {
+            "id": "partner-employed",
+            "totalHouseholdResources": 3005.2,
+            "buergergeldDelta": 0,
+            "deltaFromBaseline": 1276.25
+          }
+        ],
+        "hasRiskWarnings": true,
+        "riskWarningCategories": ["legal"],
+        "bestScenarioId": "partner-employed",
+        "spread": 1276.25
+      }
+    },
+    {
+      "id": "S11-full-household-unemployment",
+      "description": "Dual income household — both members lose employment",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [
+            { "id": "applicant", "role": "applicant", "age": 32, "taxClass": 1, "churchTax": false },
+            { "id": "partner", "role": "partner", "age": 30, "taxClass": 5, "churchTax": false }
+          ],
+          "housing": { "coldRent": 900, "utilities": 100, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": false }
+        },
+        "baselineEmployments": {
+          "applicant": { "type": "regular", "grossMonthly": 3000, "taxClass": 1 },
+          "partner": { "type": "regular", "grossMonthly": 2200, "taxClass": 5 }
+        },
+        "scenarios": [
+          {
+            "id": "both-unemployed",
+            "label": "Both lose jobs",
+            "events": [
+              { "type": "unemployment" },
+              { "type": "unemployment", "memberId": "partner" }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 3443.94,
+        "baselineBuergergeld": 0,
+        "scenarioOrder": ["both-unemployed"],
+        "scenarios": [
+          {
+            "id": "both-unemployed",
+            "totalHouseholdResources": 2012,
+            "buergergeldDelta": 2012,
+            "deltaFromBaseline": -1431.94
+          }
+        ],
+        "hasRiskWarnings": false,
+        "bestScenarioId": "baseline",
+        "spread": 1431.94
+      }
+    },
+    {
+      "id": "S12-dual-income-optimization",
+      "description": "Unemployed couple compares applicant vs partner Minijob €450",
+      "input": {
+        "taxYear": 2025,
+        "household": {
+          "members": [
+            { "id": "applicant", "role": "applicant", "age": 32, "taxClass": 1, "churchTax": false },
+            { "id": "partner", "role": "partner", "age": 30, "taxClass": 5, "churchTax": false }
+          ],
+          "housing": { "coldRent": 900, "utilities": 100, "bundesland": "BE", "cityMietstufe": 3 },
+          "currentBenefits": { "receivingBuergergeld": true }
+        },
+        "baselineEmployments": {
+          "applicant": { "type": "none" },
+          "partner": { "type": "none" }
+        },
+        "scenarios": [
+          {
+            "id": "applicant-minijob",
+            "label": "Applicant Minijob",
+            "events": [{ "type": "minijob", "grossMonthly": 450 }]
+          },
+          {
+            "id": "partner-minijob",
+            "label": "Partner Minijob",
+            "events": [{ "type": "minijob", "memberId": "partner", "grossMonthly": 450 }]
+          }
+        ]
+      },
+      "expect": {
+        "baselineTotalHouseholdResources": 2012,
+        "baselineBuergergeld": 2012,
+        "scenarioOrder": ["applicant-minijob", "partner-minijob"],
+        "scenarios": [
+          {
+            "id": "applicant-minijob",
+            "totalHouseholdResources": 2182,
+            "buergergeldDelta": -280,
+            "deltaFromBaseline": 170
+          },
+          {
+            "id": "partner-minijob",
+            "totalHouseholdResources": 2182,
+            "buergergeldDelta": -280,
+            "deltaFromBaseline": 170
+          }
+        ],
+        "hasRiskWarnings": true,
+        "riskWarningCategories": ["legal", "benefits", "housing"],
+        "bestScenarioId": "applicant-minijob",
+        "spread": 170
+      }
+    }
+  ]
+}

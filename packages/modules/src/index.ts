@@ -33,11 +33,19 @@ export {
   LifeEventOutputSchema,
 } from './life-event/index.js';
 
+export {
+  benefitsSimulatorModule,
+  benefitsSimulatorRegistration,
+  BenefitsSimulatorInputSchema,
+  BenefitsSimulatorOutputSchema,
+} from './benefits-simulator/index.js';
+
 import { financialRealityRegistration } from './financial-reality/index.js';
 import { systemTranslationRegistration } from './system-translation/index.js';
 import { healthcareNavigationRegistration } from './healthcare-navigation/index.js';
 import { groceryOptimizationRegistration } from './grocery-optimization/index.js';
 import { lifeEventRegistration } from './life-event/index.js';
+import { benefitsSimulatorRegistration } from './benefits-simulator/index.js';
 import type { ModuleRegistration } from '@arrivalos/core';
 
 export const allModuleRegistrations: ModuleRegistration[] = [
@@ -46,6 +54,7 @@ export const allModuleRegistrations: ModuleRegistration[] = [
   healthcareNavigationRegistration,
   groceryOptimizationRegistration,
   lifeEventRegistration,
+  benefitsSimulatorRegistration,
 ];
 
 export function registerAllModules(registry: { register: (r: ModuleRegistration) => void }): void {
