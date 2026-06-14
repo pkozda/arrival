@@ -1,0 +1,61 @@
+[
+  {
+    "id": "single-unemployed-rent-800",
+    "description": "Single person, no income, €800 rent",
+    "input": {
+      "householdSize": 1,
+      "maritalStatus": "single",
+      "monthlyRent": 800,
+      "grossIncome": 0,
+      "employmentStatus": "unemployed"
+    },
+    "expected": {
+      "eligible": true,
+      "benefitMin": 1200,
+      "benefitMax": 1400
+    }
+  },
+  {
+    "id": "single-employed-2500",
+    "description": "Single employed €2500 — likely no Bürgergeld",
+    "input": {
+      "householdSize": 1,
+      "maritalStatus": "single",
+      "monthlyRent": 800,
+      "grossIncome": 2500,
+      "employmentStatus": "employed",
+      "taxClass": 1
+    },
+    "expected": {
+      "eligible": false,
+      "benefitMax": 0
+    }
+  },
+  {
+    "id": "freibetrag-800-gross",
+    "description": "§11b Freibetrag on €800 employment gross",
+    "input": {
+      "grossEmploymentIncome": 800
+    },
+    "expected": {
+      "freibetragMin": 180,
+      "freibetragMax": 240,
+      "countableMax": 620
+    }
+  },
+  {
+    "id": "couple-1-child-unemployed",
+    "description": "Couple with one child, no employment",
+    "input": {
+      "householdSize": 3,
+      "maritalStatus": "married",
+      "monthlyRent": 1000,
+      "grossIncome": 0,
+      "employmentStatus": "unemployed"
+    },
+    "expected": {
+      "eligible": true,
+      "regelbedarfMin": 1400
+    }
+  }
+]

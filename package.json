@@ -12,7 +12,7 @@
     "dev": "concurrently \"npm run dev -w @arrivalos/api\" \"npm run dev -w @arrivalos/web\"",
     "dev:api": "npm run dev -w @arrivalos/api",
     "dev:web": "npm run dev -w @arrivalos/web",
-    "test": "npm run test --workspaces --if-present",
+    "test": "npm run test -w @arrivalos/shared-services && npm run test -w @arrivalos/modules",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },

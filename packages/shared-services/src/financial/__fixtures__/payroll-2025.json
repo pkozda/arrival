@@ -1,0 +1,59 @@
+[
+  {
+    "id": "stkl1-2500-monthly",
+    "description": "Regular employment €2500 gross, Steuerklasse I, no church tax",
+    "input": {
+      "grossMonthly": 2500,
+      "taxClass": 1,
+      "churchTax": false,
+      "taxYear": 2025
+    },
+    "expected": {
+      "incomeTaxMin": 200,
+      "incomeTaxMax": 220,
+      "netMin": 1750,
+      "netMax": 1820
+    }
+  },
+  {
+    "id": "minijob-450",
+    "description": "Minijob €450, no RV opt-in",
+    "input": {
+      "grossMonthly": 450,
+      "employmentType": "minijob",
+      "rvOptIn": false
+    },
+    "expected": {
+      "net": 450,
+      "socialContributions": 0
+    }
+  },
+  {
+    "id": "minijob-556-rv-opt-in",
+    "description": "Minijob at ceiling with RV opt-in",
+    "input": {
+      "grossMonthly": 556,
+      "employmentType": "minijob",
+      "rvOptIn": true
+    },
+    "expected": {
+      "netMax": 540,
+      "netMin": 530
+    }
+  },
+  {
+    "id": "midijob-1000-stkl1",
+    "description": "Midijob €1000 in Gleitzone",
+    "input": {
+      "grossMonthly": 1000,
+      "taxClass": 1,
+      "employmentType": "midijob"
+    },
+    "expected": {
+      "netMin": 800,
+      "netMax": 900,
+      "assessmentBaseMin": 800,
+      "assessmentBaseMax": 900
+    }
+  }
+]

@@ -14,14 +14,18 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@arrivalos/core": "*",
+    "lohnsteuerrechner": "^1.0.7",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
   }
 }
