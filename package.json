@@ -1,0 +1,26 @@
+{
+  "name": "arrivalos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Modular decision-support platform for migrants in Germany",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @arrivalos/core && npm run build -w @arrivalos/shared-services && npm run build -w @arrivalos/modules && npm run build -w @arrivalos/api && npm run build -w @arrivalos/web",
+    "dev": "concurrently \"npm run dev -w @arrivalos/api\" \"npm run dev -w @arrivalos/web\"",
+    "dev:api": "npm run dev -w @arrivalos/api",
+    "dev:web": "npm run dev -w @arrivalos/web",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
