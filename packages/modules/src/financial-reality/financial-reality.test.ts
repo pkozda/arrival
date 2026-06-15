@@ -4,11 +4,13 @@ import {
   adaptV2OutputToLegacy,
   financialPipeline,
 } from '@arrivalos/shared-services';
+import { InMemoryProfileStore, ProfileEngine, resolveExecutionContext } from '@arrivalos/profile';
 import {
   financialRealityModule,
   setAdvancedTaxScenarios,
   isAdvancedTaxScenariosEnabled,
 } from './index.js';
+import { resolveFinancialProfileContext } from './profile-context.js';
 
 describe('v1 adapter', () => {
   it('maps legacy input to v2 engine input', () => {
@@ -129,5 +131,93 @@ describe('Financial Reality Module', () => {
       {}
     );
     expect(() => financialRealityModule.outputSchema.parse(result)).not.toThrow();
+  });
+
+  it('evaluates admin rules from profileSlice instead of systemState', async () => {
+    const result = await financialRealityModule.execute(
+      {
+        grossIncome: 2500,
+        taxClass: 1,
+        churchTax: false,
+        householdSize: 1,
+        monthlyRent: 800,
+        employmentStatus: 'employed',
+        maritalStatus: 'single',
+      },
+      {
+        profileSlice: {
+          preferredLanguage: 'de',
+          insurance: { hasCoverage: true },
+          benefits: { daysInGermany: 90 },
+        },
+      }
+    );
+
+    expect(result.adminRules.some((rule) => rule.includes('Anmeldung'))).toBe(true);
+    expect(result.adminRules.some((rule) => rule.includes('Krankenversicherung'))).toBe(false);
+  });
+
+  it('does not assume health insurance when profile context is missing', async () => {
+    const result = await financialRealityModule.execute(
+      {
+        grossIncome: 2500,
+        taxClass: 1,
+        churchTax: false,
+        householdSize: 1,
+        monthlyRent: 800,
+        employmentStatus: 'employed',
+        maritalStatus: 'single',
+      },
+      {}
+    );
+
+    expect(result.adminRules.some((rule) => rule.includes('Krankenversicherung'))).toBe(true);
+    expect(result.adminRules.some((rule) => rule.includes('Anmeldung'))).toBe(false);
+  });
+
+  it('resolves admin rules from profileSlice via the real profile pipeline', async () => {
+    const store = new InMemoryProfileStore();
+    const engine = new ProfileEngine(store);
+    const sessionId = 'sess_fr_pipeline';
+
+    const profile = await engine.createProfile({ preferredLanguage: 'de' });
+    await engine.bindSession(sessionId, profile.id);
+    await engine.updateProfile(
+      profile.id,
+      {
+        employment: {
+          grossMonthlyIncome: 2500,
+          taxClass: 1,
+          churchTax: false,
+          status: 'employed',
+        },
+        household: { size: 1, maritalStatus: 'single' },
+        housing: { monthlyColdRent: 800 },
+        insurance: { hasCoverage: true, type: 'public' },
+        benefits: { daysInGermany: 90 },
+      },
+      1
+    );
+
+    const { context, mergedInput } = await resolveExecutionContext(engine, {
+      sessionId,
+      moduleId: 'financial-reality',
+      requestInput: {},
+    });
+
+    const profileContext = resolveFinancialProfileContext(
+      context,
+      mergedInput as Record<string, unknown>
+    );
+    expect(profileContext.hasHealthInsurance).toBe(true);
+    expect(profileContext.daysInGermany).toBe(90);
+
+    const result = await financialRealityModule.execute(
+      mergedInput as Parameters<typeof financialRealityModule.execute>[0],
+      context
+    );
+
+    expect(result.adminRules.some((rule) => rule.includes('Anmeldung'))).toBe(true);
+    expect(result.adminRules.some((rule) => rule.includes('Krankenversicherung'))).toBe(false);
   });
 });

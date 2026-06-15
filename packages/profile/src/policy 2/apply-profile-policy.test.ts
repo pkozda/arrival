@@ -47,11 +47,19 @@ describe('applyProfilePolicy', () => {
     expect(slice.household?.size).toBe(3);
   });
 
+  it('includes insurance and benefits in financial-reality slice', () => {
+    const slice = applyProfilePolicy(fullProfile, FINANCIAL_REALITY_POLICY);
+
+    expect(slice.insurance).toEqual({ type: 'public', hasCoverage: true });
+    expect(slice.benefits).toEqual({
+      receivingBuergergeld: false,
+      daysInGermany: 120,
+    });
+  });
+
   it('excludes unrelated top-level fields from financial-reality slice', () => {
     const slice = applyProfilePolicy(fullProfile, FINANCIAL_REALITY_POLICY);
 
-    expect(slice.insurance).toBeUndefined();
-    expect(slice.benefits).toBeUndefined();
     expect(slice.residency).toBeUndefined();
     expect(slice.countryOfOrigin).toBeUndefined();
   });
@@ -71,9 +79,10 @@ describe('applyProfilePolicy', () => {
     expect(healthcareSlice.extensions?.['financial-reality']).toBeUndefined();
   });
 
-  it('financial module cannot see healthcare-only domains in slice', () => {
+  it('financial module can see insurance for admin rule context', () => {
     const slice = applyProfilePolicy(fullProfile, FINANCIAL_REALITY_POLICY);
-    expect(slice.insurance).toBeUndefined();
+    expect(slice.insurance?.hasCoverage).toBe(true);
+    expect(slice.benefits?.daysInGermany).toBe(120);
   });
 
   it('healthcare module cannot see employment or housing in slice', () => {
@@ -93,6 +102,7 @@ describe('buildPolicyConstrainedDocument', () => {
 
     expect(doc.employment?.grossMonthlyIncome).toBe(2500);
     expect(doc.housing?.monthlyColdRent).toBe(900);
-    expect(doc.insurance).toBeUndefined();
+    expect(doc.insurance).toEqual({ type: 'public', hasCoverage: true });
+    expect(doc.benefits?.daysInGermany).toBe(120);
   });
 });

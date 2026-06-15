@@ -60,6 +60,13 @@ describe('resolveExecutionContext', () => {
         ?.grossMonthlyIncome
     ).toBeUndefined();
     expect(result.profileSlice?.employment?.grossMonthlyIncome).toBeUndefined();
+    expect(result.context.profileSlice?.insurance).toEqual({
+      hasCoverage: true,
+      type: 'public',
+    });
+    expect(result.context.profileSlice?.benefits).toEqual({ daysInGermany: 90 });
+    expect(result.profileSlice?.insurance?.hasCoverage).toBe(true);
+    expect(result.profileSlice?.benefits?.daysInGermany).toBe(90);
 
     expect(result.context.dataProvenance).toEqual(
       expect.arrayContaining([
@@ -76,6 +83,8 @@ describe('resolveExecutionContext', () => {
         { type: 'PROFILE_LOADED', profileId: result.profile!.id },
         { type: 'POLICY_APPLIED', policyId: 'financial-reality' },
         { type: 'FIELD_ALLOWED', field: 'employment' },
+        { type: 'FIELD_ALLOWED', field: 'insurance' },
+        { type: 'FIELD_ALLOWED', field: 'benefits' },
         { type: 'FIELD_REDACTED', field: 'employment.grossMonthlyIncome' },
         { type: 'MERGE_DECISION', field: 'grossIncome', source: 'profile' },
         { type: 'FINAL_VALUE', field: 'grossIncome', value: 2500 },

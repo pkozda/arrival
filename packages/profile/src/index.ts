@@ -7,6 +7,7 @@ export * from './ports/profile-store.js';
 export * from './adapters/in-memory-store.js';
 export * from './engine/profile-engine.js';
 export * from './engine/resolve-execution-context.js';
+export * from './merge/index.js';
 export * from './policy/index.js';
 export * from './trace/index.js';
 export * from './migrations/index.js';
