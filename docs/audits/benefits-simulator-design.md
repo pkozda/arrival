@@ -12,7 +12,7 @@
 
 ## Executive Summary
 
-ArrivalOS helps migrants make **financial decisions** in Germany. The existing **Financial Reality Module** answers: *"What is my net income, and is this one job offer worth taking?"*
+Arrive Atlas helps migrants make **financial decisions** in Germany. The existing **Financial Reality Module** answers: *"What is my net income, and is this one job offer worth taking?"*
 
 A proposed **Benefits Simulator Module** answers a complementary question: *"What happens to my household finances and benefits if my life situation changes?"*
 
@@ -772,6 +772,6 @@ Add module card on home page; link from Financial Reality: *"Explore more scenar
 
 The Benefits Simulator fills a **defined product gap** left by Financial Reality: **multi-event benefit transition planning** for migrants navigating unemployment, flexible employment, family, and housing changes.
 
-Architecturally, it fits cleanly into ArrivalOS as a sixth module that **composes** the existing Financial v2 engine rather than duplicating it. The Profile Engine, policy layer, and trace system require **registry-only** integration — no pipeline changes.
+Architecturally, it fits cleanly into Arrive Atlas as a sixth module that **composes** the existing Financial v2 engine rather than duplicating it. The Profile Engine, policy layer, and trace system require **registry-only** integration — no pipeline changes.
 
 **Recommended next step:** Approve this design, implement BS-M0 (shared scenario grid) and BS-M1 (module shell) behind a feature flag, then validate against the same 24-scenario fixture set used for Financial v2 validation.

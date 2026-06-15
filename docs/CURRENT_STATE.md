@@ -1,4 +1,4 @@
-# ArrivalOS — Current State & Next Steps
+# Arrive Atlas — Current State & Next Steps
 
 **Version:** 0.1.0  
 **Date:** June 2026  
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-ArrivalOS is a **working prototype** of a modular decision-support platform for migrants in Germany. The foundational architecture described in the product vision is in place: a plugin-based core, five feature modules, shared services, a REST API, and a Next.js frontend.
+Arrive Atlas is a **working prototype** of a modular decision-support platform for migrants in Germany. The foundational architecture described in the product vision is in place: a plugin-based core, five feature modules, shared services, a REST API, and a Next.js frontend.
 
 The app runs end-to-end today (`npm run dev` → API on `:3001`, web on `:3000`). Users can switch language (EN/DE/RU/UA), toggle light/dark theme, and execute all five modules through dedicated UI pages.
 
@@ -352,7 +352,7 @@ If picking **three tasks** to do next:
 
 ## Conclusion
 
-ArrivalOS v0.1.0 successfully proves the **modular decision-support architecture**. The platform can register modules, execute them with validated contracts, track events, and present results in a multilingual UI.
+Arrive Atlas v0.1.0 successfully proves the **modular decision-support architecture**. The platform can register modules, execute them with validated contracts, track events, and present results in a multilingual UI.
 
 It is **not yet ready for real migrant decision-making** — financial calculations need verification, translation content is too thin, and nothing persists between sessions.
 

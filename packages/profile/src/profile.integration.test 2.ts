@@ -44,7 +44,9 @@ describe('profile vertical slice (Phase 0)', () => {
     expect(fromProfile.profile?.revision).toBe(2);
     expect(fromProfile.mergedInput.grossIncome).toBe(2500);
     expect(fromProfile.mergedInput.monthlyRent).toBe(800);
-    expect(fromProfile.context.userProfile?.income).toBe(2500);
+    expect(fromProfile.context.userProfile).toEqual({ language: 'en' });
+    expect(fromProfile.context.userProfile?.income).toBeUndefined();
+    expect(fromProfile.context.systemState).toBeUndefined();
     expect(fromProfile.context.profileSlice?.insurance).toEqual({
       hasCoverage: true,
       type: 'public',

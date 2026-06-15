@@ -1,3 +1,4 @@
+import { PRODUCT_NAME, PRODUCT_TAGLINE } from '../branding/product.js';
 import type { SupportedLanguage } from '../types/index.js';
 
 type TranslationKey = string;
@@ -5,8 +6,8 @@ type Translations = Record<TranslationKey, string>;
 
 const translations: Record<SupportedLanguage, Translations> = {
   en: {
-    'app.title': 'ArrivalOS',
-    'app.subtitle': 'Your decision-support companion in Germany',
+    'app.title': PRODUCT_NAME,
+    'app.subtitle': PRODUCT_TAGLINE,
     'nav.financial': 'Financial Reality',
     'nav.healthcare': 'Healthcare Navigation',
     'nav.grocery': 'Grocery Optimization',
@@ -28,7 +29,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     'lifeEvent.description': 'Scenario-based guidance for major life changes',
   },
   de: {
-    'app.title': 'ArrivalOS',
+    'app.title': PRODUCT_NAME,
     'app.subtitle': 'Ihr Entscheidungsunterstützung in Deutschland',
     'nav.financial': 'Finanzielle Realität',
     'nav.healthcare': 'Gesundheitsnavigation',
@@ -51,7 +52,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     'lifeEvent.description': 'Szenariobasierte Beratung bei wichtigen Lebensveränderungen',
   },
   ru: {
-    'app.title': 'ArrivalOS',
+    'app.title': PRODUCT_NAME,
     'app.subtitle': 'Ваш помощник в принятии решений в Германии',
     'nav.financial': 'Финансовая реальность',
     'nav.healthcare': 'Навигация по здравоохранению',
@@ -74,7 +75,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     'lifeEvent.description': 'Сценарная помощь при важных жизненных изменениях',
   },
   ua: {
-    'app.title': 'ArrivalOS',
+    'app.title': PRODUCT_NAME,
     'app.subtitle': 'Ваш помічник у прийнятті рішень у Німеччині',
     'nav.financial': 'Фінансова реальність',
     'nav.healthcare': 'Навігація охорони здоров\'я',

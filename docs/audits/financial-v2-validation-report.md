@@ -313,7 +313,7 @@ Logic is fine; **inputs are not trustworthy** for low-income comparisons.
 
 The v2 **core payroll math for regular employment is credible** (+0.6% to +3% vs public calculators for standard StKl I cases). The **benefits engine skeleton** implements the right 2025 parameters and §11b structure at a simplified level.
 
-However, **the adapter layer that serves real users today introduces unacceptable errors** for the exact population most likely to rely on ArrivalOS: low-wage and Bürgergeld-adjacent households. A ~€92/month net error on Minijob income, combined with verdict flips on employment decisions, creates **material risk of harmful financial guidance**.
+However, **the adapter layer that serves real users today introduces unacceptable errors** for the exact population most likely to rely on Arrive Atlas: low-wage and Bürgergeld-adjacent households. A ~€92/month net error on Minijob income, combined with verdict flips on employment decisions, creates **material risk of harmful financial guidance**.
 
 **Do not proceed to M2 user-facing features on this path without fixing Minijob/Midijob routing and adding safety guardrails.** Re-run this validation suite after the fix; target PayrollEngine (UI path) ≥ 70 and Comparator ≥ 65 before reopening the user-testing gate.
 

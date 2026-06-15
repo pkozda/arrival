@@ -1,3 +1,4 @@
+export * from './branding/product.js';
 export * from './types/index.js';
 export * from './session/index.js';
 export * from './i18n/index.js';

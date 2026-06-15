@@ -67,104 +67,7 @@ export function buildAppContext(
 
   const userProfile = {
     language: preferredLanguage,
-    residencyStatus:
-      requestOverrides?.userProfile?.residencyStatus ?? doc.residency?.status,
-    income:
-      requestOverrides?.userProfile?.income ?? doc.employment?.grossMonthlyIncome,
-    householdSize:
-      requestOverrides?.userProfile?.householdSize ?? doc.household?.size,
   };
-
-  if (requestOverrides?.userProfile?.residencyStatus) {
-    dataProvenance.push({ field: 'userProfile.residencyStatus', source: 'override' });
-    recordContextFieldTrace(
-      trace,
-      'context.userProfile.residencyStatus',
-      'override',
-      userProfile.residencyStatus
-    );
-  } else if (doc.residency?.status) {
-    dataProvenance.push({ field: 'userProfile.residencyStatus', source: 'profile' });
-    recordContextFieldTrace(
-      trace,
-      'context.userProfile.residencyStatus',
-      'profile',
-      userProfile.residencyStatus
-    );
-  }
-
-  if (requestOverrides?.userProfile?.income !== undefined) {
-    dataProvenance.push({ field: 'userProfile.income', source: 'override' });
-    recordContextFieldTrace(
-      trace,
-      'context.userProfile.income',
-      'override',
-      userProfile.income
-    );
-  } else if (doc.employment?.grossMonthlyIncome !== undefined) {
-    dataProvenance.push({ field: 'userProfile.income', source: 'profile' });
-    recordContextFieldTrace(
-      trace,
-      'context.userProfile.income',
-      'profile',
-      userProfile.income
-    );
-  }
-
-  if (requestOverrides?.userProfile?.householdSize !== undefined) {
-    dataProvenance.push({ field: 'userProfile.householdSize', source: 'override' });
-    recordContextFieldTrace(
-      trace,
-      'context.userProfile.householdSize',
-      'override',
-      userProfile.householdSize
-    );
-  } else if (doc.household?.size !== undefined) {
-    dataProvenance.push({ field: 'userProfile.householdSize', source: 'profile' });
-    recordContextFieldTrace(
-      trace,
-      'context.userProfile.householdSize',
-      'profile',
-      userProfile.householdSize
-    );
-  }
-
-  const location =
-    requestOverrides?.location ??
-    formatLocation(doc.location?.city, doc.location?.bundesland);
-
-  if (requestOverrides?.location) {
-    dataProvenance.push({ field: 'location', source: 'override' });
-    recordContextFieldTrace(trace, 'context.location', 'override', location);
-  } else if (location) {
-    dataProvenance.push({ field: 'location', source: 'profile' });
-    recordContextFieldTrace(trace, 'context.location', 'profile', location);
-  }
-
-  const systemState = {
-    benefits: {
-      receivingBuergergeld: doc.benefits?.receivingBuergergeld,
-      receivingAlg1: doc.benefits?.receivingAlg1,
-      receivingWohngeld: doc.benefits?.receivingWohngeld,
-      daysInGermany: doc.benefits?.daysInGermany,
-      ...(requestOverrides?.systemState?.benefits ?? {}),
-    },
-    insurance: {
-      hasCoverage: doc.insurance?.hasCoverage,
-      type: doc.insurance?.type,
-      ...(requestOverrides?.systemState?.insurance ?? {}),
-    },
-    employmentStatus: doc.employment?.status
-      ? { status: doc.employment.status }
-      : requestOverrides?.systemState?.employmentStatus,
-  };
-
-  if (doc.benefits?.daysInGermany !== undefined) {
-    dataProvenance.push({ field: 'systemState.benefits.daysInGermany', source: 'profile' });
-  }
-  if (doc.insurance?.hasCoverage !== undefined) {
-    dataProvenance.push({ field: 'systemState.insurance.hasCoverage', source: 'profile' });
-  }
 
   return {
     sessionId,
@@ -173,8 +76,6 @@ export function buildAppContext(
     profileSchemaVersion: profile.document.schemaVersion,
     profileSlice: profileSlice as unknown as Record<string, unknown>,
     userProfile,
-    location,
-    systemState,
     dataProvenance,
   };
 }
@@ -183,16 +84,11 @@ function buildWithoutProfile(
   sessionId?: string,
   requestOverrides?: Partial<AppContext>
 ): AppContext {
+  const language = requestOverrides?.userProfile?.language;
+
   return {
     sessionId,
-    userProfile: requestOverrides?.userProfile,
-    location: requestOverrides?.location,
-    systemState: requestOverrides?.systemState,
+    userProfile: language !== undefined ? { language } : undefined,
     dataProvenance: [],
   };
-}
-
-function formatLocation(city?: string, bundesland?: string): string | undefined {
-  if (city && bundesland) return `${city}, ${bundesland}`;
-  return city ?? bundesland;
 }

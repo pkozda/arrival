@@ -47,7 +47,10 @@ describe('resolveExecutionContext', () => {
 
     expect(result.context.profileId).toBe(result.profile?.id);
     expect(result.context.profileVersion).toBe(2);
-    expect(result.context.userProfile?.income).toBe(2500);
+    expect(result.context.userProfile).toEqual({ language: 'de' });
+    expect(result.context.userProfile?.income).toBeUndefined();
+    expect(result.context.systemState).toBeUndefined();
+    expect(result.context.location).toBeUndefined();
     expect(result.context.profileSlice?.employment).toEqual(
       expect.objectContaining({
         taxClass: 1,
@@ -72,8 +75,11 @@ describe('resolveExecutionContext', () => {
       expect.arrayContaining([
         { field: 'grossIncome', source: 'profile' },
         { field: 'monthlyRent', source: 'profile' },
-        { field: 'userProfile.income', source: 'profile' },
+        { field: 'userProfile.language', source: 'profile' },
       ])
+    );
+    expect(result.context.dataProvenance).not.toEqual(
+      expect.arrayContaining([{ field: 'userProfile.income', source: 'profile' }])
     );
 
     expect(result.trace.sessionId).toBe(sessionId);

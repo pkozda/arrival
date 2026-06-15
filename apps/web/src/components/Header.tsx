@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useApp } from './AppProvider';
-import type { SupportedLanguage } from '@arrivalos/core';
+import { PRODUCT_NAME, type SupportedLanguage } from '@arrivalos/core';
 
 const NAV_ITEMS = [
   { href: '/modules/financial-reality', key: 'nav.financial', icon: '€' },
@@ -81,7 +81,7 @@ export function Header() {
       <header className="header">
         <div className="header-inner container">
           <Link href="/" className="header-logo">
-            <span className="header-logo-title">ArrivalOS</span>
+            <span className="header-logo-title">{PRODUCT_NAME}</span>
             <span className="header-logo-version">v0.1</span>
           </Link>
 

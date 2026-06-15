@@ -1,4 +1,4 @@
-# ArrivalOS Platform Architecture Audit
+# Arrive Atlas Platform Architecture Audit
 
 **Date:** June 2026  
 **Auditor role:** Principal Platform Architect  
@@ -18,7 +18,7 @@
 
 ## Executive Summary
 
-ArrivalOS has successfully evolved from a **single financial calculator** into a **modular decision platform** with a credible vertical slice: Profile Engine → Policy → Input Merge → Trace → Module execution, backed by a substantial Financial v2 engine and a thin Benefits Simulator orchestration layer.
+Arrive Atlas has successfully evolved from a **single financial calculator** into a **modular decision platform** with a credible vertical slice: Profile Engine → Policy → Input Merge → Trace → Module execution, backed by a substantial Financial v2 engine and a thin Benefits Simulator orchestration layer.
 
 That slice is **not yet a migrant operating system**. The platform can scale **within the financial/benefits corridor** with disciplined refactors. Scaling across Housing, Employment, Healthcare, and Knowledge as first-class domains will fail without structural changes — not because the module contract is wrong, but because **shared ownership, package boundaries, and cross-domain abstractions are immature**.
 
@@ -525,7 +525,7 @@ Per `system-translation-v2.md`, SUE requires:
 | **Migration cost** | **Medium** — phased extraction over MVP→Beta |
 | **Operational complexity** | **Medium** — bounded; event infra only where cross-domain needed |
 
-**Fit:** **Best match** for ArrivalOS migrant OS trajectory.
+**Fit:** **Best match** for Arrive Atlas migrant OS trajectory.
 
 ---
 
@@ -699,7 +699,7 @@ Priority is **boundary integrity and financial trust**, not new domains.
 |-------|---------|
 | 80–100 | Production migrant OS platform |
 | 60–79 | Beta-ready multi-domain platform with known gaps |
-| 40–59 | **← ArrivalOS is here** — credible single-domain platform, multi-domain needs structural work |
+| 40–59 | **← Arrive Atlas is here** — credible single-domain platform, multi-domain needs structural work |
 | 20–39 | Prototype |
 | 0–19 | Demo |
 
@@ -713,7 +713,7 @@ Priority is **boundary integrity and financial trust**, not new domains.
 
 ## 11. Conclusion
 
-ArrivalOS has made the **right foundational bets**: module registry, typed execution context, profile engine with policy and trace, and financial engine depth. The Benefits Simulator proves the **orchestrator-over-domain-engine** pattern works.
+Arrive Atlas has made the **right foundational bets**: module registry, typed execution context, profile engine with policy and trace, and financial engine depth. The Benefits Simulator proves the **orchestrator-over-domain-engine** pattern works.
 
 The platform **will not scale** to a multi-domain migrant operating system if development continues on the current trajectory — especially profile importing financial code, `shared-services` absorbing every new domain, and content modules shipping without platform governance.
 

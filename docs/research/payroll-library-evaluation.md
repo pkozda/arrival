@@ -59,7 +59,7 @@ Plausible for €2,500 gross, Steuerklasse I.
 | **Years** | 2025, 2026 |
 
 **Pros:** Most complete maintained solution; Finanzfluss production usage; Zod types.  
-**Cons:** **AGPL-3.0 requires source disclosure for network services** — incompatible with closed/private ArrivalOS deployment without legal review.
+**Cons:** **AGPL-3.0 requires source disclosure for network services** — incompatible with closed/private Arrive Atlas deployment without legal review.
 
 **Decision:** Rejected for licensing reasons.
 

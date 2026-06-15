@@ -16,7 +16,7 @@
 
 ## Executive Summary
 
-ArrivalOS currently operates with **intentional dual heritage** in `AppContext`: Profile Engine fields (`profileSlice`, `profileId`, `profileVersion`, `dataProvenance`) coexist with legacy shapes (`userProfile`, `systemState`). The Profile Engine **writes** legacy fields from `ProfileDocument` in `buildAppContext()`, but modules **read** them inconsistently.
+Arrive Atlas currently operates with **intentional dual heritage** in `AppContext`: Profile Engine fields (`profileSlice`, `profileId`, `profileVersion`, `dataProvenance`) coexist with legacy shapes (`userProfile`, `systemState`). The Profile Engine **writes** legacy fields from `ProfileDocument` in `buildAppContext()`, but modules **read** them inconsistently.
 
 **Critical finding:** `financial-reality` reads `systemState.insurance` and `systemState.benefits`, but its **module policy excludes `insurance` and `benefits` domains** from the policy-constrained document. Those `systemState` fields are therefore **always undefined** when profile is loaded — admin rules fall back to hardcoded defaults (`hasHealthInsurance: true`, `daysInGermany: 0`). This is not merely redundant data; it is **silent data loss**.
 

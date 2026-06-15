@@ -29,6 +29,14 @@ export const SystemTranslationOutputSchema = z.object({
 export type SystemTranslationInput = z.infer<typeof SystemTranslationInputSchema>;
 export type SystemTranslationOutput = z.infer<typeof SystemTranslationOutputSchema>;
 
+export function resolveSystemTranslationLanguage(context: AppContext): string {
+  const preferredLanguage = (
+    context.profileSlice as { preferredLanguage?: string } | undefined
+  )?.preferredLanguage;
+
+  return preferredLanguage ?? context.userProfile?.language ?? 'en';
+}
+
 export const systemTranslationModule: Module<SystemTranslationInput, SystemTranslationOutput> = {
   id: 'system-translation',
   name: 'System Translation Module',
@@ -38,7 +46,9 @@ export const systemTranslationModule: Module<SystemTranslationInput, SystemTrans
   outputSchema: SystemTranslationOutputSchema,
 
   async execute(input, context: AppContext): Promise<SystemTranslationOutput> {
-    const language = context.userProfile?.language ?? 'en';
+    const language = resolveSystemTranslationLanguage(context) as Parameters<
+      typeof translateTerm
+    >[1];
 
     if (input.mode === 'lookup') {
       const entry = translateTerm(input.query, language);
