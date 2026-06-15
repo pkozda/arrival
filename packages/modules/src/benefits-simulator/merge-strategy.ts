@@ -1,12 +1,16 @@
-import type { ProfileDocument } from '../types/profile-document.js';
+import type {
+  MergeModuleInputParams,
+  MergeModuleInputResult,
+  ModuleMergeStrategy,
+  ProfileDocument,
+} from '@arrivalos/profile';
 import type { Employment } from '@arrivalos/shared-services';
-import { buildHouseholdFromLegacy, resolveEmploymentsForLegacyInput } from '@arrivalos/shared-services';
+import {
+  buildHouseholdFromLegacy,
+  resolveEmploymentsForLegacyInput,
+} from '@arrivalos/shared-services';
 
-/**
- * Merge profile-derived defaults into benefits-simulator request input.
- * Called from mergeModuleInput — module never reads profile directly.
- */
-export function mergeBenefitsSimulatorInputFromProfile(
+function mergeBenefitsSimulatorInputFromProfile(
   requestInput: Record<string, unknown>,
   profile: ProfileDocument | null
 ): Record<string, unknown> {
@@ -79,7 +83,7 @@ export function mergeBenefitsSimulatorInputFromProfile(
   };
 }
 
-export function ensureBenefitsSimulatorEmployments(
+function ensureBenefitsSimulatorEmployments(
   merged: Record<string, unknown>
 ): Record<string, unknown> {
   const household = merged.household as { members?: Array<{ id: string }> } | undefined;
@@ -99,3 +103,34 @@ export function ensureBenefitsSimulatorEmployments(
     baselineEmployments: defaults,
   };
 }
+
+export const benefitsSimulatorMergeStrategy: ModuleMergeStrategy = {
+  moduleId: 'benefits-simulator',
+
+  merge(params: MergeModuleInputParams): MergeModuleInputResult {
+    const requestInput = params.requestInput ?? {};
+    const requestOverrides = params.requestOverrides ?? {};
+    const profile = params.profile ?? null;
+
+    const profileMerged = mergeBenefitsSimulatorInputFromProfile(requestInput, profile);
+    const merged = ensureBenefitsSimulatorEmployments({
+      ...profileMerged,
+      ...requestOverrides,
+    });
+    const provenance: MergeModuleInputResult['provenance'] = [];
+
+    if (profile && !requestInput.household && merged.household) {
+      provenance.push({ field: 'household', source: 'profile' });
+    }
+    if (profile && !requestInput.baselineEmployments && merged.baselineEmployments) {
+      provenance.push({ field: 'baselineEmployments', source: 'profile' });
+    }
+    for (const [field, value] of Object.entries(requestInput)) {
+      if (value !== undefined) {
+        provenance.push({ field, source: 'input' });
+      }
+    }
+
+    return { merged, provenance };
+  },
+};

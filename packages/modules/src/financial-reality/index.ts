@@ -9,6 +9,7 @@ import {
   financialPipeline,
   type LegacyFinancialInput,
 } from '@arrivalos/shared-services';
+import { resolveFinancialProfileContext } from './profile-context.js';
 
 // ─── v1 schemas (unchanged contract) ─────────────────────────────────────────
 
@@ -102,13 +103,18 @@ async function executeV1(
     input.monthlyRent
   );
 
+  const { hasHealthInsurance, daysInGermany } = resolveFinancialProfileContext(
+    context,
+    input as Record<string, unknown>
+  );
+
   const ruleData = {
     netIncome: taxResult.netIncome,
     employmentStatus: input.employmentStatus,
     maritalStatus: input.maritalStatus,
     taxClass: input.taxClass,
-    hasHealthInsurance: context.systemState?.insurance?.hasCoverage ?? true,
-    daysInGermany: context.systemState?.benefits?.daysInGermany ?? 0,
+    hasHealthInsurance,
+    daysInGermany,
   };
 
   const rules = germanAdminRules.evaluate(ruleData);
@@ -185,13 +191,18 @@ async function executeV2(
     proposedGrossIncome: input.proposedGrossIncome,
   };
 
+  const { hasHealthInsurance, daysInGermany } = resolveFinancialProfileContext(
+    context,
+    input as Record<string, unknown>
+  );
+
   const ruleData = {
     netIncome: input.grossIncome,
     employmentStatus: input.employmentStatus,
     maritalStatus: input.maritalStatus,
     taxClass: input.taxClass,
-    hasHealthInsurance: context.systemState?.insurance?.hasCoverage ?? true,
-    daysInGermany: context.systemState?.benefits?.daysInGermany ?? 0,
+    hasHealthInsurance,
+    daysInGermany,
   };
   const rules = germanAdminRules.evaluate(ruleData);
 

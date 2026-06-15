@@ -45,8 +45,15 @@ describe('profile vertical slice (Phase 0)', () => {
     expect(fromProfile.mergedInput.grossIncome).toBe(2500);
     expect(fromProfile.mergedInput.monthlyRent).toBe(800);
     expect(fromProfile.context.userProfile?.income).toBe(2500);
-    expect(fromProfile.context.systemState?.benefits?.daysInGermany).toBeUndefined();
-    expect(fromProfile.context.systemState?.insurance?.hasCoverage).toBeUndefined();
+    expect(fromProfile.context.profileSlice?.insurance).toEqual({
+      hasCoverage: true,
+      type: 'public',
+    });
+    expect(fromProfile.context.profileSlice?.benefits).toEqual({
+      daysInGermany: 120,
+    });
+    expect(fromProfile.profileSlice?.insurance?.hasCoverage).toBe(true);
+    expect(fromProfile.profileSlice?.benefits?.daysInGermany).toBe(120);
 
     const withOverride = await resolveExecutionContext(engine, {
       sessionId,

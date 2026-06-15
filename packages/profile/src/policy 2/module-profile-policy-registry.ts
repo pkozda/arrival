@@ -9,7 +9,15 @@ export type ModuleProfilePolicy = {
 
 export const FINANCIAL_REALITY_POLICY: ModuleProfilePolicy = {
   moduleId: 'financial-reality',
-  allowedFields: ['preferredLanguage', 'employment', 'household', 'housing', 'location'],
+  allowedFields: [
+    'preferredLanguage',
+    'employment',
+    'household',
+    'housing',
+    'location',
+    'insurance',
+    'benefits',
+  ],
   sensitiveFields: ['employment.grossMonthlyIncome', 'housing.monthlyColdRent'],
   allowExtensions: true,
   allowedExtensions: ['financial-reality'],
