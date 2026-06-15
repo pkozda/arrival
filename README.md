@@ -1,14 +1,14 @@
-# ArrivalOS
+# Arrive Atlas
 
-> A modular decision-support platform for migrants in Germany
+> Your integration and life navigation system
 
-ArrivalOS transforms complex administrative, financial, and healthcare structures into **actionable decisions** and **scenario-based guidance**.
+Arrive Atlas transforms complex administrative, financial, and healthcare structures into **actionable decisions** and **scenario-based guidance**.
 
 ---
 
-## What is ArrivalOS?
+## What is Arrive Atlas?
 
-Moving to Germany means navigating a dense web of institutions — Jobcenter, Krankenkasse, Finanzamt — each with its own rules, deadlines, and terminology. ArrivalOS doesn't just deliver information; it helps you **decide what to do next**.
+Moving to Germany means navigating a dense web of institutions — Jobcenter, Krankenkasse, Finanzamt — each with its own rules, deadlines, and terminology. Arrive Atlas doesn't just deliver information; it helps you **decide what to do next**.
 
 | Principle | Meaning |
 |-----------|---------|
@@ -251,7 +251,7 @@ export const myModule: Module<MyInput, MyOutput> = {
 
 ## Long-Term Vision
 
-ArrivalOS evolves into a **life operating system** for migrants in Europe:
+Arrive Atlas evolves into a **life operating system** for migrants in Europe:
 
 - Financial decision intelligence
 - Healthcare navigation

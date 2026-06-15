@@ -11,7 +11,7 @@
 
 ## Executive Summary
 
-The Financial Reality Module is the highest-priority MVP module in ArrivalOS. Today it functions as a **single-person gross-to-net calculator** with a **highly simplified Bürgergeld gap estimate** and four hardcoded decision heuristics. It is architecturally well-placed inside the modular platform but **not trustworthy for real-world migrant decision support**.
+The Financial Reality Module is the highest-priority MVP module in Arrive Atlas. Today it functions as a **single-person gross-to-net calculator** with a **highly simplified Bürgergeld gap estimate** and four hardcoded decision heuristics. It is architecturally well-placed inside the modular platform but **not trustworthy for real-world migrant decision support**.
 
 This document:
 

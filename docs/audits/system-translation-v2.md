@@ -13,7 +13,7 @@
 
 ## Executive Summary
 
-ArrivalOS today offers a **glossary-based System Translation Module**: 8 static German terms with flat definitions and weak `relatedTerms` links. It answers *"What does this word mean?"* but not *"How does this concept affect my life?"*
+Arrive Atlas today offers a **glossary-based System Translation Module**: 8 static German terms with flat definitions and weak `relatedTerms` links. It answers *"What does this word mean?"* but not *"How does this concept affect my life?"*
 
 This document proposes redesigning the module into a **System Understanding Engine (SUE)** — a structured knowledge system for migrants navigating German administrative, financial, and social systems.
 
@@ -70,7 +70,7 @@ TranslationEntry {
 | Strength | Value |
 |----------|-------|
 | Multilingual foundation | 4 languages wired (DE/EN/RU/UA) |
-| Category taxonomy | 6 domains align with ArrivalOS modules |
+| Category taxonomy | 6 domains align with Arrive Atlas modules |
 | Module isolation | Clean `Module.execute()` boundary |
 | Deterministic | No LLM; predictable outputs |
 | Related terms hint | Nascent graph potential |
@@ -828,7 +828,7 @@ New subsystem: `@arrivalos/shared-services/knowledge`
 
 ## Verdict
 
-System Translation v1 is a **necessary but insufficient** layer for ArrivalOS's decision-support mission. The platform already produces rich **scenario signals** (Benefits Simulator) and **profile context** (Profile Engine) — but the glossary cannot connect them.
+System Translation v1 is a **necessary but insufficient** layer for Arrive Atlas's decision-support mission. The platform already produces rich **scenario signals** (Benefits Simulator) and **profile context** (Profile Engine) — but the glossary cannot connect them.
 
 System Understanding Engine v2 closes that gap with a **deterministic concept graph** that transforms terms into actionable knowledge paths, using simulator outputs as the scenario layer without duplicating financial engines.
 

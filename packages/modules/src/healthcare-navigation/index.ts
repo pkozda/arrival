@@ -39,6 +39,14 @@ export const HealthcareNavigationOutputSchema = z.object({
 export type HealthcareNavigationInput = z.infer<typeof HealthcareNavigationInputSchema>;
 export type HealthcareNavigationOutput = z.infer<typeof HealthcareNavigationOutputSchema>;
 
+export function resolveHealthcareNavigationLanguage(context: AppContext): string {
+  const preferredLanguage = (
+    context.profileSlice as { preferredLanguage?: string } | undefined
+  )?.preferredLanguage;
+
+  return preferredLanguage ?? context.userProfile?.language ?? 'en';
+}
+
 const SCENARIOS: Record<
   HealthcareNavigationInput['situation'],
   (input: HealthcareNavigationInput, lang: string) => HealthcareNavigationOutput
@@ -214,7 +222,7 @@ export const healthcareNavigationModule: Module<HealthcareNavigationInput, Healt
   outputSchema: HealthcareNavigationOutputSchema,
 
   async execute(input, context: AppContext): Promise<HealthcareNavigationOutput> {
-    const lang = context.userProfile?.language ?? 'en';
+    const lang = resolveHealthcareNavigationLanguage(context);
     const handler = SCENARIOS[input.situation];
     const result = handler(input, lang);
 

@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { PRODUCT_NAME, PRODUCT_TAGLINE } from '@arrivalos/core';
 import { AppProvider } from '@/components/AppProvider';
 import { ThemeScript } from '@/components/ThemeScript';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'ArrivalOS — Decision Support for Migrants in Germany',
-  description: 'Transform complex administrative, financial, and healthcare structures into actionable decisions',
+  title: `${PRODUCT_NAME} — Decision Support for Migrants in Germany`,
+  description: PRODUCT_TAGLINE,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

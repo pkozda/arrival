@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-ArrivalOS today passes a **minimal, ephemeral `AppContext`** into every module execution. Profile data is fragmented across three places that do not share a schema:
+Arrive Atlas today passes a **minimal, ephemeral `AppContext`** into every module execution. Profile data is fragmented across three places that do not share a schema:
 
 1. **`AppContext.userProfile`** — four optional fields (`language`, `residencyStatus`, `income`, `householdSize`)
 2. **`AppContext.systemState`** — untyped `Record<string, unknown>` buckets for benefits, insurance, employment

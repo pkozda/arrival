@@ -15,7 +15,7 @@
 
 ## Executive Summary
 
-ArrivalOS has evolved from a prototype financial calculator into a **layered decision platform** with profile merge, policy enforcement, execution traceability, dual financial modules, and **100 automated tests** (78 unique — see §1.3). The **critical Minijob/Midijob routing defect** identified in the June 2026 validation report has been **fixed and regression-protected**. Benefits Simulator adds **12 golden scenario fixtures** with exact-value assertions.
+Arrive Atlas has evolved from a prototype financial calculator into a **layered decision platform** with profile merge, policy enforcement, execution traceability, dual financial modules, and **100 automated tests** (78 unique — see §1.3). The **critical Minijob/Midijob routing defect** identified in the June 2026 validation report has been **fixed and regression-protected**. Benefits Simulator adds **12 golden scenario fixtures** with exact-value assertions.
 
 However, **significant simplifications remain** in the benefits and household models (KdU caps, Kindergeld imputation, child ages, self-employed heuristic, default Bundesland). **Decision engine and scenario comparator have zero direct unit tests.** Financial Reality lacks golden fixtures. There is **no API integration test for Benefits Simulator** and **no end-to-end browser tests**.
 
@@ -453,7 +453,7 @@ The following **must be true** before exposing the platform to real migrants (ev
 
 ## 10. Conclusion
 
-The ArrivalOS financial platform has **crossed a critical threshold**: the Minijob/Midijob routing defect that blocked user testing in June 2026 is **fixed and regression-locked**, and Benefits Simulator adds **production-quality golden scenario protection** for life-transition modeling.
+The Arrive Atlas financial platform has **crossed a critical threshold**: the Minijob/Midijob routing defect that blocked user testing in June 2026 is **fixed and regression-locked**, and Benefits Simulator adds **production-quality golden scenario protection** for life-transition modeling.
 
 The platform is **not yet safe for unsupervised, authoritative financial guidance** due to:
 
