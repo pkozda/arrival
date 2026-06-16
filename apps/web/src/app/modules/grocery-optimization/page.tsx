@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { ModuleLayout } from '@/components/ModuleLayout';
 import { ResultPanel } from '@/components/ResultPanel';
+import { ModuleResultRenderer } from '@/components/ModuleResultRenderer';
 import { executeModule } from '@/lib/api';
+import { useModuleSnapshot, toModuleResult } from '@/lib/snapshot';
 import { useApp } from '@/components/AppProvider';
 
 interface GroceryResult {
@@ -32,10 +34,13 @@ interface GroceryResult {
 }
 
 export default function GroceryOptimizationPage() {
-  const { sessionId, language, t } = useApp();
+  const { sessionId, language, t, refreshUiSnapshot } = useApp();
+  const uiState = useModuleSnapshot('grocery-optimization');
+  const input = uiState.input;
+  const result = uiState.result as GroceryResult | null;
+  const moduleResult = toModuleResult<GroceryResult>('grocery-optimization', uiState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
-  const [result, setResult] = useState<GroceryResult | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,22 +48,22 @@ export default function GroceryOptimizationPage() {
     setError(undefined);
 
     const form = new FormData(e.currentTarget);
-    const input = {
+    const submitInput = {
       monthlyBudget: Number(form.get('monthlyBudget')),
       householdSize: Number(form.get('householdSize')),
     };
 
     try {
-      const res = await executeModule(
+      const res = await executeModule<typeof submitInput, GroceryResult>(
         'grocery-optimization',
-        input,
+        submitInput,
         { userProfile: { language } },
         sessionId ?? undefined
       );
       if (!res.success) {
         setError(res.error ?? t('common.error'));
       } else {
-        setResult(res.data as GroceryResult);
+        await refreshUiSnapshot();
       }
     } catch {
       setError(t('common.error'));
@@ -70,21 +75,26 @@ export default function GroceryOptimizationPage() {
   return (
     <ModuleLayout titleKey="grocery.title" descKey="grocery.description">
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.5rem' }}>
-        <form className="card" onSubmit={handleSubmit}>
+        <form
+          key={`grocery-optimization-${uiState.snapshotVersion}`}
+          className="card"
+          onSubmit={handleSubmit}
+        >
           <div className="form-group">
             <label htmlFor="monthlyBudget">Monthly food budget (€)</label>
-            <input id="monthlyBudget" name="monthlyBudget" type="number" defaultValue={300} min={50} required />
+            <input id="monthlyBudget" name="monthlyBudget" type="number" defaultValue={Number(input.monthlyBudget)} min={50} required />
           </div>
           <div className="form-group">
             <label htmlFor="householdSize">Household size</label>
-            <input id="householdSize" name="householdSize" type="number" defaultValue={1} min={1} required />
+            <input id="householdSize" name="householdSize" type="number" defaultValue={Number(input.householdSize)} min={1} required />
           </div>
-          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%' }}>
+          <button type="submit" className="btn btn-primary" disabled={loading || uiState.isStale} style={{ width: '100%' }}>
             {loading ? t('common.loading') : t('common.submit')}
           </button>
         </form>
 
-        <ResultPanel loading={loading} error={error}>
+        <ResultPanel loading={loading || uiState.isStale} error={error}>
+          <ModuleResultRenderer result={moduleResult}>
           {result && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="card">
@@ -139,6 +149,7 @@ export default function GroceryOptimizationPage() {
               ))}
             </div>
           )}
+          </ModuleResultRenderer>
         </ResultPanel>
       </div>
     </ModuleLayout>

@@ -1,7 +1,15 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import { createSession, fetchTranslations } from '@/lib/api';
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from 'react';
+import { ensureSession, fetchTranslations, fetchUiSnapshot, type UiSnapshot } from '@/lib/api';
 import type { SupportedLanguage } from '@arrivalos/core';
 
 export type Theme = 'light' | 'dark';
@@ -10,7 +18,11 @@ interface AppState {
   language: SupportedLanguage;
   theme: Theme;
   sessionId: string | null;
+  uiSnapshot: UiSnapshot | null;
+  uiSnapshotLoading: boolean;
+  uiSnapshotError: string | null;
   translations: Record<string, string>;
+  refreshUiSnapshot: () => Promise<void>;
   setLanguage: (lang: SupportedLanguage) => void;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
@@ -30,7 +42,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<SupportedLanguage>('en');
   const [theme, setThemeState] = useState<Theme>('dark');
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [uiSnapshot, setUiSnapshot] = useState<UiSnapshot | null>(null);
+  const [uiSnapshotLoading, setUiSnapshotLoading] = useState(true);
+  const [uiSnapshotError, setUiSnapshotError] = useState<string | null>(null);
   const [translations, setTranslations] = useState<Record<string, string>>({});
+
+  const lastAppliedSnapshotVersionRef = useRef(-1);
+  const snapshotFetchGenerationRef = useRef(0);
+
+  const applySnapshotIfNewer = useCallback((snapshot: UiSnapshot): boolean => {
+    if (snapshot.snapshotVersion > lastAppliedSnapshotVersionRef.current) {
+      lastAppliedSnapshotVersionRef.current = snapshot.snapshotVersion;
+      setUiSnapshot(snapshot);
+      return true;
+    }
+    return false;
+  }, []);
 
   useEffect(() => {
     setThemeState(getInitialTheme());
@@ -42,14 +69,74 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   useEffect(() => {
-    createSession({ userProfile: { language } })
+    ensureSession({ userProfile: { language } })
       .then(setSessionId)
       .catch(console.error);
   }, []);
 
   useEffect(() => {
+    if (!sessionId) {
+      return;
+    }
+
+    const requestId = ++snapshotFetchGenerationRef.current;
+    let cancelled = false;
+
+    setUiSnapshotLoading(true);
+    setUiSnapshotError(null);
+
+    fetchUiSnapshot(sessionId)
+      .then((snapshot) => {
+        if (cancelled || requestId !== snapshotFetchGenerationRef.current) {
+          return;
+        }
+        applySnapshotIfNewer(snapshot);
+        setUiSnapshotLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (cancelled || requestId !== snapshotFetchGenerationRef.current) {
+          return;
+        }
+        setUiSnapshot(null);
+        setUiSnapshotError(err instanceof Error ? err.message : 'Failed to load snapshot');
+        setUiSnapshotLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId, applySnapshotIfNewer]);
+
+  useEffect(() => {
     fetchTranslations(language).then(setTranslations).catch(console.error);
   }, [language]);
+
+  const refreshUiSnapshot = useCallback(async () => {
+    if (!sessionId) return;
+
+    const requestId = ++snapshotFetchGenerationRef.current;
+
+    setUiSnapshotLoading(true);
+    setUiSnapshotError(null);
+
+    try {
+      const snapshot = await fetchUiSnapshot(sessionId);
+      if (requestId !== snapshotFetchGenerationRef.current) {
+        return;
+      }
+      applySnapshotIfNewer(snapshot);
+    } catch (err: unknown) {
+      if (requestId !== snapshotFetchGenerationRef.current) {
+        return;
+      }
+      setUiSnapshotError(err instanceof Error ? err.message : 'Failed to refresh snapshot');
+      // Degrade gracefully: keep existing snapshot and version cursor.
+    } finally {
+      if (requestId === snapshotFetchGenerationRef.current) {
+        setUiSnapshotLoading(false);
+      }
+    }
+  }, [sessionId, applySnapshotIfNewer]);
 
   const setLanguage = useCallback((lang: SupportedLanguage) => {
     setLanguageState(lang);
@@ -73,7 +160,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       language,
       theme,
       sessionId,
+      uiSnapshot,
+      uiSnapshotLoading,
+      uiSnapshotError,
       translations,
+      refreshUiSnapshot,
       setLanguage,
       setTheme,
       toggleTheme,

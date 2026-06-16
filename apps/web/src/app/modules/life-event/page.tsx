@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { ModuleLayout } from '@/components/ModuleLayout';
 import { ResultPanel } from '@/components/ResultPanel';
+import { ModuleResultRenderer } from '@/components/ModuleResultRenderer';
 import { executeModule } from '@/lib/api';
+import { useModuleSnapshot, toModuleResult } from '@/lib/snapshot';
 import { useApp } from '@/components/AppProvider';
 
 interface LifeEventResult {
@@ -33,10 +35,18 @@ interface LifeEventResult {
 }
 
 export default function LifeEventPage() {
-  const { sessionId, language, t } = useApp();
+  const { sessionId, language, t, refreshUiSnapshot } = useApp();
+  const uiState = useModuleSnapshot('life-event');
+  const input = uiState.input;
+  const currentStatus = input.currentStatus as {
+    employed: boolean;
+    insured: boolean;
+    registered: boolean;
+  };
+  const result = uiState.result as LifeEventResult | null;
+  const moduleResult = toModuleResult<LifeEventResult>('life-event', uiState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
-  const [result, setResult] = useState<LifeEventResult | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -44,7 +54,7 @@ export default function LifeEventPage() {
     setError(undefined);
 
     const form = new FormData(e.currentTarget);
-    const input = {
+    const submitInput = {
       event: form.get('event') as string,
       timeline: form.get('timeline') as string,
       currentStatus: {
@@ -55,16 +65,16 @@ export default function LifeEventPage() {
     };
 
     try {
-      const res = await executeModule(
+      const res = await executeModule<typeof submitInput, LifeEventResult>(
         'life-event',
-        input,
+        submitInput,
         { userProfile: { language } },
         sessionId ?? undefined
       );
       if (!res.success) {
         setError(res.error ?? t('common.error'));
       } else {
-        setResult(res.data as LifeEventResult);
+        await refreshUiSnapshot();
       }
     } catch {
       setError(t('common.error'));
@@ -82,10 +92,14 @@ export default function LifeEventPage() {
   return (
     <ModuleLayout titleKey="lifeEvent.title" descKey="lifeEvent.description">
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.5rem' }}>
-        <form className="card" onSubmit={handleSubmit}>
+        <form
+          key={`life-event-${uiState.snapshotVersion}`}
+          className="card"
+          onSubmit={handleSubmit}
+        >
           <div className="form-group">
             <label htmlFor="event">Life event</label>
-            <select id="event" name="event" defaultValue="arrival">
+            <select id="event" name="event" defaultValue={String(input.event)}>
               <option value="arrival">Arriving in Germany</option>
               <option value="job-change">Job change</option>
               <option value="job-loss">Job loss</option>
@@ -98,7 +112,7 @@ export default function LifeEventPage() {
           </div>
           <div className="form-group">
             <label htmlFor="timeline">Timeline</label>
-            <select id="timeline" name="timeline" defaultValue="planning">
+            <select id="timeline" name="timeline" defaultValue={String(input.timeline)}>
               <option value="immediate">Immediate</option>
               <option value="within-month">Within a month</option>
               <option value="within-3-months">Within 3 months</option>
@@ -111,22 +125,23 @@ export default function LifeEventPage() {
             </legend>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-                <input name="registered" type="checkbox" /> Registered (Anmeldung)
+                <input name="registered" type="checkbox" defaultChecked={currentStatus.registered} /> Registered (Anmeldung)
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-                <input name="insured" type="checkbox" /> Health insurance active
+                <input name="insured" type="checkbox" defaultChecked={currentStatus.insured} /> Health insurance active
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-                <input name="employed" type="checkbox" /> Currently employed
+                <input name="employed" type="checkbox" defaultChecked={currentStatus.employed} /> Currently employed
               </label>
             </div>
           </fieldset>
-          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%' }}>
+          <button type="submit" className="btn btn-primary" disabled={loading || uiState.isStale} style={{ width: '100%' }}>
             {loading ? t('common.loading') : t('common.submit')}
           </button>
         </form>
 
-        <ResultPanel loading={loading} error={error}>
+        <ResultPanel loading={loading || uiState.isStale} error={error}>
+          <ModuleResultRenderer result={moduleResult}>
           {result && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="card">
@@ -191,6 +206,7 @@ export default function LifeEventPage() {
               )}
             </div>
           )}
+          </ModuleResultRenderer>
         </ResultPanel>
       </div>
     </ModuleLayout>

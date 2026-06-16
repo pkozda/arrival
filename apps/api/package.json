@@ -15,6 +15,7 @@
     "@arrivalos/modules": "*",
     "@arrivalos/profile": "*",
     "@arrivalos/shared-services": "*",
+    "@arrivalos/ux": "*",
     "@fastify/cors": "^10.0.2",
     "fastify": "^5.2.1",
     "zod": "^3.24.1"
