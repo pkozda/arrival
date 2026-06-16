@@ -8,6 +8,7 @@ import {
   toUIProfileResponse,
 } from '@arrivalos/profile';
 import { profileEngine } from '../profile-runtime.js';
+import { recordSnapshotMutation } from '../snapshot-version-store.js';
 
 function getSessionId(request: FastifyRequest): string | undefined {
   const header = request.headers['x-session-id'];
@@ -38,6 +39,7 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
     if (sessionId) {
       await profileEngine.bindSession(sessionId, profile.id);
       updateSessionContext(sessionId, { profileId: profile.id });
+      recordSnapshotMutation(sessionId, `profile-create:${profile.id}`);
     }
 
     return reply.status(201).send(toUIProfileResponse(profile));
@@ -83,6 +85,7 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
         patch,
         expectedRevision
       );
+      recordSnapshotMutation(sessionId, `profile-update:${profile.id}:${updated.revision}`);
       return toUIProfileResponse(updated);
     } catch (error) {
       if (error instanceof ProfileRevisionConflictError) {

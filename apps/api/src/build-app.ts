@@ -14,10 +14,16 @@ import { resolveExecutionContext } from '@arrivalos/profile';
 import { registerAllModules } from '@arrivalos/modules';
 import { profileEngine } from './profile-runtime.js';
 import { registerProfileRoutes } from './routes/profile.js';
+import { registerUiSnapshotRoutes } from './routes/ui-snapshot.js';
 import {
   getLastExecutionTrace,
   storeExecutionTrace,
 } from './execution-trace-store.js';
+import { randomUUID } from 'node:crypto';
+import { storeModuleExecution } from './module-execution-store.js';
+import { activateProfileFromModuleExecution } from './profile-activation.js';
+import { recordSnapshotMutation } from './snapshot-version-store.js';
+import { attachUxToExecutionResult } from './ux-integration.js';
 
 let modulesRegistered = false;
 
@@ -103,7 +109,37 @@ export async function buildApp(options: { logger?: boolean } = {}) {
     if (!result.success) {
       return reply.status(422).send(result);
     }
-    return result;
+
+    if (sessionId && result.data !== undefined) {
+      const executionId = randomUUID();
+      const snapshotVersion = recordSnapshotMutation(sessionId, executionId);
+      storeModuleExecution(
+        sessionId,
+        id,
+        result.data,
+        result.executedAt,
+        executionId,
+        snapshotVersion
+      );
+    }
+
+    if (sessionId) {
+      try {
+        const profileActivated = await activateProfileFromModuleExecution(
+          sessionId,
+          id,
+          cleanInput,
+          rawContext.userProfile?.language
+        );
+        if (profileActivated) {
+          recordSnapshotMutation(sessionId, `profile:${id}`);
+        }
+      } catch (error) {
+        request.log.warn({ err: error, moduleId: id, sessionId }, 'profile activation failed');
+      }
+    }
+
+    return attachUxToExecutionResult(result);
   });
 
   app.get('/api/modules/:id/trace', async (request, reply) => {
@@ -128,6 +164,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
   });
 
   await registerProfileRoutes(app);
+  await registerUiSnapshotRoutes(app);
 
   app.post('/api/sessions', async (request) => {
     const body = (request.body ?? {}) as Record<string, unknown>;

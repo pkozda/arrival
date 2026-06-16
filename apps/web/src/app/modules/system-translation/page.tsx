@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { ModuleLayout } from '@/components/ModuleLayout';
 import { ResultPanel } from '@/components/ResultPanel';
+import { ModuleResultRenderer } from '@/components/ModuleResultRenderer';
 import { executeModule } from '@/lib/api';
+import { useModuleSnapshot, toModuleResult } from '@/lib/snapshot';
 import { useApp } from '@/components/AppProvider';
 
 interface TranslationResult {
@@ -18,10 +20,13 @@ interface TranslationResult {
 }
 
 export default function SystemTranslationPage() {
-  const { sessionId, language, t } = useApp();
+  const { sessionId, language, t, refreshUiSnapshot } = useApp();
+  const uiState = useModuleSnapshot('system-translation');
+  const input = uiState.input;
+  const result = uiState.result as TranslationResult | null;
+  const moduleResult = toModuleResult<TranslationResult>('system-translation', uiState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
-  const [result, setResult] = useState<TranslationResult | null>(null);
 
   async function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -33,7 +38,7 @@ export default function SystemTranslationPage() {
     const mode = form.get('mode') as string;
 
     try {
-      const res = await executeModule(
+      const res = await executeModule<{ query: string; mode: string }, TranslationResult>(
         'system-translation',
         { query, mode },
         { userProfile: { language } },
@@ -42,7 +47,7 @@ export default function SystemTranslationPage() {
       if (!res.success) {
         setError(res.error ?? t('common.error'));
       } else {
-        setResult(res.data as TranslationResult);
+        await refreshUiSnapshot();
       }
     } catch {
       setError(t('common.error'));
@@ -53,28 +58,34 @@ export default function SystemTranslationPage() {
 
   return (
     <ModuleLayout titleKey="translation.title" descKey="translation.description">
-      <form className="card" onSubmit={handleSearch} style={{ marginBottom: '1.5rem' }}>
+      <form
+        key={`system-translation-${uiState.snapshotVersion}`}
+        className="card"
+        onSubmit={handleSearch}
+        style={{ marginBottom: '1.5rem' }}
+      >
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
             <label htmlFor="query">Search German term</label>
-            <input id="query" name="query" type="text" placeholder="e.g. Anmeldung, Bürgergeld, Steuerklasse" required />
+            <input id="query" name="query" type="text" defaultValue={String(input.query)} placeholder="e.g. Anmeldung, Bürgergeld, Steuerklasse" required />
           </div>
           <div className="form-group" style={{ width: '140px', marginBottom: 0 }}>
             <label htmlFor="mode">Mode</label>
-            <select id="mode" name="mode" defaultValue="search">
+            <select id="mode" name="mode" defaultValue={String(input.mode)}>
               <option value="search">Search</option>
               <option value="lookup">Exact lookup</option>
             </select>
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
+            <button type="submit" className="btn btn-primary" disabled={loading || uiState.isStale}>
               {loading ? '...' : 'Search'}
             </button>
           </div>
         </div>
       </form>
 
-      <ResultPanel loading={loading} error={error}>
+      <ResultPanel loading={loading || uiState.isStale} error={error}>
+        <ModuleResultRenderer result={moduleResult}>
         {result && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {result.contextHint && (
@@ -109,6 +120,7 @@ export default function SystemTranslationPage() {
             ))}
           </div>
         )}
+        </ModuleResultRenderer>
       </ResultPanel>
     </ModuleLayout>
   );

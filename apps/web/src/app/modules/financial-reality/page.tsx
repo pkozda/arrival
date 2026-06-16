@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { ModuleLayout } from '@/components/ModuleLayout';
 import { ResultPanel } from '@/components/ResultPanel';
+import { ModuleResultRenderer } from '@/components/ModuleResultRenderer';
 import { executeModule } from '@/lib/api';
+import { useModuleSnapshot, toModuleResult } from '@/lib/snapshot';
 import { useApp } from '@/components/AppProvider';
 
 interface FinancialResult {
@@ -35,10 +37,13 @@ interface FinancialResult {
 }
 
 export default function FinancialRealityPage() {
-  const { sessionId, language, t } = useApp();
+  const { sessionId, language, t, refreshUiSnapshot } = useApp();
+  const uiState = useModuleSnapshot('financial-reality');
+  const input = uiState.input;
+  const result = uiState.result as FinancialResult | null;
+  const moduleResult = toModuleResult<FinancialResult>('financial-reality', uiState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
-  const [result, setResult] = useState<FinancialResult | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -46,7 +51,7 @@ export default function FinancialRealityPage() {
     setError(undefined);
 
     const form = new FormData(e.currentTarget);
-    const input = {
+    const submitInput = {
       grossIncome: Number(form.get('grossIncome')),
       taxClass: Number(form.get('taxClass')) as 1 | 2 | 3 | 4 | 5 | 6,
       churchTax: form.get('churchTax') === 'on',
@@ -57,16 +62,16 @@ export default function FinancialRealityPage() {
     };
 
     try {
-      const res = await executeModule<typeof input, FinancialResult>(
+      const res = await executeModule<typeof submitInput, FinancialResult>(
         'financial-reality',
-        input,
+        submitInput,
         { userProfile: { language } },
         sessionId ?? undefined
       );
       if (!res.success) {
         setError(res.error ?? t('common.error'));
       } else {
-        setResult(res.data ?? null);
+        await refreshUiSnapshot();
       }
     } catch {
       setError(t('common.error'));
@@ -78,14 +83,18 @@ export default function FinancialRealityPage() {
   return (
     <ModuleLayout titleKey="financial.title" descKey="financial.description">
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-        <form className="card" onSubmit={handleSubmit}>
+        <form
+          key={`financial-reality-${uiState.snapshotVersion}`}
+          className="card"
+          onSubmit={handleSubmit}
+        >
           <div className="form-group">
             <label htmlFor="grossIncome">Gross monthly income (€)</label>
-            <input id="grossIncome" name="grossIncome" type="number" defaultValue={2500} min={0} required />
+            <input id="grossIncome" name="grossIncome" type="number" defaultValue={Number(input.grossIncome)} min={0} required />
           </div>
           <div className="form-group">
             <label htmlFor="taxClass">Steuerklasse</label>
-            <select id="taxClass" name="taxClass" defaultValue="1">
+            <select id="taxClass" name="taxClass" defaultValue={String(input.taxClass)}>
               {[1, 2, 3, 4, 5, 6].map((c) => (
                 <option key={c} value={c}>Class {c}</option>
               ))}
@@ -93,15 +102,15 @@ export default function FinancialRealityPage() {
           </div>
           <div className="form-group">
             <label htmlFor="householdSize">Household size</label>
-            <input id="householdSize" name="householdSize" type="number" defaultValue={1} min={1} required />
+            <input id="householdSize" name="householdSize" type="number" defaultValue={Number(input.householdSize)} min={1} required />
           </div>
           <div className="form-group">
             <label htmlFor="monthlyRent">Monthly rent (€)</label>
-            <input id="monthlyRent" name="monthlyRent" type="number" defaultValue={800} min={0} required />
+            <input id="monthlyRent" name="monthlyRent" type="number" defaultValue={Number(input.monthlyRent)} min={0} required />
           </div>
           <div className="form-group">
             <label htmlFor="employmentStatus">Employment status</label>
-            <select id="employmentStatus" name="employmentStatus" defaultValue="employed">
+            <select id="employmentStatus" name="employmentStatus" defaultValue={String(input.employmentStatus)}>
               <option value="employed">Employed</option>
               <option value="self-employed">Self-employed</option>
               <option value="unemployed">Unemployed</option>
@@ -111,7 +120,7 @@ export default function FinancialRealityPage() {
           </div>
           <div className="form-group">
             <label htmlFor="maritalStatus">Marital status</label>
-            <select id="maritalStatus" name="maritalStatus" defaultValue="single">
+            <select id="maritalStatus" name="maritalStatus" defaultValue={String(input.maritalStatus)}>
               <option value="single">Single</option>
               <option value="married">Married</option>
               <option value="divorced">Divorced</option>
@@ -119,15 +128,16 @@ export default function FinancialRealityPage() {
             </select>
           </div>
           <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <input id="churchTax" name="churchTax" type="checkbox" />
+            <input id="churchTax" name="churchTax" type="checkbox" defaultChecked={Boolean(input.churchTax)} />
             <label htmlFor="churchTax" style={{ margin: 0 }}>Church tax (Kirchensteuer)</label>
           </div>
-          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%' }}>
+          <button type="submit" className="btn btn-primary" disabled={loading || uiState.isStale} style={{ width: '100%' }}>
             {loading ? t('common.loading') : t('common.submit')}
           </button>
         </form>
 
-        <ResultPanel loading={loading} error={error}>
+        <ResultPanel loading={loading || uiState.isStale} error={error}>
+          <ModuleResultRenderer result={moduleResult}>
           {result && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="card">
@@ -182,6 +192,7 @@ export default function FinancialRealityPage() {
               )}
             </div>
           )}
+          </ModuleResultRenderer>
         </ResultPanel>
       </div>
     </ModuleLayout>
