@@ -114,42 +114,6 @@ export class SessionRegistryService {
   async getAccountEvents(accountId: string): Promise<SessionRegistryEvent[]> {
     return this.store.getEventsByAccount(accountId);
   }
-
-  async assertActiveSession(
-    sessionId: string,
-    accountId: string,
-    metadata: SessionRegistrationMetadata = {}
-  ): Promise<AccountSession> {
-    let record = await this.store.getSessionRecord(sessionId);
-
-    if (!record) {
-      record = await this.registerSession(accountId, sessionId, metadata);
-      return record;
-    }
-
-    if (record.accountId !== accountId) {
-      throw new SessionRevokedError(sessionId);
-    }
-
-    if (record.status === 'revoked') {
-      throw new SessionRevokedError(sessionId);
-    }
-
-    const lastSeenAt = nowIso();
-    const updated = await this.store.updateLastSeen(sessionId, lastSeenAt);
-    if (updated) {
-      await this.store.appendEvent(
-        createRegistryEvent({
-          type: 'session.lastSeenUpdated',
-          sessionId,
-          accountId,
-        })
-      );
-      return updated;
-    }
-
-    return record;
-  }
 }
 
 export const sessionRegistryService = new SessionRegistryService();

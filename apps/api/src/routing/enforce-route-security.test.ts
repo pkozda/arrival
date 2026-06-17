@@ -4,7 +4,7 @@ import {
   enforceRouteSecurity,
   evaluateRouteAccess,
   findMatchingRouteRule,
-  UnclassifiedRouteError,
+  RouteSecurityMisconfigurationError,
 } from './enforce-route-security.js';
 import { matchRoute } from './match-route.js';
 import {
@@ -181,6 +181,6 @@ describe('enforceRouteSecurity', () => {
         method: 'GET',
         path: '/api/unknown',
       })
-    ).toThrow(UnclassifiedRouteError);
+    ).toThrow(RouteSecurityMisconfigurationError);
   });
 });

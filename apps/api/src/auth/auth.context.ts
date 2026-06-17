@@ -4,6 +4,7 @@ import {
   resolveAccountFromSession,
 } from '../authz/account-context.js';
 import type { AuthContext, BuildAuthContextResult } from './auth.types.js';
+import { extractLegacySessionId } from './legacy-auth-adapter.js';
 import {
   authTokenService,
   InvalidAuthTokenError,
@@ -37,11 +38,6 @@ function extractBearerToken(request: FastifyRequest): string | undefined {
   }
 
   return token;
-}
-
-function extractLegacySessionId(request: FastifyRequest): string | undefined {
-  const header = request.headers['x-session-id'];
-  return typeof header === 'string' && header.length > 0 ? header : undefined;
 }
 
 async function resolveSessionAuth(

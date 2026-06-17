@@ -144,9 +144,10 @@ export async function buildApp(options: { logger?: boolean } = {}) {
     requireRouteSecurityRule('POST', '/api/modules/:id/execute'),
     async (request, reply) => {
       const { id } = request.params as { id: string };
+      const identity = request.identity!;
       const body = request.body as Record<string, unknown>;
-      const sessionId = request.auth!.sessionId;
-      const accountId = request.identity!.accountId ?? null;
+      const sessionId = identity.sessionId;
+      const accountId = identity.accountId;
 
       const module = globalRegistry.get(id);
       if (!module) {
@@ -202,7 +203,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
             trace: { ...trace, sessionId },
             requestInput: cleanInput,
             preferredLanguage: rawContext.userProfile?.language,
-            actor: toMutationActor(request.auth!),
+            actor: toMutationActor(identity),
           });
         } catch (error) {
           request.log.warn({ err: error, moduleId: id, sessionId }, 'module execute mutation failed');
@@ -221,7 +222,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
     requireRouteSecurityRule('GET', '/api/modules/:id/trace'),
     async (request, reply) => {
       const { id } = request.params as { id: string };
-      const sessionId = request.auth!.sessionId;
+      const sessionId = request.identity!.sessionId;
 
       reply.header('x-deprecation', 'Use GET /api/ui-snapshot for UI state. Trace is diagnostic-only.');
 

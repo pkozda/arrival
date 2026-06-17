@@ -19,7 +19,7 @@ function routeContractKey(method: string, path: string): string {
 }
 
 export function validateRouteSecurityMap(
-  map: RouteSecurityRule[],
+  map: readonly RouteSecurityRule[],
   registeredRoutes: RegisteredRouteRef[]
 ): void {
   const seenRules = new Set<string>();
@@ -48,7 +48,7 @@ export function validateRouteSecurityMap(
   }
 }
 
-export const RouteSecurityMap: RouteSecurityRule[] = [
+const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
   {
     method: 'GET',
     path: '/health',
@@ -176,6 +176,10 @@ export const RouteSecurityMap: RouteSecurityRule[] = [
     description: 'Revoke single session',
   },
 ];
+
+export const RouteSecurityMap: readonly RouteSecurityRule[] = Object.freeze(
+  ROUTE_SECURITY_MAP_SOURCE.map((entry) => Object.freeze({ ...entry }))
+);
 
 export function requireRouteSecurityRule(method: string, path: string): RouteSecurityRule {
   const normalizedMethod = method.toUpperCase();
