@@ -22,7 +22,7 @@ describe('GET /api/ui-snapshot', () => {
     }
   });
 
-  it('requires x-session-id header', async () => {
+  it('requires authentication', async () => {
     const app = await buildApp();
 
     const res = await app.inject({
@@ -30,7 +30,8 @@ describe('GET /api/ui-snapshot', () => {
       url: '/api/ui-snapshot',
     });
 
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(401);
+    expect(res.json()).toEqual({ error: 'Authentication required' });
   });
 
   it('returns 404 for unknown session', async () => {

@@ -5,6 +5,8 @@ import {
   SnapshotProjectionError,
   UI_SNAPSHOT_SCHEMA_VERSION,
 } from './snapshot-schema.js';
+import type { AccountEntitlements } from '../entitlements/entitlement.types.js';
+import { entitlementService } from '../entitlements/entitlement.service.js';
 import type { SystemState, StoredModuleExecution } from './system-state-types.js';
 
 const UX_SOURCES = new Set<UXSource>([
@@ -41,6 +43,7 @@ export type UiSnapshot = {
     id: string;
     name: string;
     description?: string;
+    access?: 'available' | 'locked' | 'premium-required';
   }>;
   executions: UiSnapshotExecution[];
   executionsByModuleId: Record<string, UiSnapshotExecution[]>;
@@ -181,9 +184,13 @@ export function validateSystemStateForProjection(state: SystemState): void {
 }
 
 /**
- * Pure projection: UiSnapshot is fully determined by SystemState only.
+ * Pure projection: UiSnapshot is fully determined by SystemState,
+ * with optional entitlement context for module access metadata.
  */
-export function buildUiSnapshot(state: SystemState): UiSnapshot {
+export function buildUiSnapshot(
+  state: SystemState,
+  options?: { entitlements?: AccountEntitlements | null }
+): UiSnapshot {
   validateSystemStateForProjection(state);
 
   const sessionContext = state.session.context as Record<string, unknown>;
@@ -204,6 +211,11 @@ export function buildUiSnapshot(state: SystemState): UiSnapshot {
 
   const uxSnapshot = buildUxSnapshotFromState(state, executions);
 
+  const entitlements =
+    state.accountId !== null
+      ? (options?.entitlements ?? null)
+      : null;
+
   return {
     schemaVersion: UI_SNAPSHOT_SCHEMA_VERSION,
     snapshotVersion: state.version.snapshotVersion,
@@ -215,11 +227,19 @@ export function buildUiSnapshot(state: SystemState): UiSnapshot {
       uiPreferences: resolveUiPreferences(userProfile),
     },
     profile,
-    modules: state.modules.map((module) => ({
-      id: module.id,
-      name: module.name,
-      ...(module.description ? { description: module.description } : {}),
-    })),
+    modules: state.modules.map((module) => {
+      const access = entitlementService.resolveModuleAccess(
+        entitlements,
+        module.id,
+        state.accountId
+      );
+      return {
+        id: module.id,
+        name: module.name,
+        ...(module.description ? { description: module.description } : {}),
+        ...(access ? { access } : {}),
+      };
+    }),
     executions,
     executionsByModuleId,
     uxSnapshot,

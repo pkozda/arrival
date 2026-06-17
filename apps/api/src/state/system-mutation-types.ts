@@ -7,12 +7,14 @@ import type {
 import type { ExecutionTrace } from '@arrivalos/profile';
 import type { SystemModuleDescriptor, SystemProjectionConfig } from './system-state-types.js';
 import type { SystemState } from './system-state-types.js';
+import type { MutationActor } from './mutation-actor.js';
 
 export type SessionCreateMutation = {
   type: 'SESSION_CREATE';
   context: AppContext;
   modules: SystemModuleDescriptor[];
   projectionConfig: SystemProjectionConfig;
+  actor?: MutationActor;
 };
 
 export type SessionPatchMutation = {
@@ -20,12 +22,14 @@ export type SessionPatchMutation = {
   sessionId: string;
   context: Partial<AppContext>;
   mutationId: string;
+  actor?: MutationActor;
 };
 
 export type ProfileCreateMutation = {
   type: 'PROFILE_CREATE';
   sessionId: string;
   input: ProfileCreateInput;
+  actor?: MutationActor;
 };
 
 export type ProfileUpdateMutation = {
@@ -33,6 +37,7 @@ export type ProfileUpdateMutation = {
   sessionId: string;
   patch: ProfilePatch;
   expectedRevision: number;
+  actor?: MutationActor;
 };
 
 export type ModuleExecuteMutation = {
@@ -45,6 +50,23 @@ export type ModuleExecuteMutation = {
   trace: ExecutionTrace;
   requestInput: Record<string, unknown>;
   preferredLanguage?: SupportedLanguage;
+  actor?: MutationActor;
+};
+
+export type AccountClaimMutation = {
+  type: 'ACCOUNT_CLAIM';
+  sessionId: string;
+  accountId: string;
+  mutationId: string;
+  actor?: MutationActor;
+};
+
+export type AccountLinkMutation = {
+  type: 'ACCOUNT_LINK';
+  sessionId: string;
+  accountId: string;
+  mutationId: string;
+  actor?: MutationActor;
 };
 
 export type SystemMutation =
@@ -52,7 +74,9 @@ export type SystemMutation =
   | SessionPatchMutation
   | ProfileCreateMutation
   | ProfileUpdateMutation
-  | ModuleExecuteMutation;
+  | ModuleExecuteMutation
+  | AccountClaimMutation
+  | AccountLinkMutation;
 
 export type SessionCreateResult = {
   type: 'SESSION_CREATE';
@@ -84,9 +108,23 @@ export type ModuleExecuteResult = {
   state: SystemState;
 };
 
+export type AccountClaimResult = {
+  type: 'ACCOUNT_CLAIM';
+  accountId: string;
+  state: SystemState;
+};
+
+export type AccountLinkResult = {
+  type: 'ACCOUNT_LINK';
+  accountId: string;
+  state: SystemState;
+};
+
 export type SystemMutationResult =
   | SessionCreateResult
   | SessionPatchResult
   | ProfileCreateResult
   | ProfileUpdateResult
-  | ModuleExecuteResult;
+  | ModuleExecuteResult
+  | AccountClaimResult
+  | AccountLinkResult;

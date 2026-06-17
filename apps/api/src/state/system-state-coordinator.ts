@@ -3,7 +3,10 @@ import {
   getPersistedSystemStateStore,
   type PersistedSystemStateStore,
 } from './persisted-system-state-store.js';
+import { attachMutationActor, type MutationActor } from './mutation-actor.js';
 import {
+  applyAccountClaim,
+  applyAccountLink,
   applyModuleExecute,
   applyProfileCreate,
   applyProfileUpdate,
@@ -13,6 +16,8 @@ import {
 } from './system-state-apply.js';
 import type { SystemState } from './system-state-types.js';
 import type {
+  AccountClaimMutation,
+  AccountLinkMutation,
   ModuleExecuteMutation,
   ProfileCreateMutation,
   ProfileUpdateMutation,
@@ -27,14 +32,20 @@ type SessionPatchResult = Extract<SystemMutationResult, { type: 'SESSION_PATCH' 
 type ProfileCreateResult = Extract<SystemMutationResult, { type: 'PROFILE_CREATE' }>;
 type ProfileUpdateResult = Extract<SystemMutationResult, { type: 'PROFILE_UPDATE' }>;
 type ModuleExecuteResult = Extract<SystemMutationResult, { type: 'MODULE_EXECUTE' }>;
+type AccountClaimResult = Extract<SystemMutationResult, { type: 'ACCOUNT_CLAIM' }>;
+type AccountLinkResult = Extract<SystemMutationResult, { type: 'ACCOUNT_LINK' }>;
 
 export class SystemStateCoordinator {
-  private readonly store: PersistedSystemStateStore;
   private readonly cache = new Map<string, SystemState>();
   private readonly mutationChains = new Map<string, Promise<unknown>>();
+  private readonly storeResolver: () => PersistedSystemStateStore;
 
-  constructor(store: PersistedSystemStateStore = getPersistedSystemStateStore()) {
-    this.store = store;
+  constructor(storeResolver: () => PersistedSystemStateStore = getPersistedSystemStateStore) {
+    this.storeResolver = storeResolver;
+  }
+
+  private get store(): PersistedSystemStateStore {
+    return this.storeResolver();
   }
 
   resetCache(): void {
@@ -64,6 +75,8 @@ export class SystemStateCoordinator {
   async applyMutation(mutation: ProfileCreateMutation): Promise<ProfileCreateResult>;
   async applyMutation(mutation: ProfileUpdateMutation): Promise<ProfileUpdateResult>;
   async applyMutation(mutation: ModuleExecuteMutation): Promise<ModuleExecuteResult>;
+  async applyMutation(mutation: AccountClaimMutation): Promise<AccountClaimResult>;
+  async applyMutation(mutation: AccountLinkMutation): Promise<AccountLinkResult>;
   async applyMutation(mutation: SystemMutation): Promise<SystemMutationResult> {
     if (mutation.type === 'SESSION_CREATE') {
       return this.applyMutationInternal(mutation);
@@ -89,6 +102,20 @@ export class SystemStateCoordinator {
     }) as Promise<T>;
   }
 
+  private async persistState(
+    state: SystemState,
+    actor?: MutationActor
+  ): Promise<SystemState> {
+    const enriched = attachMutationActor(state, actor);
+    await this.store.save(enriched);
+    this.cache.set(enriched.session.id, enriched);
+    return enriched;
+  }
+
+  private getMutationActor(mutation: SystemMutation): MutationActor | undefined {
+    return 'actor' in mutation ? mutation.actor : undefined;
+  }
+
   private async applyMutationInternal(mutation: SystemMutation): Promise<SystemMutationResult> {
     switch (mutation.type) {
       case 'SESSION_CREATE': {
@@ -98,27 +125,24 @@ export class SystemStateCoordinator {
           projectionConfig: mutation.projectionConfig,
           mutationId: `session-create:${Date.now()}`,
         });
-        await this.store.save(state);
-        this.cache.set(state.session.id, state);
-        return { type: 'SESSION_CREATE', state };
+        const enriched = await this.persistState(state, this.getMutationActor(mutation));
+        return { type: 'SESSION_CREATE', state: enriched };
       }
       case 'SESSION_PATCH': {
         const current = await this.requireState(mutation.sessionId, true);
         const state = applySessionPatch(current, mutation.context, mutation.mutationId);
-        await this.store.save(state);
-        this.cache.set(state.session.id, state);
-        return { type: 'SESSION_PATCH', state };
+        const enriched = await this.persistState(state, this.getMutationActor(mutation));
+        return { type: 'SESSION_PATCH', state: enriched };
       }
       case 'PROFILE_CREATE': {
         const current = await this.requireState(mutation.sessionId, true);
         const mutationId = `profile-create:${current.session.id}`;
         const state = applyProfileCreate(current, mutation.input, mutationId);
-        await this.store.save(state);
-        this.cache.set(state.session.id, state);
+        const enriched = await this.persistState(state, this.getMutationActor(mutation));
         return {
           type: 'PROFILE_CREATE',
-          profile: state.profileRecord!,
-          state,
+          profile: enriched.profileRecord!,
+          state: enriched,
         };
       }
       case 'PROFILE_UPDATE': {
@@ -130,12 +154,11 @@ export class SystemStateCoordinator {
           mutation.expectedRevision,
           mutationId
         );
-        await this.store.save(state);
-        this.cache.set(state.session.id, state);
+        const enriched = await this.persistState(state, this.getMutationActor(mutation));
         return {
           type: 'PROFILE_UPDATE',
-          profile: state.profileRecord!,
-          state,
+          profile: enriched.profileRecord!,
+          state: enriched,
         };
       }
       case 'MODULE_EXECUTE': {
@@ -151,17 +174,36 @@ export class SystemStateCoordinator {
           preferredLanguage: mutation.preferredLanguage,
           mutationId: mutation.executionId,
         });
-        await this.store.save(state);
-        this.cache.set(state.session.id, state);
+        const enriched = await this.persistState(state, this.getMutationActor(mutation));
         const profileActivated =
-          state.profileRecord?.id !== current.profileRecord?.id ||
-          state.profileRecord?.revision !== current.profileRecord?.revision;
+          enriched.profileRecord?.id !== current.profileRecord?.id ||
+          enriched.profileRecord?.revision !== current.profileRecord?.revision;
         return {
           type: 'MODULE_EXECUTE',
           executionId: mutation.executionId,
-          snapshotVersion: state.version.snapshotVersion,
+          snapshotVersion: enriched.version.snapshotVersion,
           profileActivated,
-          state,
+          state: enriched,
+        };
+      }
+      case 'ACCOUNT_CLAIM': {
+        const current = await this.requireState(mutation.sessionId, true);
+        const state = applyAccountClaim(current, mutation.accountId, mutation.mutationId);
+        const enriched = await this.persistState(state, this.getMutationActor(mutation));
+        return {
+          type: 'ACCOUNT_CLAIM',
+          accountId: enriched.accountId!,
+          state: enriched,
+        };
+      }
+      case 'ACCOUNT_LINK': {
+        const current = await this.requireState(mutation.sessionId, true);
+        const state = applyAccountLink(current, mutation.accountId, mutation.mutationId);
+        const enriched = await this.persistState(state, this.getMutationActor(mutation));
+        return {
+          type: 'ACCOUNT_LINK',
+          accountId: enriched.accountId!,
+          state: enriched,
         };
       }
       default: {
