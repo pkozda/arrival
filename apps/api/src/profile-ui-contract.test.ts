@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { UI_PROFILE_FORBIDDEN_RESPONSE_KEYS } from '@arrivalos/profile';
 import { buildApp } from './build-app.js';
-import { profileStore } from './profile-runtime.js';
+import { resetTestStateStore, setupTestStateStore, teardownTestStateStore } from './test-state.js';
 
 function assertNoEngineLeakage(body: Record<string, unknown>): void {
   for (const key of UI_PROFILE_FORBIDDEN_RESPONSE_KEYS) {
@@ -11,8 +11,13 @@ function assertNoEngineLeakage(body: Record<string, unknown>): void {
 }
 
 describe('Profile UI contract boundary', () => {
-  beforeEach(() => {
-    profileStore.clear();
+  beforeEach(async () => {
+    setupTestStateStore();
+    await resetTestStateStore();
+  });
+
+  afterEach(() => {
+    teardownTestStateStore();
   });
 
   it('GET /api/profile returns only UI contract fields after create and update', async () => {

@@ -131,6 +131,26 @@ export class InMemoryProfileStore implements ProfileStore {
     this.sessionToProfile.clear();
   }
 
+  /** Restores a profile record and session binding (used by state hydration). */
+  restoreRecord(record: ProfileRecord, sessionId: string): void {
+    this.profiles.set(record.id, { ...record, document: { ...record.document } });
+    this.sessionToProfile.set(sessionId, record.id);
+    if (!this.revisions.has(record.id)) {
+      this.revisions.set(record.id, [
+        {
+          id: `prev_restore_${record.id}`,
+          profileId: record.id,
+          revision: record.revision,
+          schemaVersion: record.document.schemaVersion,
+          document: record.document,
+          changedFields: ['*'],
+          changedBy: 'system',
+          createdAt: record.updatedAt,
+        },
+      ]);
+    }
+  }
+
   private toRevision(
     record: ProfileRecord,
     changedFields: string[],

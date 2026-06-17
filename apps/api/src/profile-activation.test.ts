@@ -1,9 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, afterEach } from 'vitest';
 import { buildApp } from './build-app.js';
-import { profileStore } from './profile-runtime.js';
-import { clearExecutionTraces } from './execution-trace-store.js';
-import { clearModuleExecutions } from './module-execution-store.js';
-import { clearSnapshotVersions } from './snapshot-version-store.js';
+import { resetTestStateStore, setupTestStateStore, teardownTestStateStore } from './test-state.js';
 import { moduleInputToProfilePatch } from './profile-activation.js';
 
 describe('moduleInputToProfilePatch', () => {
@@ -47,11 +44,13 @@ describe('moduleInputToProfilePatch', () => {
 });
 
 describe('profile activation integration', () => {
-  beforeEach(() => {
-    profileStore.clear();
-    clearExecutionTraces();
-    clearModuleExecutions();
-    clearSnapshotVersions();
+  beforeEach(async () => {
+    setupTestStateStore();
+    await resetTestStateStore();
+  });
+
+  afterEach(() => {
+    teardownTestStateStore();
   });
 
   it('scenario 1: financial-reality execution persists profile document', async () => {

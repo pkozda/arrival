@@ -3,11 +3,21 @@ import { z } from 'zod';
 export const SupportedLanguageSchema = z.enum(['ru', 'ua', 'de', 'en']);
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
 
+export const ThemePreferenceSchema = z.enum(['light', 'dark', 'system']);
+export type ThemePreference = z.infer<typeof ThemePreferenceSchema>;
+
+export const UiPreferencesSchema = z.object({
+  theme: ThemePreferenceSchema.default('light'),
+});
+
+export type UiPreferences = z.infer<typeof UiPreferencesSchema>;
+
 export const UserProfileSchema = z.object({
   language: SupportedLanguageSchema.default('en'),
   residencyStatus: z.string().optional(),
   income: z.number().nonnegative().optional(),
   householdSize: z.number().int().positive().optional(),
+  uiPreferences: UiPreferencesSchema.optional(),
 });
 
 export type UserProfile = z.infer<typeof UserProfileSchema>;

@@ -1,5 +1,4 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
-import { updateSessionContext } from '@arrivalos/core';
 import {
   ProfilePatchSchema,
   ProfileCreateInputSchema,
@@ -7,8 +6,7 @@ import {
   ProfileNotFoundError,
   toUIProfileResponse,
 } from '@arrivalos/profile';
-import { profileEngine } from '../profile-runtime.js';
-import { recordSnapshotMutation } from '../snapshot-version-store.js';
+import { systemStateCoordinator } from '../state/system-state-coordinator.js';
 
 function getSessionId(request: FastifyRequest): string | undefined {
   const header = request.headers['x-session-id'];
@@ -33,16 +31,17 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
   app.post('/api/profile', async (request, reply) => {
     const body = ProfileCreateInputSchema.parse(request.body ?? {});
     const sessionId = getSessionId(request);
-
-    const profile = await profileEngine.createProfile(body);
-
-    if (sessionId) {
-      await profileEngine.bindSession(sessionId, profile.id);
-      updateSessionContext(sessionId, { profileId: profile.id });
-      recordSnapshotMutation(sessionId, `profile-create:${profile.id}`);
+    if (!sessionId) {
+      return reply.status(400).send({ error: 'X-Session-Id header is required' });
     }
 
-    return reply.status(201).send(toUIProfileResponse(profile));
+    const result = await systemStateCoordinator.applyMutation({
+      type: 'PROFILE_CREATE',
+      sessionId,
+      input: body,
+    });
+
+    return reply.status(201).send(toUIProfileResponse(result.profile));
   });
 
   app.get('/api/profile', async (request, reply) => {
@@ -51,12 +50,12 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
       return reply.status(400).send({ error: 'X-Session-Id header is required' });
     }
 
-    const profile = await profileEngine.getProfileBySession(sessionId);
-    if (!profile) {
+    const state = await systemStateCoordinator.getState(sessionId);
+    if (!state?.profileRecord) {
       return reply.status(404).send({ error: 'No profile bound to session' });
     }
 
-    return toUIProfileResponse(profile);
+    return toUIProfileResponse(state.profileRecord);
   });
 
   app.patch('/api/profile', async (request, reply) => {
@@ -72,21 +71,21 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
       });
     }
 
-    const profile = await profileEngine.getProfileBySession(sessionId);
-    if (!profile) {
+    const state = await systemStateCoordinator.getState(sessionId);
+    if (!state?.profileRecord) {
       return reply.status(404).send({ error: 'No profile bound to session' });
     }
 
     const patch = ProfilePatchSchema.parse(request.body ?? {});
 
     try {
-      const updated = await profileEngine.updateProfile(
-        profile.id,
+      const result = await systemStateCoordinator.applyMutation({
+        type: 'PROFILE_UPDATE',
+        sessionId,
         patch,
-        expectedRevision
-      );
-      recordSnapshotMutation(sessionId, `profile-update:${profile.id}:${updated.revision}`);
-      return toUIProfileResponse(updated);
+        expectedRevision,
+      });
+      return toUIProfileResponse(result.profile);
     } catch (error) {
       if (error instanceof ProfileRevisionConflictError) {
         return reply.status(409).send({
@@ -106,15 +105,22 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
       return reply.status(400).send({ error: 'X-Session-Id header is required' });
     }
 
-    const profile = await profileEngine.getProfileBySession(sessionId);
-    if (!profile) {
+    const state = await systemStateCoordinator.getState(sessionId);
+    if (!state?.profileRecord) {
       return reply.status(404).send({ error: 'No profile bound to session' });
     }
 
     try {
-      const revisions = await profileEngine.listRevisions(profile.id);
+      const revisions = state.profileRevisions
+        .filter((revision) => revision.profileId === state.profileRecord!.id)
+        .sort((a, b) => b.revision - a.revision);
+
+      if (revisions.length === 0) {
+        throw new ProfileNotFoundError(state.profileRecord.id);
+      }
+
       return {
-        profileId: profile.id,
+        profileId: state.profileRecord.id,
         revisions: revisions.map((r) => ({
           id: r.id,
           revision: r.revision,

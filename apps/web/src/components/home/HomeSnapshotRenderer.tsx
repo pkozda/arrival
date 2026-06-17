@@ -2,6 +2,11 @@
 
 import Link from 'next/link';
 import type { UiSnapshot } from '@/lib/api';
+import {
+  getAttentionLayer,
+  getGlobalUxActions,
+  getPrioritySignals,
+} from '@/lib/snapshot';
 
 type Props = {
   snapshot: UiSnapshot;
@@ -132,7 +137,10 @@ function ListSection({ title, items }: { title: string; items: unknown[] }) {
 }
 
 export function HomeSnapshotRenderer({ snapshot }: Props) {
-  const { session, profile, modules, executions, uxSnapshot, ftu } = snapshot;
+  const { session, profile, modules, executions, ftu } = snapshot;
+  const actionCards = getGlobalUxActions(snapshot);
+  const prioritySignals = getPrioritySignals(snapshot);
+  const attentionLayer = getAttentionLayer(snapshot);
 
   return (
     <>
@@ -164,9 +172,9 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
         </section>
       )}
 
-      <ListSection title="Attention layer" items={uxSnapshot.attentionLayer} />
-      <ListSection title="Action cards" items={uxSnapshot.actionCards} />
-      <ListSection title="Priority signals" items={uxSnapshot.prioritySignals} />
+      <ListSection title="Attention layer" items={attentionLayer} />
+      <ListSection title="Action cards" items={actionCards} />
+      <ListSection title="Priority signals" items={prioritySignals} />
 
       {modules.length > 0 && (
         <section style={cardStyle}>

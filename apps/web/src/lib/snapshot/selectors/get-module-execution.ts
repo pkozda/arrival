@@ -9,10 +9,10 @@ export function getModuleExecution(
     return null;
   }
 
-  const matches = snapshot.executions.filter((entry) => entry.moduleId === moduleId);
-  if (matches.length === 0) {
+  const history = snapshot.executionsByModuleId[moduleId];
+  if (!history || history.length === 0) {
     return null;
   }
 
-  return matches[matches.length - 1] ?? null;
+  return history[history.length - 1] ?? null;
 }
