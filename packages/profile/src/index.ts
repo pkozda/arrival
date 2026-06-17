@@ -11,3 +11,8 @@ export * from './merge/index.js';
 export * from './policy/index.js';
 export * from './trace/index.js';
 export * from './migrations/index.js';
+export {
+  collectChangedFields,
+  createEmptyProfileDocument,
+  deepMergeProfile,
+} from './utils/merge-profile.js';

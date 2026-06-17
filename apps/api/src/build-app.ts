@@ -2,12 +2,8 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import {
   globalRegistry,
-  createSession,
-  getSession,
-  updateSessionContext,
   getSupportedLanguages,
   getTranslations,
-  getEvents,
   AppContextSchema,
 } from '@arrivalos/core';
 import { resolveExecutionContext } from '@arrivalos/profile';
@@ -15,15 +11,9 @@ import { registerAllModules } from '@arrivalos/modules';
 import { profileEngine } from './profile-runtime.js';
 import { registerProfileRoutes } from './routes/profile.js';
 import { registerUiSnapshotRoutes } from './routes/ui-snapshot.js';
-import {
-  getLastExecutionTrace,
-  storeExecutionTrace,
-} from './execution-trace-store.js';
 import { randomUUID } from 'node:crypto';
-import { storeModuleExecution } from './module-execution-store.js';
-import { activateProfileFromModuleExecution } from './profile-activation.js';
-import { recordSnapshotMutation } from './snapshot-version-store.js';
-import { attachUxToExecutionResult } from './ux-integration.js';
+import { systemStateCoordinator } from './state/system-state-coordinator.js';
+import { attachUxToExecutionResult, isAtlasUxEnabled } from './ux-integration.js';
 
 let modulesRegistered = false;
 
@@ -32,6 +22,14 @@ function ensureModulesRegistered(): void {
     registerAllModules(globalRegistry);
     modulesRegistered = true;
   }
+}
+
+function listModuleDescriptors() {
+  return globalRegistry.list().map((module) => ({
+    id: module.id,
+    name: module.name,
+    ...(module.description ? { description: module.description } : {}),
+  }));
 }
 
 export async function buildApp(options: { logger?: boolean } = {}) {
@@ -101,10 +99,6 @@ export async function buildApp(options: { logger?: boolean } = {}) {
       inputOverrides: contextInputOverrides,
     });
 
-    if (sessionId) {
-      storeExecutionTrace(trace);
-    }
-
     const result = await globalRegistry.execute(id, mergedInput, context);
     if (!result.success) {
       return reply.status(422).send(result);
@@ -112,30 +106,21 @@ export async function buildApp(options: { logger?: boolean } = {}) {
 
     if (sessionId && result.data !== undefined) {
       const executionId = randomUUID();
-      const snapshotVersion = recordSnapshotMutation(sessionId, executionId);
-      storeModuleExecution(
-        sessionId,
-        id,
-        result.data,
-        result.executedAt,
-        executionId,
-        snapshotVersion
-      );
-    }
-
-    if (sessionId) {
       try {
-        const profileActivated = await activateProfileFromModuleExecution(
+        await systemStateCoordinator.applyMutation({
+          type: 'MODULE_EXECUTE',
           sessionId,
-          id,
-          cleanInput,
-          rawContext.userProfile?.language
-        );
-        if (profileActivated) {
-          recordSnapshotMutation(sessionId, `profile:${id}`);
-        }
+          moduleId: id,
+          result: result.data,
+          executedAt: result.executedAt,
+          executionId,
+          trace: { ...trace, sessionId },
+          requestInput: cleanInput,
+          preferredLanguage: rawContext.userProfile?.language,
+        });
       } catch (error) {
-        request.log.warn({ err: error, moduleId: id, sessionId }, 'profile activation failed');
+        request.log.warn({ err: error, moduleId: id, sessionId }, 'module execute mutation failed');
+        return reply.status(404).send({ error: 'Session not found' });
       }
     }
 
@@ -146,6 +131,8 @@ export async function buildApp(options: { logger?: boolean } = {}) {
     const { id } = request.params as { id: string };
     const sessionId = request.headers['x-session-id'] as string | undefined;
 
+    reply.header('x-deprecation', 'Use GET /api/ui-snapshot for UI state. Trace is diagnostic-only.');
+
     if (!sessionId) {
       return reply.status(400).send({ error: 'x-session-id header is required' });
     }
@@ -155,7 +142,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
       return reply.status(404).send({ error: `Module "${id}" not found` });
     }
 
-    const trace = getLastExecutionTrace(sessionId, id);
+    const trace = await systemStateCoordinator.getLatestTrace(sessionId, id);
     if (!trace) {
       return reply.status(404).send({ error: 'No execution trace found for this session and module' });
     }
@@ -169,28 +156,41 @@ export async function buildApp(options: { logger?: boolean } = {}) {
   app.post('/api/sessions', async (request) => {
     const body = (request.body ?? {}) as Record<string, unknown>;
     const context = AppContextSchema.parse(body.context ?? body);
-    const session = createSession(context);
-    return { sessionId: session.id, context: session.context };
+    const result = await systemStateCoordinator.applyMutation({
+      type: 'SESSION_CREATE',
+      context,
+      modules: listModuleDescriptors(),
+      projectionConfig: { uxSnapshotEnabled: isAtlasUxEnabled() },
+    });
+
+    return { sessionId: result.state.session.id, context: result.state.session.context };
   });
 
   app.get('/api/sessions/:id', async (request, reply) => {
     const { id } = request.params as { id: string };
-    const session = getSession(id);
-    if (!session) {
+    const state = await systemStateCoordinator.getState(id);
+    if (!state) {
       return reply.status(404).send({ error: 'Session not found' });
     }
-    return session;
+    return state.session;
   });
 
   app.patch('/api/sessions/:id', async (request, reply) => {
     const { id } = request.params as { id: string };
     const body = request.body as Record<string, unknown>;
     const context = AppContextSchema.partial().parse(body.context ?? body);
-    const session = updateSessionContext(id, context);
-    if (!session) {
+
+    try {
+      const result = await systemStateCoordinator.applyMutation({
+        type: 'SESSION_PATCH',
+        sessionId: id,
+        context,
+        mutationId: `session-patch:${id}`,
+      });
+      return result.state.session;
+    } catch {
       return reply.status(404).send({ error: 'Session not found' });
     }
-    return session;
   });
 
   app.get('/api/i18n/languages', async () => ({
@@ -211,13 +211,26 @@ export async function buildApp(options: { logger?: boolean } = {}) {
 
   app.get('/api/events', async (request) => {
     const query = request.query as Record<string, string>;
+
+    if (!query.sessionId) {
+      return {
+        events: [],
+        deprecation: 'Session-scoped events are available via GET /api/events?sessionId=...',
+      };
+    }
+
+    const state = await systemStateCoordinator.getState(query.sessionId);
+    if (!state) {
+      return {
+        events: [],
+        deprecation: 'Session-scoped events are derived from persisted SystemState.',
+      };
+    }
+
     return {
-      events: getEvents({
-        type: query.type,
-        moduleId: query.moduleId,
-        sessionId: query.sessionId,
-        limit: query.limit ? parseInt(query.limit, 10) : 50,
-      }),
+      events: state.events,
+      snapshotVersion: state.version.snapshotVersion,
+      deprecation: 'Session-scoped events are derived from persisted SystemState.',
     };
   });
 

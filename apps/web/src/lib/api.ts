@@ -33,12 +33,16 @@ export interface SnapshotProfile {
 }
 
 export interface UiSnapshot {
+  schemaVersion: number;
   snapshotVersion: number;
   lastMutationId: string | null;
   generatedAt: string;
   session: {
     sessionId: string;
     language: string;
+    uiPreferences: {
+      theme: 'light' | 'dark' | 'system';
+    };
   };
   profile: SnapshotProfile | null;
   modules: Array<{
@@ -53,6 +57,16 @@ export interface UiSnapshot {
     executionId: string;
     snapshotVersion: number;
   }>;
+  executionsByModuleId: Record<
+    string,
+    Array<{
+      moduleId: string;
+      result: unknown;
+      timestamp: number;
+      executionId: string;
+      snapshotVersion: number;
+    }>
+  >;
   uxSnapshot: {
     actionCards: unknown[];
     prioritySignals: unknown[];
@@ -61,6 +75,10 @@ export interface UiSnapshot {
   ftu: {
     isFirstTimeUser: boolean;
     step?: number;
+  };
+  fallback?: {
+    reason: string;
+    code: 'PROJECTION_ERROR';
   };
 }
 
@@ -93,13 +111,6 @@ export interface ModuleResult<T = unknown> {
   error?: string;
   executedAt: string;
   ux?: UxPayload;
-}
-
-export async function fetchModules(): Promise<ModuleInfo[]> {
-  const res = await fetch(`${API_URL}/api/modules`, { next: { revalidate: 60 } });
-  if (!res.ok) throw new Error('Failed to fetch modules');
-  const data = await res.json();
-  return data.modules;
 }
 
 export async function executeModule<TInput, TOutput>(
@@ -175,6 +186,20 @@ export async function ensureSession(context?: Record<string, unknown>): Promise<
   return sessionId;
 }
 
+export const LEGACY_THEME_STORAGE_KEY = 'arrivalos-theme';
+
+export function clearLegacyThemeStorage(): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    localStorage.removeItem(LEGACY_THEME_STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 export async function fetchUiSnapshot(sessionId: string): Promise<UiSnapshot> {
   const res = await fetch(`${API_URL}/api/ui-snapshot`, {
     headers: { 'x-session-id': sessionId },
@@ -186,6 +211,38 @@ export async function fetchUiSnapshot(sessionId: string): Promise<UiSnapshot> {
   }
 
   return res.json() as Promise<UiSnapshot>;
+}
+
+export async function updateSessionLanguage(
+  sessionId: string,
+  language: string
+): Promise<void> {
+  const res = await fetch(`${API_URL}/api/sessions/${sessionId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ context: { userProfile: { language } } }),
+  });
+
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(body?.error ?? `Session update failed (${res.status})`);
+  }
+}
+
+export async function updateSessionTheme(
+  sessionId: string,
+  theme: 'light' | 'dark' | 'system'
+): Promise<void> {
+  const res = await fetch(`${API_URL}/api/sessions/${sessionId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ context: { userProfile: { uiPreferences: { theme } } } }),
+  });
+
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(body?.error ?? `Session update failed (${res.status})`);
+  }
 }
 
 export async function fetchTranslations(lang: string): Promise<Record<string, string>> {

@@ -1,16 +1,15 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { buildApp } from './build-app.js';
-import { profileStore } from './profile-runtime.js';
-import { clearExecutionTraces } from './execution-trace-store.js';
-import { clearModuleExecutions } from './module-execution-store.js';
-import { clearSnapshotVersions } from './snapshot-version-store.js';
+import { resetTestStateStore, setupTestStateStore, teardownTestStateStore } from './test-state.js';
 
 describe('API profile + financial module integration', () => {
-  beforeEach(() => {
-    profileStore.clear();
-    clearExecutionTraces();
-    clearModuleExecutions();
-    clearSnapshotVersions();
+  beforeEach(async () => {
+    setupTestStateStore();
+    await resetTestStateStore();
+  });
+
+  afterEach(() => {
+    teardownTestStateStore();
   });
 
   it('creates session, profile, updates revision, and executes financial module with merged input', async () => {

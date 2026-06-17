@@ -1,13 +1,5 @@
 import type { UiSnapshot, UxActionCard, UxPayload } from '@/lib/api';
-
-function isUxActionCard(value: unknown): value is UxActionCard {
-  return (
-    typeof value === 'object'
-    && value !== null
-    && typeof (value as UxActionCard).source === 'string'
-    && typeof (value as UxActionCard).title === 'string'
-  );
-}
+import { isUxActionCard } from './ux-action-card';
 
 export function getModuleUx(snapshot: UiSnapshot | null, moduleId: string): UxPayload | null {
   if (!snapshot) {

@@ -53,7 +53,7 @@ function BurgerIcon({ open }: { open: boolean }) {
 
 export function Header() {
   const pathname = usePathname();
-  const { language, setLanguage, theme, toggleTheme, t } = useApp();
+  const { language, changeLanguage, theme, toggleTheme, t } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -159,7 +159,7 @@ export function Header() {
                 key={lang.code}
                 type="button"
                 className={`header-lang-btn${language === lang.code ? ' header-lang-btn--active' : ''}`}
-                onClick={() => setLanguage(lang.code)}
+                onClick={() => changeLanguage(lang.code)}
               >
                 {lang.label}
               </button>

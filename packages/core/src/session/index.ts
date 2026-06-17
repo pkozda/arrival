@@ -50,3 +50,19 @@ export function deleteSession(sessionId: string): boolean {
 export function listSessions(): Session[] {
   return Array.from(sessions.values());
 }
+
+/** Restores a session into the in-memory store (used by state hydration). */
+export function restoreSession(session: Session): void {
+  sessions.set(session.id, {
+    ...session,
+    context: {
+      ...session.context,
+      userProfile: session.context.userProfile
+        ? { ...session.context.userProfile }
+        : session.context.userProfile,
+      systemState: session.context.systemState
+        ? { ...session.context.systemState }
+        : session.context.systemState,
+    },
+  });
+}

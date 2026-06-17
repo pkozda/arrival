@@ -7,40 +7,64 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useMemo,
+  useSyncExternalStore,
   type ReactNode,
 } from 'react';
-import { ensureSession, fetchTranslations, fetchUiSnapshot, type UiSnapshot } from '@/lib/api';
-import type { SupportedLanguage } from '@arrivalos/core';
-
-export type Theme = 'light' | 'dark';
+import {
+  clearLegacyThemeStorage,
+  ensureSession,
+  fetchTranslations,
+  fetchUiSnapshot,
+  updateSessionLanguage,
+  updateSessionTheme,
+  type UiSnapshot,
+} from '@/lib/api';
+import {
+  getSessionLanguage,
+  getThemePreference,
+  resolveTheme,
+  type ResolvedTheme,
+} from '@/lib/snapshot';
+import type { SupportedLanguage, ThemePreference } from '@arrivalos/core';
 
 interface AppState {
   language: SupportedLanguage;
-  theme: Theme;
+  theme: ResolvedTheme;
+  themePreference: ThemePreference;
   sessionId: string | null;
   uiSnapshot: UiSnapshot | null;
   uiSnapshotLoading: boolean;
   uiSnapshotError: string | null;
   translations: Record<string, string>;
   refreshUiSnapshot: () => Promise<void>;
-  setLanguage: (lang: SupportedLanguage) => void;
-  setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
+  changeLanguage: (lang: SupportedLanguage) => Promise<void>;
+  changeTheme: (theme: ThemePreference) => Promise<void>;
+  toggleTheme: () => Promise<void>;
   t: (key: string) => string;
 }
 
-function getInitialTheme(): Theme {
-  if (typeof window === 'undefined') return 'dark';
-  const stored = localStorage.getItem('arrivalos-theme');
-  if (stored === 'light' || stored === 'dark') return stored;
+function subscribeSystemColorScheme(onStoreChange: () => void): () => void {
+  const media = window.matchMedia('(prefers-color-scheme: light)');
+  media.addEventListener('change', onStoreChange);
+  return () => media.removeEventListener('change', onStoreChange);
+}
+
+function getSystemColorSchemeSnapshot(): ResolvedTheme {
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+function useSystemColorScheme(): ResolvedTheme {
+  return useSyncExternalStore(
+    subscribeSystemColorScheme,
+    getSystemColorSchemeSnapshot,
+    () => 'light'
+  );
 }
 
 const AppContext = createContext<AppState | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<SupportedLanguage>('en');
-  const [theme, setThemeState] = useState<Theme>('dark');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [uiSnapshot, setUiSnapshot] = useState<UiSnapshot | null>(null);
   const [uiSnapshotLoading, setUiSnapshotLoading] = useState(true);
@@ -49,6 +73,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const lastAppliedSnapshotVersionRef = useRef(-1);
   const snapshotFetchGenerationRef = useRef(0);
+
+  const language = useMemo(() => getSessionLanguage(uiSnapshot), [uiSnapshot]);
+  const themePreference = useMemo(() => getThemePreference(uiSnapshot), [uiSnapshot]);
+  const systemTheme = useSystemColorScheme();
+  const theme = useMemo(
+    () => (themePreference === 'system' ? systemTheme : resolveTheme(themePreference)),
+    [themePreference, systemTheme]
+  );
 
   const applySnapshotIfNewer = useCallback((snapshot: UiSnapshot): boolean => {
     if (snapshot.snapshotVersion > lastAppliedSnapshotVersionRef.current) {
@@ -60,16 +92,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    setThemeState(getInitialTheme());
+    clearLegacyThemeStorage();
   }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem('arrivalos-theme', theme);
   }, [theme]);
 
   useEffect(() => {
-    ensureSession({ userProfile: { language } })
+    ensureSession({
+      userProfile: {
+        language: 'en',
+        uiPreferences: { theme: 'light' },
+      },
+    })
       .then(setSessionId)
       .catch(console.error);
   }, []);
@@ -130,7 +166,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return;
       }
       setUiSnapshotError(err instanceof Error ? err.message : 'Failed to refresh snapshot');
-      // Degrade gracefully: keep existing snapshot and version cursor.
     } finally {
       if (requestId === snapshotFetchGenerationRef.current) {
         setUiSnapshotLoading(false);
@@ -138,17 +173,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [sessionId, applySnapshotIfNewer]);
 
-  const setLanguage = useCallback((lang: SupportedLanguage) => {
-    setLanguageState(lang);
-  }, []);
+  const changeLanguage = useCallback(async (lang: SupportedLanguage) => {
+    if (!sessionId) return;
+    await updateSessionLanguage(sessionId, lang);
+    await refreshUiSnapshot();
+  }, [sessionId, refreshUiSnapshot]);
 
-  const setTheme = useCallback((next: Theme) => {
-    setThemeState(next);
-  }, []);
+  const changeTheme = useCallback(async (next: ThemePreference) => {
+    if (!sessionId) return;
+    await updateSessionTheme(sessionId, next);
+    await refreshUiSnapshot();
+  }, [sessionId, refreshUiSnapshot]);
 
-  const toggleTheme = useCallback(() => {
-    setThemeState((current) => (current === 'dark' ? 'light' : 'dark'));
-  }, []);
+  const toggleTheme = useCallback(async () => {
+    const next: ThemePreference = theme === 'dark' ? 'light' : 'dark';
+    await changeTheme(next);
+  }, [theme, changeTheme]);
 
   const t = useCallback(
     (key: string) => translations[key] ?? key,
@@ -159,14 +199,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider value={{
       language,
       theme,
+      themePreference,
       sessionId,
       uiSnapshot,
       uiSnapshotLoading,
       uiSnapshotError,
       translations,
       refreshUiSnapshot,
-      setLanguage,
-      setTheme,
+      changeLanguage,
+      changeTheme,
       toggleTheme,
       t,
     }}>

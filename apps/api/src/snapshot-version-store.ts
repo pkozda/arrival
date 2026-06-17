@@ -29,6 +29,10 @@ export function getSnapshotVersionState(sessionId: string): SessionVersionState 
   return { ...sessionState(sessionId) };
 }
 
+export function restoreSnapshotVersion(sessionId: string, version: SessionVersionState): void {
+  versionBySession.set(sessionId, { ...version });
+}
+
 export function clearSnapshotVersions(): void {
   versionBySession.clear();
 }

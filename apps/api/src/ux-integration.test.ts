@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildApp } from './build-app.js';
-import { profileStore } from './profile-runtime.js';
-import { clearExecutionTraces } from './execution-trace-store.js';
+import { resetTestStateStore, setupTestStateStore, teardownTestStateStore } from './test-state.js';
 import {
   attachUxToExecutionResult,
   isAtlasUxEnabled,
@@ -106,10 +105,14 @@ describe('attachUxToExecutionResult', () => {
 });
 
 describe('API UX integration', () => {
-  beforeEach(() => {
-    profileStore.clear();
-    clearExecutionTraces();
+  beforeEach(async () => {
+    setupTestStateStore();
+    await resetTestStateStore();
     process.env.ATLAS_UX_ENABLED = 'true';
+  });
+
+  afterEach(() => {
+    teardownTestStateStore();
   });
 
   it('includes UX actions and summary for financial-reality execution', async () => {
