@@ -1,17 +1,14 @@
 import { resolveAuthError } from '../auth/auth-error-mapper.js';
 import type { ResolvedIdentity } from '../auth/resolved-identity.js';
+import { RouteSecurityMisconfigurationError } from './iam-strict-mode.js';
 import { matchRoute } from './match-route.js';
 import { RouteSecurityMap } from './route-security-map.js';
 import type { RouteSecurityRule } from './route-security.js';
 
-export class UnclassifiedRouteError extends Error {
-  readonly code = 'UNCLASSIFIED_ROUTE';
+/** @deprecated Use RouteSecurityMisconfigurationError */
+export class UnclassifiedRouteError extends RouteSecurityMisconfigurationError {}
 
-  constructor(method: string, path: string) {
-    super(`UNCLASSIFIED_ROUTE: ${method} ${path}`);
-    this.name = 'UnclassifiedRouteError';
-  }
-}
+export { RouteSecurityMisconfigurationError };
 
 export type EnforceRouteSecurityInput = {
   method: string;
@@ -31,7 +28,7 @@ export type EnforceRouteSecurityResult =
 export function findMatchingRouteRule(
   method: string,
   path: string,
-  map: RouteSecurityRule[] = RouteSecurityMap
+  map: readonly RouteSecurityRule[] = RouteSecurityMap
 ): RouteSecurityRule | null {
   const normalizedMethod = method.toUpperCase();
   return (

@@ -14,10 +14,10 @@ export async function registerAccountRoutes(app: FastifyInstance): Promise<void>
     '/api/account/claim',
     requireRouteSecurityRule('POST', '/api/account/claim'),
     async (request, reply) => {
-      const auth = request.auth!;
+      const identity = request.identity!;
 
       try {
-        return await accountClaimService.claimSession(auth.sessionId, {
+        return await accountClaimService.claimSession(identity.sessionId, {
           userAgent: typeof request.headers['user-agent'] === 'string'
             ? request.headers['user-agent']
             : undefined,

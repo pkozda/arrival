@@ -29,20 +29,23 @@ function assertRouteAccountAccess(
   reply: FastifyReply,
   accountId: string
 ): boolean {
-  const context = request.accountContext;
-  if (!context) {
-    sendAuthError(reply, 'missing_credential');
+  const identity = request.identity;
+  if (!identity) {
+    sendAuthError(reply, 'authentication_required');
     return false;
   }
 
   try {
-    validateAccountAccess(context, accountId);
+    validateAccountAccess(
+      { sessionId: identity.sessionId, accountId: identity.accountId },
+      accountId
+    );
   } catch {
     sendAuthError(reply, 'account_forbidden');
     return false;
   }
 
-  if (context.accountId !== accountId) {
+  if (identity.accountId !== accountId) {
     sendAuthError(reply, 'account_forbidden');
     return false;
   }
@@ -127,7 +130,7 @@ export async function registerSessionLifecycleRoutes(app: FastifyInstance): Prom
     requireRouteSecurityRule('POST', '/api/sessions/:id/revoke'),
     async (request, reply) => {
       const { id: targetSessionId } = request.params as { id: string };
-      const caller = request.accountContext!;
+      const caller = request.identity!;
 
       const targetState = await systemStateCoordinator.getState(targetSessionId);
       if (!targetState?.accountId) {

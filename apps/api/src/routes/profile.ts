@@ -32,14 +32,14 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
     '/api/profile',
     requireRouteSecurityRule('POST', '/api/profile'),
     async (request, reply) => {
-      const sessionId = request.accountContext!.sessionId;
+      const identity = request.identity!;
       const body = ProfileCreateInputSchema.parse(request.body ?? {});
 
       const result = await systemStateCoordinator.applyMutation({
         type: 'PROFILE_CREATE',
-        sessionId,
+        sessionId: identity.sessionId,
         input: body,
-        actor: request.auth ? toMutationActor(request.auth) : undefined,
+        actor: toMutationActor(identity),
       });
 
       return reply.status(201).send(toUIProfileResponse(result.profile));
@@ -52,8 +52,7 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
     '/api/profile',
     requireRouteSecurityRule('GET', '/api/profile'),
     async (request, reply) => {
-      const sessionId = request.accountContext!.sessionId;
-      const state = await systemStateCoordinator.getState(sessionId);
+      const state = await systemStateCoordinator.getState(request.identity!.sessionId);
       if (!state?.profileRecord) {
         return reply.status(404).send({ error: 'No profile bound to session' });
       }
@@ -68,7 +67,7 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
     '/api/profile',
     requireRouteSecurityRule('PATCH', '/api/profile'),
     async (request, reply) => {
-      const sessionId = request.accountContext!.sessionId;
+      const identity = request.identity!;
       const expectedRevision = getExpectedRevision(request);
       if (expectedRevision === undefined) {
         return reply.status(428).send({
@@ -76,7 +75,7 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
         });
       }
 
-      const state = await systemStateCoordinator.getState(sessionId);
+      const state = await systemStateCoordinator.getState(identity.sessionId);
       if (!state?.profileRecord) {
         return reply.status(404).send({ error: 'No profile bound to session' });
       }
@@ -86,10 +85,10 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
       try {
         const result = await systemStateCoordinator.applyMutation({
           type: 'PROFILE_UPDATE',
-          sessionId,
+          sessionId: identity.sessionId,
           patch,
           expectedRevision,
-          actor: request.auth ? toMutationActor(request.auth) : undefined,
+          actor: toMutationActor(identity),
         });
         return toUIProfileResponse(result.profile);
       } catch (error) {
@@ -112,8 +111,7 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
     '/api/profile/revisions',
     requireRouteSecurityRule('GET', '/api/profile/revisions'),
     async (request, reply) => {
-      const sessionId = request.accountContext!.sessionId;
-      const state = await systemStateCoordinator.getState(sessionId);
+      const state = await systemStateCoordinator.getState(request.identity!.sessionId);
       if (!state?.profileRecord) {
         return reply.status(404).send({ error: 'No profile bound to session' });
       }

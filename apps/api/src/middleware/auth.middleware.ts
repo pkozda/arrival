@@ -1,9 +1,9 @@
-import type { AuthContext } from '../auth/auth.types.js';
+import type { ResolvedIdentity } from '../auth/resolved-identity.js';
 
-export function toMutationActor(auth: AuthContext) {
+export function toMutationActor(identity: ResolvedIdentity) {
   return {
-    sessionId: auth.sessionId,
-    accountId: auth.accountId,
-    authSubject: auth.authSubject,
+    sessionId: identity.sessionId,
+    accountId: identity.accountId,
+    authSubject: identity.authSubject,
   };
 }

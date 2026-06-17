@@ -33,7 +33,7 @@ export async function registerUiSnapshotRoutes(app: FastifyInstance): Promise<vo
     '/api/ui-snapshot',
     requireRouteSecurityRule('GET', '/api/ui-snapshot'),
     async (request, reply) => {
-      const sessionId = request.accountContext!.sessionId;
+      const sessionId = request.identity!.sessionId;
       const state = await systemStateCoordinator.getState(sessionId);
       if (!state) {
         return reply.status(404).send({ error: 'Session not found' });

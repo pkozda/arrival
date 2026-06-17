@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { sendAuthError } from '../auth/auth-error-mapper.js';
 import { buildResolvedIdentity } from '../auth/build-resolved-identity.js';
 import { buildAuthContext } from '../auth/auth.context.js';
+import { hasLegacySessionCredential } from '../auth/legacy-auth-adapter.js';
 import type { AuthContext } from '../auth/auth.types.js';
 import type { ResolvedIdentity } from '../auth/resolved-identity.js';
 import { evaluateTokenAccountSemantics } from '../auth/token-account-semantics.js';
@@ -14,11 +15,35 @@ import {
 import { sessionRegistryService } from '../sessions/registry/session-registry.service.js';
 import { systemStateCoordinator } from '../state/system-state-coordinator.js';
 import {
-  enforceRouteSecurity,
+  evaluateRouteAccess,
+  findMatchingRouteRule,
   type EnforceRouteSecurityResult,
-  UnclassifiedRouteError,
 } from './enforce-route-security.js';
+import { handleRouteSecurityMisconfiguration } from './iam-strict-mode.js';
 import type { RouteSecurityRule } from './route-security.js';
+
+function resolveActiveRouteRule(
+  request: FastifyRequest,
+  registeredRule: RouteSecurityRule
+): RouteSecurityRule {
+  const routePath = request.routeOptions.url ?? request.url;
+  const mapRule = findMatchingRouteRule(request.method, routePath);
+
+  const registrationMismatch =
+    registeredRule.method.toUpperCase() !== request.method.toUpperCase() ||
+    registeredRule.path !== routePath;
+  const mapMissing = mapRule === null;
+  const mapMismatch =
+    mapRule !== null &&
+    (mapRule.path !== registeredRule.path ||
+      mapRule.method.toUpperCase() !== registeredRule.method.toUpperCase());
+
+  if (mapMissing || registrationMismatch || mapMismatch) {
+    handleRouteSecurityMisconfiguration(request.log, request.method, routePath);
+  }
+
+  return mapRule ?? registeredRule;
+}
 
 async function assertSessionNotRevoked(
   reply: FastifyReply,
@@ -53,8 +78,7 @@ export function hasAuthCredential(request: FastifyRequest): boolean {
     return true;
   }
 
-  const sessionHeader = request.headers['x-session-id'];
-  return typeof sessionHeader === 'string' && sessionHeader.length > 0;
+  return hasLegacySessionCredential(request);
 }
 
 export function sendRouteSecurityError(
@@ -110,7 +134,7 @@ function enforceTokenAccountIdentity(
   });
 
   if (!semantics.ok) {
-    emitIAMEvent(request.log, IAMEventType.TOKEN_ACCOUNT_DRIFT_DETECTED, {
+    emitIAMEvent(request.log, IAMEventType.TOKEN_MISMATCH, {
       sessionId: identity.sessionId,
       tokenAccountId: tokenPayload.accountId,
       stateAccountId: identity.stateAccountId ?? identity.accountId,
@@ -131,13 +155,17 @@ function enforceTokenAccountIdentity(
 
 async function applyAccountAuthorization(
   request: FastifyRequest,
-  reply: FastifyReply,
-  auth: AuthContext
+  reply: FastifyReply
 ): Promise<boolean> {
-  const accountId = request.identity?.accountId ?? auth.accountId;
+  const identity = request.identity;
+  if (!identity) {
+    sendAuthError(reply, 'authentication_required');
+    return false;
+  }
+
   const context = {
-    sessionId: auth.sessionId,
-    accountId,
+    sessionId: identity.sessionId,
+    accountId: identity.accountId,
   };
 
   try {
@@ -156,7 +184,6 @@ async function applyAccountAuthorization(
       }
     }
 
-    request.accountContext = context;
     return true;
   } catch (error) {
     if (error instanceof AccountAccessForbiddenError) {
@@ -180,8 +207,7 @@ async function applySessionLifecycle(request: FastifyRequest): Promise<void> {
   });
 
   if (registration.created && process.env.NODE_ENV !== 'production') {
-    request.log.warn({
-      iamEvent: IAMEventType.REGISTRY_BACKFILL,
+    emitIAMEvent(request.log, IAMEventType.REGISTRY_BACKFILL, {
       sessionId: identity.sessionId,
       accountId: identity.accountId,
     });
@@ -198,17 +224,10 @@ export async function applySecurityPipeline(
   reply: FastifyReply,
   rule: RouteSecurityRule
 ): Promise<boolean> {
-  const routePath = request.routeOptions.url ?? request.url;
+  const activeRule = resolveActiveRouteRule(request, rule);
 
-  if (rule.method.toUpperCase() !== request.method.toUpperCase() || rule.path !== routePath) {
-    throw new UnclassifiedRouteError(request.method, routePath);
-  }
-
-  if (rule.tier === 'public' || rule.tier === 'anonymous-create') {
-    const access = enforceRouteSecurity({
-      method: request.method,
-      path: routePath,
-    });
+  if (activeRule.tier === 'public' || activeRule.tier === 'anonymous-create') {
+    const access = evaluateRouteAccess(undefined, activeRule);
     if (!access.ok) {
       sendRouteSecurityError(reply, access);
       return false;
@@ -238,32 +257,28 @@ export async function applySecurityPipeline(
     return false;
   }
 
-  request.auth = authResult.auth;
+  const auth = authResult.auth;
 
-  const state = await systemStateCoordinator.getState(authResult.auth.sessionId);
-  request.identity = await buildResolvedIdentity(authResult.auth, state);
+  const state = await systemStateCoordinator.getState(auth.sessionId);
+  request.identity = await buildResolvedIdentity(auth, state);
 
-  emitIdentityObservabilityEvents(request.log, authResult.auth, request.identity);
+  emitIdentityObservabilityEvents(request.log, auth, request.identity);
 
-  if (!(await assertSessionNotRevoked(reply, authResult.auth.sessionId))) {
+  if (!(await assertSessionNotRevoked(reply, auth.sessionId))) {
     return false;
   }
 
-  if (!enforceTokenAccountIdentity(request, reply, authResult.auth, request.identity)) {
+  if (!enforceTokenAccountIdentity(request, reply, auth, request.identity)) {
     return false;
   }
 
-  const access = enforceRouteSecurity({
-    method: request.method,
-    path: routePath,
-    identity: request.identity,
-  });
+  const access = evaluateRouteAccess(request.identity, activeRule);
   if (!access.ok) {
     sendRouteSecurityError(reply, access);
     return false;
   }
 
-  if (!(await applyAccountAuthorization(request, reply, authResult.auth))) {
+  if (!(await applyAccountAuthorization(request, reply))) {
     return false;
   }
 
