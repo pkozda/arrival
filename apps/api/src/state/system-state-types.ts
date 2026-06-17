@@ -24,9 +24,15 @@ export type SnapshotVersionState = {
   snapshotVersion: number;
   stateHash: string;
   lastMutationId: string | null;
+  lastActor?: {
+    sessionId: string;
+    accountId: string | null;
+    authSubject: string | null;
+  } | null;
 };
 
 export type SystemState = {
+  accountId: string | null;
   session: Session;
   profileRecord: ProfileRecord | null;
   profileRevisions: ProfileRevision[];

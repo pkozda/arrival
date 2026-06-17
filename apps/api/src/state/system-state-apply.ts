@@ -192,6 +192,7 @@ export function createInitialSystemState(params: {
 
   return finalizeSystemState(
     {
+      accountId: null,
       session,
       profileRecord: null,
       profileRevisions: [],
@@ -216,6 +217,85 @@ export function applySessionPatch(
       ...state,
       session: mergeSessionContext(state.session, context),
       generatedAt: nowIso(),
+    },
+    mutationId
+  );
+}
+
+export class SessionAlreadyClaimedError extends Error {
+  constructor(public readonly existingAccountId: string) {
+    super(`Session already claimed by account: ${existingAccountId}`);
+    this.name = 'SessionAlreadyClaimedError';
+  }
+}
+
+export function applyAccountClaim(
+  state: SystemState,
+  accountId: string,
+  mutationId: string
+): SystemState {
+  if (state.accountId !== null) {
+    if (state.accountId === accountId) {
+      return state;
+    }
+    throw new SessionAlreadyClaimedError(state.accountId);
+  }
+
+  const timestamp = nowIso();
+  const events: TrackedEvent[] = [
+    ...state.events,
+    {
+      id: `evt_${mutationId}`,
+      type: 'account.claim',
+      sessionId: state.session.id,
+      timestamp,
+      payload: { accountId },
+    },
+  ];
+
+  return finalizeSystemState(
+    {
+      ...state,
+      accountId,
+      events,
+      session: mergeSessionContext(state.session, {}),
+      generatedAt: timestamp,
+    },
+    mutationId
+  );
+}
+
+export function applyAccountLink(
+  state: SystemState,
+  accountId: string,
+  mutationId: string
+): SystemState {
+  if (state.accountId !== null) {
+    if (state.accountId === accountId) {
+      return state;
+    }
+    throw new SessionAlreadyClaimedError(state.accountId);
+  }
+
+  const timestamp = nowIso();
+  const events: TrackedEvent[] = [
+    ...state.events,
+    {
+      id: `evt_${mutationId}`,
+      type: 'account.link',
+      sessionId: state.session.id,
+      timestamp,
+      payload: { accountId },
+    },
+  ];
+
+  return finalizeSystemState(
+    {
+      ...state,
+      accountId,
+      events,
+      session: mergeSessionContext(state.session, {}),
+      generatedAt: timestamp,
     },
     mutationId
   );

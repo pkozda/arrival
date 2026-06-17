@@ -1,5 +1,6 @@
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { normalizeSystemStateAccountId } from './system-state-account.js';
 import type { SystemState } from './system-state-types.js';
 
 export interface PersistedSystemStateStore {
@@ -24,7 +25,7 @@ export class FilePersistedSystemStateStore implements PersistedSystemStateStore 
   async load(sessionId: string): Promise<SystemState | null> {
     try {
       const raw = await readFile(sessionFilePath(this.rootDir, sessionId), 'utf8');
-      return JSON.parse(raw) as SystemState;
+      return normalizeSystemStateAccountId(JSON.parse(raw) as SystemState);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
         return null;

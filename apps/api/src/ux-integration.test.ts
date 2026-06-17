@@ -115,6 +115,15 @@ describe('API UX integration', () => {
     teardownTestStateStore();
   });
 
+  async function createSession(app: Awaited<ReturnType<typeof buildApp>>): Promise<string> {
+    const sessionRes = await app.inject({
+      method: 'POST',
+      url: '/api/sessions',
+      payload: { context: { userProfile: { language: 'en' } } },
+    });
+    return (sessionRes.json() as { sessionId: string }).sessionId;
+  }
+
   it('includes UX actions and summary for financial-reality execution', async () => {
     const app = await buildApp();
 
@@ -186,10 +195,12 @@ describe('API UX integration', () => {
     process.env.ATLAS_UX_ENABLED = 'false';
 
     const app = await buildApp();
+    const sessionId = await createSession(app);
 
     const executeRes = await app.inject({
       method: 'POST',
       url: '/api/modules/financial-reality/execute',
+      headers: { 'x-session-id': sessionId },
       payload: {
         input: {
           grossIncome: 2500,
@@ -220,10 +231,12 @@ describe('API UX integration', () => {
     });
 
     const app = await buildApp();
+    const sessionId = await createSession(app);
 
     const executeRes = await app.inject({
       method: 'POST',
       url: '/api/modules/financial-reality/execute',
+      headers: { 'x-session-id': sessionId },
       payload: {
         input: {
           grossIncome: 2500,
