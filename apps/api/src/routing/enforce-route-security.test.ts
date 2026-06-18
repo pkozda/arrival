@@ -51,8 +51,12 @@ describe('RouteSecurityMap', () => {
   it('classifies every known API route pattern', () => {
     const routes = [
       ['GET', '/health'],
+      ['GET', '/api/health/governance'],
+      ['GET', '/api/health/modules'],
       ['GET', '/api/modules'],
       ['GET', '/api/modules/financial-reality'],
+      ['GET', '/api/modules/financial-reality/schema'],
+      ['GET', '/api/modules/financial-reality/capabilities'],
       ['GET', '/api/i18n/languages'],
       ['GET', '/api/i18n/en'],
       ['POST', '/api/sessions'],
@@ -60,6 +64,7 @@ describe('RouteSecurityMap', () => {
       ['PATCH', '/api/sessions/sess_1'],
       ['GET', '/api/events'],
       ['GET', '/api/modules/financial-reality/trace'],
+      ['GET', '/api/modules/financial-reality/explain'],
       ['POST', '/api/modules/financial-reality/execute'],
       ['GET', '/api/ui-snapshot'],
       ['POST', '/api/profile'],

@@ -1,13 +1,16 @@
-import type { UiSnapshot, UxPayload } from '@/lib/api';
+import type { ModuleUIProjection } from '@/lib/product-contract';
 
 export type ModuleUIStatus = 'idle' | 'executed' | 'partial';
 
-export type ModuleExecutionView = UiSnapshot['executions'][number];
+export type ModuleExecutionView = {
+  moduleId: string;
+  projection: ModuleUIProjection;
+  createdAt: string;
+  executionId: string;
+};
 
 export type ModuleUIState = {
-  input: Record<string, unknown>;
-  result: unknown | null;
-  ux: UxPayload | null;
+  projection: ModuleUIProjection | null;
   status: ModuleUIStatus;
   executionId: string | null;
   snapshotVersion: number;

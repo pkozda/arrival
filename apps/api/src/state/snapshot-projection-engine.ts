@@ -3,6 +3,13 @@ import { getLegacyDomainResult } from '@arrivalos/module-runtime';
 import type { ProfileDocument } from '@arrivalos/profile';
 import { buildUXActionPlan, type UXSource } from '@arrivalos/ux';
 import {
+  buildUiSnapshotProjection,
+  type ActionCard,
+  type ExecutionSnapshot,
+  type ModuleSnapshotSummary,
+  type SnapshotRecommendation,
+} from '@arrivalos/product-contract';
+import {
   SnapshotProjectionError,
   UI_SNAPSHOT_SCHEMA_VERSION,
 } from './snapshot-schema.js';
@@ -19,15 +26,16 @@ const UX_SOURCES = new Set<UXSource>([
   'grocery-optimization',
 ]);
 
-export type UiSnapshotExecution = {
+export type LegacyUiSnapshotExecution = {
   moduleId: string;
   result: unknown;
+  projection?: import('@arrivalos/product-contract').ModuleUIProjection;
   timestamp: number;
   executionId: string;
   snapshotVersion: number;
 };
 
-export type UiSnapshot = {
+export type LegacyUiSnapshot = {
   schemaVersion: number;
   snapshotVersion: number;
   lastMutationId: string | null;
@@ -46,8 +54,8 @@ export type UiSnapshot = {
     description?: string;
     access?: 'available' | 'locked' | 'premium-required';
   }>;
-  executions: UiSnapshotExecution[];
-  executionsByModuleId: Record<string, UiSnapshotExecution[]>;
+  executions: LegacyUiSnapshotExecution[];
+  executionsByModuleId: Record<string, LegacyUiSnapshotExecution[]>;
   uxSnapshot: {
     actionCards: unknown[];
     prioritySignals: unknown[];
@@ -57,6 +65,22 @@ export type UiSnapshot = {
     isFirstTimeUser: boolean;
     step?: number;
   };
+};
+
+export type UiSnapshot = {
+  schemaVersion: number;
+  snapshotVersion: number;
+  lastMutationId: string | null;
+  generatedAt: string;
+  session: LegacyUiSnapshot['session'];
+  profile: ProfileDocument | null;
+  modules: LegacyUiSnapshot['modules'];
+  executions: ExecutionSnapshot[];
+  executionsByModuleId: Record<string, ExecutionSnapshot[]>;
+  actionCards: ActionCard[];
+  recommendations: SnapshotRecommendation[];
+  summaries: ModuleSnapshotSummary[];
+  ftu: LegacyUiSnapshot['ftu'];
 };
 
 export type UiSnapshotFallback = UiSnapshot & {
@@ -121,20 +145,30 @@ function resolveFtuState(
   return { isFirstTimeUser: false };
 }
 
-function toSnapshotExecution(entry: StoredModuleExecution): UiSnapshotExecution {
+function toSnapshotExecutionInput(entry: StoredModuleExecution) {
+  return {
+    moduleId: entry.moduleId,
+    executionId: entry.executionId,
+    timestamp: entry.timestamp,
+    ...(entry.projection !== undefined ? { projection: entry.projection } : {}),
+  };
+}
+
+function toLegacySnapshotExecution(entry: StoredModuleExecution): LegacyUiSnapshotExecution {
   return {
     moduleId: entry.moduleId,
     result: getLegacyDomainResult(entry),
+    ...(entry.projection !== undefined ? { projection: entry.projection } : {}),
     timestamp: entry.timestamp,
     executionId: entry.executionId,
     snapshotVersion: entry.snapshotVersion,
   };
 }
 
-function buildUxSnapshotFromState(
+function buildLegacyUxSnapshotFromState(
   state: SystemState,
-  latestExecutions: UiSnapshotExecution[]
-): UiSnapshot['uxSnapshot'] {
+  latestExecutions: LegacyUiSnapshotExecution[]
+): LegacyUiSnapshot['uxSnapshot'] {
   if (!state.projectionConfig.uxSnapshotEnabled) {
     return {
       actionCards: [],
@@ -168,50 +202,12 @@ function buildUxSnapshotFromState(
   }
 }
 
-export function validateSystemStateForProjection(state: SystemState): void {
-  if (!state.session?.id) {
-    throw new SnapshotProjectionError('INVALID_SYSTEM_STATE', 'SystemState.session.id is required');
-  }
-
-  if (
-    typeof state.version?.snapshotVersion !== 'number' ||
-    state.version.snapshotVersion < 0
-  ) {
-    throw new SnapshotProjectionError(
-      'INVALID_SYSTEM_STATE',
-      'SystemState.version.snapshotVersion must be a non-negative number'
-    );
-  }
-}
-
-/**
- * Pure projection: UiSnapshot is fully determined by SystemState,
- * with optional entitlement context for module access metadata.
- */
-export function buildUiSnapshot(
+function buildSnapshotMetadata(
   state: SystemState,
   options?: { entitlements?: AccountEntitlements | null }
-): UiSnapshot {
-  validateSystemStateForProjection(state);
-
-  const sessionContext = state.session.context as Record<string, unknown>;
+) {
   const userProfile = state.session.context.userProfile;
   const profile = state.profileRecord?.document ?? null;
-
-  const executionsByModuleId = Object.fromEntries(
-    Object.entries(state.executionsByModuleId).map(([moduleId, history]) => [
-      moduleId,
-      history.map(toSnapshotExecution),
-    ])
-  ) as Record<string, UiSnapshotExecution[]>;
-
-  const executions = Object.values(executionsByModuleId)
-    .map((history) => history[history.length - 1])
-    .filter((entry): entry is UiSnapshotExecution => entry !== undefined)
-    .sort((a, b) => a.timestamp - b.timestamp);
-
-  const uxSnapshot = buildUxSnapshotFromState(state, executions);
-
   const entitlements =
     state.accountId !== null
       ? (options?.entitlements ?? null)
@@ -241,10 +237,100 @@ export function buildUiSnapshot(
         ...(access ? { access } : {}),
       };
     }),
+  };
+}
+
+export function validateSystemStateForProjection(state: SystemState): void {
+  if (!state.session?.id) {
+    throw new SnapshotProjectionError('INVALID_SYSTEM_STATE', 'SystemState.session.id is required');
+  }
+
+  if (
+    typeof state.version?.snapshotVersion !== 'number' ||
+    state.version.snapshotVersion < 0
+  ) {
+    throw new SnapshotProjectionError(
+      'INVALID_SYSTEM_STATE',
+      'SystemState.version.snapshotVersion must be a non-negative number'
+    );
+  }
+}
+
+/**
+ * Pure projection: UiSnapshot is fully determined by SystemState,
+ * with optional entitlement context for module access metadata.
+ */
+export function buildUiSnapshot(
+  state: SystemState,
+  options?: { entitlements?: AccountEntitlements | null }
+): UiSnapshot {
+  validateSystemStateForProjection(state);
+
+  const metadata = buildSnapshotMetadata(state, options);
+  const executionInputs = Object.values(state.executionsByModuleId).flatMap((history) =>
+    history.map(toSnapshotExecutionInput)
+  );
+
+  const executionsByModuleId = Object.fromEntries(
+    Object.entries(state.executionsByModuleId).map(([moduleId, history]) => [
+      moduleId,
+      buildUiSnapshotProjection(history.map(toSnapshotExecutionInput)).executions,
+    ])
+  ) as Record<string, ExecutionSnapshot[]>;
+
+  const latestExecutions = Object.values(executionsByModuleId)
+    .map((history) => history[history.length - 1])
+    .filter((entry): entry is ExecutionSnapshot => entry !== undefined)
+    .sort((left, right) => left.createdAt.localeCompare(right.createdAt));
+
+  const projectionPayload = buildUiSnapshotProjection(executionInputs);
+
+  return {
+    ...metadata,
+    executions: latestExecutions,
+    executionsByModuleId,
+    actionCards: projectionPayload.actionCards,
+    recommendations: projectionPayload.recommendations,
+    summaries: projectionPayload.summaries,
+    ftu: resolveFtuState(
+      state.session.context as Record<string, unknown>,
+      metadata.profile,
+      latestExecutions.length
+    ),
+  };
+}
+
+export function buildLegacyUiSnapshot(
+  state: SystemState,
+  options?: { entitlements?: AccountEntitlements | null }
+): LegacyUiSnapshot {
+  validateSystemStateForProjection(state);
+
+  const metadata = buildSnapshotMetadata(state, options);
+  const executionsByModuleId = Object.fromEntries(
+    Object.entries(state.executionsByModuleId).map(([moduleId, history]) => [
+      moduleId,
+      history.map(toLegacySnapshotExecution),
+    ])
+  ) as Record<string, LegacyUiSnapshotExecution[]>;
+
+  const executions = Object.values(executionsByModuleId)
+    .map((history) => history[history.length - 1])
+    .filter((entry): entry is LegacyUiSnapshotExecution => entry !== undefined)
+    .sort((left, right) => left.timestamp - right.timestamp);
+
+  const uxSnapshot = buildLegacyUxSnapshotFromState(state, executions);
+
+  return {
+    ...metadata,
     executions,
     executionsByModuleId,
     uxSnapshot,
-    ftu: resolveFtuState(sessionContext, profile, executions.length),
+    ftu: resolveFtuState(
+      state.session.context as Record<string, unknown>,
+      metadata.profile,
+      executions.length
+    ),
   };
 }
 

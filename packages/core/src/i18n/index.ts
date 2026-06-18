@@ -1,5 +1,5 @@
-import { PRODUCT_NAME, PRODUCT_TAGLINE } from '../branding/product.js';
-import type { SupportedLanguage } from '../types/index.js';
+import { PRODUCT_NAME, PRODUCT_TAGLINE } from '@arrivalos/ui-contract';
+import type { SupportedLanguage } from '@arrivalos/ui-contract';
 
 type TranslationKey = string;
 type Translations = Record<TranslationKey, string>;

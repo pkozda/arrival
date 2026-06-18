@@ -1,5 +1,6 @@
 import type { Session, TrackedEvent } from '@arrivalos/core';
 import type { ModuleResult } from '@arrivalos/module-runtime';
+import type { ModuleUIProjection } from '@arrivalos/product-contract';
 import type { ExecutionTrace } from '@arrivalos/profile';
 import type { ProfileRecord, ProfileRevision } from '@arrivalos/profile';
 
@@ -14,6 +15,8 @@ export type StoredModuleExecution = {
   legacyResult?: unknown;
   /** Canonical MRC envelope when dual-write is enabled. */
   moduleResult?: ModuleResult;
+  /** UI-safe execution projection for product layer consumers. */
+  projection?: ModuleUIProjection;
 };
 
 export type SystemModuleDescriptor = {

@@ -1,21 +1,9 @@
-import type { UiSnapshot, UxActionCard, UxPayload } from '@/lib/api';
-import { isUxActionCard } from './ux-action-card';
+import type { UiSnapshot } from '@/lib/product-contract';
 
-export function getModuleUx(snapshot: UiSnapshot | null, moduleId: string): UxPayload | null {
+export function getModuleUx(snapshot: UiSnapshot | null, moduleId: string) {
   if (!snapshot) {
-    return null;
+    return [];
   }
 
-  const actions = snapshot.uxSnapshot.actionCards.filter(
-    (card): card is UxActionCard => isUxActionCard(card) && card.source === moduleId
-  );
-
-  if (actions.length === 0) {
-    return null;
-  }
-
-  return {
-    actions,
-    summary: actions.map((action) => action.title).join(' · '),
-  };
+  return snapshot.actionCards.filter((card) => card.moduleId === moduleId);
 }

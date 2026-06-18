@@ -2,6 +2,7 @@ export type ModuleCapability =
   | 'produces-recommendations'
   | 'produces-actions'
   | 'produces-explanations'
+  | 'produces-risk-warnings'
   | 'requires-profile'
   | 'supports-scenarios'
   | 'supports-comparison';

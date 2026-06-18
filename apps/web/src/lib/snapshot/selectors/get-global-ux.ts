@@ -1,28 +1,21 @@
-import type { UiSnapshot, UxActionCard } from '@/lib/api';
-import { parseUxActionCards } from './ux-action-card';
+import type { UiSnapshot } from '@/lib/product-contract';
 
-export function getGlobalUxActions(snapshot: UiSnapshot | null): UxActionCard[] {
-  if (!snapshot) {
-    return [];
-  }
-
-  return parseUxActionCards(snapshot.uxSnapshot.actionCards);
+export function getGlobalUxActions(snapshot: UiSnapshot | null) {
+  return snapshot?.actionCards ?? [];
 }
 
-export function getPrioritySignals(snapshot: UiSnapshot | null): unknown[] {
+export function getPrioritySignals(snapshot: UiSnapshot | null) {
   if (!snapshot) {
     return [];
   }
 
-  return snapshot.uxSnapshot.prioritySignals;
+  return snapshot.recommendations.filter(
+    (recommendation) => recommendation.priority === 'high' || recommendation.priority === 'critical'
+  );
 }
 
-export function getAttentionLayer(snapshot: UiSnapshot | null): UxActionCard[] {
-  if (!snapshot) {
-    return [];
-  }
-
-  return parseUxActionCards(snapshot.uxSnapshot.attentionLayer);
+export function getAttentionLayer(snapshot: UiSnapshot | null) {
+  return getGlobalUxActions(snapshot).filter((card) => card.priority === 'high').slice(0, 2);
 }
 
 export function hasGlobalUx(snapshot: UiSnapshot | null): boolean {

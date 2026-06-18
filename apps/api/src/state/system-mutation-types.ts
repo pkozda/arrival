@@ -1,5 +1,6 @@
 import type { AppContext, SupportedLanguage } from '@arrivalos/core';
 import type { ModuleResult } from '@arrivalos/module-runtime';
+import type { ModuleUIProjection } from '@arrivalos/product-contract';
 import type {
   ProfileCreateInput,
   ProfilePatch,
@@ -48,6 +49,7 @@ export type ModuleExecuteMutation = {
   executionId: string;
   result: unknown;
   moduleResult?: ModuleResult;
+  projection?: ModuleUIProjection;
   executedAt: string;
   trace: ExecutionTrace;
   requestInput: Record<string, unknown>;

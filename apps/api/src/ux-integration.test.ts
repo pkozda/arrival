@@ -124,7 +124,7 @@ describe('API UX integration', () => {
     return (sessionRes.json() as { sessionId: string }).sessionId;
   }
 
-  it('includes UX actions and summary for financial-reality execution', async () => {
+  it('includes UX actions and summary for financial-reality execution via legacy contract', async () => {
     const app = await buildApp();
 
     const sessionRes = await app.inject({
@@ -164,7 +164,7 @@ describe('API UX integration', () => {
 
     const executeRes = await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {},
@@ -199,7 +199,7 @@ describe('API UX integration', () => {
 
     const executeRes = await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {
@@ -235,7 +235,7 @@ describe('API UX integration', () => {
 
     const executeRes = await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {

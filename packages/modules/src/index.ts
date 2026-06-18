@@ -40,24 +40,18 @@ export {
   BenefitsSimulatorOutputSchema,
 } from './benefits-simulator/index.js';
 
-import { registerModuleMergeStrategy } from '@arrivalos/profile';
-import { financialRealityRegistration } from './financial-reality/index.js';
-import { systemTranslationRegistration } from './system-translation/index.js';
-import { healthcareNavigationRegistration } from './healthcare-navigation/index.js';
-import { groceryOptimizationRegistration } from './grocery-optimization/index.js';
-import { lifeEventRegistration } from './life-event/index.js';
-import { benefitsSimulatorRegistration } from './benefits-simulator/index.js';
-import { benefitsSimulatorMergeStrategy } from './benefits-simulator/merge-strategy.js';
-import type { ModuleRegistration } from '@arrivalos/core';
+export {
+  FINANCIAL_REALITY_CONTRACT,
+  BENEFITS_SIMULATOR_CONTRACT,
+  DEFAULT_MODULE_CONTRACT,
+} from './module-contracts.js';
 
-export const allModuleRegistrations: ModuleRegistration[] = [
-  financialRealityRegistration,
-  systemTranslationRegistration,
-  healthcareNavigationRegistration,
-  groceryOptimizationRegistration,
-  lifeEventRegistration,
-  benefitsSimulatorRegistration,
-];
+export { compiledModuleCatalog, allModuleRegistrations } from './catalog.js';
+
+import { registerModuleMergeStrategy } from '@arrivalos/profile';
+import type { ModuleRegistration } from '@arrivalos/core';
+import { benefitsSimulatorMergeStrategy } from './benefits-simulator/merge-strategy.js';
+import { allModuleRegistrations } from './catalog.js';
 
 export function registerAllMergeStrategies(): void {
   registerModuleMergeStrategy(benefitsSimulatorMergeStrategy);

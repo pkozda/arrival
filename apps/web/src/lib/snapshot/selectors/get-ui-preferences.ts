@@ -1,14 +1,12 @@
-import type { SupportedLanguage } from '@arrivalos/core';
-import type { UiSnapshot } from '@/lib/api';
-import { getSessionLanguage } from './get-session-language';
-import { getThemePreference } from './get-theme';
+import type { SupportedLanguage } from '@/lib/product-contract';
+import type { UiSnapshot } from '@/lib/product-contract';
 
 export function getUiPreferences(snapshot: UiSnapshot | null): {
-  theme: ReturnType<typeof getThemePreference>;
   language: SupportedLanguage;
+  theme: UiSnapshot['session']['uiPreferences']['theme'];
 } {
   return {
-    theme: getThemePreference(snapshot),
-    language: getSessionLanguage(snapshot),
+    language: (snapshot?.session.language ?? 'en') as SupportedLanguage,
+    theme: snapshot?.session.uiPreferences.theme ?? 'light',
   };
 }

@@ -19,6 +19,7 @@ export const MODULE_CONTRACT_SPECS: Record<string, ModuleContractSpec> = {
     capabilities: [
       'produces-recommendations',
       'produces-actions',
+      'produces-risk-warnings',
       'supports-scenarios',
       'supports-comparison',
     ],

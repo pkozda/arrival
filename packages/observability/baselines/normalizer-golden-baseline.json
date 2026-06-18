@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "modules": {
+    "financial-reality": {
+      "recommendationIdsHash": "d3c95d324bed760871d0e3bf6fac9ccc83fd2854936ecfa32a1a230a1a024021",
+      "actionIdsHash": "5ba097a86605e6ce341170c354c62b412cbb92ab3416ad79177501d874c7a768"
+    },
+    "benefits-simulator": {
+      "recommendationIdsHash": "fe606edde98af48bb03acf62b2abfa08375f0ffdc58f3d4b1b4a308ec6fc0ce0",
+      "actionIdsHash": "89756b7fc110b206a9ede0c6c608df842edfecbc895e29c682861f8e7ab93c04"
+    }
+  }
+}

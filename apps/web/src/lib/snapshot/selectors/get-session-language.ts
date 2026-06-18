@@ -1,5 +1,5 @@
-import { SupportedLanguageSchema, type SupportedLanguage } from '@arrivalos/core';
-import type { UiSnapshot } from '@/lib/api';
+import { SupportedLanguageSchema, type SupportedLanguage } from '@/lib/product-contract';
+import type { UiSnapshot } from '@/lib/product-contract';
 
 export function getSessionLanguage(snapshot: UiSnapshot | null): SupportedLanguage {
   const parsed = SupportedLanguageSchema.safeParse(snapshot?.session?.language);

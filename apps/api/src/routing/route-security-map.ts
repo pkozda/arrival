@@ -57,6 +57,18 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
   },
   {
     method: 'GET',
+    path: '/api/health/governance',
+    tier: 'account-required',
+    description: 'Governance health (ops-only)',
+  },
+  {
+    method: 'GET',
+    path: '/api/health/modules',
+    tier: 'account-required',
+    description: 'Module health summary (ops-only)',
+  },
+  {
+    method: 'GET',
     path: '/api/modules',
     tier: 'public',
     description: 'Module catalog',
@@ -66,6 +78,18 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
     path: '/api/modules/:id',
     tier: 'public',
     description: 'Module metadata',
+  },
+  {
+    method: 'GET',
+    path: '/api/modules/:id/schema',
+    tier: 'public',
+    description: 'Module input/output JSON schema',
+  },
+  {
+    method: 'GET',
+    path: '/api/modules/:id/capabilities',
+    tier: 'public',
+    description: 'Module normalized capabilities',
   },
   {
     method: 'GET',
@@ -108,6 +132,12 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
     path: '/api/modules/:id/trace',
     tier: 'credential-required',
     description: 'Diagnostic execution trace',
+  },
+  {
+    method: 'GET',
+    path: '/api/modules/:id/explain',
+    tier: 'credential-required',
+    description: 'Product explainability view for a stored execution',
   },
   {
     method: 'POST',

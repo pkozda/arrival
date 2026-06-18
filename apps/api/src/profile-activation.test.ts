@@ -65,7 +65,7 @@ describe('profile activation integration', () => {
 
     const executeRes = await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {
@@ -117,7 +117,7 @@ describe('profile activation integration', () => {
 
     await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {
@@ -162,7 +162,7 @@ describe('profile activation integration', () => {
 
     await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {
@@ -180,7 +180,7 @@ describe('profile activation integration', () => {
 
     const secondExecuteRes = await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {},
