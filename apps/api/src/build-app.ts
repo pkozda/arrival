@@ -7,8 +7,16 @@ import {
   AppContextSchema,
 } from '@arrivalos/core';
 import { resolveExecutionContext } from '@arrivalos/profile';
-import { registerAllModules } from '@arrivalos/modules';
+import { registerAllModules, allModuleRegistrations } from '@arrivalos/modules';
 import { profileEngine } from './profile-runtime.js';
+import {
+  ModuleRuntime,
+  bootstrapGovernedRuntime,
+  executeGovernedModule,
+  type GovernedModuleRegistry,
+} from '@arrivalos/module-runtime';
+import { runMrcShadowValidation } from './mrc-shadow.js';
+import { attachModuleResultEnvelope, buildExecuteApiResponse } from './mrc-envelope.js';
 import { registerSessionLifecycleRoutes } from './routes/session-lifecycle.js';
 import { registerAccountRoutes } from './routes/account.js';
 import { registerProfileRoutes } from './routes/profile.js';
@@ -41,6 +49,7 @@ import {
 } from './routing/session-ownership.js';
 
 let modulesRegistered = false;
+let governedRegistry: GovernedModuleRegistry | null = null;
 
 function ensureModulesRegistered(): void {
   if (!modulesRegistered) {
@@ -49,8 +58,21 @@ function ensureModulesRegistered(): void {
   }
 }
 
+function ensureGovernedRuntime(): GovernedModuleRegistry {
+  ensureModulesRegistered();
+
+  if (!governedRegistry) {
+    governedRegistry = bootstrapGovernedRuntime(
+      globalRegistry,
+      allModuleRegistrations
+    ).governedRegistry;
+  }
+
+  return governedRegistry;
+}
+
 function listModuleDescriptors() {
-  return globalRegistry.list().map((module) => ({
+  return ensureGovernedRuntime().list().map((module) => ({
     id: module.id,
     name: module.name,
     ...(module.description ? { description: module.description } : {}),
@@ -58,7 +80,12 @@ function listModuleDescriptors() {
 }
 
 export async function buildApp(options: { logger?: boolean } = {}) {
-  ensureModulesRegistered();
+  const runtimeRegistry = ensureGovernedRuntime();
+
+  const moduleRuntime = new ModuleRuntime({
+    profileEngine,
+    governedRegistry: runtimeRegistry,
+  });
 
   const app = Fastify({ logger: options.logger ?? false });
   const registeredRoutes: RegisteredRouteRef[] = [];
@@ -104,7 +131,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
     '/api/modules',
     requireRouteSecurityRule('GET', '/api/modules'),
     async () => ({
-      modules: globalRegistry.list().map((m) => ({
+      modules: runtimeRegistry.list().map((m) => ({
         id: m.id,
         name: m.name,
         version: m.version,
@@ -122,7 +149,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
     requireRouteSecurityRule('GET', '/api/modules/:id'),
     async (request, reply) => {
       const { id } = request.params as { id: string };
-      const module = globalRegistry.get(id);
+      const module = runtimeRegistry.get(id);
       if (!module) {
         return reply.status(404).send({ error: `Module "${id}" not found` });
       }
@@ -149,7 +176,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
       const sessionId = identity.sessionId;
       const accountId = identity.accountId;
 
-      const module = globalRegistry.get(id);
+      const module = runtimeRegistry.get(id);
       if (!module) {
         return reply.status(404).send({ error: `Module "${id}" not found` });
       }
@@ -185,19 +212,48 @@ export async function buildApp(options: { logger?: boolean } = {}) {
         inputOverrides: contextInputOverrides,
       });
 
-      const result = await globalRegistry.execute(id, mergedInput, context);
+      const result = await executeGovernedModule(
+        runtimeRegistry,
+        id,
+        mergedInput,
+        context
+      );
+
+      runMrcShadowValidation(
+        moduleRuntime,
+        {
+          moduleId: id,
+          sessionId,
+          accountId,
+          requestInput: cleanInput,
+          requestContext: rawContext,
+          inputOverrides: contextInputOverrides,
+        },
+        result,
+        request.log
+      );
+
       if (!result.success) {
         return reply.status(422).send(result);
       }
 
+      const executionId = randomUUID();
+      const moduleResult = attachModuleResultEnvelope(result, executionId, {
+        moduleId: id,
+        appContext: context,
+        mergedInput,
+        accountId,
+        governedRegistry: runtimeRegistry,
+      });
+
       if (sessionId && result.data !== undefined) {
-        const executionId = randomUUID();
         try {
           await systemStateCoordinator.applyMutation({
             type: 'MODULE_EXECUTE',
             sessionId,
             moduleId: id,
             result: result.data,
+            moduleResult,
             executedAt: result.executedAt,
             executionId,
             trace: { ...trace, sessionId },
@@ -211,7 +267,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
         }
       }
 
-      return attachUxToExecutionResult(result);
+      return buildExecuteApiResponse(attachUxToExecutionResult(result), moduleResult);
     }
   );
 
@@ -226,7 +282,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
 
       reply.header('x-deprecation', 'Use GET /api/ui-snapshot for UI state. Trace is diagnostic-only.');
 
-      const module = globalRegistry.get(id);
+      const module = runtimeRegistry.get(id);
       if (!module) {
         return reply.status(404).send({ error: `Module "${id}" not found` });
       }

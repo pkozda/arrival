@@ -1,4 +1,5 @@
 import { ThemePreferenceSchema, type SupportedLanguage } from '@arrivalos/core';
+import { getLegacyDomainResult } from '@arrivalos/module-runtime';
 import type { ProfileDocument } from '@arrivalos/profile';
 import { buildUXActionPlan, type UXSource } from '@arrivalos/ux';
 import {
@@ -123,7 +124,7 @@ function resolveFtuState(
 function toSnapshotExecution(entry: StoredModuleExecution): UiSnapshotExecution {
   return {
     moduleId: entry.moduleId,
-    result: entry.result,
+    result: getLegacyDomainResult(entry),
     timestamp: entry.timestamp,
     executionId: entry.executionId,
     snapshotVersion: entry.snapshotVersion,

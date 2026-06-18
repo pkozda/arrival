@@ -1,4 +1,5 @@
 import type { AppContext, Session, TrackedEvent } from '@arrivalos/core';
+import type { ModuleResult } from '@arrivalos/module-runtime';
 import {
   ProfileCreateInputSchema,
   ProfileDocumentSchema,
@@ -352,6 +353,7 @@ export function applyModuleExecute(params: {
   moduleId: string;
   executionId: string;
   result: unknown;
+  moduleResult?: ModuleResult;
   executedAt: string;
   trace: ExecutionTrace;
   requestInput: Record<string, unknown>;
@@ -365,6 +367,12 @@ export function applyModuleExecute(params: {
     timestamp: Number.isNaN(timestamp) ? Date.now() : timestamp,
     executionId: params.executionId,
     snapshotVersion: 0,
+    ...(params.moduleResult !== undefined
+      ? {
+          legacyResult: params.result,
+          moduleResult: params.moduleResult,
+        }
+      : {}),
   };
 
   const executionsByModuleId = {
