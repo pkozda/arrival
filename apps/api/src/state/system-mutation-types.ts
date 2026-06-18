@@ -1,4 +1,5 @@
 import type { AppContext, SupportedLanguage } from '@arrivalos/core';
+import type { ModuleResult } from '@arrivalos/module-runtime';
 import type {
   ProfileCreateInput,
   ProfilePatch,
@@ -46,6 +47,7 @@ export type ModuleExecuteMutation = {
   moduleId: string;
   executionId: string;
   result: unknown;
+  moduleResult?: ModuleResult;
   executedAt: string;
   trace: ExecutionTrace;
   requestInput: Record<string, unknown>;

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@arrivalos/core": "*",
+    "@arrivalos/module-runtime": "*",
     "@arrivalos/modules": "*",
     "@arrivalos/profile": "*",
     "@arrivalos/shared-services": "*",

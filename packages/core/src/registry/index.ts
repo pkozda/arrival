@@ -8,8 +8,13 @@ import { trackEvent } from '../events/index.js';
 
 export class ModuleRegistry {
   private modules = new Map<string, ModuleRegistration>();
+  private registrationFrozen = false;
 
   register(registration: ModuleRegistration): void {
+    if (this.registrationFrozen) {
+      throw new Error('Module registry registration is frozen');
+    }
+
     const { id, version } = registration;
 
     if (this.modules.has(id)) {
@@ -26,7 +31,19 @@ export class ModuleRegistry {
     });
   }
 
+  freezeRegistration(): void {
+    this.registrationFrozen = true;
+  }
+
+  isRegistrationFrozen(): boolean {
+    return this.registrationFrozen;
+  }
+
   unregister(moduleId: string): boolean {
+    if (this.registrationFrozen) {
+      throw new Error('Module registry registration is frozen');
+    }
+
     const removed = this.modules.delete(moduleId);
     if (removed) {
       trackEvent('module.unregistered', { moduleId });
@@ -40,34 +57,64 @@ export class ModuleRegistry {
 
   list(includeDisabled = false): ModuleRegistration[] {
     const all = Array.from(this.modules.values());
-    if (includeDisabled) return all;
+    if (includeDisabled) {
+      return all;
+    }
+
     return all.filter((m) => m.enabled);
+  }
+
+  listModuleIds(includeDisabled = false): string[] {
+    return this.list(includeDisabled).map((module) => module.id);
   }
 
   isEnabled(moduleId: string): boolean {
     const registration = this.modules.get(moduleId);
-    if (!registration) return false;
-    if (!registration.enabled) return false;
+    if (!registration) {
+      return false;
+    }
+
+    if (!registration.enabled) {
+      return false;
+    }
+
     return true;
   }
 
   hasFeatureFlag(moduleId: string, flag: string): boolean {
     const registration = this.modules.get(moduleId);
-    if (!registration) return false;
+    if (!registration) {
+      return false;
+    }
+
     return registration.featureFlags[flag] ?? false;
   }
 
   setEnabled(moduleId: string, enabled: boolean): boolean {
+    if (this.registrationFrozen) {
+      throw new Error('Module registry registration is frozen');
+    }
+
     const registration = this.modules.get(moduleId);
-    if (!registration) return false;
+    if (!registration) {
+      return false;
+    }
+
     registration.enabled = enabled;
     trackEvent('module.toggled', { moduleId, payload: { enabled } });
     return true;
   }
 
   setFeatureFlag(moduleId: string, flag: string, value: boolean): boolean {
+    if (this.registrationFrozen) {
+      throw new Error('Module registry registration is frozen');
+    }
+
     const registration = this.modules.get(moduleId);
-    if (!registration) return false;
+    if (!registration) {
+      return false;
+    }
+
     registration.featureFlags[flag] = value;
     trackEvent('module.feature_flag', { moduleId, payload: { flag, value } });
     return true;
