@@ -1,4 +1,4 @@
-import type { UiSnapshot } from '@/lib/api';
+import type { UiSnapshot } from '@/lib/product-contract';
 import type { ModuleExecutionView } from '../types';
 
 export function getModuleExecution(
@@ -14,5 +14,15 @@ export function getModuleExecution(
     return null;
   }
 
-  return history[history.length - 1] ?? null;
+  const latest = history[history.length - 1];
+  if (!latest) {
+    return null;
+  }
+
+  return {
+    moduleId: latest.moduleId,
+    projection: latest.projection,
+    createdAt: latest.createdAt,
+    executionId: latest.executionId,
+  };
 }

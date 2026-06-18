@@ -1,17 +1,14 @@
 'use client';
 
 import { Header } from './Header';
-import { useApp } from './AppProvider';
 
 interface ModuleLayoutProps {
-  titleKey: string;
-  descKey: string;
+  title: string;
+  description: string;
   children: React.ReactNode;
 }
 
-export function ModuleLayout({ titleKey, descKey, children }: ModuleLayoutProps) {
-  const { t } = useApp();
-
+export function ModuleLayout({ title, description, children }: ModuleLayoutProps) {
   return (
     <>
       <Header />
@@ -19,9 +16,9 @@ export function ModuleLayout({ titleKey, descKey, children }: ModuleLayoutProps)
         <div className="container">
           <div style={{ marginBottom: '2rem' }}>
             <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-              {t(titleKey)}
+              {title}
             </h1>
-            <p style={{ color: 'var(--color-text-muted)' }}>{t(descKey)}</p>
+            <p style={{ color: 'var(--color-text-muted)' }}>{description}</p>
           </div>
           {children}
         </div>

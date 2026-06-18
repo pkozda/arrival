@@ -1,118 +1,25 @@
+import type {
+  ModuleCatalogResponse,
+  ModuleSchemaProjection,
+  PublicModuleContract,
+} from '@/lib/product-contract';
+import type {
+  ModuleExecuteResponse,
+  ModuleExplanationView,
+  ThemePreference,
+  UiSnapshot,
+} from '@/lib/product-contract';
+
+export type {
+  ModuleExecuteResponse,
+  ModuleExplanationView,
+  UiSnapshot,
+};
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export const SESSION_STORAGE_KEY = 'arrival_atlas_session_id';
 export const TOKEN_STORAGE_KEY = 'arrival_atlas_auth_token';
-
-export interface SnapshotProfileEmployment {
-  status?: string;
-  grossMonthlyIncome?: number;
-  taxClass?: number;
-  churchTax?: boolean;
-}
-
-export interface SnapshotProfileHousehold {
-  size?: number;
-  maritalStatus?: string;
-}
-
-export interface SnapshotProfileHousing {
-  monthlyColdRent?: number;
-}
-
-export interface SnapshotProfileInsurance {
-  type?: string;
-  hasCoverage?: boolean;
-}
-
-export interface SnapshotProfile {
-  preferredLanguage?: string;
-  employment?: SnapshotProfileEmployment;
-  household?: SnapshotProfileHousehold;
-  housing?: SnapshotProfileHousing;
-  insurance?: SnapshotProfileInsurance;
-  [key: string]: unknown;
-}
-
-export interface UiSnapshot {
-  schemaVersion: number;
-  snapshotVersion: number;
-  lastMutationId: string | null;
-  generatedAt: string;
-  session: {
-    sessionId: string;
-    language: string;
-    uiPreferences: {
-      theme: 'light' | 'dark' | 'system';
-    };
-  };
-  profile: SnapshotProfile | null;
-  modules: Array<{
-    id: string;
-    name: string;
-    description?: string;
-  }>;
-  executions: Array<{
-    moduleId: string;
-    result: unknown;
-    timestamp: number;
-    executionId: string;
-    snapshotVersion: number;
-  }>;
-  executionsByModuleId: Record<
-    string,
-    Array<{
-      moduleId: string;
-      result: unknown;
-      timestamp: number;
-      executionId: string;
-      snapshotVersion: number;
-    }>
-  >;
-  uxSnapshot: {
-    actionCards: unknown[];
-    prioritySignals: unknown[];
-    attentionLayer: unknown[];
-  };
-  ftu: {
-    isFirstTimeUser: boolean;
-    step?: number;
-  };
-  fallback?: {
-    reason: string;
-    code: 'PROJECTION_ERROR';
-  };
-}
-
-export interface ModuleInfo {
-  id: string;
-  name: string;
-  version: string;
-  description: string;
-  enabled: boolean;
-}
-
-export interface UxActionCard {
-  id: string;
-  title: string;
-  description: string;
-  priority: 'high' | 'medium' | 'low';
-  source: string;
-}
-
-export interface UxPayload {
-  actions: UxActionCard[];
-  summary: string;
-}
-
-export interface ModuleResult<T = unknown> {
-  moduleId: string;
-  version: string;
-  success: boolean;
-  data?: T;
-  error?: string;
-  executedAt: string;
-  ux?: UxPayload;
-}
 
 export type AuthHeaderOptions = {
   sessionId?: string | null;
@@ -191,19 +98,77 @@ function jsonAuthHeaders(options: AuthHeaderOptions = {}): Record<string, string
   };
 }
 
-export async function executeModule<TInput, TOutput>(
+export async function fetchModuleCatalog(): Promise<PublicModuleContract[]> {
+  const res = await fetch(`${API_URL}/api/modules`);
+  if (!res.ok) {
+    throw new Error(`Module catalog request failed (${res.status})`);
+  }
+
+  const body = (await res.json()) as ModuleCatalogResponse;
+  return body.modules;
+}
+
+export async function fetchModuleContract(moduleId: string): Promise<PublicModuleContract> {
+  const res = await fetch(`${API_URL}/api/modules/${moduleId}`);
+  if (!res.ok) {
+    throw new Error(`Module contract request failed (${res.status})`);
+  }
+
+  return res.json() as Promise<PublicModuleContract>;
+}
+
+export async function fetchModuleSchema(moduleId: string): Promise<ModuleSchemaProjection> {
+  const res = await fetch(`${API_URL}/api/modules/${moduleId}/schema`);
+  if (!res.ok) {
+    throw new Error(`Module schema request failed (${res.status})`);
+  }
+
+  return res.json() as Promise<ModuleSchemaProjection>;
+}
+
+export async function executeModule(
   moduleId: string,
-  input: TInput,
+  input: Record<string, unknown>,
   context?: Record<string, unknown>,
   sessionId?: string
-): Promise<ModuleResult<TOutput>> {
+): Promise<ModuleExecuteResponse> {
   const res = await fetch(`${API_URL}/api/modules/${moduleId}/execute`, {
     method: 'POST',
     headers: jsonAuthHeaders({ sessionId }),
     body: JSON.stringify({ input, context }),
   });
 
-  return res.json();
+  const body = (await res.json()) as ModuleExecuteResponse;
+  if (!res.ok && !body.projection) {
+    const errorBody = body as unknown as { error?: string };
+    throw new Error(
+      typeof errorBody.error === 'string'
+        ? errorBody.error
+        : `Module execution failed (${res.status})`
+    );
+  }
+
+  return body;
+}
+
+export async function fetchModuleExplanation(
+  moduleId: string,
+  executionId: string,
+  sessionId?: string
+): Promise<ModuleExplanationView> {
+  const res = await fetch(
+    `${API_URL}/api/modules/${moduleId}/explain?executionId=${encodeURIComponent(executionId)}`,
+    {
+      headers: buildAuthHeaders({ sessionId }),
+    }
+  );
+
+  if (!res.ok) {
+    const errorBody = (await res.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(errorBody?.error ?? `Explain request failed (${res.status})`);
+  }
+
+  return res.json() as Promise<ModuleExplanationView>;
 }
 
 export async function createSession(context?: Record<string, unknown>): Promise<string> {
@@ -236,9 +201,6 @@ export async function isSessionValid(
   }
 }
 
-/**
- * Restore a stored session when valid; otherwise create a new session and persist it.
- */
 export async function ensureSession(context?: Record<string, unknown>): Promise<string> {
   const storedSessionId = readStoredSessionId();
   const storedToken = readStoredToken();
@@ -298,7 +260,7 @@ export async function updateSessionLanguage(
 
 export async function updateSessionTheme(
   sessionId: string,
-  theme: 'light' | 'dark' | 'system'
+  theme: ThemePreference
 ): Promise<void> {
   const res = await fetch(`${API_URL}/api/sessions/${sessionId}`, {
     method: 'PATCH',

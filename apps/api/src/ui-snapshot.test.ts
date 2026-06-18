@@ -74,11 +74,9 @@ describe('GET /api/ui-snapshot', () => {
     expect(snapshot.executions).toEqual([]);
     expect(snapshot.executionsByModuleId).toEqual({});
     expect(snapshot.schemaVersion).toBe(1);
-    expect(snapshot.uxSnapshot).toEqual({
-      actionCards: [],
-      prioritySignals: [],
-      attentionLayer: [],
-    });
+    expect(snapshot.actionCards).toEqual([]);
+    expect(snapshot.recommendations).toEqual([]);
+    expect(snapshot.summaries).toEqual([]);
     expect(snapshot.ftu).toEqual({
       isFirstTimeUser: true,
       step: 1,
@@ -96,7 +94,7 @@ describe('GET /api/ui-snapshot', () => {
     );
   });
 
-  it('includes profile, executions, and ux snapshot after module execution', async () => {
+  it('includes profile, executions, and projection snapshot after module execution', async () => {
     process.env.ATLAS_UX_ENABLED = 'true';
     const app = await buildApp();
 
@@ -145,17 +143,58 @@ describe('GET /api/ui-snapshot', () => {
     expect(snapshot.profile?.preferredLanguage).toBe('en');
     expect(snapshot.executions).toHaveLength(1);
     expect(snapshot.executions[0]?.moduleId).toBe('financial-reality');
-    expect(snapshot.executions[0]?.timestamp).toEqual(expect.any(Number));
     expect(snapshot.executions[0]?.executionId).toEqual(expect.any(String));
-    expect(snapshot.executions[0]?.snapshotVersion).toEqual(expect.any(Number));
+    expect(snapshot.executions[0]?.projection.moduleId).toBe('financial-reality');
+    expect(snapshot.executions[0]?.createdAt).toEqual(expect.any(String));
     expect(snapshot.snapshotVersion).toBeGreaterThan(0);
     expect(snapshot.lastMutationId).toEqual(expect.any(String));
     expect(snapshot.generatedAt).toEqual(expect.any(String));
     expect(snapshot.ftu.isFirstTimeUser).toBe(false);
+    expect(snapshot.actionCards.length).toBeGreaterThanOrEqual(0);
+    expect(snapshot.executions[0]).not.toHaveProperty('result');
+  });
+
+  it('returns legacy snapshot shape with snapshotVersion=legacy', async () => {
+    process.env.ATLAS_UX_ENABLED = 'true';
+    const app = await buildApp();
+
+    const sessionRes = await app.inject({
+      method: 'POST',
+      url: '/api/sessions',
+      payload: { context: { userProfile: { language: 'en' } } },
+    });
+    const { sessionId } = sessionRes.json() as { sessionId: string };
+
+    await app.inject({
+      method: 'POST',
+      url: '/api/modules/financial-reality/execute',
+      headers: { 'x-session-id': sessionId },
+      payload: {
+        input: {
+          grossIncome: 2500,
+          taxClass: 1,
+        },
+        context: {},
+      },
+    });
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/ui-snapshot?snapshotVersion=legacy',
+      headers: { 'x-session-id': sessionId },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const snapshot = res.json() as {
+      executions: Array<{ result: unknown; projection?: unknown }>;
+      uxSnapshot: { actionCards: unknown[] };
+    };
+
+    expect(snapshot.executions[0]?.result).toBeTruthy();
     expect(snapshot.uxSnapshot.actionCards.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('returns empty ux snapshot when UX feature flag is disabled', async () => {
+  it('returns empty action cards when UX feature flag is disabled', async () => {
     process.env.ATLAS_UX_ENABLED = 'false';
     const app = await buildApp();
 
@@ -189,11 +228,8 @@ describe('GET /api/ui-snapshot', () => {
     const snapshot = res.json() as UiSnapshot;
 
     expect(snapshot.executions).toHaveLength(1);
-    expect(snapshot.uxSnapshot).toEqual({
-      actionCards: [],
-      prioritySignals: [],
-      attentionLayer: [],
-    });
+    expect(snapshot.actionCards).toEqual([]);
+    expect(snapshot.recommendations).toEqual([]);
   });
 
   it('increments snapshotVersion monotonically across mutations', async () => {
@@ -251,8 +287,8 @@ describe('GET /api/ui-snapshot', () => {
     const afterExecute = afterExecuteRes.json() as UiSnapshot;
 
     expect(afterExecute.snapshotVersion).not.toBe(afterProfile.snapshotVersion);
-    expect(afterExecute.executions[0]?.snapshotVersion).toBeGreaterThan(0);
     expect(afterExecute.executions[0]?.executionId).toEqual(expect.any(String));
+    expect(afterExecute.executions[0]?.projection.moduleId).toBe('financial-reality');
   });
 
   it('preserves highest execution snapshotVersion under concurrent module executes', async () => {
@@ -311,9 +347,9 @@ describe('GET /api/ui-snapshot', () => {
     expect(snapshot.executions).toHaveLength(1);
     expect(snapshot.executionsByModuleId['financial-reality']).toHaveLength(2);
     const execution = snapshot.executions[0];
-    expect(execution?.snapshotVersion).toBeGreaterThan(0);
     expect(execution?.executionId).toEqual(expect.any(String));
-    expect(snapshot.snapshotVersion).toBeGreaterThanOrEqual(execution?.snapshotVersion ?? 0);
+    expect(execution?.projection.moduleId).toBe('financial-reality');
+    expect(snapshot.snapshotVersion).toBeGreaterThan(0);
   });
 
   it('restores persisted system state after simulated process restart', async () => {

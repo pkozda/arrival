@@ -68,7 +68,7 @@ describe('API profile + financial module integration', () => {
 
     const executeFromProfileRes = await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {},
@@ -86,7 +86,7 @@ describe('API profile + financial module integration', () => {
 
     const executeOverrideRes = await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: { grossIncome: 3000 },

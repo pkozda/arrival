@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import {
+  SupportedLanguageSchema,
+  ThemePreferenceSchema,
+  type SupportedLanguage,
+  type ThemePreference,
+} from '@arrivalos/ui-contract';
 
-export const SupportedLanguageSchema = z.enum(['ru', 'ua', 'de', 'en']);
-export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
-
-export const ThemePreferenceSchema = z.enum(['light', 'dark', 'system']);
-export type ThemePreference = z.infer<typeof ThemePreferenceSchema>;
+export { SupportedLanguageSchema, ThemePreferenceSchema, type SupportedLanguage, type ThemePreference };
 
 export const UiPreferencesSchema = z.object({
   theme: ThemePreferenceSchema.default('light'),

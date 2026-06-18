@@ -4,22 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useApp } from './AppProvider';
-import { PRODUCT_NAME, type SupportedLanguage } from '@arrivalos/core';
-
-const NAV_ITEMS = [
-  { href: '/modules/financial-reality', key: 'nav.financial', icon: '€' },
-  { href: '/modules/healthcare-navigation', key: 'nav.healthcare', icon: '+' },
-  { href: '/modules/grocery-optimization', key: 'nav.grocery', icon: '🛒' },
-  { href: '/modules/system-translation', key: 'nav.translation', icon: 'Aa' },
-  { href: '/modules/life-event', key: 'nav.lifeEvents', icon: '◎' },
-];
-
-const LANGUAGES: { code: SupportedLanguage; label: string }[] = [
-  { code: 'en', label: 'EN' },
-  { code: 'de', label: 'DE' },
-  { code: 'ru', label: 'RU' },
-  { code: 'ua', label: 'UA' },
-];
+import { PRODUCT_NAME, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@/lib/product-contract';
 
 function ThemeIcon({ theme }: { theme: 'light' | 'dark' }) {
   if (theme === 'dark') {
@@ -30,6 +15,7 @@ function ThemeIcon({ theme }: { theme: 'light' | 'dark' }) {
       </svg>
     );
   }
+
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
@@ -51,10 +37,21 @@ function BurgerIcon({ open }: { open: boolean }) {
   );
 }
 
+const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
+  en: 'EN',
+  de: 'DE',
+  ru: 'RU',
+  ua: 'UA',
+};
+
 export function Header() {
   const pathname = usePathname();
-  const { language, changeLanguage, theme, toggleTheme, t } = useApp();
+  const { language, changeLanguage, theme, toggleTheme, t, modules } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navModules = modules
+    .filter((module) => module.status === 'available')
+    .sort((left, right) => left.title.localeCompare(right.title));
 
   useEffect(() => {
     setMenuOpen(false);
@@ -63,8 +60,8 @@ export function Header() {
   useEffect(() => {
     if (!menuOpen) return;
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
     };
 
     document.body.style.overflow = 'hidden';
@@ -134,17 +131,18 @@ export function Header() {
         </div>
 
         <ul className="header-nav-list">
-          {NAV_ITEMS.map((item) => {
-            const active = pathname === item.href;
+          {navModules.map((module) => {
+            const href = `/modules/${module.id}`;
+            const active = pathname === href;
             return (
-              <li key={item.href}>
+              <li key={module.id}>
                 <Link
-                  href={item.href}
+                  href={href}
                   className={`header-nav-link${active ? ' header-nav-link--active' : ''}`}
                   onClick={() => setMenuOpen(false)}
                 >
-                  <span className="header-nav-icon">{item.icon}</span>
-                  <span>{t(item.key)}</span>
+                  <span className="header-nav-icon">{module.metadata.icon ?? '•'}</span>
+                  <span>{module.title}</span>
                 </Link>
               </li>
             );
@@ -154,14 +152,14 @@ export function Header() {
         <div className="header-drawer-footer">
           <span className="header-drawer-label">{t('common.language')}</span>
           <div className="header-lang-group">
-            {LANGUAGES.map((lang) => (
+            {SUPPORTED_LANGUAGES.map((lang) => (
               <button
-                key={lang.code}
+                key={lang}
                 type="button"
-                className={`header-lang-btn${language === lang.code ? ' header-lang-btn--active' : ''}`}
-                onClick={() => changeLanguage(lang.code)}
+                className={`header-lang-btn${language === lang ? ' header-lang-btn--active' : ''}`}
+                onClick={() => changeLanguage(lang)}
               >
-                {lang.label}
+                {LANGUAGE_LABELS[lang]}
               </button>
             ))}
           </div>

@@ -169,6 +169,7 @@ export class SystemStateCoordinator {
           executionId: mutation.executionId,
           result: mutation.result,
           moduleResult: mutation.moduleResult,
+          projection: mutation.projection,
           executedAt: mutation.executedAt,
           trace: mutation.trace,
           requestInput: mutation.requestInput,

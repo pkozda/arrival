@@ -1,5 +1,6 @@
 import type { AppContext, Session, TrackedEvent } from '@arrivalos/core';
 import type { ModuleResult } from '@arrivalos/module-runtime';
+import type { ModuleUIProjection } from '@arrivalos/product-contract';
 import {
   ProfileCreateInputSchema,
   ProfileDocumentSchema,
@@ -354,6 +355,7 @@ export function applyModuleExecute(params: {
   executionId: string;
   result: unknown;
   moduleResult?: ModuleResult;
+  projection?: ModuleUIProjection;
   executedAt: string;
   trace: ExecutionTrace;
   requestInput: Record<string, unknown>;
@@ -373,6 +375,7 @@ export function applyModuleExecute(params: {
           moduleResult: params.moduleResult,
         }
       : {}),
+    ...(params.projection !== undefined ? { projection: params.projection } : {}),
   };
 
   const executionsByModuleId = {
@@ -452,4 +455,13 @@ export function getLatestExecutionTrace(
     return null;
   }
   return history[history.length - 1] ?? null;
+}
+
+export function getStoredModuleExecution(
+  state: SystemState,
+  moduleId: string,
+  executionId: string
+): StoredModuleExecution | null {
+  const history = state.executionsByModuleId[moduleId] ?? [];
+  return history.find((entry) => entry.executionId === executionId) ?? null;
 }

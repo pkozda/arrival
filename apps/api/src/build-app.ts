@@ -15,15 +15,31 @@ import {
   executeGovernedModule,
   type GovernedModuleRegistry,
 } from '@arrivalos/module-runtime';
+import {
+  bootstrapProductContractLayer,
+  projectModuleCapabilities,
+  projectModuleSchema,
+  projectPublicContract,
+  projectPublicModuleContract,
+  type ContractSnapshotStore,
+} from '@arrivalos/product-contract';
 import { runMrcShadowValidation } from './mrc-shadow.js';
-import { attachModuleResultEnvelope, buildExecuteApiResponse } from './mrc-envelope.js';
+import {
+  buildLegacyExecuteResponse,
+  buildProjectionExecuteResponse,
+  isLegacyExecuteContract,
+  sealModuleResultForProjection,
+} from './module-execute-response.js';
 import { registerSessionLifecycleRoutes } from './routes/session-lifecycle.js';
 import { registerAccountRoutes } from './routes/account.js';
 import { registerProfileRoutes } from './routes/profile.js';
 import { registerUiSnapshotRoutes } from './routes/ui-snapshot.js';
 import { randomUUID } from 'node:crypto';
 import { systemStateCoordinator } from './state/system-state-coordinator.js';
-import { attachUxToExecutionResult, isAtlasUxEnabled } from './ux-integration.js';
+import { buildModuleExplanationResponse } from './module-explain.js';
+import { mapExecuteFailureResponse } from './module-error-boundary.js';
+import { markLegacyContractDeprecated } from './legacy-contract-deprecation.js';
+import { isAtlasUxEnabled } from './ux-integration.js';
 import { toMutationActor } from './middleware/auth.middleware.js';
 import {
   authTokenService,
@@ -44,12 +60,18 @@ import {
 } from './routing/route-security-map.js';
 import { securedRoute } from './routing/apply-route-security.js';
 import {
+  buildGovernanceHealthReport,
+  buildModulesHealthReport,
+} from './observability-runtime.js';
+import { globalMetricsCollector } from '@arrivalos/observability';
+import {
   assertSessionOwnership,
   resolveOwnedSessionId,
 } from './routing/session-ownership.js';
 
 let modulesRegistered = false;
 let governedRegistry: GovernedModuleRegistry | null = null;
+let contractSnapshotStore: ContractSnapshotStore | null = null;
 
 function ensureModulesRegistered(): void {
   if (!modulesRegistered) {
@@ -71,16 +93,25 @@ function ensureGovernedRuntime(): GovernedModuleRegistry {
   return governedRegistry;
 }
 
+function ensureContractSnapshotStore(): ContractSnapshotStore {
+  if (!contractSnapshotStore) {
+    contractSnapshotStore = bootstrapProductContractLayer(ensureGovernedRuntime());
+  }
+
+  return contractSnapshotStore;
+}
+
 function listModuleDescriptors() {
-  return ensureGovernedRuntime().list().map((module) => ({
+  return projectPublicContract(ensureGovernedRuntime()).map((module) => ({
     id: module.id,
-    name: module.name,
+    name: module.title,
     ...(module.description ? { description: module.description } : {}),
   }));
 }
 
 export async function buildApp(options: { logger?: boolean } = {}) {
   const runtimeRegistry = ensureGovernedRuntime();
+  const contractStore = ensureContractSnapshotStore();
 
   const moduleRuntime = new ModuleRuntime({
     profileEngine,
@@ -128,17 +159,34 @@ export async function buildApp(options: { logger?: boolean } = {}) {
   securedRoute(
     app,
     'get',
+    '/api/health/governance',
+    requireRouteSecurityRule('GET', '/api/health/governance'),
+    async () =>
+      buildGovernanceHealthReport({
+        governedRegistry: runtimeRegistry,
+        contractStore,
+      })
+  );
+
+  securedRoute(
+    app,
+    'get',
+    '/api/health/modules',
+    requireRouteSecurityRule('GET', '/api/health/modules'),
+    async () =>
+      buildModulesHealthReport({
+        governedRegistry: runtimeRegistry,
+        contractStore,
+      })
+  );
+
+  securedRoute(
+    app,
+    'get',
     '/api/modules',
     requireRouteSecurityRule('GET', '/api/modules'),
     async () => ({
-      modules: runtimeRegistry.list().map((m) => ({
-        id: m.id,
-        name: m.name,
-        version: m.version,
-        description: m.description,
-        enabled: m.enabled,
-        featureFlags: m.featureFlags,
-      })),
+      modules: projectPublicContract(runtimeRegistry),
     })
   );
 
@@ -149,18 +197,41 @@ export async function buildApp(options: { logger?: boolean } = {}) {
     requireRouteSecurityRule('GET', '/api/modules/:id'),
     async (request, reply) => {
       const { id } = request.params as { id: string };
-      const module = runtimeRegistry.get(id);
-      if (!module) {
+      const contract = projectPublicModuleContract(runtimeRegistry, id);
+      if (!contract) {
         return reply.status(404).send({ error: `Module "${id}" not found` });
       }
-      return {
-        id: module.id,
-        name: module.name,
-        version: module.version,
-        description: module.description,
-        enabled: module.enabled,
-        featureFlags: module.featureFlags,
-      };
+      return contract;
+    }
+  );
+
+  securedRoute(
+    app,
+    'get',
+    '/api/modules/:id/schema',
+    requireRouteSecurityRule('GET', '/api/modules/:id/schema'),
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const schema = projectModuleSchema(contractStore, id);
+      if (!schema) {
+        return reply.status(404).send({ error: `Module "${id}" not found` });
+      }
+      return schema;
+    }
+  );
+
+  securedRoute(
+    app,
+    'get',
+    '/api/modules/:id/capabilities',
+    requireRouteSecurityRule('GET', '/api/modules/:id/capabilities'),
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const capabilities = projectModuleCapabilities(contractStore, id);
+      if (!capabilities) {
+        return reply.status(404).send({ error: `Module "${id}" not found` });
+      }
+      return capabilities;
     }
   );
 
@@ -204,6 +275,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
           | undefined) ??
         {};
 
+      const startedAt = Date.now();
       const { context, mergedInput, trace } = await resolveExecutionContext(profileEngine, {
         sessionId,
         moduleId: id,
@@ -219,6 +291,8 @@ export async function buildApp(options: { logger?: boolean } = {}) {
         context
       );
 
+      globalMetricsCollector.recordExecution(id, Date.now() - startedAt, result.success);
+
       runMrcShadowValidation(
         moduleRuntime,
         {
@@ -233,12 +307,13 @@ export async function buildApp(options: { logger?: boolean } = {}) {
         request.log
       );
 
-      if (!result.success) {
-        return reply.status(422).send(result);
+      const executionId = randomUUID();
+      const contractSnapshot = contractStore.getContractSnapshot(id);
+      if (!contractSnapshot) {
+        return reply.status(404).send({ error: `Module "${id}" not found` });
       }
 
-      const executionId = randomUUID();
-      const moduleResult = attachModuleResultEnvelope(result, executionId, {
+      const sealedModuleResult = sealModuleResultForProjection(result, executionId, {
         moduleId: id,
         appContext: context,
         mergedInput,
@@ -246,14 +321,24 @@ export async function buildApp(options: { logger?: boolean } = {}) {
         governedRegistry: runtimeRegistry,
       });
 
-      if (sessionId && result.data !== undefined) {
+      const projectionResponse = buildProjectionExecuteResponse(sealedModuleResult, contractSnapshot, {
+        executionId,
+        duration: Date.now() - startedAt,
+      });
+
+      const useLegacyContract = isLegacyExecuteContract(
+        (request.query ?? {}) as Record<string, unknown>
+      );
+
+      if (sessionId && result.success && result.data !== undefined) {
         try {
           await systemStateCoordinator.applyMutation({
             type: 'MODULE_EXECUTE',
             sessionId,
             moduleId: id,
             result: result.data,
-            moduleResult,
+            moduleResult: sealedModuleResult,
+            projection: projectionResponse.projection,
             executedAt: result.executedAt,
             executionId,
             trace: { ...trace, sessionId },
@@ -267,7 +352,21 @@ export async function buildApp(options: { logger?: boolean } = {}) {
         }
       }
 
-      return buildExecuteApiResponse(attachUxToExecutionResult(result), moduleResult);
+      if (!result.success) {
+        if (useLegacyContract) {
+          return reply.status(422).send(mapExecuteFailureResponse({ result, projectionResponse }));
+        }
+
+        return reply.status(422).send(mapExecuteFailureResponse({ result, projectionResponse }));
+      }
+
+      if (useLegacyContract) {
+        markLegacyContractDeprecated(reply, 'execute');
+        request.log.warn({ moduleId: id, sessionId, feature: 'contractVersion=legacy' }, 'legacy execute contract used');
+        return buildLegacyExecuteResponse(result, sealedModuleResult);
+      }
+
+      return projectionResponse;
     }
   );
 
@@ -280,7 +379,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
       const { id } = request.params as { id: string };
       const sessionId = request.identity!.sessionId;
 
-      reply.header('x-deprecation', 'Use GET /api/ui-snapshot for UI state. Trace is diagnostic-only.');
+      reply.header('x-deprecation', 'Diagnostic-only. Use GET /api/modules/:id/explain for product explainability.');
 
       const module = runtimeRegistry.get(id);
       if (!module) {
@@ -293,6 +392,42 @@ export async function buildApp(options: { logger?: boolean } = {}) {
       }
 
       return trace;
+    }
+  );
+
+  securedRoute(
+    app,
+    'get',
+    '/api/modules/:id/explain',
+    requireRouteSecurityRule('GET', '/api/modules/:id/explain'),
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const sessionId = request.identity!.sessionId;
+      const query = (request.query ?? {}) as Record<string, unknown>;
+      const executionId = typeof query.executionId === 'string' ? query.executionId : undefined;
+
+      if (!executionId) {
+        return reply.status(400).send({ error: 'executionId query parameter is required' });
+      }
+
+      const module = runtimeRegistry.get(id);
+      if (!module) {
+        return reply.status(404).send({ error: `Module "${id}" not found` });
+      }
+
+      const response = await buildModuleExplanationResponse({
+        sessionId,
+        moduleId: id,
+        executionId,
+        coordinator: systemStateCoordinator,
+        contractStore,
+      });
+
+      if (!response.ok) {
+        return reply.status(response.statusCode).send({ error: response.error });
+      }
+
+      return response.view;
     }
   );
 

@@ -1,5 +1,5 @@
-import { ThemePreferenceSchema, type ThemePreference } from '@arrivalos/core';
-import type { UiSnapshot } from '@/lib/api';
+import { ThemePreferenceSchema, type ThemePreference } from '@/lib/product-contract';
+import type { UiSnapshot } from '@/lib/product-contract';
 
 export type ResolvedTheme = 'light' | 'dark';
 

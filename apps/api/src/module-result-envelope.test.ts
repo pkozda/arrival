@@ -6,7 +6,7 @@ import {
   applyModuleExecute,
   createInitialSystemState,
 } from './state/system-state-apply.js';
-import { buildUiSnapshot } from './state/snapshot-projection-engine.js';
+import { buildLegacyUiSnapshot } from './state/snapshot-projection-engine.js';
 import { resolveExecutionResult } from '@arrivalos/module-runtime';
 import {
   resetTestStateStore,
@@ -69,7 +69,7 @@ describe('MRC-2 module result envelope integration', () => {
     expect(stored?.legacyResult).toEqual(legacySuccess.data);
     expect(stored?.moduleResult).toEqual(envelope);
 
-    const snapshot = buildUiSnapshot(next);
+    const snapshot = buildLegacyUiSnapshot(next);
     expect(snapshot.executions[0]?.result).toEqual(legacySuccess.data);
     expect(resolveExecutionResult(stored!)).toEqual(envelope);
   });
@@ -88,7 +88,7 @@ describe('MRC-2 module result envelope integration', () => {
 
     const executeRes = await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {
@@ -134,7 +134,7 @@ describe('MRC-2 module result envelope integration', () => {
 
     const executeRes = await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {
@@ -171,7 +171,7 @@ describe('MRC-2 module result envelope integration', () => {
 
     const executeRes = await app.inject({
       method: 'POST',
-      url: '/api/modules/financial-reality/execute',
+      url: '/api/modules/financial-reality/execute?contractVersion=legacy',
       headers: { 'x-session-id': sessionId },
       payload: {
         input: {
@@ -205,7 +205,7 @@ describe('MRC-2 module result envelope integration', () => {
     expect(body.moduleResult?.meta.executionId).toBeDefined();
   });
 
-  it('omits moduleResult from API response when envelope mode is disabled', async () => {
+  it('returns projection-only response by default when envelope mode is disabled', async () => {
     process.env.ARRIVALOS_MRC_ENVELOPE = 'false';
     const app = await buildApp();
 
@@ -233,8 +233,16 @@ describe('MRC-2 module result envelope integration', () => {
       },
     });
 
-    const body = executeRes.json() as { success: boolean; moduleResult?: unknown };
-    expect(body.success).toBe(true);
+    const body = executeRes.json() as {
+      projection?: { status: string; moduleId: string };
+      moduleResult?: unknown;
+      data?: unknown;
+      success?: boolean;
+    };
+    expect(body.projection?.status).toBe('success');
+    expect(body.projection?.moduleId).toBe('financial-reality');
     expect(body.moduleResult).toBeUndefined();
+    expect(body.data).toBeUndefined();
+    expect(body.success).toBeUndefined();
   });
 });

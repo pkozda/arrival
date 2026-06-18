@@ -13,8 +13,10 @@
   "dependencies": {
     "@arrivalos/core": "*",
     "@arrivalos/module-runtime": "*",
+    "@arrivalos/module-sdk": "*",
     "@arrivalos/modules": "*",
-    "@arrivalos/profile": "*",
+    "@arrivalos/observability": "*",
+    "@arrivalos/product-contract": "*",
     "@arrivalos/shared-services": "*",
     "@arrivalos/ux": "*",
     "@fastify/cors": "^10.0.2",

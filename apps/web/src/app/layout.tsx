@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { PRODUCT_NAME, PRODUCT_TAGLINE } from '@arrivalos/core';
+import { PRODUCT_NAME, PRODUCT_TAGLINE } from '@/lib/product-contract';
 import { AppProvider } from '@/components/AppProvider';
 import { ThemeScript } from '@/components/ThemeScript';
 import './globals.css';

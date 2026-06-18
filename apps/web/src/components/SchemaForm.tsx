@@ -1,0 +1,133 @@
+'use client';
+
+import type { SchemaField } from '@/lib/product-contract';
+import { getNestedValue, schemaFieldLabel } from '@/lib/schema-form-utils';
+
+type Props = {
+  fields: SchemaField[];
+  defaults: Record<string, unknown>;
+  prefix?: string;
+  disabled?: boolean;
+  submitLabel: string;
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+};
+
+function SchemaFieldInput({
+  field,
+  defaults,
+  prefix = '',
+  disabled = false,
+}: {
+  field: SchemaField;
+  defaults: Record<string, unknown>;
+  prefix?: string;
+  disabled?: boolean;
+}) {
+  const fieldName = prefix ? `${prefix}.${field.name}` : field.name;
+  const label = schemaFieldLabel(field);
+  const defaultValue = getNestedValue(defaults, fieldName);
+
+  if (field.type === 'object' && field.properties) {
+    return (
+      <fieldset style={{ border: '1px solid var(--color-border)', borderRadius: '0.5rem', padding: '0.75rem', marginBottom: '1rem' }}>
+        <legend style={{ fontSize: '0.875rem', fontWeight: 600, padding: '0 0.25rem' }}>{label}</legend>
+        {field.properties.map((nested) => (
+          <SchemaFieldInput
+            key={`${fieldName}.${nested.name}`}
+            field={nested}
+            defaults={defaults}
+            prefix={fieldName}
+            disabled={disabled}
+          />
+        ))}
+      </fieldset>
+    );
+  }
+
+  if (field.type === 'boolean') {
+    return (
+      <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <input
+          id={fieldName}
+          name={fieldName}
+          type="checkbox"
+          defaultChecked={Boolean(defaultValue)}
+          disabled={disabled}
+        />
+        <label htmlFor={fieldName} style={{ margin: 0 }}>{label}</label>
+      </div>
+    );
+  }
+
+  if (field.enumValues && field.enumValues.length > 0) {
+    return (
+      <div className="form-group">
+        <label htmlFor={fieldName}>{label}</label>
+        <select id={fieldName} name={fieldName} defaultValue={String(defaultValue ?? field.enumValues[0])} disabled={disabled}>
+          {field.enumValues.map((option) => (
+            <option key={String(option)} value={String(option)}>
+              {String(option)}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  if (field.type === 'number' || field.type === 'integer') {
+    return (
+      <div className="form-group">
+        <label htmlFor={fieldName}>{label}</label>
+        <input
+          id={fieldName}
+          name={fieldName}
+          type="number"
+          defaultValue={defaultValue !== undefined ? Number(defaultValue) : undefined}
+          min={field.minimum}
+          required={field.required}
+          disabled={disabled}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="form-group">
+      <label htmlFor={fieldName}>{label}</label>
+      <input
+        id={fieldName}
+        name={fieldName}
+        type="text"
+        defaultValue={defaultValue !== undefined ? String(defaultValue) : ''}
+        required={field.required}
+        disabled={disabled}
+      />
+    </div>
+  );
+}
+
+export function SchemaForm({
+  fields,
+  defaults,
+  prefix,
+  disabled = false,
+  submitLabel,
+  onSubmit,
+}: Props) {
+  return (
+    <form className="card" onSubmit={onSubmit}>
+      {fields.map((field) => (
+        <SchemaFieldInput
+          key={prefix ? `${prefix}.${field.name}` : field.name}
+          field={field}
+          defaults={defaults}
+          prefix={prefix}
+          disabled={disabled}
+        />
+      ))}
+      <button type="submit" className="btn btn-primary" disabled={disabled} style={{ width: '100%' }}>
+        {submitLabel}
+      </button>
+    </form>
+  );
+}

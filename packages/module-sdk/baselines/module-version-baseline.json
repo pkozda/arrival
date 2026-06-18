@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "modules": {
+    "financial-reality": {
+      "version": "2.0.0",
+      "inputSchemaHash": "45d70839",
+      "outputSchemaHash": "aef10cca",
+      "capabilitiesHash": "f15d1a4c",
+      "recommendationShapeHash": "741638a5",
+      "actionShapeHash": "741638a5"
+    },
+    "system-translation": {
+      "version": "1.0.0",
+      "inputSchemaHash": "66849ae5",
+      "outputSchemaHash": "f8ef5aeb",
+      "capabilitiesHash": "741638a5",
+      "recommendationShapeHash": "741638a5",
+      "actionShapeHash": "741638a5"
+    },
+    "healthcare-navigation": {
+      "version": "1.0.0",
+      "inputSchemaHash": "450ab4f5",
+      "outputSchemaHash": "410ce04a",
+      "capabilitiesHash": "741638a5",
+      "recommendationShapeHash": "741638a5",
+      "actionShapeHash": "741638a5"
+    },
+    "grocery-optimization": {
+      "version": "1.0.0",
+      "inputSchemaHash": "01c0289d",
+      "outputSchemaHash": "70df02d8",
+      "capabilitiesHash": "741638a5",
+      "recommendationShapeHash": "741638a5",
+      "actionShapeHash": "741638a5"
+    },
+    "life-event": {
+      "version": "1.0.0",
+      "inputSchemaHash": "2254dc2b",
+      "outputSchemaHash": "153e52ab",
+      "capabilitiesHash": "741638a5",
+      "recommendationShapeHash": "741638a5",
+      "actionShapeHash": "741638a5"
+    },
+    "benefits-simulator": {
+      "version": "1.0.0",
+      "inputSchemaHash": "7ccd9d04",
+      "outputSchemaHash": "4a173801",
+      "capabilitiesHash": "52f154f7",
+      "recommendationShapeHash": "741638a5",
+      "actionShapeHash": "741638a5"
+    }
+  }
+}

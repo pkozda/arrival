@@ -14,25 +14,33 @@ import {
 import {
   clearLegacyThemeStorage,
   ensureSession,
+  fetchModuleCatalog,
   fetchTranslations,
   fetchUiSnapshot,
   updateSessionLanguage,
   updateSessionTheme,
-  type UiSnapshot,
 } from '@/lib/api';
+import type {
+  PublicModuleContract,
+  SupportedLanguage,
+  ThemePreference,
+  UiSnapshot,
+} from '@/lib/product-contract';
 import {
   getSessionLanguage,
   getThemePreference,
   resolveTheme,
   type ResolvedTheme,
 } from '@/lib/snapshot';
-import type { SupportedLanguage, ThemePreference } from '@arrivalos/core';
 
 interface AppState {
   language: SupportedLanguage;
   theme: ResolvedTheme;
   themePreference: ThemePreference;
   sessionId: string | null;
+  modules: PublicModuleContract[];
+  modulesLoading: boolean;
+  modulesError: string | null;
   uiSnapshot: UiSnapshot | null;
   uiSnapshotLoading: boolean;
   uiSnapshotError: string | null;
@@ -66,6 +74,9 @@ const AppContext = createContext<AppState | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [modules, setModules] = useState<PublicModuleContract[]>([]);
+  const [modulesLoading, setModulesLoading] = useState(true);
+  const [modulesError, setModulesError] = useState<string | null>(null);
   const [uiSnapshot, setUiSnapshot] = useState<UiSnapshot | null>(null);
   const [uiSnapshotLoading, setUiSnapshotLoading] = useState(true);
   const [uiSnapshotError, setUiSnapshotError] = useState<string | null>(null);
@@ -98,6 +109,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchModuleCatalog()
+      .then((catalog) => {
+        if (!cancelled) {
+          setModules(catalog);
+          setModulesLoading(false);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          setModulesError(error instanceof Error ? error.message : 'Failed to load module catalog');
+          setModulesLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     ensureSession({
@@ -201,6 +234,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       theme,
       themePreference,
       sessionId,
+      modules,
+      modulesLoading,
+      modulesError,
       uiSnapshot,
       uiSnapshotLoading,
       uiSnapshotError,
