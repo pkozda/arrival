@@ -1,3 +1,22 @@
+---
+id: platform-readiness-audit
+title: Platform Readiness Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: platform
+status: active
+maturity: stable
+owner: system
+tags:
+  - observability
+  - module-sdk
+  - health-endpoints
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # Platform Readiness Audit
 
 **Date:** 2026-06-18  
@@ -23,15 +42,15 @@ Arrival Atlas has completed the platform evolution through **Phase 4 — Observa
 
 | Package | Status | Tests |
 |---------|--------|-------|
-| `@arrivalos/profile` | ✅ green | passing |
-| `@arrivalos/shared-services` | ✅ green | passing |
-| `@arrivalos/module-runtime` | ✅ green | 45/45 |
-| `@arrivalos/module-sdk` | ✅ green | 8/8 |
-| `@arrivalos/product-contract` | ✅ green | 41/41 |
-| `@arrivalos/observability` | ✅ green | 13/13 |
-| `@arrivalos/modules` | ✅ green | 43/43 |
-| `@arrivalos/ux` | ✅ green | passing |
-| `@arrivalos/api` | ✅ green | **173/173** |
+| `@arrival-atlas/profile` | ✅ green | passing |
+| `@arrival-atlas/shared-services` | ✅ green | passing |
+| `@arrival-atlas/module-runtime` | ✅ green | 45/45 |
+| `@arrival-atlas/module-sdk` | ✅ green | 8/8 |
+| `@arrival-atlas/product-contract` | ✅ green | 41/41 |
+| `@arrival-atlas/observability` | ✅ green | 13/13 |
+| `@arrival-atlas/modules` | ✅ green | 43/43 |
+| `@arrival-atlas/ux` | ✅ green | passing |
+| `@arrival-atlas/api` | ✅ green | **173/173** |
 
 **Regression status:** No regressions detected across module-runtime, product-contract, module-sdk, or API suites after Phase 4.
 
@@ -62,7 +81,7 @@ Arrival Atlas has completed the platform evolution through **Phase 4 — Observa
 | Criterion | Status | Evidence |
 |-----------|--------|----------|
 | `GET /api/modules/:id/explain` | ✅ | `module-explain-api.test.ts` |
-| `ModuleExplanationView` | ✅ | Reason mapping in `@arrivalos/product-contract` |
+| `ModuleExplanationView` | ✅ | Reason mapping in `@arrival-atlas/product-contract` |
 | No `/trace` in UI | ✅ | `explain-ui-boundary.test.ts` |
 | ADL TRC-03 compliance | ✅ | No trace leakage in explanation output |
 | Golden fixtures | ✅ | financial-reality + benefits-simulator |
@@ -71,7 +90,7 @@ Arrival Atlas has completed the platform evolution through **Phase 4 — Observa
 
 | Criterion | Status | Evidence |
 |-----------|--------|----------|
-| `@arrivalos/module-sdk` | ✅ | `defineModule`, `registerModulesFromSDK` |
+| `@arrival-atlas/module-sdk` | ✅ | `defineModule`, `registerModulesFromSDK` |
 | SDK catalog pipeline | ✅ | `packages/modules/src/catalog.ts` |
 | Versioning CI gate | ✅ | `module-version-baseline.json` + CI test |
 | Isolation contract | ✅ | `validateModuleIsolation()` — 0 violations |
@@ -161,7 +180,7 @@ External Module Authors / Ops
 | UiSnapshot migration (`executions[].result` → projection) | Phase 5 / ADL §7 | Home page still uses `uxSnapshot` |
 | Product execution lifecycle trace | Phase 2.2 (deferred) | `/trace` remains diagnostic-only |
 | Persistent metrics export | Phase 4.2 (future) | Metrics are in-memory only |
-| `@arrivalos/core` in web selectors | Phase 5 G2 | Theme/language selectors only |
+| `@arrival-atlas/core` in web selectors | Phase 5 G2 | Theme/language selectors only |
 
 These are **documented deferrals**, not Phase 4 blockers.
 
@@ -184,7 +203,7 @@ These are **documented deferrals**, not Phase 4 blockers.
 | Gate | Ready? | Notes |
 |------|--------|-------|
 | G1 — Web consumes only product-contract types | ⚠️ partial | Module pages migrated; home snapshot UX pending |
-| G2 — No runtime imports in web | ⚠️ partial | `@arrivalos/core` in theme/language selectors only |
+| G2 — No runtime imports in web | ⚠️ partial | `@arrival-atlas/core` in theme/language selectors only |
 | G3 — Module pages driven by contract | ✅ | All 5 module pages use projection renderer |
 | G4 — Execute uses ModuleUIProjection only | ✅ | Boundary tests enforce |
 | G5 — Explain uses Explain API only | ⚠️ partial | API ready; UI explain panel not yet built |

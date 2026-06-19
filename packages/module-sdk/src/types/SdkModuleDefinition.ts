@@ -1,4 +1,4 @@
-import type { AppContext } from '@arrivalos/core';
+import type { AppContext } from '@arrival-atlas/core';
 import type { z } from 'zod';
 import type { SdkActionDefinition } from '../defineAction.js';
 import type { SdkRecommendationDefinition } from '../defineRecommendation.js';
@@ -46,7 +46,7 @@ export type SdkModuleDefinition<TInput = unknown, TOutput = unknown> = DefineMod
 >;
 
 export type CompiledSdkModule = {
-  registration: import('@arrivalos/core').ModuleRegistration;
+  registration: import('@arrival-atlas/core').ModuleRegistration;
   contract: SdkRegisteredModuleContract;
   fingerprints: SdkModuleFingerprints;
 };
@@ -60,7 +60,7 @@ export type SdkModuleFingerprints = {
 };
 
 export type CompiledModuleCatalog = {
-  registrations: import('@arrivalos/core').ModuleRegistration[];
+  registrations: import('@arrival-atlas/core').ModuleRegistration[];
   contracts: SdkRegisteredModuleContract[];
   fingerprintsByModuleId: Record<string, SdkModuleFingerprints>;
 };

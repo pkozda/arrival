@@ -1,5 +1,5 @@
-import type { ModuleRegistration } from '@arrivalos/core';
-import { ModuleRegistry } from '@arrivalos/core';
+import type { ModuleRegistration } from '@arrival-atlas/core';
+import { ModuleRegistry } from '@arrival-atlas/core';
 import { bootstrapGovernedRuntime } from '../governance/bootstrapGovernedRuntime.js';
 import type { GovernedModuleRegistry } from '../governance/GovernedModuleRegistry.js';
 

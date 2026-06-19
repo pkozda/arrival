@@ -1,4 +1,4 @@
-import { SupportedLanguageSchema } from '@arrivalos/core';
+import { SupportedLanguageSchema } from '@arrival-atlas/core';
 import { z } from 'zod';
 
 export const PROFILE_SCHEMA_VERSION = '1.0.0';

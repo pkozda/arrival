@@ -202,7 +202,7 @@ let activeStore: SessionRegistryStore | null = null;
 export function getSessionRegistryStore(): SessionRegistryStore {
   if (!activeStore) {
     const rootDir =
-      process.env.ARRIVALOS_SESSIONS_DIR ?? path.join(process.cwd(), '.arrivalos-sessions');
+      process.env.ARRIVAL_ATLAS_SESSIONS_DIR ?? path.join(process.cwd(), '.arrival-atlas-sessions');
     activeStore = new FileSessionRegistryStore(rootDir);
   }
   return activeStore;

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { ModuleRegistry } from '@arrivalos/core';
-import { allModuleRegistrations } from '@arrivalos/modules';
-import { bootstrapGovernedRuntime } from '@arrivalos/module-runtime';
-import { bootstrapProductContractLayer } from '@arrivalos/product-contract';
-import { compiledModuleCatalog } from '@arrivalos/modules';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { allModuleRegistrations } from '@arrival-atlas/modules';
+import { bootstrapGovernedRuntime } from '@arrival-atlas/module-runtime';
+import { bootstrapProductContractLayer } from '@arrival-atlas/product-contract';
+import { compiledModuleCatalog } from '@arrival-atlas/modules';
 import {
   bootstrapObservability,
   buildGovernanceHealth,

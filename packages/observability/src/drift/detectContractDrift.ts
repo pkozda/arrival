@@ -1,5 +1,5 @@
-import type { ContractSnapshotStore } from '@arrivalos/product-contract';
-import type { CompiledModuleCatalog } from '@arrivalos/module-sdk';
+import type { ContractSnapshotStore } from '@arrival-atlas/product-contract';
+import type { CompiledModuleCatalog } from '@arrival-atlas/module-sdk';
 import { stableStringify } from '../stableStringify.js';
 import type { DriftFinding } from './types.js';
 

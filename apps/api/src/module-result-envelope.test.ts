@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { ModuleExecutionResult } from '@arrivalos/core';
-import { wrapLegacyExecutionResult } from '@arrivalos/module-runtime';
+import type { ModuleExecutionResult } from '@arrival-atlas/core';
+import { wrapLegacyExecutionResult } from '@arrival-atlas/module-runtime';
 import { buildApp } from './build-app.js';
 import {
   applyModuleExecute,
   createInitialSystemState,
 } from './state/system-state-apply.js';
 import { buildLegacyUiSnapshot } from './state/snapshot-projection-engine.js';
-import { resolveExecutionResult } from '@arrivalos/module-runtime';
+import { resolveExecutionResult } from '@arrival-atlas/module-runtime';
 import {
   resetTestStateStore,
   setupTestStateStore,
@@ -26,7 +26,7 @@ const legacySuccess: ModuleExecutionResult = {
 };
 
 describe('MRC-2 module result envelope integration', () => {
-  const previousFlag = process.env.ARRIVALOS_MRC_ENVELOPE;
+  const previousFlag = process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
 
   beforeEach(async () => {
     setupTestStateStore();
@@ -36,14 +36,14 @@ describe('MRC-2 module result envelope integration', () => {
   afterEach(() => {
     teardownTestStateStore();
     if (previousFlag === undefined) {
-      delete process.env.ARRIVALOS_MRC_ENVELOPE;
+      delete process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
     } else {
-      process.env.ARRIVALOS_MRC_ENVELOPE = previousFlag;
+      process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = previousFlag;
     }
   });
 
   it('stores dual-write execution records when envelope mode is enabled', () => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
     const envelope = wrapLegacyExecutionResult(legacySuccess, { executionId: 'exec_dpss' });
     const state = createInitialSystemState({
       context: { userProfile: { language: 'en' } },
@@ -75,8 +75,8 @@ describe('MRC-2 module result envelope integration', () => {
   });
 
   it('returns moduleResult with explanation when envelope and explanation modes are enabled', async () => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
-    process.env.ARRIVALOS_MRC_EXPLANATION = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = 'true';
     const app = await buildApp();
 
     const sessionRes = await app.inject({
@@ -121,8 +121,8 @@ describe('MRC-2 module result envelope integration', () => {
   });
 
   it('omits actions when envelope is enabled but explanation is disabled', async () => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
-    delete process.env.ARRIVALOS_MRC_EXPLANATION;
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
+    delete process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
     const app = await buildApp();
 
     const sessionRes = await app.inject({
@@ -159,7 +159,7 @@ describe('MRC-2 module result envelope integration', () => {
   });
 
   it('returns legacy API response with moduleResult when envelope mode is enabled', async () => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
     const app = await buildApp();
 
     const sessionRes = await app.inject({
@@ -206,7 +206,7 @@ describe('MRC-2 module result envelope integration', () => {
   });
 
   it('returns projection-only response by default when envelope mode is disabled', async () => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'false';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'false';
     const app = await buildApp();
 
     const sessionRes = await app.inject({

@@ -1,3 +1,20 @@
+---
+id: p5-0-full-system-architecture-audit
+title: P5.0 Full System Architecture Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: platform
+status: active
+maturity: stable
+owner: system
+tags:
+  - system-design
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # P5.0 — Full System Architecture Audit
 
 **Role:** Principal Systems Architect / Distributed Systems Auditor  
@@ -12,7 +29,7 @@
 
 ### System Status: **PARTIAL**
 
-The ArrivalOS web application has achieved **strong UI-layer unification** under `UiSnapshot` after P0–P4.4. The frontend treats `UiSnapshot` as the authoritative read model for persisted user-visible state: module results, profile-mapped form defaults, UX cards, language, and theme.
+The Arrival Atlas web application has achieved **strong UI-layer unification** under `UiSnapshot` after P0–P4.4. The frontend treats `UiSnapshot` as the authoritative read model for persisted user-visible state: module results, profile-mapped form defaults, UX cards, language, and theme.
 
 However, at the **system level**, `UiSnapshot` is **not** a single source-of-truth state model. It is a **computed aggregate projection** assembled at read time from **five independent in-memory write stores**. Multiple API surfaces bypass the snapshot entirely. Several domains are incomplete in the projection. All server state is ephemeral.
 

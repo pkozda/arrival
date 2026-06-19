@@ -1,4 +1,4 @@
-import type { Module, ModuleRegistration } from '@arrivalos/core';
+import type { Module, ModuleRegistration } from '@arrival-atlas/core';
 import { hashStableValue, hashZodSchema } from './hashZodSchema.js';
 import type {
   CompiledSdkModule,

@@ -7,34 +7,34 @@ import {
 } from './test-state.js';
 
 describe('Module execute projection API', () => {
-  const previousEnvelope = process.env.ARRIVALOS_MRC_ENVELOPE;
-  const previousExplanation = process.env.ARRIVALOS_MRC_EXPLANATION;
-  const previousActions = process.env.ARRIVALOS_MRC_ACTIONS;
+  const previousEnvelope = process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
+  const previousExplanation = process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
+  const previousActions = process.env.ARRIVAL_ATLAS_MRC_ACTIONS;
 
   beforeEach(async () => {
     setupTestStateStore();
     await resetTestStateStore();
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
-    process.env.ARRIVALOS_MRC_EXPLANATION = 'true';
-    process.env.ARRIVALOS_MRC_ACTIONS = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ACTIONS = 'true';
   });
 
   afterEach(() => {
     teardownTestStateStore();
     if (previousEnvelope === undefined) {
-      delete process.env.ARRIVALOS_MRC_ENVELOPE;
+      delete process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
     } else {
-      process.env.ARRIVALOS_MRC_ENVELOPE = previousEnvelope;
+      process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = previousEnvelope;
     }
     if (previousExplanation === undefined) {
-      delete process.env.ARRIVALOS_MRC_EXPLANATION;
+      delete process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
     } else {
-      process.env.ARRIVALOS_MRC_EXPLANATION = previousExplanation;
+      process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = previousExplanation;
     }
     if (previousActions === undefined) {
-      delete process.env.ARRIVALOS_MRC_ACTIONS;
+      delete process.env.ARRIVAL_ATLAS_MRC_ACTIONS;
     } else {
-      process.env.ARRIVALOS_MRC_ACTIONS = previousActions;
+      process.env.ARRIVAL_ATLAS_MRC_ACTIONS = previousActions;
     }
   });
 

@@ -1,5 +1,5 @@
 {
-  "name": "@arrivalos/module-runtime",
+  "name": "@arrival-atlas/module-runtime",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -18,11 +18,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@arrivalos/core": "*",
-    "@arrivalos/profile": "*"
+    "@arrival-atlas/core": "*",
+    "@arrival-atlas/profile": "*"
   },
   "devDependencies": {
-    "@arrivalos/modules": "*",
+    "@arrival-atlas/modules": "*",
     "@types/node": "^22.10.5",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"

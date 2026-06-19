@@ -6,7 +6,7 @@ export {
   PRODUCT_TAGLINE,
   type SupportedLanguage,
   type ThemePreference,
-} from '@arrivalos/ui-contract';
+} from '@arrival-atlas/ui-contract';
 export type {
   UiSnapshot,
   UiSnapshotSession,

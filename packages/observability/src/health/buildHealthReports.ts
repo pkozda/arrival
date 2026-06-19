@@ -1,4 +1,4 @@
-import type { ContractSnapshotStore } from '@arrivalos/product-contract';
+import type { ContractSnapshotStore } from '@arrival-atlas/product-contract';
 import type { DriftFinding } from '../drift/types.js';
 import type { ObservabilityRuntimeState } from '../snapshots/types.js';
 

@@ -19,48 +19,48 @@ import {
 } from '../test-state.js';
 
 describe('isIamStrictModeEnabled', () => {
-  const originalStrict = process.env.ARRIVALOS_IAM_STRICT;
+  const originalStrict = process.env.ARRIVAL_ATLAS_IAM_STRICT;
   const originalNodeEnv = process.env.NODE_ENV;
 
   afterEach(() => {
     if (originalStrict === undefined) {
-      delete process.env.ARRIVALOS_IAM_STRICT;
+      delete process.env.ARRIVAL_ATLAS_IAM_STRICT;
     } else {
-      process.env.ARRIVALOS_IAM_STRICT = originalStrict;
+      process.env.ARRIVAL_ATLAS_IAM_STRICT = originalStrict;
     }
     process.env.NODE_ENV = originalNodeEnv;
   });
 
   it('defaults to strict in test environment', () => {
-    delete process.env.ARRIVALOS_IAM_STRICT;
+    delete process.env.ARRIVAL_ATLAS_IAM_STRICT;
     process.env.NODE_ENV = 'test';
     expect(isIamStrictModeEnabled()).toBe(true);
   });
 
   it('respects explicit false', () => {
-    process.env.ARRIVALOS_IAM_STRICT = 'false';
+    process.env.ARRIVAL_ATLAS_IAM_STRICT = 'false';
     expect(isIamStrictModeEnabled()).toBe(false);
   });
 
   it('respects explicit true', () => {
-    process.env.ARRIVALOS_IAM_STRICT = 'true';
+    process.env.ARRIVAL_ATLAS_IAM_STRICT = 'true';
     expect(isIamStrictModeEnabled()).toBe(true);
   });
 });
 
 describe('handleRouteSecurityMisconfiguration', () => {
-  const originalStrict = process.env.ARRIVALOS_IAM_STRICT;
+  const originalStrict = process.env.ARRIVAL_ATLAS_IAM_STRICT;
 
   afterEach(() => {
     if (originalStrict === undefined) {
-      delete process.env.ARRIVALOS_IAM_STRICT;
+      delete process.env.ARRIVAL_ATLAS_IAM_STRICT;
     } else {
-      process.env.ARRIVALOS_IAM_STRICT = originalStrict;
+      process.env.ARRIVAL_ATLAS_IAM_STRICT = originalStrict;
     }
   });
 
   it('emits ROUTE_UNCLASSIFIED and throws in strict mode', () => {
-    process.env.ARRIVALOS_IAM_STRICT = 'true';
+    process.env.ARRIVAL_ATLAS_IAM_STRICT = 'true';
     const logger = { warn: vi.fn() };
 
     expect(() =>
@@ -75,7 +75,7 @@ describe('handleRouteSecurityMisconfiguration', () => {
   });
 
   it('emits ROUTE_UNCLASSIFIED and continues in non-strict mode', () => {
-    process.env.ARRIVALOS_IAM_STRICT = 'false';
+    process.env.ARRIVAL_ATLAS_IAM_STRICT = 'false';
     const logger = { warn: vi.fn() };
 
     expect(
@@ -101,7 +101,7 @@ describe('session registry service', () => {
 
 describe('TOKEN_MISMATCH emission', () => {
   beforeEach(async () => {
-    process.env.ARRIVALOS_AUTH_SECRET = 'arrivalos-test-auth-secret';
+    process.env.ARRIVAL_ATLAS_AUTH_SECRET = 'arrival-atlas-test-auth-secret';
     setupTestStateStore();
     await resetTestStateStore();
   });
@@ -145,7 +145,7 @@ describe('TOKEN_MISMATCH emission', () => {
 });
 
 describe('applySecurityPipeline strict mode integration', () => {
-  const originalStrict = process.env.ARRIVALOS_IAM_STRICT;
+  const originalStrict = process.env.ARRIVAL_ATLAS_IAM_STRICT;
 
   beforeEach(async () => {
     setupTestStateStore();
@@ -156,9 +156,9 @@ describe('applySecurityPipeline strict mode integration', () => {
     teardownTestStateStore();
     vi.restoreAllMocks();
     if (originalStrict === undefined) {
-      delete process.env.ARRIVALOS_IAM_STRICT;
+      delete process.env.ARRIVAL_ATLAS_IAM_STRICT;
     } else {
-      process.env.ARRIVALOS_IAM_STRICT = originalStrict;
+      process.env.ARRIVAL_ATLAS_IAM_STRICT = originalStrict;
     }
   });
 
@@ -174,7 +174,7 @@ describe('applySecurityPipeline strict mode integration', () => {
   }
 
   it('throws in strict mode when route map lookup fails', async () => {
-    process.env.ARRIVALOS_IAM_STRICT = 'true';
+    process.env.ARRIVAL_ATLAS_IAM_STRICT = 'true';
     vi.spyOn(enforceRouteSecurityModule, 'findMatchingRouteRule').mockReturnValue(null);
 
     const request = {
@@ -192,7 +192,7 @@ describe('applySecurityPipeline strict mode integration', () => {
   });
 
   it('continues in non-strict mode when route map lookup fails', async () => {
-    process.env.ARRIVALOS_IAM_STRICT = 'false';
+    process.env.ARRIVAL_ATLAS_IAM_STRICT = 'false';
     const warn = vi.fn();
     vi.spyOn(enforceRouteSecurityModule, 'findMatchingRouteRule').mockReturnValue(null);
 

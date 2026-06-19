@@ -1,5 +1,5 @@
 {
-  "name": "@arrivalos/api",
+  "name": "@arrival-atlas/api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -11,14 +11,14 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@arrivalos/core": "*",
-    "@arrivalos/module-runtime": "*",
-    "@arrivalos/module-sdk": "*",
-    "@arrivalos/modules": "*",
-    "@arrivalos/observability": "*",
-    "@arrivalos/product-contract": "*",
-    "@arrivalos/shared-services": "*",
-    "@arrivalos/ux": "*",
+    "@arrival-atlas/core": "*",
+    "@arrival-atlas/module-runtime": "*",
+    "@arrival-atlas/module-sdk": "*",
+    "@arrival-atlas/modules": "*",
+    "@arrival-atlas/observability": "*",
+    "@arrival-atlas/product-contract": "*",
+    "@arrival-atlas/shared-services": "*",
+    "@arrival-atlas/ux": "*",
     "@fastify/cors": "^10.0.2",
     "fastify": "^5.2.1",
     "zod": "^3.24.1"

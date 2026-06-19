@@ -1,9 +1,27 @@
+---
+id: benefits-simulator-m1-1-hardening-report
+title: Benefits Simulator M1.1 Hardening Report
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: benefits
+status: active
+maturity: stable
+owner: system
+tags:
+  - benefits-calculation
+  - golden-scenarios
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # Benefits Simulator — M1.1 Production Hardening Report
 
 **Date:** June 2026  
 **Module:** `benefits-simulator` v1.0.0  
 **Output schema:** `1.0.0`  
-**Follows:** `docs/audits/benefits-simulator-implementation-plan.md`  
+**Follows:** `docs/benefits/benefits-simulator-implementation-plan.md`  
 **Status:** Complete
 
 ---
@@ -25,7 +43,7 @@ M1.1 hardens the Benefits Simulator for production readiness through **determini
 | Golden scenario fixtures | `tests/fixtures/benefits-simulator-scenarios.json` (12 scenarios) |
 | Golden snapshot tests | `packages/modules/src/benefits-simulator/golden-scenarios.test.ts` |
 | Schema versioning | `meta.schemaVersion: "1.0.0"` |
-| UI contract | `docs/contracts/benefits-simulator-ui-contract.md` |
+| UI contract | `docs/benefits/benefits-simulator-ui-contract.md` |
 
 ### Out of scope (unchanged)
 
@@ -124,7 +142,7 @@ meta: {
 
 ## 4. UI Contract
 
-**File:** `docs/contracts/benefits-simulator-ui-contract.md`
+**File:** `docs/benefits/benefits-simulator-ui-contract.md`
 
 Defines (non-functional):
 
@@ -147,7 +165,7 @@ Defines (non-functional):
 |------|---------|
 | `tests/fixtures/benefits-simulator-scenarios.json` | 12 golden scenarios |
 | `packages/modules/src/benefits-simulator/golden-scenarios.test.ts` | Regression suite |
-| `docs/contracts/benefits-simulator-ui-contract.md` | UI binding contract |
+| `docs/benefits/benefits-simulator-ui-contract.md` | UI binding contract |
 | `docs/audits/benefits-simulator-m1-1-hardening-report.md` | This report |
 
 ### Modified (additive only)
@@ -174,10 +192,10 @@ Defines (non-functional):
 
 | Package | Before M1.1 | After M1.1 | Delta |
 |---------|-------------|------------|-------|
-| `@arrivalos/profile` | 44 | 44 | — |
-| `@arrivalos/shared-services` | 31 | 31 | — |
-| `@arrivalos/modules` | 9 | 22 | +13 |
-| `@arrivalos/api` | 3 | 3 | — |
+| `@arrival-atlas/profile` | 44 | 44 | — |
+| `@arrival-atlas/shared-services` | 31 | 31 | — |
+| `@arrival-atlas/modules` | 9 | 22 | +13 |
+| `@arrival-atlas/api` | 3 | 3 | — |
 | **Total** | **87** | **100** | **+13** |
 
 ---
@@ -219,4 +237,4 @@ Defines (non-functional):
 
 Benefits Simulator M1.1 is **production-hardened** for deterministic regression safety and UI integration readiness. Financial behavior is locked by 12 golden scenarios; output contract is versioned and documented.
 
-**Recommended next step:** Web UI page implementing `docs/contracts/benefits-simulator-ui-contract.md`.
+**Recommended next step:** Web UI page implementing `docs/benefits/benefits-simulator-ui-contract.md`.

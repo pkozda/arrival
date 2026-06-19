@@ -1,4 +1,22 @@
-# Frontend UX Alignment Audit — Arrive Atlas UI Adaptation
+---
+id: frontend-ux-alignment-audit
+title: Frontend UX Alignment Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: product
+status: active
+maturity: stable
+owner: system
+tags:
+  - ux-alignment
+  - web-architecture
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
+# Frontend UX Alignment Audit — Arrival Atlas UI Adaptation
 
 **Date:** June 2026  
 **Scope:** `apps/web/src/` vs backend UX Orchestrator + API enrichment  
@@ -8,7 +26,7 @@
 
 ## Executive Summary
 
-The Arrive Atlas frontend is a **module-centric, per-page rendering model**. Each module page calls `executeModule`, stores `res.data`, and renders a **bespoke result layout**. The backend now attaches an optional `ux` object (`actions[]`, `summary`) on successful execution, but the frontend **does not type, read, or render it**.
+The Arrival Atlas frontend is a **module-centric, per-page rendering model**. Each module page calls `executeModule`, stores `res.data`, and renders a **bespoke result layout**. The backend now attaches an optional `ux` object (`actions[]`, `summary`) on successful execution, but the frontend **does not type, read, or render it**.
 
 Minimal adaptation can introduce a UX-first layer **without rewriting module pages**: extend the API client, add 2–3 shared UX components, and insert them above existing module output inside `ResultPanel`. A full dashboard for cross-module aggregation does not exist today and is a Phase 2 concern.
 
@@ -86,7 +104,7 @@ There is **no shared action-card component**; priority styling exists only on fi
 
 ---
 
-## 2. Gaps vs Arrive Atlas UX Model
+## 2. Gaps vs Arrival Atlas UX Model
 
 ### Backend UX model (API response)
 
@@ -146,7 +164,7 @@ Note: **`signals[]` are not exposed** in the API — only `actions` and `summary
 **File:** `apps/web/src/lib/ux.ts` (proposed)
 
 ```ts
-// Types aligned with @arrivalos/ux / API ux-integration.ts
+// Types aligned with @arrival-atlas/ux / API ux-integration.ts
 export interface UxActionCard {
   id: string;
   title: string;
@@ -186,7 +204,7 @@ export function groupActionsByPriority(actions: UxActionCard[]) {
 - `ux.actions.length === 0` → optional neutral empty state or skip UX block.
 - Never fail render if `ux` is malformed — treat as absent.
 
-**Optional:** import types from `@arrivalos/ux` in web package (add dependency) to avoid drift.
+**Optional:** import types from `@arrival-atlas/ux` in web package (add dependency) to avoid drift.
 
 ### C. Layout changes
 
@@ -226,7 +244,7 @@ Option A — **Client-side session store:** cache last `ux` from each module exe
 
 Option B — **New API endpoint:** `POST /api/ux/action-plan` accepting multiple module results (matches `collectUxModuleOutputs` pattern server-side).
 
-Recommended: **Phase 1 single-module first**; Phase 2 Option B for true “Arrive Atlas dashboard.”
+Recommended: **Phase 1 single-module first**; Phase 2 Option B for true “Arrival Atlas dashboard.”
 
 ### Visual hierarchy
 
@@ -245,7 +263,7 @@ Recommended: **Phase 1 single-module first**; Phase 2 Option B for true “Arriv
 | Duplicate guidance (financial `decisions` + `ux.actions`) | Medium | UX-first mode hides redundant decision list; map overlap by `id` / keywords |
 | Users lose detail when collapsing raw output | Medium | Collapsed by default, not removed; debug flag |
 | `ATLAS_UX_ENABLED=false` in prod | Low | Fallback already matches today; no UX block |
-| Type drift web ↔ `@arrivalos/ux` | Medium | Shared type import or codegen from ux package |
+| Type drift web ↔ `@arrival-atlas/ux` | Medium | Shared type import or codegen from ux package |
 | Healthcare steps vs UX insurance card redundancy | Low | Keep steps as detail; UX card is headline action |
 | Over-rendering complexity | Medium | One `UxActionPlan` wrapper, not per-module UX logic |
 | i18n — UX strings English-only from orchestrator | Medium | Future: pass language to orchestrator; Phase 1 accept EN |
@@ -259,7 +277,7 @@ Recommended: **Phase 1 single-module first**; Phase 2 Option B for true “Arriv
 
 ### Phase 1 — Foundation (smallest viable UX-first UI)
 
-1. Add `@arrivalos/ux` types (or mirror) to web `ModuleResult`
+1. Add `@arrival-atlas/ux` types (or mirror) to web `ModuleResult`
 2. Create `UxSummaryBanner`, `UxActionCard`, `UxActionPlan`
 3. Integrate into **`financial-reality/page.tsx` only** (highest UX overlap, profile-driven admin rules)
 4. Verify with profile bound + `daysInGermany: 90` → Anmeldung card visible
@@ -296,7 +314,7 @@ Recommended: **Phase 1 single-module first**; Phase 2 Option B for true “Arriv
 | P0 | `apps/web/src/lib/ux.ts` | New — types + helpers |
 | P0 | `apps/web/src/components/UxActionPlan.tsx` | New — summary + grouped cards |
 | P1 | `apps/web/src/app/modules/financial-reality/page.tsx` | Store full `res`, render `UxActionPlan` above stats |
-| P1 | `apps/web/package.json` | Optional `@arrivalos/ux` dependency |
+| P1 | `apps/web/package.json` | Optional `@arrival-atlas/ux` dependency |
 | P2 | Other module pages | Same wrapper pattern |
 | P2 | `apps/web/src/app/page.tsx` | Optional dashboard strip |
 | P3 | `apps/web/src/app/globals.css` | UX banner styles if needed |

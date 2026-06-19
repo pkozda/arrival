@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import type { ModuleExecutionResult } from '@arrivalos/core';
-import { ModuleRegistry } from '@arrivalos/core';
-import { registerAllModules } from '@arrivalos/modules';
-import { BenefitsSimulatorInputSchema } from '@arrivalos/modules';
+import type { ModuleExecutionResult } from '@arrival-atlas/core';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { registerAllModules } from '@arrival-atlas/modules';
+import { BenefitsSimulatorInputSchema } from '@arrival-atlas/modules';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -145,18 +145,18 @@ describe('buildActionItems', () => {
 });
 
 describe('enrichModuleResultActions', () => {
-  const previousExplanation = process.env.ARRIVALOS_MRC_EXPLANATION;
+  const previousExplanation = process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
 
   afterEach(() => {
     if (previousExplanation === undefined) {
-      delete process.env.ARRIVALOS_MRC_EXPLANATION;
+      delete process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
     } else {
-      process.env.ARRIVALOS_MRC_EXPLANATION = previousExplanation;
+      process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = previousExplanation;
     }
   });
 
   it('does not add actions when explanation flag is off', () => {
-    process.env.ARRIVALOS_MRC_EXPLANATION = 'false';
+    process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = 'false';
     const envelope = wrapLegacyExecutionResult(financialLegacy, { executionId: 'exec_1' });
 
     const enriched = enrichModuleResultActions(envelope, financialLegacy, {
@@ -167,7 +167,7 @@ describe('enrichModuleResultActions', () => {
   });
 
   it('adds actions when explanation flag is on', () => {
-    process.env.ARRIVALOS_MRC_EXPLANATION = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = 'true';
     const envelope = wrapLegacyExecutionResult(financialLegacy, { executionId: 'exec_2' });
 
     const enriched = enrichModuleResultActions(envelope, financialLegacy, {
@@ -180,32 +180,32 @@ describe('enrichModuleResultActions', () => {
 });
 
 describe('MRC-4 envelope pipeline', () => {
-  const previousEnvelope = process.env.ARRIVALOS_MRC_ENVELOPE;
-  const previousExplanation = process.env.ARRIVALOS_MRC_EXPLANATION;
+  const previousEnvelope = process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
+  const previousExplanation = process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
 
   afterEach(() => {
     if (previousEnvelope === undefined) {
-      delete process.env.ARRIVALOS_MRC_ENVELOPE;
+      delete process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
     } else {
-      process.env.ARRIVALOS_MRC_ENVELOPE = previousEnvelope;
+      process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = previousEnvelope;
     }
 
     if (previousExplanation === undefined) {
-      delete process.env.ARRIVALOS_MRC_EXPLANATION;
+      delete process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
     } else {
-      process.env.ARRIVALOS_MRC_EXPLANATION = previousExplanation;
+      process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = previousExplanation;
     }
   });
 
   it('implicitly enables envelope when explanation is on (FLAG-01)', () => {
-    delete process.env.ARRIVALOS_MRC_ENVELOPE;
-    process.env.ARRIVALOS_MRC_EXPLANATION = 'true';
+    delete process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
+    process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = 'true';
     expect(isMrcEnvelopeEnabled()).toBe(true);
   });
 
   it('omits actions when explanation is off', () => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
-    process.env.ARRIVALOS_MRC_EXPLANATION = 'false';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = 'false';
 
     const legacySnapshot = structuredClone(financialLegacy.data);
     const envelope = buildModuleResultEnvelope(
@@ -223,8 +223,8 @@ describe('MRC-4 envelope pipeline', () => {
   });
 
   it('adds actions and isolates payload when explanation is on', () => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
-    process.env.ARRIVALOS_MRC_EXPLANATION = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = 'true';
 
     const legacySnapshot = structuredClone(financialLegacy.data);
     const envelope = buildModuleResultEnvelope(
@@ -245,8 +245,8 @@ describe('MRC-4 envelope pipeline', () => {
   });
 
   it('produces deterministic actions for benefits simulator fixture', async () => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
-    process.env.ARRIVALOS_MRC_EXPLANATION = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = 'true';
 
     const registry = new ModuleRegistry();
     registerAllModules(registry);

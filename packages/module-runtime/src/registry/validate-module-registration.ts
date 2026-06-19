@@ -1,4 +1,4 @@
-import type { ModuleRegistration } from '@arrivalos/core';
+import type { ModuleRegistration } from '@arrival-atlas/core';
 import type { ValidationResult } from './contract-types.js';
 import {
   MODULE_CONTRACT_SPECS,

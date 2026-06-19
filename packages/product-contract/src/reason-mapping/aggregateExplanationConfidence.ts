@@ -1,4 +1,4 @@
-import type { ModuleResult } from '@arrivalos/module-runtime';
+import type { ModuleResult } from '@arrival-atlas/module-runtime';
 import type { ExplanationConfidence } from '../ModuleExplanationView.js';
 
 function coverageRatio(mapped: number, total: number): number {

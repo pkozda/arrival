@@ -1,5 +1,5 @@
-import type { AppContext, SupportedLanguage, ThemePreference } from '@arrivalos/core';
-import type { ProfileSlice } from '@arrivalos/profile';
+import type { AppContext, SupportedLanguage, ThemePreference } from '@arrival-atlas/core';
+import type { ProfileSlice } from '@arrival-atlas/profile';
 import type { ModuleRuntimeContext } from '../types/ModuleRuntimeContext.js';
 
 export type ToModuleRuntimeContextParams = {

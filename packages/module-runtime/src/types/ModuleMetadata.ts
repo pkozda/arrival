@@ -1,4 +1,4 @@
-import type { ModuleMetadata as CoreModuleMetadata } from '@arrivalos/core';
+import type { ModuleMetadata as CoreModuleMetadata } from '@arrival-atlas/core';
 
 export type ModuleRuntimeContractVersion = '1.0';
 

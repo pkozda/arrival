@@ -1,3 +1,21 @@
+---
+id: p4-1-system-state-architecture-audit
+title: P4.1 System State Architecture Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: platform
+status: active
+maturity: stable
+owner: system
+tags:
+  - system-state
+  - snapshot-projection
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # P4.1 — System State Architecture Audit
 
 **Role:** Principal Software Architect / Staff Systems Auditor  
@@ -383,7 +401,7 @@ Evidence:
 | Global UX panels (legacy) | ❌ | ux-store empty; components not mounted |
 | Client FTU wizard state | ❌ (inactive) | `localStorage` `arrival_atlas_ftu_v1` — not used on active home |
 | UI language | ❌ | Resets to AppProvider default `'en'`; ignores `snapshot.session.language` |
-| Theme | ✅ (client-only) | `localStorage` `arrivalos-theme` |
+| Theme | ✅ (client-only) | `localStorage` `arrival-atlas-theme` |
 
 ---
 

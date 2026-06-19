@@ -1,4 +1,4 @@
-import type { SdkModuleContractSpec } from '@arrivalos/module-sdk';
+import type { SdkModuleContractSpec } from '@arrival-atlas/module-sdk';
 
 export const FINANCIAL_REALITY_CONTRACT: SdkModuleContractSpec = {
   runtimeContractVersion: '1.0',

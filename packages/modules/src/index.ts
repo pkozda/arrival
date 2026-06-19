@@ -48,8 +48,8 @@ export {
 
 export { compiledModuleCatalog, allModuleRegistrations } from './catalog.js';
 
-import { registerModuleMergeStrategy } from '@arrivalos/profile';
-import type { ModuleRegistration } from '@arrivalos/core';
+import { registerModuleMergeStrategy } from '@arrival-atlas/profile';
+import type { ModuleRegistration } from '@arrival-atlas/core';
 import { benefitsSimulatorMergeStrategy } from './benefits-simulator/merge-strategy.js';
 import { allModuleRegistrations } from './catalog.js';
 

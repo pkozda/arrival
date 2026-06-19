@@ -10,10 +10,10 @@ const webPackageJson = readFileSync(
 );
 
 const FORBIDDEN_PACKAGE_IMPORTS = [
-  '@arrivalos/core',
-  '@arrivalos/module-runtime',
-  '@arrivalos/modules',
-  '@arrivalos/observability',
+  '@arrival-atlas/core',
+  '@arrival-atlas/module-runtime',
+  '@arrival-atlas/modules',
+  '@arrival-atlas/observability',
 ] as const;
 
 function listSourceFiles(directory: string): string[] {

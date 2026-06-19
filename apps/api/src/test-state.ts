@@ -17,49 +17,49 @@ export function setupTestStateStore(): FilePersistedSystemStateStore {
     rmSync(activeTestDir, { recursive: true, force: true });
   }
 
-  activeTestDir = mkdtempSync(join(tmpdir(), 'arrivalos-state-test-'));
+  activeTestDir = mkdtempSync(join(tmpdir(), 'arrival-atlas-state-test-'));
   const store = new FilePersistedSystemStateStore(activeTestDir);
   resetPersistedSystemStateStore(store);
-  process.env.ARRIVALOS_STATE_DIR = activeTestDir;
+  process.env.ARRIVAL_ATLAS_STATE_DIR = activeTestDir;
 
   const accountsDir = join(activeTestDir, 'accounts');
   const accountStore = new FileAccountStore(accountsDir);
   resetAccountStore(accountStore);
-  process.env.ARRIVALOS_ACCOUNTS_DIR = accountsDir;
+  process.env.ARRIVAL_ATLAS_ACCOUNTS_DIR = accountsDir;
 
   const entitlementsDir = join(activeTestDir, 'entitlements');
   const entitlementStore = new FileEntitlementStore(entitlementsDir);
   resetEntitlementStore(entitlementStore);
-  process.env.ARRIVALOS_ENTITLEMENTS_DIR = entitlementsDir;
+  process.env.ARRIVAL_ATLAS_ENTITLEMENTS_DIR = entitlementsDir;
 
   const sessionsDir = join(activeTestDir, 'sessions-registry');
   const sessionRegistryStore = new FileSessionRegistryStore(sessionsDir);
   resetSessionRegistryStore(sessionRegistryStore);
-  process.env.ARRIVALOS_SESSIONS_DIR = sessionsDir;
+  process.env.ARRIVAL_ATLAS_SESSIONS_DIR = sessionsDir;
 
-  process.env.ARRIVALOS_AUTH_SECRET = 'arrivalos-test-auth-secret';
+  process.env.ARRIVAL_ATLAS_AUTH_SECRET = 'arrival-atlas-test-auth-secret';
 
   return store;
 }
 
 export async function resetTestStateStore(): Promise<void> {
   const stateDir =
-    process.env.ARRIVALOS_STATE_DIR ?? join(tmpdir(), 'arrivalos-state-fallback');
+    process.env.ARRIVAL_ATLAS_STATE_DIR ?? join(tmpdir(), 'arrival-atlas-state-fallback');
   const store = new FilePersistedSystemStateStore(stateDir);
   await clearCoordinatorState(store);
 
   const accountsDir =
-    process.env.ARRIVALOS_ACCOUNTS_DIR ?? join(stateDir, 'accounts');
+    process.env.ARRIVAL_ATLAS_ACCOUNTS_DIR ?? join(stateDir, 'accounts');
   const accountStore = new FileAccountStore(accountsDir);
   await accountStore.clear();
 
   const entitlementsDir =
-    process.env.ARRIVALOS_ENTITLEMENTS_DIR ?? join(stateDir, 'entitlements');
+    process.env.ARRIVAL_ATLAS_ENTITLEMENTS_DIR ?? join(stateDir, 'entitlements');
   const entitlementStore = new FileEntitlementStore(entitlementsDir);
   await entitlementStore.clear();
 
   const sessionsDir =
-    process.env.ARRIVALOS_SESSIONS_DIR ?? join(stateDir, 'sessions-registry');
+    process.env.ARRIVAL_ATLAS_SESSIONS_DIR ?? join(stateDir, 'sessions-registry');
   const sessionRegistryStore = new FileSessionRegistryStore(sessionsDir);
   await sessionRegistryStore.clear();
 }

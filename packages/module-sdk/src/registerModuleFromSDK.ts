@@ -1,4 +1,4 @@
-import type { ModuleExecutionResult } from '@arrivalos/core';
+import type { ModuleExecutionResult } from '@arrival-atlas/core';
 import { compileModuleRegistration } from './compileModuleRegistration.js';
 import type { SdkModuleDefinition } from './types/SdkModuleDefinition.js';
 import type { ModuleError, ModuleErrorCategory } from './types/ModuleError.js';

@@ -1,4 +1,4 @@
-import type { AppContext, ModuleExecutionResult } from '@arrivalos/core';
+import type { AppContext, ModuleExecutionResult } from '@arrival-atlas/core';
 import type { GovernedModuleRegistry } from './GovernedModuleRegistry.js';
 
 export async function executeGovernedModule<TInput, TOutput>(

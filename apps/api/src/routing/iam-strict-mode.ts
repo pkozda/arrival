@@ -13,7 +13,7 @@ export class RouteSecurityMisconfigurationError extends Error {
 }
 
 export function isIamStrictModeEnabled(): boolean {
-  const explicit = process.env.ARRIVALOS_IAM_STRICT;
+  const explicit = process.env.ARRIVAL_ATLAS_IAM_STRICT;
   if (explicit === 'true') {
     return true;
   }

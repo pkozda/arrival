@@ -1,4 +1,4 @@
-import type { ExecutionTrace } from '@arrivalos/profile';
+import type { ExecutionTrace } from '@arrival-atlas/profile';
 import {
   getPersistedSystemStateStore,
   type PersistedSystemStateStore,

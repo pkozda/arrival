@@ -1,3 +1,21 @@
+---
+id: p6-2-identity-access-architecture-audit
+title: P6.2 Identity Access Architecture Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: platform
+status: active
+maturity: stable
+owner: system
+tags:
+  - iam
+  - session-auth
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # P6.2 — Identity & Access Architecture Audit
 
 **Role:** Principal Identity Architect / Access Control Auditor  
@@ -308,7 +326,7 @@ Ownership verify := exists(SystemState[sessionId])
 └────────────────────────────┬─────────────────────────────────────┘
                              │
 ┌────────────────────────────▼─────────────────────────────────────┐
-│ SystemState(sessionId) → .arrivalos-state/{sessionId}.json       │
+│ SystemState(sessionId) → .arrival-atlas-state/{sessionId}.json       │
 └──────────────────────────────────────────────────────────────────┘
 
 FUTURE (not implemented):
@@ -489,7 +507,7 @@ SystemStateCoordinator
   ↓  [per-session write lock — no identity check]
 FilePersistedSystemStateStore
   ↓  [filesystem — no identity layer]
-.arrivalos-state/*.json
+.arrival-atlas-state/*.json
 ```
 
 ### 10.2 Boundary Analysis
@@ -719,7 +737,7 @@ Acceptable only if:
 | Client session bootstrap | `apps/web/src/lib/api.ts`, `apps/web/src/components/AppProvider.tsx` |
 | Mutation types (no account mutations) | `apps/api/src/state/system-mutation-types.ts` |
 | SystemState shape (no accountId) | `apps/api/src/state/system-state-types.ts` |
-| Future design intent | `docs/audits/user-profile-engine-design.md` §7.4 |
+| Future design intent | `docs/identity/user-profile-engine-design.md` §7.4 |
 | Prior security audit | P6.1 (session threat model, route matrix) |
 
 ---

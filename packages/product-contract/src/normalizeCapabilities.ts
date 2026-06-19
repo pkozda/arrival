@@ -1,4 +1,4 @@
-import type { RegisteredModuleContract } from '@arrivalos/module-runtime';
+import type { RegisteredModuleContract } from '@arrival-atlas/module-runtime';
 import type { NormalizedCapabilities } from './NormalizedCapabilities.js';
 
 export function normalizeCapabilities(

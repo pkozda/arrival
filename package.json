@@ -1,5 +1,5 @@
 {
-  "name": "arrivalos",
+  "name": "arrival-atlas",
   "version": "0.1.0",
   "private": true,
   "description": "Modular decision-support platform for migrants in Germany",
@@ -8,11 +8,11 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build -w @arrivalos/ui-contract && npm run build -w @arrivalos/core && npm run build -w @arrivalos/profile && npm run build -w @arrivalos/shared-services && npm run build -w @arrivalos/module-runtime && npm run build -w @arrivalos/module-sdk && npm run build -w @arrivalos/product-contract && npm run build -w @arrivalos/observability && npm run build -w @arrivalos/modules && npm run build -w @arrivalos/ux && npm run build -w @arrivalos/api && npm run build -w @arrivalos/web",
-    "dev": "concurrently \"npm run dev -w @arrivalos/api\" \"npm run dev -w @arrivalos/web\"",
-    "dev:api": "npm run dev -w @arrivalos/api",
-    "dev:web": "npm run dev -w @arrivalos/web",
-    "test": "npm run test -w @arrivalos/ui-contract && npm run test -w @arrivalos/profile && npm run test -w @arrivalos/shared-services && npm run test -w @arrivalos/module-runtime && npm run test -w @arrivalos/module-sdk && npm run test -w @arrivalos/product-contract && npm run test -w @arrivalos/observability && npm run test -w @arrivalos/modules && npm run test -w @arrivalos/ux && npm run test -w @arrivalos/api && npm run test -w @arrivalos/web",
+    "build": "npm run build -w @arrival-atlas/ui-contract && npm run build -w @arrival-atlas/core && npm run build -w @arrival-atlas/profile && npm run build -w @arrival-atlas/shared-services && npm run build -w @arrival-atlas/module-runtime && npm run build -w @arrival-atlas/module-sdk && npm run build -w @arrival-atlas/product-contract && npm run build -w @arrival-atlas/observability && npm run build -w @arrival-atlas/modules && npm run build -w @arrival-atlas/ux && npm run build -w @arrival-atlas/api && npm run build -w @arrival-atlas/web",
+    "dev": "concurrently \"npm run dev -w @arrival-atlas/api\" \"npm run dev -w @arrival-atlas/web\"",
+    "dev:api": "npm run dev -w @arrival-atlas/api",
+    "dev:web": "npm run dev -w @arrival-atlas/web",
+    "test": "npm run test -w @arrival-atlas/ui-contract && npm run test -w @arrival-atlas/profile && npm run test -w @arrival-atlas/shared-services && npm run test -w @arrival-atlas/module-runtime && npm run test -w @arrival-atlas/module-sdk && npm run test -w @arrival-atlas/product-contract && npm run test -w @arrival-atlas/observability && npm run test -w @arrival-atlas/modules && npm run test -w @arrival-atlas/ux && npm run test -w @arrival-atlas/api && npm run test -w @arrival-atlas/web",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },

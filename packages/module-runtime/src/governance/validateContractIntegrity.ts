@@ -1,4 +1,4 @@
-import type { ModuleRegistry } from '@arrivalos/core';
+import type { ModuleRegistry } from '@arrival-atlas/core';
 import type { RegisteredModuleContract } from '../registry/contract-types.js';
 
 export function validateContractIntegrity(

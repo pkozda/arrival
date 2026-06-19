@@ -1,5 +1,5 @@
 {
-  "name": "@arrivalos/observability",
+  "name": "@arrival-atlas/observability",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,13 +19,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@arrivalos/module-sdk": "*",
-    "@arrivalos/product-contract": "*"
+    "@arrival-atlas/module-sdk": "*",
+    "@arrival-atlas/product-contract": "*"
   },
   "devDependencies": {
-    "@arrivalos/core": "*",
-    "@arrivalos/module-runtime": "*",
-    "@arrivalos/modules": "*",
+    "@arrival-atlas/core": "*",
+    "@arrival-atlas/module-runtime": "*",
+    "@arrival-atlas/modules": "*",
     "@types/node": "^22.10.5",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"

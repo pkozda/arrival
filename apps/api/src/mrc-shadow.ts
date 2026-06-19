@@ -1,17 +1,17 @@
 import type { FastifyBaseLogger } from 'fastify';
-import type { ModuleExecutionResult } from '@arrivalos/core';
+import type { ModuleExecutionResult } from '@arrival-atlas/core';
 import {
   ModuleRuntime,
   type ExecuteModuleParams,
   type ModuleRuntimeExecuteOutcome,
-} from '@arrivalos/module-runtime';
+} from '@arrival-atlas/module-runtime';
 
 export function isMrcShadowEnabled(): boolean {
-  if (process.env.ARRIVALOS_MRC_SHADOW === 'false') {
+  if (process.env.ARRIVAL_ATLAS_MRC_SHADOW === 'false') {
     return false;
   }
 
-  if (process.env.ARRIVALOS_MRC_SHADOW === 'true') {
+  if (process.env.ARRIVAL_ATLAS_MRC_SHADOW === 'true') {
     return true;
   }
 

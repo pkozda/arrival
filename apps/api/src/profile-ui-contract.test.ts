@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { UI_PROFILE_FORBIDDEN_RESPONSE_KEYS } from '@arrivalos/profile';
+import { UI_PROFILE_FORBIDDEN_RESPONSE_KEYS } from '@arrival-atlas/profile';
 import { buildApp } from './build-app.js';
 import { resetTestStateStore, setupTestStateStore, teardownTestStateStore } from './test-state.js';
 

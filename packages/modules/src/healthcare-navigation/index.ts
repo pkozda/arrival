@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AppContext, Module, ModuleRegistration } from '@arrivalos/core';
+import type { AppContext, Module, ModuleRegistration } from '@arrival-atlas/core';
 
 export const HealthcareNavigationInputSchema = z.object({
   situation: z.enum([

@@ -5,7 +5,7 @@ import {
   attachUxToExecutionResult,
   isAtlasUxEnabled,
 } from './ux-integration.js';
-import * as uxPackage from '@arrivalos/ux';
+import * as uxPackage from '@arrival-atlas/ux';
 
 const ORIGINAL_UX_FLAG = process.env.ATLAS_UX_ENABLED;
 

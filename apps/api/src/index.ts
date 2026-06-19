@@ -1,4 +1,4 @@
-import { PRODUCT_NAME } from '@arrivalos/core';
+import { PRODUCT_NAME } from '@arrival-atlas/core';
 import { buildApp } from './build-app.js';
 
 const port = parseInt(process.env.PORT ?? '3001', 10);

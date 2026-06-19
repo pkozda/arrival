@@ -87,7 +87,7 @@ describe('POST /api/account/claim', () => {
     expect(state?.accountId).toBe(body.accountId);
     expect(isAccountLinked(state!)).toBe(true);
 
-    const accountStore = new FileAccountStore(process.env.ARRIVALOS_ACCOUNTS_DIR!);
+    const accountStore = new FileAccountStore(process.env.ARRIVAL_ATLAS_ACCOUNTS_DIR!);
     const account = await accountStore.getAccountById(body.accountId);
     expect(account).not.toBeNull();
     expect(account?.status).toBe('active');
@@ -132,7 +132,7 @@ describe('POST /api/account/claim', () => {
     expect(secondBody.accountId).toBe(firstBody.accountId);
     expect(secondBody.linked).toBe(true);
 
-    const accountStore = new FileAccountStore(process.env.ARRIVALOS_ACCOUNTS_DIR!);
+    const accountStore = new FileAccountStore(process.env.ARRIVAL_ATLAS_ACCOUNTS_DIR!);
     const accounts = await accountStore.listAccounts();
     expect(accounts).toHaveLength(1);
   });
@@ -188,7 +188,7 @@ describe('AccountClaimService', () => {
     });
     const { sessionId } = sessionRes.json() as { sessionId: string };
 
-    const accountStore = new FileAccountStore(process.env.ARRIVALOS_ACCOUNTS_DIR!);
+    const accountStore = new FileAccountStore(process.env.ARRIVAL_ATLAS_ACCOUNTS_DIR!);
     const service = new AccountClaimService(systemStateCoordinator, new AccountService(accountStore));
 
     const result = await service.claimSession(sessionId);

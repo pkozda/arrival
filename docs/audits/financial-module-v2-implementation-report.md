@@ -1,3 +1,20 @@
+---
+id: financial-module-v2-implementation-report
+title: Financial Module v2 Implementation Report
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: finance
+status: active
+maturity: stable
+owner: system
+tags:
+  - financial-modeling
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # Financial Reality Module v2 — Implementation Report (Phase M0/M1)
 
 **Date:** June 2026  
@@ -25,7 +42,7 @@ Financial Reality Module v2 engine is implemented behind the existing module ID 
 ## Completed Items
 
 ### Step 1 — Library Evaluation
-- [x] `docs/research/payroll-library-evaluation.md`
+- [x] `docs/finance/payroll-library-evaluation.md`
 - [x] Selected `lohnsteuerrechner` (MIT, PAP 2025/2026)
 - [x] Rejected `@finanzfluss/calculators` (AGPL-3.0)
 - [x] `PayrollTaxAdapter` abstraction for swap-ability
@@ -56,7 +73,7 @@ Financial Reality Module v2 engine is implemented behind the existing module ID 
 - [x] v1 engine preserved for flag-off regression
 
 ### Documentation
-- [x] `docs/architecture/financial-module-v2-notes.md`
+- [x] `docs/finance/financial-module-v2-notes.md`
 - [x] This report
 
 ---
@@ -95,8 +112,8 @@ Financial Reality Module v2 engine is implemented behind the existing module ID 
 ## Test Results
 
 ```
-@arrivalos/shared-services  — 10 passed (financial.test.ts)
-@arrivalos/modules          —  6 passed (financial-reality.test.ts)
+@arrival-atlas/shared-services  — 10 passed (financial.test.ts)
+@arrival-atlas/modules          —  6 passed (financial-reality.test.ts)
 ────────────────────────────────────────────────────────────
 Total                       — 16 passed, 0 failed
 ```
@@ -201,8 +218,8 @@ v2 net is higher because PAP Lohnsteuer is lower than the v1 multiplier approxim
 | `packages/modules/src/financial-reality/index.ts` | v2 orchestration |
 | `packages/modules/src/financial-reality/financial-reality.test.ts` | New |
 | `packages/shared-services/package.json` | +lohnsteuerrechner, vitest |
-| `docs/research/payroll-library-evaluation.md` | New |
-| `docs/architecture/financial-module-v2-notes.md` | New |
+| `docs/finance/payroll-library-evaluation.md` | New |
+| `docs/finance/financial-module-v2-notes.md` | New |
 
 **Unchanged:** All other modules, API routes, web UI pages, core registry.
 

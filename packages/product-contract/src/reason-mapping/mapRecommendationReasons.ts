@@ -1,4 +1,4 @@
-import type { Recommendation } from '@arrivalos/module-runtime';
+import type { Recommendation } from '@arrival-atlas/module-runtime';
 import type { ExplanationFactor } from '../ModuleExplanationView.js';
 import { mapExplanationFactors } from './mapExplanationFactors.js';
 

@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ModuleRegistry } from '@arrivalos/core';
-import { allModuleRegistrations, compiledModuleCatalog } from '@arrivalos/modules';
-import { bootstrapGovernedRuntime } from '@arrivalos/module-runtime';
-import { bootstrapProductContractLayer } from '@arrivalos/product-contract';
-import { validateModuleVersioningCatalog } from '@arrivalos/module-sdk';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { allModuleRegistrations, compiledModuleCatalog } from '@arrival-atlas/modules';
+import { bootstrapGovernedRuntime } from '@arrival-atlas/module-runtime';
+import { bootstrapProductContractLayer } from '@arrival-atlas/product-contract';
+import { validateModuleVersioningCatalog } from '@arrival-atlas/module-sdk';
 import {
   bootstrapObservability,
   buildBootstrapIntegritySnapshot,

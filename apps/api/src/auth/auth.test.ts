@@ -15,7 +15,7 @@ function mockRequest(headers: Record<string, string>): FastifyRequest {
 
 describe('auth token service', () => {
   beforeEach(() => {
-    process.env.ARRIVALOS_AUTH_SECRET = 'arrivalos-test-auth-secret';
+    process.env.ARRIVAL_ATLAS_AUTH_SECRET = 'arrival-atlas-test-auth-secret';
   });
 
   it('creates and verifies a token payload', () => {

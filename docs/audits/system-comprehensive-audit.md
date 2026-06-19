@@ -1,4 +1,21 @@
-# Arrive Atlas — Comprehensive System Audit
+---
+id: system-comprehensive-audit
+title: System Comprehensive Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: platform
+status: active
+maturity: stable
+owner: system
+tags:
+  - system-design
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
+# Arrival Atlas — Comprehensive System Audit
 
 **Date:** June 2026  
 **Auditor role:** Senior Staff Engineer + Product Architect + UX Systems Analyst  
@@ -122,7 +139,7 @@ Module pages use: `ModuleLayout` + form + `ModuleResultRenderer` (wraps `UxActio
 |--|--|
 | **Responsibility** | Profile document schema, revisioning, module policy filtering, input merge, execution traces |
 | **Inputs/Outputs** | Session-bound profile + request input → merged input + filtered `AppContext` |
-| **Dependencies** | `@arrivalos/core`; module merge strategies registered from `@arrivalos/modules` |
+| **Dependencies** | `@arrival-atlas/core`; module merge strategies registered from `@arrival-atlas/modules` |
 | **Coupling** | Medium — central to execution but cleanly port-based (`ProfileStore` interface) |
 | **Leakage** | `MODULE_INPUT_CONFIG` in `input-merger.ts` is a growing per-module field map (only financial-reality + healthcare-navigation configured); benefits-simulator uses external merge strategy pattern instead |
 
@@ -282,7 +299,7 @@ Module pages use: `ModuleLayout` + form + `ModuleResultRenderer` (wraps `UxActio
 | **Per-module input config growth** | Static field maps vs merge strategy pattern | `input-merger.ts` vs `benefits-simulator/merge-strategy.ts` |
 | **Incomplete module UX coverage** | 3/6 modules produce signals | `normalizeModuleOutput()` default case |
 | **Hardcoded module lists** | Frontend home, header nav, UX priority order maintained separately | `page.tsx`, `Header.tsx`, `ux-aggregator.ts` |
-| **Naming drift** | Product: "Arrive Atlas"; packages: `@arrivalos/*`; API health: `arrivalos-api`; theme key: `arrivalos-theme` | Multiple files |
+| **Naming drift** | Product: "Arrival Atlas"; packages: `@arrival-atlas/*`; API health: `arrival-atlas-api`; theme key: `arrival-atlas-theme` | Multiple files |
 | **Legacy AppContext fields** | `systemState` in schema/session merge; modules largely ignore | `core/types`, `session/index.ts` |
 
 ---

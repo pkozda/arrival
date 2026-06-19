@@ -4,7 +4,7 @@ import {
   ThemePreferenceSchema,
   type SupportedLanguage,
   type ThemePreference,
-} from '@arrivalos/ui-contract';
+} from '@arrival-atlas/ui-contract';
 
 export { SupportedLanguageSchema, ThemePreferenceSchema, type SupportedLanguage, type ThemePreference };
 

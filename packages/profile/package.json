@@ -1,5 +1,5 @@
 {
-  "name": "@arrivalos/profile",
+  "name": "@arrival-atlas/profile",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,7 +19,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@arrivalos/core": "*",
+    "@arrival-atlas/core": "*",
     "zod": "^3.24.1"
   },
   "devDependencies": {

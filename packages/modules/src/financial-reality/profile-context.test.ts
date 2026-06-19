@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import type { AppContext } from '@arrivalos/core';
+import type { AppContext } from '@arrival-atlas/core';
 import { resolveFinancialProfileContext } from './profile-context.js';
 
 describe('resolveFinancialProfileContext', () => {

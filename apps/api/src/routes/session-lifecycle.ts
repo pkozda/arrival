@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { AppContextSchema, globalRegistry } from '@arrivalos/core';
+import { AppContextSchema, globalRegistry } from '@arrival-atlas/core';
 import { sendAuthError } from '../auth/auth-error-mapper.js';
 import { validateAccountAccess } from '../authz/account-session.guard.js';
 import { securedRoute } from '../routing/apply-route-security.js';

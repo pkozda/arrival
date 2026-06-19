@@ -10,19 +10,19 @@ export type IsolationViolation = {
 const FORBIDDEN_IMPORT_PATTERNS: Array<{ rule: string; pattern: RegExp }> = [
   {
     rule: 'governance-kernel-import',
-    pattern: /@arrivalos\/module-runtime(?:\/governance|\b).*GovernedModuleRegistry/,
+    pattern: /@arrival-atlas\/module-runtime(?:\/governance|\b).*GovernedModuleRegistry/,
   },
   {
     rule: 'governance-kernel-import',
-    pattern: /from ['"]@arrivalos\/module-runtime['"];?/,
+    pattern: /from ['"]@arrival-atlas\/module-runtime['"];?/,
   },
   {
     rule: 'registry-import',
-    pattern: /\b(ModuleRegistry|globalRegistry|registerModule)\b.*from ['"]@arrivalos\/core['"]/,
+    pattern: /\b(ModuleRegistry|globalRegistry|registerModule)\b.*from ['"]@arrival-atlas\/core['"]/,
   },
   {
     rule: 'registry-import',
-    pattern: /from ['"]@arrivalos\/core['"].*(ModuleRegistry|globalRegistry)/,
+    pattern: /from ['"]@arrival-atlas\/core['"].*(ModuleRegistry|globalRegistry)/,
   },
 ];
 

@@ -1,3 +1,20 @@
+---
+id: financial-platform-readiness-audit
+title: Financial Platform Readiness Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: finance
+status: active
+maturity: stable
+owner: system
+tags:
+  - financial-modeling
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # Financial Platform Production-Readiness Audit
 
 **Date:** June 2026  
@@ -9,13 +26,13 @@
 **Related prior audits:**  
 `docs/audits/financial-v2-validation-report.md` (June 14, 2026),  
 `docs/audits/benefits-simulator-m1-1-hardening-report.md`,  
-`docs/audits/user-profile-engine-policy-layer-report.md`
+`docs/archive/user-profile-engine/policy-layer-report.md`
 
 ---
 
 ## Executive Summary
 
-Arrive Atlas has evolved from a prototype financial calculator into a **layered decision platform** with profile merge, policy enforcement, execution traceability, dual financial modules, and **100 automated tests** (78 unique — see §1.3). The **critical Minijob/Midijob routing defect** identified in the June 2026 validation report has been **fixed and regression-protected**. Benefits Simulator adds **12 golden scenario fixtures** with exact-value assertions.
+Arrival Atlas has evolved from a prototype financial calculator into a **layered decision platform** with profile merge, policy enforcement, execution traceability, dual financial modules, and **100 automated tests** (78 unique — see §1.3). The **critical Minijob/Midijob routing defect** identified in the June 2026 validation report has been **fixed and regression-protected**. Benefits Simulator adds **12 golden scenario fixtures** with exact-value assertions.
 
 However, **significant simplifications remain** in the benefits and household models (KdU caps, Kindergeld imputation, child ages, self-employed heuristic, default Bundesland). **Decision engine and scenario comparator have zero direct unit tests.** Financial Reality lacks golden fixtures. There is **no API integration test for Benefits Simulator** and **no end-to-end browser tests**.
 
@@ -39,10 +56,10 @@ However, **significant simplifications remain** in the benefits and household mo
 
 | Package | Test files | Tests (reported) | Unique tests (est.) | Financial relevance |
 |---------|------------|------------------:|----------------------:|---------------------|
-| `@arrivalos/shared-services` | 4 | 31 | 31 | **Core** — payroll, benefits, routing, simulator |
-| `@arrivalos/modules` | 3 | 22 | 22 | Financial Reality + Benefits Simulator |
-| `@arrivalos/profile` | 12 | 44 | **~22** | Merge, policy, trace, resolve pipeline |
-| `@arrivalos/api` | 2 | 3 | 3 | Profile + financial execute (1 path) |
+| `@arrival-atlas/shared-services` | 4 | 31 | 31 | **Core** — payroll, benefits, routing, simulator |
+| `@arrival-atlas/modules` | 3 | 22 | 22 | Financial Reality + Benefits Simulator |
+| `@arrival-atlas/profile` | 12 | 44 | **~22** | Merge, policy, trace, resolve pipeline |
+| `@arrival-atlas/api` | 2 | 3 | 3 | Profile + financial execute (1 path) |
 | **Total** | **21** | **100** | **~78** | |
 
 > **Finding F-01 (P2):** Profile package contains duplicate test directories (`engine 2/`, `policy 2/`, `trace 2/`) mirroring primary tests. Inflates count without adding coverage. Remove duplicates.
@@ -453,7 +470,7 @@ The following **must be true** before exposing the platform to real migrants (ev
 
 ## 10. Conclusion
 
-The Arrive Atlas financial platform has **crossed a critical threshold**: the Minijob/Midijob routing defect that blocked user testing in June 2026 is **fixed and regression-locked**, and Benefits Simulator adds **production-quality golden scenario protection** for life-transition modeling.
+The Arrival Atlas financial platform has **crossed a critical threshold**: the Minijob/Midijob routing defect that blocked user testing in June 2026 is **fixed and regression-locked**, and Benefits Simulator adds **production-quality golden scenario protection** for life-transition modeling.
 
 The platform is **not yet safe for unsupervised, authoritative financial guidance** due to:
 

@@ -1,4 +1,4 @@
-import type { ModuleResult } from '@arrivalos/module-runtime';
+import type { ModuleResult } from '@arrival-atlas/module-runtime';
 import type { ContractSnapshot } from './ContractSnapshot.js';
 import type { ModuleUIProjection } from './ModuleUIProjection.js';
 import {

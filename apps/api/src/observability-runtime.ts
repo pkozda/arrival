@@ -1,18 +1,18 @@
-import { compiledModuleCatalog } from '@arrivalos/modules';
+import { compiledModuleCatalog } from '@arrival-atlas/modules';
 import {
   bootstrapObservability,
   buildGovernanceHealth,
   buildModuleHealthSummary,
   buildNormalizerGoldenBaseline,
   type ObservabilityRuntimeState,
-} from '@arrivalos/observability';
-import { globalRegistry } from '@arrivalos/core';
-import type { ContractSnapshotStore } from '@arrivalos/product-contract';
-import type { GovernedModuleRegistry } from '@arrivalos/module-runtime';
+} from '@arrival-atlas/observability';
+import { globalRegistry } from '@arrival-atlas/core';
+import type { ContractSnapshotStore } from '@arrival-atlas/product-contract';
+import type { GovernedModuleRegistry } from '@arrival-atlas/module-runtime';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { NormalizerGoldenBaseline } from '@arrivalos/observability';
+import type { NormalizerGoldenBaseline } from '@arrival-atlas/observability';
 
 function loadNormalizerBaseline(): NormalizerGoldenBaseline {
   try {

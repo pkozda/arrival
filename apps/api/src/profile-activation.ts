@@ -4,7 +4,7 @@ import {
   MaritalStatusSchema,
   ProfilePatchSchema,
   type ProfilePatch,
-} from '@arrivalos/profile';
+} from '@arrival-atlas/profile';
 
 function isPresent(value: unknown): boolean {
   return value !== undefined && value !== null && value !== '';

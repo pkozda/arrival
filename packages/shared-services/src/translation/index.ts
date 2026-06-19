@@ -1,4 +1,4 @@
-import type { SupportedLanguage } from '@arrivalos/core';
+import type { SupportedLanguage } from '@arrival-atlas/core';
 
 export interface TranslationEntry {
   term: string;

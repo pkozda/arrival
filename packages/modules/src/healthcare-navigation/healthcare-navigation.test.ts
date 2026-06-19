@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { AppContext } from '@arrivalos/core';
+import type { AppContext } from '@arrival-atlas/core';
 import {
   healthcareNavigationModule,
   resolveHealthcareNavigationLanguage,

@@ -71,7 +71,7 @@ let activeStore: PersistedSystemStateStore | null = null;
 export function getPersistedSystemStateStore(): PersistedSystemStateStore {
   if (!activeStore) {
     const rootDir =
-      process.env.ARRIVALOS_STATE_DIR ?? path.join(process.cwd(), '.arrivalos-state');
+      process.env.ARRIVAL_ATLAS_STATE_DIR ?? path.join(process.cwd(), '.arrival-atlas-state');
     activeStore = new FilePersistedSystemStateStore(rootDir);
   }
   return activeStore;
@@ -82,5 +82,5 @@ export function resetPersistedSystemStateStore(store: PersistedSystemStateStore)
 }
 
 export function resolveDefaultStateDir(): string {
-  return process.env.ARRIVALOS_STATE_DIR ?? path.join(process.cwd(), '.arrivalos-state');
+  return process.env.ARRIVAL_ATLAS_STATE_DIR ?? path.join(process.cwd(), '.arrival-atlas-state');
 }

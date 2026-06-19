@@ -1,8 +1,8 @@
 import { describe, expect, it, afterEach } from 'vitest';
-import { ModuleRegistry } from '@arrivalos/core';
-import { InMemoryProfileStore, ProfileEngine } from '@arrivalos/profile';
-import { registerAllModules } from '@arrivalos/modules';
-import { BenefitsSimulatorInputSchema } from '@arrivalos/modules';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { InMemoryProfileStore, ProfileEngine } from '@arrival-atlas/profile';
+import { registerAllModules } from '@arrival-atlas/modules';
+import { BenefitsSimulatorInputSchema } from '@arrival-atlas/modules';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -98,26 +98,26 @@ describe('generateModuleExplanation', () => {
 });
 
 describe('MRC-3 envelope enrichment', () => {
-  const previousEnvelope = process.env.ARRIVALOS_MRC_ENVELOPE;
-  const previousExplanation = process.env.ARRIVALOS_MRC_EXPLANATION;
+  const previousEnvelope = process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
+  const previousExplanation = process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
 
   afterEach(() => {
     if (previousEnvelope === undefined) {
-      delete process.env.ARRIVALOS_MRC_ENVELOPE;
+      delete process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
     } else {
-      process.env.ARRIVALOS_MRC_ENVELOPE = previousEnvelope;
+      process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = previousEnvelope;
     }
 
     if (previousExplanation === undefined) {
-      delete process.env.ARRIVALOS_MRC_EXPLANATION;
+      delete process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
     } else {
-      process.env.ARRIVALOS_MRC_EXPLANATION = previousExplanation;
+      process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = previousExplanation;
     }
   });
 
   it('enriches envelope without mutating legacy payload', async () => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
-    process.env.ARRIVALOS_MRC_EXPLANATION = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = 'true';
 
     const store = new InMemoryProfileStore();
     const profileEngine = new ProfileEngine(store);

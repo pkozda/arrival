@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ModuleRegistry } from '@arrivalos/core';
-import { allModuleRegistrations } from '@arrivalos/modules';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { allModuleRegistrations } from '@arrival-atlas/modules';
 import {
   FinancialRealityInputSchema,
   FinancialRealityOutputSchema,
-} from '@arrivalos/modules';
-import { bootstrapGovernedRuntime } from '@arrivalos/module-runtime';
+} from '@arrival-atlas/modules';
+import { bootstrapGovernedRuntime } from '@arrival-atlas/module-runtime';
 import { buildContractSnapshot } from './buildContractSnapshot.js';
 import { bootstrapProductContractLayer } from './bootstrapProductContractLayer.js';
 import { createContractSnapshotStore } from './ContractSnapshotStore.js';

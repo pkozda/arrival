@@ -3,12 +3,12 @@ import type {
   MergeModuleInputResult,
   ModuleMergeStrategy,
   ProfileDocument,
-} from '@arrivalos/profile';
-import type { Employment } from '@arrivalos/shared-services';
+} from '@arrival-atlas/profile';
+import type { Employment } from '@arrival-atlas/shared-services';
 import {
   buildHouseholdFromLegacy,
   resolveEmploymentsForLegacyInput,
-} from '@arrivalos/shared-services';
+} from '@arrival-atlas/shared-services';
 
 function mergeBenefitsSimulatorInputFromProfile(
   requestInput: Record<string, unknown>,

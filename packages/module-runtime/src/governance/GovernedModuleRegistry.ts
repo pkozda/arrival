@@ -1,4 +1,4 @@
-import type { AppContext, ModuleExecutionResult, ModuleRegistration } from '@arrivalos/core';
+import type { AppContext, ModuleExecutionResult, ModuleRegistration } from '@arrival-atlas/core';
 import type { ModuleCapabilities } from '../types/ModuleCapabilities.js';
 import type { ActionItem } from '../types/ActionItem.js';
 import type { Recommendation } from '../types/Recommendation.js';

@@ -3,8 +3,8 @@ import {
   adaptLegacyInputToV2,
   adaptV2OutputToLegacy,
   financialPipeline,
-} from '@arrivalos/shared-services';
-import { InMemoryProfileStore, ProfileEngine, resolveExecutionContext } from '@arrivalos/profile';
+} from '@arrival-atlas/shared-services';
+import { InMemoryProfileStore, ProfileEngine, resolveExecutionContext } from '@arrival-atlas/profile';
 import {
   financialRealityModule,
   setAdvancedTaxScenarios,

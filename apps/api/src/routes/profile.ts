@@ -5,7 +5,7 @@ import {
   ProfileRevisionConflictError,
   ProfileNotFoundError,
   toUIProfileResponse,
-} from '@arrivalos/profile';
+} from '@arrival-atlas/profile';
 import { toMutationActor } from '../middleware/auth.middleware.js';
 import { securedRoute } from '../routing/apply-route-security.js';
 import { requireRouteSecurityRule } from '../routing/route-security-map.js';

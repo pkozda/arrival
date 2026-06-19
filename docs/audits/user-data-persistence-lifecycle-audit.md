@@ -1,3 +1,22 @@
+---
+id: user-data-persistence-lifecycle-audit
+title: User Data Persistence Lifecycle Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: identity
+status: active
+maturity: stable
+owner: system
+tags:
+  - profile-merge
+  - session-persistence
+  - form-hydration
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # User Data Persistence Lifecycle Audit
 
 **Date:** June 2026  
@@ -262,7 +281,7 @@ Stores **module output** (not user input), keyed by `sessionId`. Unreachable aft
 
 | Key | Location | Data |
 |-----|----------|------|
-| `arrivalos-theme` | `localStorage` | Theme preference |
+| `arrival-atlas-theme` | `localStorage` | Theme preference |
 | `arrival_atlas_ftu_v1` | `localStorage` | FTU step (home no longer uses FTU UI) |
 
 **Not persisted:** `sessionId`, profile, form values, module results, UX store.

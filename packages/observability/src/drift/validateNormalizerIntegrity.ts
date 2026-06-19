@@ -1,5 +1,5 @@
-import { normalizeRecommendations } from '@arrivalos/module-runtime';
-import { buildActionItems } from '@arrivalos/module-runtime';
+import { normalizeRecommendations } from '@arrival-atlas/module-runtime';
+import { buildActionItems } from '@arrival-atlas/module-runtime';
 import { sha256Checksum } from '../sha256.js';
 import type { DriftFinding } from './types.js';
 

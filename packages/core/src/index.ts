@@ -1,4 +1,4 @@
-export { PRODUCT_NAME, PRODUCT_TAGLINE } from '@arrivalos/ui-contract';
+export { PRODUCT_NAME, PRODUCT_TAGLINE } from '@arrival-atlas/ui-contract';
 export * from './types/index.js';
 export * from './session/index.js';
 export * from './i18n/index.js';
