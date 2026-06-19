@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ModuleRegistry } from '@arrivalos/core';
-import { allModuleRegistrations } from '@arrivalos/modules';
-import { bootstrapGovernedRuntime } from '@arrivalos/module-runtime';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { allModuleRegistrations } from '@arrival-atlas/modules';
+import { bootstrapGovernedRuntime } from '@arrival-atlas/module-runtime';
 import { mapModuleStatus } from './mapModuleStatus.js';
 import { normalizeCapabilities } from './normalizeCapabilities.js';
 import {

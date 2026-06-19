@@ -1,4 +1,4 @@
-import type { ModuleRegistration } from '@arrivalos/core';
+import type { ModuleRegistration } from '@arrival-atlas/core';
 import { defineModuleVersion } from './defineModuleVersion.js';
 import type {
   DefineModuleInput,

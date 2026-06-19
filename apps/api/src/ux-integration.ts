@@ -1,9 +1,9 @@
-import type { ModuleExecutionResult } from '@arrivalos/core';
+import type { ModuleExecutionResult } from '@arrival-atlas/core';
 import {
   buildUXActionPlan,
   type UXActionCard,
   type UXSource,
-} from '@arrivalos/ux';
+} from '@arrival-atlas/ux';
 
 const UX_SOURCES = new Set<UXSource>([
   'financial-reality',

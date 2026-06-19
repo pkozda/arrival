@@ -1,4 +1,4 @@
-import type { ModuleExecuteProjectionResponse } from '@arrivalos/product-contract';
+import type { ModuleExecuteProjectionResponse } from '@arrival-atlas/product-contract';
 
 export type {
   ActionCard,
@@ -26,7 +26,7 @@ export type {
   UiSnapshotProfile,
   UiSnapshotProjection,
   UiSnapshotSession,
-} from '@arrivalos/product-contract';
+} from '@arrival-atlas/product-contract';
 
 export {
   PRODUCT_NAME,
@@ -37,6 +37,6 @@ export {
   deriveDefaultValues,
   extractSchemaFields,
   mergeProfileIntoDefaults,
-} from '@arrivalos/product-contract';
+} from '@arrival-atlas/product-contract';
 
 export type ModuleExecuteResponse = ModuleExecuteProjectionResponse;

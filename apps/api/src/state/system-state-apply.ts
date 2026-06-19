@@ -1,6 +1,6 @@
-import type { AppContext, Session, TrackedEvent } from '@arrivalos/core';
-import type { ModuleResult } from '@arrivalos/module-runtime';
-import type { ModuleUIProjection } from '@arrivalos/product-contract';
+import type { AppContext, Session, TrackedEvent } from '@arrival-atlas/core';
+import type { ModuleResult } from '@arrival-atlas/module-runtime';
+import type { ModuleUIProjection } from '@arrival-atlas/product-contract';
 import {
   ProfileCreateInputSchema,
   ProfileDocumentSchema,
@@ -13,7 +13,7 @@ import {
   type ProfilePatch,
   type ProfileRecord,
   type ProfileRevision,
-} from '@arrivalos/profile';
+} from '@arrival-atlas/profile';
 import { moduleInputToProfilePatch } from '../profile-activation.js';
 import { finalizeSystemState } from './system-state-hash.js';
 import type {

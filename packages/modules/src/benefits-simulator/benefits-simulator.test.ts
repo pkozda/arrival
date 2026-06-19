@@ -6,7 +6,7 @@ import {
   runScenarioGrid,
   buildHouseholdFromLegacy,
   resolveEmploymentsForLegacyInput,
-} from '@arrivalos/shared-services';
+} from '@arrival-atlas/shared-services';
 import { benefitsSimulatorModule } from './index.js';
 
 function buildMinijobScenarioInput() {

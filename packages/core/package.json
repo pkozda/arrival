@@ -1,5 +1,5 @@
 {
-  "name": "@arrivalos/core",
+  "name": "@arrival-atlas/core",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -18,7 +18,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
-    "@arrivalos/ui-contract": "*",
+    "@arrival-atlas/ui-contract": "*",
     "zod": "^3.24.1"
   },
   "devDependencies": {

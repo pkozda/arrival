@@ -215,7 +215,7 @@ export async function ensureSession(context?: Record<string, unknown>): Promise<
   return createSession(context);
 }
 
-export const LEGACY_THEME_STORAGE_KEY = 'arrivalos-theme';
+export const LEGACY_THEME_STORAGE_KEY = 'arrival-atlas-theme';
 
 export function clearLegacyThemeStorage(): void {
   if (typeof window === 'undefined') {

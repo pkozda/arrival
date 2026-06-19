@@ -7,7 +7,7 @@ dist/
 *.log
 .DS_Store
 coverage/
-.arrivalos-state/
-.arrivalos-accounts/
-.arrivalos-entitlements/
-.arrivalos-sessions/
+.arrival-atlas-state/
+.arrival-atlas-accounts/
+.arrival-atlas-entitlements/
+.arrival-atlas-sessions/

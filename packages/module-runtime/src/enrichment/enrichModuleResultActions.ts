@@ -1,4 +1,4 @@
-import type { ModuleExecutionResult } from '@arrivalos/core';
+import type { ModuleExecutionResult } from '@arrival-atlas/core';
 import type { ModuleResult } from '../types/ModuleResult.js';
 import type { GovernedModuleRegistry } from '../governance/GovernedModuleRegistry.js';
 import { isMrcActionsEnabled } from '../config/mrc-actions.js';

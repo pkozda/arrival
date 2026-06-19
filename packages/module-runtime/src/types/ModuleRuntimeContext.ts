@@ -1,5 +1,5 @@
-import type { DataProvenanceEntry, SupportedLanguage, ThemePreference } from '@arrivalos/core';
-import type { ProfileSlice } from '@arrivalos/profile';
+import type { DataProvenanceEntry, SupportedLanguage, ThemePreference } from '@arrival-atlas/core';
+import type { ProfileSlice } from '@arrival-atlas/profile';
 
 /**
  * Read-only execution context exposed at the module runtime boundary.

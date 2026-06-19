@@ -1,4 +1,4 @@
-import type { DataProvenanceEntry } from '@arrivalos/core';
+import type { DataProvenanceEntry } from '@arrival-atlas/core';
 import type { ProfileDocument } from '../types/profile-document.js';
 import type { TraceCollector } from '../trace/trace-collector.js';
 

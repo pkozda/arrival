@@ -1,5 +1,5 @@
-import { PRODUCT_NAME, PRODUCT_TAGLINE } from '@arrivalos/ui-contract';
-import type { SupportedLanguage } from '@arrivalos/ui-contract';
+import { PRODUCT_NAME, PRODUCT_TAGLINE } from '@arrival-atlas/ui-contract';
+import type { SupportedLanguage } from '@arrival-atlas/ui-contract';
 
 type TranslationKey = string;
 type Translations = Record<TranslationKey, string>;

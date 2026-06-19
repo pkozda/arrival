@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import type { ModuleExecutionResult } from '@arrivalos/core';
-import { ModuleRegistry } from '@arrivalos/core';
-import { InMemoryProfileStore, ProfileEngine } from '@arrivalos/profile';
-import { registerAllModules, allModuleRegistrations } from '@arrivalos/modules';
+import type { ModuleExecutionResult } from '@arrival-atlas/core';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { InMemoryProfileStore, ProfileEngine } from '@arrival-atlas/profile';
+import { registerAllModules, allModuleRegistrations } from '@arrival-atlas/modules';
 import { bootstrapGovernedRuntime } from './governance/bootstrapGovernedRuntime.js';
 import { legacyDomainToModuleResult } from './adapters/legacyDomainToModuleResult.js';
 import {
@@ -110,17 +110,17 @@ describe('resolveExecutionResult', () => {
 });
 
 describe('ModuleRuntime envelope mode', () => {
-  const previousFlag = process.env.ARRIVALOS_MRC_ENVELOPE;
+  const previousFlag = process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
 
   beforeEach(() => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
   });
 
   afterEach(() => {
     if (previousFlag === undefined) {
-      delete process.env.ARRIVALOS_MRC_ENVELOPE;
+      delete process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
     } else {
-      process.env.ARRIVALOS_MRC_ENVELOPE = previousFlag;
+      process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = previousFlag;
     }
   });
 

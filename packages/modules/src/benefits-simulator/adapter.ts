@@ -1,4 +1,4 @@
-import type { SimulatorGridInput } from '@arrivalos/shared-services';
+import type { SimulatorGridInput } from '@arrival-atlas/shared-services';
 import type { BenefitsSimulatorInput } from './schema.js';
 
 export function adaptToSimulatorGridInput(

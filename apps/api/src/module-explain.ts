@@ -1,6 +1,6 @@
-import { resolveExecutionResult } from '@arrivalos/module-runtime';
-import type { ContractSnapshotStore } from '@arrivalos/product-contract';
-import { buildExplanationView } from '@arrivalos/product-contract';
+import { resolveExecutionResult } from '@arrival-atlas/module-runtime';
+import type { ContractSnapshotStore } from '@arrival-atlas/product-contract';
+import { buildExplanationView } from '@arrival-atlas/product-contract';
 import type { SystemStateCoordinator } from './state/system-state-coordinator.js';
 import { getStoredModuleExecution } from './state/system-state-apply.js';
 

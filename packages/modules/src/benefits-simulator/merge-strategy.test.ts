@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   clearModuleMergeStrategies,
   getModuleMergeStrategy,
-} from '@arrivalos/profile';
-import type { ProfileDocument } from '@arrivalos/profile';
+} from '@arrival-atlas/profile';
+import type { ProfileDocument } from '@arrival-atlas/profile';
 import { registerAllMergeStrategies } from '../index.js';
 import { benefitsSimulatorMergeStrategy } from './merge-strategy.js';
 

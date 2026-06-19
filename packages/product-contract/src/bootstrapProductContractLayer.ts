@@ -1,4 +1,4 @@
-import type { GovernedModuleRegistry } from '@arrivalos/module-runtime';
+import type { GovernedModuleRegistry } from '@arrival-atlas/module-runtime';
 import { buildContractSnapshot } from './buildContractSnapshot.js';
 import {
   createContractSnapshotStore,

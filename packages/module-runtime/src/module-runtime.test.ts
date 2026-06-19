@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ModuleRegistry } from '@arrivalos/core';
-import { InMemoryProfileStore, ProfileEngine } from '@arrivalos/profile';
-import { registerAllModules, allModuleRegistrations } from '@arrivalos/modules';
-import { resolveExecutionContext } from '@arrivalos/profile';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { InMemoryProfileStore, ProfileEngine } from '@arrival-atlas/profile';
+import { registerAllModules, allModuleRegistrations } from '@arrival-atlas/modules';
+import { resolveExecutionContext } from '@arrival-atlas/profile';
 import { toModuleRuntimeContext } from './adapters/toModuleRuntimeContext.js';
 import { bootstrapGovernedRuntime } from './governance/bootstrapGovernedRuntime.js';
 import { ModuleRuntime } from './runtime/ModuleRuntime.js';

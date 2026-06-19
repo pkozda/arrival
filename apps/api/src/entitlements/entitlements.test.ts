@@ -302,7 +302,7 @@ describe('account claim entitlements', () => {
     });
     const { accountId } = claimRes.json() as { accountId: string };
 
-    const store = new FileEntitlementStore(process.env.ARRIVALOS_ENTITLEMENTS_DIR!);
+    const store = new FileEntitlementStore(process.env.ARRIVAL_ATLAS_ENTITLEMENTS_DIR!);
     const entitlements = await store.getByAccountId(accountId);
 
     expect(entitlements).toEqual(createDefaultEntitlements(accountId));

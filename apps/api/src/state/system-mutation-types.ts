@@ -1,12 +1,12 @@
-import type { AppContext, SupportedLanguage } from '@arrivalos/core';
-import type { ModuleResult } from '@arrivalos/module-runtime';
-import type { ModuleUIProjection } from '@arrivalos/product-contract';
+import type { AppContext, SupportedLanguage } from '@arrival-atlas/core';
+import type { ModuleResult } from '@arrival-atlas/module-runtime';
+import type { ModuleUIProjection } from '@arrival-atlas/product-contract';
 import type {
   ProfileCreateInput,
   ProfilePatch,
   ProfileRecord,
-} from '@arrivalos/profile';
-import type { ExecutionTrace } from '@arrivalos/profile';
+} from '@arrival-atlas/profile';
+import type { ExecutionTrace } from '@arrival-atlas/profile';
 import type { SystemModuleDescriptor, SystemProjectionConfig } from './system-state-types.js';
 import type { SystemState } from './system-state-types.js';
 import type { MutationActor } from './mutation-actor.js';

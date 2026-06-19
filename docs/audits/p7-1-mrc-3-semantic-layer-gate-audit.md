@@ -1,6 +1,24 @@
+---
+id: p7-1-mrc-3-semantic-layer-gate-audit
+title: P7.1 MRC-3 Semantic Layer Gate Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: core
+status: active
+maturity: stable
+owner: system
+tags:
+  - mrc-3
+  - semantic-layer
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # P7.1 — MRC-3 Semantic Layer Gate Audit
 
-**Project:** Arrival Atlas (ArrivalOS)  
+**Project:** Arrival Atlas  
 **Document Type:** Architecture Gate Audit  
 **Domain:** Module Runtime Platform (MRC)  
 **Phase:** MRC-3 — Explanation Model & Recommendation Normalization  
@@ -10,13 +28,13 @@
 
 **Reference documents:**
 
-- [Module Runtime Contract v1.0 — Specification](../architecture/module-runtime-contract-v1-specification.md)
+- [Module Runtime Contract v1.0 — Specification](../core/module-runtime-contract-v1.md)
 - [P7.0 — Module Runtime Architecture Audit](./p7-0-module-runtime-architecture-audit.md)
-- [MRC Evolution Roadmap](../architecture/module-runtime-evolution-roadmap.md)
+- [MRC Evolution Roadmap](../archive/module-runtime-evolution-roadmap.md)
 
 **Scope:** Read-only validation of MRC-3 implementation. No code changes performed.
 
-**Baseline:** MRC-1 + MRC-2 + MRC-3 implemented; 18/18 `@arrivalos/module-runtime` tests, 154/154 API tests passing.
+**Baseline:** MRC-1 + MRC-2 + MRC-3 implemented; 18/18 `@arrival-atlas/module-runtime` tests, 154/154 API tests passing.
 
 ---
 
@@ -25,7 +43,7 @@
 MRC-3 introduces a **wrapper-only semantic layer** that normalizes legacy module outputs into `Recommendation[]` and `ModuleExplanation` inside the `ModuleResult` envelope. The audit confirms:
 
 - **Legacy execution is unchanged** — `globalRegistry.execute()` output (`data`) is not mutated by enrichment.
-- **Default production behavior is unchanged** — both `ARRIVALOS_MRC_ENVELOPE` and `ARRIVALOS_MRC_EXPLANATION` default to off; API responses and DPSS writes match pre-MRC-2 semantics.
+- **Default production behavior is unchanged** — both `ARRIVAL_ATLAS_MRC_ENVELOPE` and `ARRIVAL_ATLAS_MRC_EXPLANATION` default to off; API responses and DPSS writes match pre-MRC-2 semantics.
 - **UI snapshot and UX orchestrator remain legacy-driven** — `buildUiSnapshot()` projects domain `result` via `getLegacyDomainResult()`; `packages/ux` post-hoc parsing is untouched.
 - **Semantic derivation is bounded** — all fields trace to payload, profile slice, provenance, or merged input. No LLM or external inference.
 - **Gaps exist but are non-blocking** — execution trace is not consumed; a few synthetic fallback strings appear when legacy fields are empty; flag interaction requires both envelope flags for explanation to activate.
@@ -43,8 +61,8 @@ resolveExecutionContext()
   → globalRegistry.execute()          [authoritative legacy output]
   → attachModuleResultEnvelope()      [API primary path]
       → buildModuleResultEnvelope()
-          → wrapLegacyExecutionResult()     [if ARRIVALOS_MRC_ENVELOPE=true]
-          → enrichModuleResultSemantics()   [if ARRIVALOS_MRC_EXPLANATION=true]
+          → wrapLegacyExecutionResult()     [if ARRIVAL_ATLAS_MRC_ENVELOPE=true]
+          → enrichModuleResultSemantics()   [if ARRIVAL_ATLAS_MRC_EXPLANATION=true]
   → DPSS MODULE_EXECUTE (result.data + optional moduleResult)
   → attachUxToExecutionResult(legacy)   [UX still reads legacy.data]
   → API response { success, data, moduleResult? }
@@ -59,8 +77,8 @@ Parallel shadow path (`runMrcShadowValidation`) invokes `ModuleRuntime.execute()
 | Determinism preserved for legacy output | ✅ Pass | Enrichment reads `legacy.data` after execute; no re-execution in primary path |
 | No side effects in semantic layer | ✅ Pass | Normalizers are pure functions; no I/O, no DPSS/profile writes |
 | Envelope only enriches, never mutates legacy | ✅ Pass | `enrichModuleResultSemantics` returns new object spread; `legacy.data` untouched (verified in tests) |
-| `ARRIVALOS_MRC_ENVELOPE` gates envelope | ✅ Pass | `buildModuleResultEnvelope` returns `undefined` when off |
-| `ARRIVALOS_MRC_EXPLANATION` gates semantics | ✅ Pass | `enrichModuleResultSemantics` no-ops when off |
+| `ARRIVAL_ATLAS_MRC_ENVELOPE` gates envelope | ✅ Pass | `buildModuleResultEnvelope` returns `undefined` when off |
+| `ARRIVAL_ATLAS_MRC_EXPLANATION` gates semantics | ✅ Pass | `enrichModuleResultSemantics` no-ops when off |
 | Payload is reference, not clone | ⚠️ Note | `wrapLegacyExecutionResult` sets `payload: legacy.data` (shared reference) — safe today, fragile if future code mutates `moduleResult.payload` |
 
 ---
@@ -124,7 +142,7 @@ Returns `[]` — safe fallback, no synthetic recommendations.
 | MRC-3 enrich | `resolveConfidence()` may downgrade `high` → `medium` when `profileId` or `profileSlice` missing |
 | Post-enrich | `meta.confidence` **overwritten** with `explanation.confidence` |
 
-**Finding:** Enabling `ARRIVALOS_MRC_EXPLANATION` can change `moduleResult.meta.confidence` relative to MRC-2-only envelope for the same execution. Deterministic, but **flag-dependent semantic drift** between envelope-only and envelope+explanation modes.
+**Finding:** Enabling `ARRIVAL_ATLAS_MRC_EXPLANATION` can change `moduleResult.meta.confidence` relative to MRC-2-only envelope for the same execution. Deterministic, but **flag-dependent semantic drift** between envelope-only and envelope+explanation modes.
 
 ### 3.5 Factor Duplication
 
@@ -201,7 +219,7 @@ Recommendation-level factors are duplicated at module level. Intentional aggrega
 
 | ID | Category | Risk | Severity | MRC-4 impact |
 |----|----------|------|----------|--------------|
-| R-01 | Flags | `ARRIVALOS_MRC_EXPLANATION` has **no effect** without `ARRIVALOS_MRC_ENVELOPE` | 🟠 High | Operators may think explanation is on when it is not |
+| R-01 | Flags | `ARRIVAL_ATLAS_MRC_EXPLANATION` has **no effect** without `ARRIVAL_ATLAS_MRC_ENVELOPE` | 🟠 High | Operators may think explanation is on when it is not |
 | R-02 | Semantic | `meta.confidence` changes when explanation flag enabled | 🟠 High | Action priority logic must not assume stable confidence across flag combos |
 | R-03 | Coverage | 4/6 modules have no recommendation normalizer | 🟠 High | MRC-4 actions uneven across module catalog |
 | R-04 | Trace | Execution trace not used in explanation factors | 🟡 Medium | Auditability gap vs specification intent |
@@ -256,7 +274,7 @@ No 🔴 blocking fixes required for gate passage.
 
 | # | Fix | Type | Effort |
 |---|-----|------|--------|
-| 1 | Document flag dependency: `ARRIVALOS_MRC_EXPLANATION` requires `ARRIVALOS_MRC_ENVELOPE=true` | Docs / optional runtime warning | Low |
+| 1 | Document flag dependency: `ARRIVAL_ATLAS_MRC_EXPLANATION` requires `ARRIVAL_ATLAS_MRC_ENVELOPE=true` | Docs / optional runtime warning | Low |
 | 2 | Document `meta.confidence` overwrite behavior when explanation enabled | Docs | Low |
 | 3 | Define MRC-4 action authority: envelope `actions[]` vs legacy UX orchestrator | Architecture decision | Low |
 

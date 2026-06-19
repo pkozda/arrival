@@ -1,14 +1,14 @@
-import { ThemePreferenceSchema, type SupportedLanguage } from '@arrivalos/core';
-import { getLegacyDomainResult } from '@arrivalos/module-runtime';
-import type { ProfileDocument } from '@arrivalos/profile';
-import { buildUXActionPlan, type UXSource } from '@arrivalos/ux';
+import { ThemePreferenceSchema, type SupportedLanguage } from '@arrival-atlas/core';
+import { getLegacyDomainResult } from '@arrival-atlas/module-runtime';
+import type { ProfileDocument } from '@arrival-atlas/profile';
+import { buildUXActionPlan, type UXSource } from '@arrival-atlas/ux';
 import {
   buildUiSnapshotProjection,
   type ActionCard,
   type ExecutionSnapshot,
   type ModuleSnapshotSummary,
   type SnapshotRecommendation,
-} from '@arrivalos/product-contract';
+} from '@arrival-atlas/product-contract';
 import {
   SnapshotProjectionError,
   UI_SNAPSHOT_SCHEMA_VERSION,
@@ -29,7 +29,7 @@ const UX_SOURCES = new Set<UXSource>([
 export type LegacyUiSnapshotExecution = {
   moduleId: string;
   result: unknown;
-  projection?: import('@arrivalos/product-contract').ModuleUIProjection;
+  projection?: import('@arrival-atlas/product-contract').ModuleUIProjection;
   timestamp: number;
   executionId: string;
   snapshotVersion: number;

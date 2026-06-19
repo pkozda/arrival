@@ -1,4 +1,4 @@
-import type { ExplanationFactor as RuntimeExplanationFactor } from '@arrivalos/module-runtime';
+import type { ExplanationFactor as RuntimeExplanationFactor } from '@arrival-atlas/module-runtime';
 import type { ExplanationFactor } from '../ModuleExplanationView.js';
 
 const FORBIDDEN_SOURCES = new Set(['trace', 'runtime', 'governance']);

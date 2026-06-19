@@ -1,5 +1,5 @@
-import type { ModuleExecutionResult } from '@arrivalos/core';
-import { mapExecutionFailureToModuleError, type ModuleError } from '@arrivalos/module-sdk';
+import type { ModuleExecutionResult } from '@arrival-atlas/core';
+import { mapExecutionFailureToModuleError, type ModuleError } from '@arrival-atlas/module-sdk';
 
 export function mapExecuteFailureResponse(params: {
   result: ModuleExecutionResult;

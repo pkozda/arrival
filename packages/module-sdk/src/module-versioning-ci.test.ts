@@ -6,7 +6,7 @@ import { validateModuleVersioningCatalog } from './validateModuleVersioning.js';
 
 describe('module versioning CI gate', () => {
   it('matches the committed module version baseline', async () => {
-    const { compiledModuleCatalog } = await import('@arrivalos/modules');
+    const { compiledModuleCatalog } = await import('@arrival-atlas/modules');
     const moduleVersionBaseline = JSON.parse(
       readFileSync(
         join(dirname(fileURLToPath(import.meta.url)), '../baselines/module-version-baseline.json'),
@@ -33,7 +33,7 @@ describe('module versioning CI gate', () => {
   it('documents the module versioning policy', () => {
     const policyPath = join(
       dirname(fileURLToPath(import.meta.url)),
-      '../../../docs/architecture/module-versioning-policy.md'
+      '../../../docs/platform/module-versioning-policy.md'
     );
     const policy = readFileSync(policyPath, 'utf8');
 

@@ -1,3 +1,21 @@
+---
+id: mvp-r3-single-source-truth-audit
+title: MVP-R3 Single Source of Truth Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: identity
+status: active
+maturity: stable
+owner: system
+tags:
+  - profile-engine
+  - data-model
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # MVP-R3 — Single Context Truth Audit
 
 **Date:** June 2026  
@@ -8,15 +26,15 @@
 
 **Related docs:**  
 `docs/audits/platform-architecture-audit.md` (MVP-R3),  
-`docs/refactors/MVP-R1-profile-merge-port.md`,  
-`docs/audits/user-profile-engine-policy-layer-report.md`,  
-`docs/audits/user-profile-engine-runtime-unification-report.md`
+`docs/refactors/mvp-r1-profile-merge-port.md`,  
+`docs/archive/user-profile-engine/policy-layer-report.md`,  
+`docs/archive/user-profile-engine/runtime-unification-report.md`
 
 ---
 
 ## Executive Summary
 
-Arrive Atlas currently operates with **intentional dual heritage** in `AppContext`: Profile Engine fields (`profileSlice`, `profileId`, `profileVersion`, `dataProvenance`) coexist with legacy shapes (`userProfile`, `systemState`). The Profile Engine **writes** legacy fields from `ProfileDocument` in `buildAppContext()`, but modules **read** them inconsistently.
+Arrival Atlas currently operates with **intentional dual heritage** in `AppContext`: Profile Engine fields (`profileSlice`, `profileId`, `profileVersion`, `dataProvenance`) coexist with legacy shapes (`userProfile`, `systemState`). The Profile Engine **writes** legacy fields from `ProfileDocument` in `buildAppContext()`, but modules **read** them inconsistently.
 
 **Critical finding:** `financial-reality` reads `systemState.insurance` and `systemState.benefits`, but its **module policy excludes `insurance` and `benefits` domains** from the policy-constrained document. Those `systemState` fields are therefore **always undefined** when profile is loaded — admin rules fall back to hardcoded defaults (`hasHealthInsurance: true`, `daysInGermany: 0`). This is not merely redundant data; it is **silent data loss**.
 

@@ -1,5 +1,5 @@
-import type { ModuleRegistration } from '@arrivalos/core';
-import type { ModuleRegistry } from '@arrivalos/core';
+import type { ModuleRegistration } from '@arrival-atlas/core';
+import type { ModuleRegistry } from '@arrival-atlas/core';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

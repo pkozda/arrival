@@ -161,7 +161,7 @@ describe('account authz middleware', () => {
   });
 
   it('Case 4 — legacy SystemState without accountId remains accessible', async () => {
-    const stateDir = process.env.ARRIVALOS_STATE_DIR!;
+    const stateDir = process.env.ARRIVAL_ATLAS_STATE_DIR!;
     const legacySessionId = 'sess_legacy_authz';
     const legacyState = {
       session: {
@@ -200,7 +200,7 @@ describe('account authz middleware', () => {
   });
 
   it('rejects session identifier mismatch between header and persisted state', async () => {
-    const stateDir = process.env.ARRIVALOS_STATE_DIR!;
+    const stateDir = process.env.ARRIVAL_ATLAS_STATE_DIR!;
     const fileSessionId = 'sess_file_key';
     const internalSessionId = 'sess_internal_id';
     const mismatchedState = {

@@ -1,4 +1,4 @@
-import type { DataProvenanceEntry } from '@arrivalos/core';
+import type { DataProvenanceEntry } from '@arrival-atlas/core';
 import type { ExplanationFactor, ModuleExplanation } from '../types/ModuleExplanation.js';
 import type { RecommendationPriority } from '../types/Recommendation.js';
 import { readPayloadConfidence } from '../adapters/read-payload-confidence.js';

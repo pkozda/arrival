@@ -1,10 +1,10 @@
-import type { AppContext, ModuleExecutionResult } from '@arrivalos/core';
-import type { ModuleResult } from '@arrivalos/module-runtime';
+import type { AppContext, ModuleExecutionResult } from '@arrival-atlas/core';
+import type { ModuleResult } from '@arrival-atlas/module-runtime';
 import {
   buildModuleResultEnvelope,
   toModuleRuntimeContext,
   type SemanticEnrichmentContext,
-} from '@arrivalos/module-runtime';
+} from '@arrival-atlas/module-runtime';
 
 export type AttachModuleResultEnvelopeContext = SemanticEnrichmentContext & {
   appContext?: AppContext;

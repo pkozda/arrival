@@ -38,8 +38,8 @@ export {
 } from './metrics/MetricsCollector.js';
 
 export function collectDriftFindings(params: {
-  sdkCatalog: import('@arrivalos/module-sdk').CompiledModuleCatalog;
-  contractStore: import('@arrivalos/product-contract').ContractSnapshotStore;
+  sdkCatalog: import('@arrival-atlas/module-sdk').CompiledModuleCatalog;
+  contractStore: import('@arrival-atlas/product-contract').ContractSnapshotStore;
   storedIntegrity?: import('./snapshots/types.js').BootstrapIntegritySnapshot;
   recomputedIntegrity: import('./snapshots/types.js').BootstrapIntegritySnapshot;
   normalizerBaseline: import('./drift/validateNormalizerIntegrity.js').NormalizerGoldenBaseline;

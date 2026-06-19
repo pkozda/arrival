@@ -1,4 +1,4 @@
-import type { Module, ModuleRegistration } from '@arrivalos/core';
+import type { Module, ModuleRegistration } from '@arrival-atlas/core';
 import {
   BenefitsSimulatorInputSchema,
   BenefitsSimulatorOutputSchema,

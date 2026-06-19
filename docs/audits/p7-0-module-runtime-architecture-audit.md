@@ -1,6 +1,24 @@
+---
+id: p7-0-module-runtime-architecture-audit
+title: P7.0 Module Runtime Architecture Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: core
+status: active
+maturity: stable
+owner: system
+tags:
+  - governance-kernel
+  - module-runtime
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # P7.0 — Module Runtime Architecture Audit
 
-**Project:** Arrival Atlas (ArrivalOS)  
+**Project:** Arrival Atlas  
 **Document Type:** Architecture Audit Report  
 **Domain:** Module Runtime Platform (MRC)  
 **Status:** Initial Audit  
@@ -10,10 +28,10 @@
 **Baseline:** IAM Phase 3.1.2 complete (150/150 API tests, 8/8 web tests)  
 **Reference documents:**
 
-- [Module Runtime Contract v1.0 — Specification](../architecture/module-runtime-contract-v1-specification.md)
-- [Module Runtime Contract v1.0 — Evolution Roadmap](../architecture/module-runtime-evolution-roadmap.md)
-- [Financial Module v2 — Architecture Notes](../architecture/financial-module-v2-notes.md)
-- [User Profile Engine Runtime Unification Report](./user-profile-engine-runtime-unification-report.md)
+- [Module Runtime Contract v1.0 — Specification](../core/module-runtime-contract-v1.md)
+- [Module Runtime Contract v1.0 — Evolution Roadmap](../archive/module-runtime-evolution-roadmap.md)
+- [Financial Module v2 — Architecture Notes](../finance/financial-module-v2-notes.md)
+- [User Profile Engine Runtime Unification Report](../archive/user-profile-engine/runtime-unification-report.md)
 - [P5.0 — Full System Architecture Audit](./p5-0-full-system-architecture-audit.md)
 
 **Scope:** Read-only audit of module execution stack across `packages/core`, `packages/modules`, `packages/profile`, `packages/ux`, `packages/shared-services`, `apps/api`, `apps/web`. No code changes performed.
@@ -44,7 +62,7 @@ Arrival Atlas has a **working but informal** module execution stack. Financial R
 | Is a big-bang migration required? | **No** — dual-read projection adapter can bridge legacy `result` payloads |
 | Highest-risk migration surface? | **DPSS stored executions + web snapshot selectors** |
 
-**Recommended next step:** Phase **MRC-1** — introduce `@arrivalos/module-runtime` types and `toModuleRuntimeContext()` adapter; no module rewrites until MRC-2.
+**Recommended next step:** Phase **MRC-1** — introduce `@arrival-atlas/module-runtime` types and `toModuleRuntimeContext()` adapter; no module rewrites until MRC-2.
 
 ---
 
@@ -98,7 +116,7 @@ buildUiSnapshot(state)                           apps/api/state/snapshot-project
   · uxSnapshot from buildUXActionPlan(latest executions)
 ```
 
-**Key observation:** The runtime kernel described in MRC §4 does not exist as a package. Orchestration lives in `apps/api/build-app.ts`; contract types are split across `@arrivalos/core`, `@arrivalos/profile`, and per-module schemas.
+**Key observation:** The runtime kernel described in MRC §4 does not exist as a package. Orchestration lives in `apps/api/build-app.ts`; contract types are split across `@arrival-atlas/core`, `@arrival-atlas/profile`, and per-module schemas.
 
 ---
 
@@ -124,7 +142,7 @@ buildUiSnapshot(state)                           apps/api/state/snapshot-project
 | Explainability (partial) | `benefits.buergergeld.reasoning: string[]` | ⚠️ Unstructured |
 | Confidence metadata | `meta.confidence`, `meta.disclaimer` (v2 path) | ⚠️ Inside payload, not envelope |
 | Scenario support | v2 `comparison`, `scenarios`, `verdict` | ⚠️ Typed as `z.any()` |
-| Domain separation | Calculation in `@arrivalos/shared-services` | ✅ |
+| Domain separation | Calculation in `@arrival-atlas/shared-services` | ✅ |
 | Golden tests | Fixtures in `packages/shared-services` | ✅ |
 
 ### 4.2 What Must Be Rewritten or Migrated
@@ -290,7 +308,7 @@ Benefits Simulator is **closer to MRC-3/4 semantically** than Financial Reality:
 ### 6.3 Registry Migration Sequence
 
 ```text
-MRC-1: Add @arrivalos/module-runtime package
+MRC-1: Add @arrival-atlas/module-runtime package
        ModuleRuntime wraps existing ModuleRegistry.execute()
        AppContext → ModuleRuntimeContext adapter
 
@@ -389,7 +407,7 @@ function unwrapExecutionResult(stored: unknown): ModuleResult {
 }
 ```
 
-This avoids breaking existing `.arrivalos-state/*.json` files on disk.
+This avoids breaking existing `.arrival-atlas-state/*.json` files on disk.
 
 ---
 
@@ -482,7 +500,7 @@ type SystemState = {
 | `SystemState.projectionConfig` | UX feature flag stays |
 | `SystemState.events` | Event shape compatible |
 | Mutation type `MODULE_EXECUTE` | Same mutation; different payload shape |
-| File-per-session persistence | `.arrivalos-state/{sessionId}.json` format evolves in-place |
+| File-per-session persistence | `.arrival-atlas-state/{sessionId}.json` format evolves in-place |
 
 ### 8.5 Side Effects Outside MRC (Unchanged but Documented)
 
@@ -555,7 +573,7 @@ Full MRC-2 migration should treat all six registered modules uniformly.
 
 ## 10. Migration Roadmap (Consolidated)
 
-Aligned with [Module Runtime Evolution Roadmap](../architecture/module-runtime-evolution-roadmap.md):
+Aligned with [Module Runtime Evolution Roadmap](../archive/module-runtime-evolution-roadmap.md):
 
 | Phase | Financial Reality | Benefits Simulator | Registry | UI Snapshot | DPSS |
 |-------|-------------------|--------------------|----------|-------------|------|
@@ -570,7 +588,7 @@ Aligned with [Module Runtime Evolution Roadmap](../architecture/module-runtime-e
 ### Recommended Execution Order
 
 ```text
-1. MRC-1  — @arrivalos/module-runtime types + adapter (zero behavior change)
+1. MRC-1  — @arrival-atlas/module-runtime types + adapter (zero behavior change)
 2. MRC-2  — Envelope wrapping + DPSS dual-write/dual-read
 3. MRC-3  — Explanation normalization (Financial Reality + Benefits Simulator)
 4. MRC-4  — Action framework
@@ -619,7 +637,7 @@ The platform is **architecturally ready for MRC-1** without behavioral changes. 
 2. **Web snapshot selectors** — from `result.income` to `result.payload.income`
 3. **UX orchestrator** — from post-hoc string parsing to declared `ActionItem[]`
 
-Financial Reality and Benefits Simulator both have **strong domain engines** in `@arrivalos/shared-services`. MRC migration is primarily **contract wrapping and normalization**, not engine rewrite.
+Financial Reality and Benefits Simulator both have **strong domain engines** in `@arrival-atlas/shared-services`. MRC migration is primarily **contract wrapping and normalization**, not engine rewrite.
 
 Benefits Simulator is semantically ahead on recommendations but **behind on integration** (no web UI, no UX normalizer, context ignored). Financial Reality is **ahead on integration** but **behind on explanation structure**.
 

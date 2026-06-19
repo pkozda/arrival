@@ -1,5 +1,5 @@
 {
-  "name": "@arrivalos/product-contract",
+  "name": "@arrival-atlas/product-contract",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -18,14 +18,14 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@arrivalos/module-runtime": "*",
-    "@arrivalos/ui-contract": "*",
+    "@arrival-atlas/module-runtime": "*",
+    "@arrival-atlas/ui-contract": "*",
     "zod": "^3.24.1",
     "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
-    "@arrivalos/modules": "*",
-    "@arrivalos/core": "*",
+    "@arrival-atlas/modules": "*",
+    "@arrival-atlas/core": "*",
     "@types/node": "^22.10.5",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"

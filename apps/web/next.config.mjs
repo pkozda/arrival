@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['@arrivalos/core'],
+  transpilePackages: ['@arrival-atlas/core'],
 };
 
 export default nextConfig;

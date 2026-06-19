@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ModuleRegistry } from '@arrivalos/core';
-import { allModuleRegistrations } from '@arrivalos/modules';
-import { bootstrapGovernedRuntime, sealModuleResult } from '@arrivalos/module-runtime';
-import type { ActionItem, ModuleResult, Recommendation } from '@arrivalos/module-runtime';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { allModuleRegistrations } from '@arrival-atlas/modules';
+import { bootstrapGovernedRuntime, sealModuleResult } from '@arrival-atlas/module-runtime';
+import type { ActionItem, ModuleResult, Recommendation } from '@arrival-atlas/module-runtime';
 import { bootstrapProductContractLayer } from './bootstrapProductContractLayer.js';
 import { projectModuleUI } from './projectModuleUI.js';
 

@@ -1,3 +1,20 @@
+---
+id: mvp-r3-phase3-removal-readiness
+title: MVP-R3 Phase 3 Removal Readiness
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: platform
+status: active
+maturity: stable
+owner: system
+tags:
+  - legacy-removal
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # MVP-R3 Phase 3 — Legacy Context Removal Readiness Audit
 
 **Date:** June 2026  
@@ -10,7 +27,7 @@
 `docs/audits/mvp-r3-single-source-truth-audit.md`,  
 `docs/audits/mvp-r3-runtime-legacy-read-check.md`,  
 `docs/audits/mvp-r3-financial-policy-audit.md`,  
-`docs/audits/user-profile-engine-policy-layer-report.md`
+`docs/archive/user-profile-engine/policy-layer-report.md`
 
 ---
 
@@ -202,9 +219,9 @@ buildAppContext():
 
 | Package | Files | Impact |
 |---------|-------|--------|
-| `@arrivalos/profile` | `context-builder.ts`, `resolve-execution-context.test.ts`, `profile.integration.test.ts` | High |
-| `@arrivalos/modules` | `healthcare-navigation/index.ts`, `system-translation/index.ts`, both `*.test.ts` | Medium — remove fallbacks |
-| `@arrivalos/core` | `types/index.ts` | **Phase 4 only** |
+| `@arrival-atlas/profile` | `context-builder.ts`, `resolve-execution-context.test.ts`, `profile.integration.test.ts` | High |
+| `@arrival-atlas/modules` | `healthcare-navigation/index.ts`, `system-translation/index.ts`, both `*.test.ts` | Medium — remove fallbacks |
+| `@arrival-atlas/core` | `types/index.ts` | **Phase 4 only** |
 | `apps/web` | 6 files (AppProvider + 5 module pages) | **Phase 3b/4** — stop sending `userProfile` |
 | `apps/api` | `build-app.ts`, session routes, 2 API tests | Low (inbound parse unchanged in 3a) |
 | `packages/core` | `session/index.ts` | **Phase 4** |
@@ -213,9 +230,9 @@ buildAppContext():
 
 | Suite | Tests to update | New tests |
 |-------|----------------:|----------:|
-| `@arrivalos/profile` | 4–6 | 0–2 (profileSlice provenance) |
-| `@arrivalos/modules` | 4 (Phase 2 Case B) | 0 |
-| `@arrivalos/api` | 2 (session seed) | 0 |
+| `@arrival-atlas/profile` | 4–6 | 0–2 (profileSlice provenance) |
+| `@arrival-atlas/modules` | 4 (Phase 2 Case B) | 0 |
+| `@arrival-atlas/api` | 2 (session seed) | 0 |
 | **Total** | **~10–12** | **0–2** |
 
 ### 4.5 API impact

@@ -1,4 +1,4 @@
-import type { AppContext } from '@arrivalos/core';
+import type { AppContext } from '@arrival-atlas/core';
 import { buildAppContext } from './context-builder.js';
 import { mergeModuleInput } from './input-merger.js';
 import type { ProfileEngine } from './profile-engine.js';

@@ -5,16 +5,16 @@ import {
   getSupportedLanguages,
   getTranslations,
   AppContextSchema,
-} from '@arrivalos/core';
-import { resolveExecutionContext } from '@arrivalos/profile';
-import { registerAllModules, allModuleRegistrations } from '@arrivalos/modules';
+} from '@arrival-atlas/core';
+import { resolveExecutionContext } from '@arrival-atlas/profile';
+import { registerAllModules, allModuleRegistrations } from '@arrival-atlas/modules';
 import { profileEngine } from './profile-runtime.js';
 import {
   ModuleRuntime,
   bootstrapGovernedRuntime,
   executeGovernedModule,
   type GovernedModuleRegistry,
-} from '@arrivalos/module-runtime';
+} from '@arrival-atlas/module-runtime';
 import {
   bootstrapProductContractLayer,
   projectModuleCapabilities,
@@ -22,7 +22,7 @@ import {
   projectPublicContract,
   projectPublicModuleContract,
   type ContractSnapshotStore,
-} from '@arrivalos/product-contract';
+} from '@arrival-atlas/product-contract';
 import { runMrcShadowValidation } from './mrc-shadow.js';
 import {
   buildLegacyExecuteResponse,
@@ -63,7 +63,7 @@ import {
   buildGovernanceHealthReport,
   buildModulesHealthReport,
 } from './observability-runtime.js';
-import { globalMetricsCollector } from '@arrivalos/observability';
+import { globalMetricsCollector } from '@arrival-atlas/observability';
 import {
   assertSessionOwnership,
   resolveOwnedSessionId,
@@ -150,7 +150,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
     requireRouteSecurityRule('GET', '/health'),
     async () => ({
       status: 'ok',
-      service: 'arrivalos-api',
+      service: 'arrival-atlas-api',
       version: '0.1.0',
       timestamp: new Date().toISOString(),
     })

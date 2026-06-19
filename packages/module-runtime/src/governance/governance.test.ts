@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ModuleRegistry } from '@arrivalos/core';
-import { allModuleRegistrations } from '@arrivalos/modules';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { allModuleRegistrations } from '@arrival-atlas/modules';
 import { bootstrapGovernedRuntime } from '../governance/bootstrapGovernedRuntime.js';
 import { executeGovernedModule } from '../governance/executeGovernedModule.js';
 import { validateModuleRegistration } from '../registry/validate-module-registration.js';

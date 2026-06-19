@@ -73,8 +73,8 @@ let activeStore: EntitlementStore | null = null;
 export function getEntitlementStore(): EntitlementStore {
   if (!activeStore) {
     const rootDir =
-      process.env.ARRIVALOS_ENTITLEMENTS_DIR ??
-      path.join(process.cwd(), '.arrivalos-entitlements');
+      process.env.ARRIVAL_ATLAS_ENTITLEMENTS_DIR ??
+      path.join(process.cwd(), '.arrival-atlas-entitlements');
     activeStore = new FileEntitlementStore(rootDir);
   }
   return activeStore;

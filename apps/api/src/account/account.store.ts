@@ -93,7 +93,7 @@ let activeStore: AccountStore | null = null;
 export function getAccountStore(): AccountStore {
   if (!activeStore) {
     const rootDir =
-      process.env.ARRIVALOS_ACCOUNTS_DIR ?? path.join(process.cwd(), '.arrivalos-accounts');
+      process.env.ARRIVAL_ATLAS_ACCOUNTS_DIR ?? path.join(process.cwd(), '.arrival-atlas-accounts');
     activeStore = new FileAccountStore(rootDir);
   }
   return activeStore;
@@ -104,5 +104,5 @@ export function resetAccountStore(store: AccountStore): void {
 }
 
 export function resolveDefaultAccountsDir(): string {
-  return process.env.ARRIVALOS_ACCOUNTS_DIR ?? path.join(process.cwd(), '.arrivalos-accounts');
+  return process.env.ARRIVAL_ATLAS_ACCOUNTS_DIR ?? path.join(process.cwd(), '.arrival-atlas-accounts');
 }

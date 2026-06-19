@@ -18,8 +18,8 @@ export function resolveAuthSubject(accountId: string | null): AuthSubject {
 export class AuthTokenService {
   private getSecret(): string {
     return (
-      process.env.ARRIVALOS_AUTH_SECRET ??
-      'arrivalos-dev-auth-secret-change-in-production'
+      process.env.ARRIVAL_ATLAS_AUTH_SECRET ??
+      'arrival-atlas-dev-auth-secret-change-in-production'
     );
   }
 

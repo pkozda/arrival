@@ -1,4 +1,4 @@
-import type { GovernedModuleRegistry } from '@arrivalos/module-runtime';
+import type { GovernedModuleRegistry } from '@arrival-atlas/module-runtime';
 import type { ContractSnapshot } from './ContractSnapshot.js';
 import { normalizeCapabilities } from './normalizeCapabilities.js';
 import { resolveProductMetadata } from './moduleProductMetadata.js';

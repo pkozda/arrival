@@ -19,7 +19,7 @@ describe('Account store', () => {
 
   beforeEach(() => {
     setupTestStateStore();
-    store = new FileAccountStore(process.env.ARRIVALOS_ACCOUNTS_DIR!);
+    store = new FileAccountStore(process.env.ARRIVAL_ATLAS_ACCOUNTS_DIR!);
   });
 
   afterEach(() => {
@@ -104,7 +104,7 @@ describe('Account service', () => {
 
   beforeEach(() => {
     setupTestStateStore();
-    service = new AccountService(new FileAccountStore(process.env.ARRIVALOS_ACCOUNTS_DIR!));
+    service = new AccountService(new FileAccountStore(process.env.ARRIVAL_ATLAS_ACCOUNTS_DIR!));
   });
 
   afterEach(() => {
@@ -165,7 +165,7 @@ describe('SystemState accountId (Phase 1)', () => {
   });
 
   it('legacy SystemState files without accountId load as null', async () => {
-    const stateDir = process.env.ARRIVALOS_STATE_DIR!;
+    const stateDir = process.env.ARRIVAL_ATLAS_STATE_DIR!;
     const legacySessionId = 'sess_legacy_no_account';
     const legacyState = {
       session: {

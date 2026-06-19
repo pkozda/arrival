@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import type { AppContext, Module, ModuleRegistration } from '@arrivalos/core';
+import type { AppContext, Module, ModuleRegistration } from '@arrival-atlas/core';
 import {
   translateTerm,
   searchTerms,
   formatTranslation,
   getTermsByCategory,
-} from '@arrivalos/shared-services';
+} from '@arrival-atlas/shared-services';
 
 export const SystemTranslationInputSchema = z.object({
   query: z.string().min(1).max(200),

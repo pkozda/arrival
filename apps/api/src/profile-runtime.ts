@@ -1,11 +1,11 @@
-import { ProfileEngine, ProfileNotFoundError, type ProfileStore } from '@arrivalos/profile';
+import { ProfileEngine, ProfileNotFoundError, type ProfileStore } from '@arrival-atlas/profile';
 import type {
   CreateProfileMeta,
   ProfileRecord,
   ProfileRevision,
   UpdateProfileMeta,
-} from '@arrivalos/profile';
-import type { ProfileDocument, ProfilePatch } from '@arrivalos/profile';
+} from '@arrival-atlas/profile';
+import type { ProfileDocument, ProfilePatch } from '@arrival-atlas/profile';
 import { systemStateCoordinator } from './state/system-state-coordinator.js';
 
 class CoordinatorBackedProfileStore implements ProfileStore {

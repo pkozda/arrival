@@ -1,5 +1,5 @@
 {
-  "name": "@arrivalos/module-sdk",
+  "name": "@arrival-atlas/module-sdk",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,11 +19,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@arrivalos/core": "*",
+    "@arrival-atlas/core": "*",
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@arrivalos/modules": "*",
+    "@arrival-atlas/modules": "*",
     "@types/node": "^22.10.5",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"

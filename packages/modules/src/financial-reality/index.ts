@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AppContext, Module, ModuleRegistration } from '@arrivalos/core';
+import type { AppContext, Module, ModuleRegistration } from '@arrival-atlas/core';
 import {
   calculateNetIncome,
   calculateBuergergeldEligibility,
@@ -8,7 +8,7 @@ import {
   adaptV2OutputToLegacy,
   financialPipeline,
   type LegacyFinancialInput,
-} from '@arrivalos/shared-services';
+} from '@arrival-atlas/shared-services';
 import { resolveFinancialProfileContext } from './profile-context.js';
 
 // ─── v1 schemas (unchanged contract) ─────────────────────────────────────────

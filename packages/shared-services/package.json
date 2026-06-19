@@ -1,5 +1,5 @@
 {
-  "name": "@arrivalos/shared-services",
+  "name": "@arrival-atlas/shared-services",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,7 +19,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@arrivalos/core": "*",
+    "@arrival-atlas/core": "*",
     "lohnsteuerrechner": "^1.0.7",
     "zod": "^3.24.1"
   },

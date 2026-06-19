@@ -4,7 +4,7 @@ import {
   type ScenarioComparison,
   type ScenarioResult,
   type SimulatorGridOutput,
-} from '@arrivalos/shared-services';
+} from '@arrival-atlas/shared-services';
 import { adaptToSimulatorGridInput } from './adapter.js';
 import {
   BENEFITS_SIMULATOR_SCHEMA_VERSION,

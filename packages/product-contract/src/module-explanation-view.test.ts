@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ModuleRegistry } from '@arrivalos/core';
-import { allModuleRegistrations } from '@arrivalos/modules';
+import { ModuleRegistry } from '@arrival-atlas/core';
+import { allModuleRegistrations } from '@arrival-atlas/modules';
 import {
   bootstrapGovernedRuntime,
   buildModuleResultEnvelope,
   executeGovernedModule,
   sealModuleResult,
-} from '@arrivalos/module-runtime';
-import type { ActionItem, ModuleResult, Recommendation } from '@arrivalos/module-runtime';
+} from '@arrival-atlas/module-runtime';
+import type { ActionItem, ModuleResult, Recommendation } from '@arrival-atlas/module-runtime';
 import { bootstrapProductContractLayer } from './bootstrapProductContractLayer.js';
 import { buildExplanationView } from './reason-mapping/buildExplanationView.js';
 import { mapExplanationFactors } from './reason-mapping/mapExplanationFactors.js';
@@ -204,31 +204,31 @@ describe('ModuleExplanationView', () => {
 });
 
 describe('ModuleExplanationView golden fixtures', () => {
-  const previousEnvelope = process.env.ARRIVALOS_MRC_ENVELOPE;
-  const previousExplanation = process.env.ARRIVALOS_MRC_EXPLANATION;
-  const previousActions = process.env.ARRIVALOS_MRC_ACTIONS;
+  const previousEnvelope = process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
+  const previousExplanation = process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
+  const previousActions = process.env.ARRIVAL_ATLAS_MRC_ACTIONS;
 
   beforeEach(() => {
-    process.env.ARRIVALOS_MRC_ENVELOPE = 'true';
-    process.env.ARRIVALOS_MRC_EXPLANATION = 'true';
-    process.env.ARRIVALOS_MRC_ACTIONS = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = 'true';
+    process.env.ARRIVAL_ATLAS_MRC_ACTIONS = 'true';
   });
 
   afterEach(() => {
     if (previousEnvelope === undefined) {
-      delete process.env.ARRIVALOS_MRC_ENVELOPE;
+      delete process.env.ARRIVAL_ATLAS_MRC_ENVELOPE;
     } else {
-      process.env.ARRIVALOS_MRC_ENVELOPE = previousEnvelope;
+      process.env.ARRIVAL_ATLAS_MRC_ENVELOPE = previousEnvelope;
     }
     if (previousExplanation === undefined) {
-      delete process.env.ARRIVALOS_MRC_EXPLANATION;
+      delete process.env.ARRIVAL_ATLAS_MRC_EXPLANATION;
     } else {
-      process.env.ARRIVALOS_MRC_EXPLANATION = previousExplanation;
+      process.env.ARRIVAL_ATLAS_MRC_EXPLANATION = previousExplanation;
     }
     if (previousActions === undefined) {
-      delete process.env.ARRIVALOS_MRC_ACTIONS;
+      delete process.env.ARRIVAL_ATLAS_MRC_ACTIONS;
     } else {
-      process.env.ARRIVALOS_MRC_ACTIONS = previousActions;
+      process.env.ARRIVAL_ATLAS_MRC_ACTIONS = previousActions;
     }
   });
 

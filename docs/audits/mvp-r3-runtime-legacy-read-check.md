@@ -1,3 +1,20 @@
+---
+id: mvp-r3-runtime-legacy-read-check
+title: MVP-R3 Runtime Legacy Read Check
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: platform
+status: active
+maturity: stable
+owner: system
+tags:
+  - legacy-removal
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # MVP-R3 Phase 2 — Runtime Legacy Read Check
 
 **Date:** June 2026  

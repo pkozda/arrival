@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 async function main() {
-  const { compiledModuleCatalog } = await import('@arrivalos/modules');
+  const { compiledModuleCatalog } = await import('@arrival-atlas/modules');
 
   const baseline = {
     version: '1.0.0',

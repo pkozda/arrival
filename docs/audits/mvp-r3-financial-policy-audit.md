@@ -1,3 +1,21 @@
+---
+id: mvp-r3-financial-policy-audit
+title: MVP-R3 Financial Policy Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: finance
+status: active
+maturity: stable
+owner: system
+tags:
+  - financial-modeling
+  - profile-policy
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # MVP-R3 — Financial Reality Profile Policy Audit
 
 **Date:** June 2026  
@@ -8,8 +26,8 @@
 
 **Related docs:**  
 `docs/audits/mvp-r3-single-source-truth-audit.md`,  
-`docs/audits/user-profile-engine-policy-layer-report.md`,  
-`docs/refactors/MVP-R1-profile-merge-port.md`,  
+`docs/archive/user-profile-engine/policy-layer-report.md`,  
+`docs/refactors/mvp-r1-profile-merge-port.md`,  
 `packages/modules/src/financial-reality/profile-context.ts`
 
 ---
@@ -356,12 +374,12 @@ Conflicts with MVP-R3 direction and duplicates hydration logic without fixing `p
 
 | # | Task | Package |
 |---|------|---------|
-| 1 | Add `insurance`, `benefits` to `FINANCIAL_REALITY_POLICY.allowedFields` | `@arrivalos/profile` |
-| 2 | Update `apply-profile-policy.test.ts` exclusion assertions | `@arrivalos/profile` |
-| 3 | Update `profile.integration.test.ts` — expect `profileSlice.insurance/benefits` populated | `@arrivalos/profile` |
-| 4 | Add `resolveExecutionContext` test: `daysInGermany: 90` → `profileSlice.benefits` | `@arrivalos/profile` |
-| 5 | Add financial-reality E2E via pipeline: Anmeldung rule without manual `profileSlice` injection | `@arrivalos/modules` |
-| 6 | Verify trace records `FIELD_ALLOWED` for `insurance`, `benefits` | `@arrivalos/profile` |
+| 1 | Add `insurance`, `benefits` to `FINANCIAL_REALITY_POLICY.allowedFields` | `@arrival-atlas/profile` |
+| 2 | Update `apply-profile-policy.test.ts` exclusion assertions | `@arrival-atlas/profile` |
+| 3 | Update `profile.integration.test.ts` — expect `profileSlice.insurance/benefits` populated | `@arrival-atlas/profile` |
+| 4 | Add `resolveExecutionContext` test: `daysInGermany: 90` → `profileSlice.benefits` | `@arrival-atlas/profile` |
+| 5 | Add financial-reality E2E via pipeline: Anmeldung rule without manual `profileSlice` injection | `@arrival-atlas/modules` |
+| 6 | Verify trace records `FIELD_ALLOWED` for `insurance`, `benefits` | `@arrival-atlas/profile` |
 
 ---
 

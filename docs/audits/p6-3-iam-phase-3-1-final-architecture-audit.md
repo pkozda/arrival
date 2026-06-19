@@ -1,6 +1,24 @@
+---
+id: p6-3-iam-phase-3-1-final-architecture-audit
+title: P6.3 IAM Phase 3.1 Final Architecture Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: platform
+status: active
+maturity: stable
+owner: system
+tags:
+  - iam
+  - security-boundary
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # P6.3 — IAM Phase 3.1 Final Architecture Audit
 
-**Project:** Arrival Atlas (ArrivalOS)  
+**Project:** Arrival Atlas  
 **Document Type:** Architecture Audit Report  
 **Domain:** Identity & Access Management (IAM)  
 **Status:** Final Audit  
@@ -10,8 +28,8 @@
 **Baseline:** IAM Phase 3.1 implementation (Steps 1–7), 135/135 API tests passing  
 **Reference documents:**
 
-- [IAM Phase 3.1 — Boundary Stabilization & Route Hardening](../architecture/iam-phase-3-1-boundary-stabilization.md)
-- [IAM Evolution Roadmap](../architecture/iam-evolution-roadmap.md)
+- [IAM Phase 3.1 — Boundary Stabilization & Route Hardening](../platform/iam-phase-3-1-boundary-stabilization.md)
+- [IAM Evolution Roadmap](../platform/iam-evolution-roadmap.md)
 - [P6.2 — Identity & Access Architecture Audit](./p6-2-identity-access-architecture-audit.md)
 
 **Scope:** Read-only audit of `apps/api` IAM implementation. No code changes performed.
@@ -25,7 +43,7 @@ IAM Phase 3.1 has successfully converted the API from a **transitional middlewar
 However, this audit finds **material gaps against the strict acceptance criteria** in the Phase 3.1 plan (§8), primarily:
 
 1. **Handler contract drift** — downstream routes still read `request.accountContext` and `request.auth` instead of `request.identity` exclusively.
-2. **Operational guardrails not wired** — `ARRIVALOS_IAM_STRICT` and `ROUTE_UNCLASSIFIED` telemetry are defined but not implemented.
+2. **Operational guardrails not wired** — `ARRIVAL_ATLAS_IAM_STRICT` and `ROUTE_UNCLASSIFIED` telemetry are defined but not implemented.
 3. **Web client incompatibility** — the Next.js client (`apps/web`) has flows that violate hardened route policy and will fail at runtime against the current API.
 4. **Structural deviation from plan** — middleware was consolidated into `applySecurityPipeline` rather than retained as separate Fastify middleware modules (functionally equivalent, documentation/acceptance mismatch).
 
@@ -179,7 +197,7 @@ The only exception is the **Vitest isolation test** in `apply-route-security.tes
 | ID | Finding | Severity |
 |----|---------|----------|
 | **F-RC-01** | **No unwrapped production routes** | ✅ Pass |
-| **F-RC-02** | **`ARRIVALOS_IAM_STRICT` env flag not implemented** — plan §7 requires runtime strict mode with `ROUTE_UNCLASSIFIED` event | **Medium** | Only bootstrap-time map validation exists; runtime unclassified routes throw `UnclassifiedRouteError` only on contract mismatch, not on missing map entry at request time |
+| **F-RC-02** | **`ARRIVAL_ATLAS_IAM_STRICT` env flag not implemented** — plan §7 requires runtime strict mode with `ROUTE_UNCLASSIFIED` event | **Medium** | Only bootstrap-time map validation exists; runtime unclassified routes throw `UnclassifiedRouteError` only on contract mismatch, not on missing map entry at request time |
 | **F-RC-03** | **`credential-optional` tier removed** (execute hardened) | ✅ Pass | Aligns with R12 closure |
 | **F-RC-04** | Fastify `@fastify/cors` may register OPTIONS handlers excluded from map tracking | **Low** | HEAD/OPTIONS explicitly skipped in `onRoute` hook — acceptable |
 
@@ -327,7 +345,7 @@ Functionally equivalent pipeline; **documentation and §8 checklist items refere
 | F-LC-02 | Web client session GET/PATCH without credentials | **Critical** | Add `x-session-id` or Bearer to all session routes in `apps/web` | 3.1.1 |
 | F-IA-01 | Handlers use `accountContext`/`auth` not `identity` | **High** | Migrate to `request.identity`; remove compat shim reads | 3.1.1 |
 | F-LC-03 | Web ignores issued token | **High** | Store token; prefer Bearer/cookie | 3.2 |
-| F-RC-02 | `ARRIVALOS_IAM_STRICT` not implemented | **Medium** | Runtime map lookup + `ROUTE_UNCLASSIFIED` event | 3.1.1 |
+| F-RC-02 | `ARRIVAL_ATLAS_IAM_STRICT` not implemented | **Medium** | Runtime map lookup + `ROUTE_UNCLASSIFIED` event | 3.1.1 |
 | F-AB-02 | Dead `assertActiveSession()` with writes | **Medium** | Delete or hard-deprecate | 3.1.1 |
 | F-IF-05 | Registry write in `POST /api/sessions` handler | **Medium** | Move to lifecycle service or document as create exception | 3.2 |
 | F-OA-02 | Possession-only claim | **Medium** | OAuth phase | 4.x |
@@ -339,7 +357,7 @@ Functionally equivalent pipeline; **documentation and §8 checklist items refere
 
 ## 11. Phase 3.1 Acceptance Criteria Scorecard
 
-Reference: [iam-phase-3-1-boundary-stabilization.md §8](../architecture/iam-phase-3-1-boundary-stabilization.md)
+Reference: [iam-phase-3-1-boundary-stabilization.md §8](../platform/iam-phase-3-1-boundary-stabilization.md)
 
 ### Identity
 
@@ -362,7 +380,7 @@ Reference: [iam-phase-3-1-boundary-stabilization.md §8](../architecture/iam-pha
 | Criterion | Status |
 |-----------|--------|
 | 100% routes in `RouteSecurityMap` | ✅ 21/21 |
-| Unclassified route hard fail with `ARRIVALOS_IAM_STRICT` | ❌ Flag not implemented |
+| Unclassified route hard fail with `ARRIVAL_ATLAS_IAM_STRICT` | ❌ Flag not implemented |
 | Tier attached at registration | ✅ `requireRouteSecurityRule()` |
 
 ### Security Fixes
@@ -434,7 +452,7 @@ Remaining work is **contract enforcement and client alignment**, not fundamental
 
 1. Migrate handlers to `request.identity` exclusively
 2. Fix web client broken session validation and PATCH flows (**Critical**)
-3. Implement `ARRIVALOS_IAM_STRICT` runtime guard
+3. Implement `ARRIVAL_ATLAS_IAM_STRICT` runtime guard
 4. Remove dead `assertActiveSession()` 
 5. Align event naming with plan (`TOKEN_MISMATCH`) or update plan docs
 

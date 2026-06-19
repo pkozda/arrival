@@ -8,14 +8,14 @@ const webSrcRoot = join(dirname(fileURLToPath(import.meta.url)), '../../../apps/
 const ALLOWED_FILES = new Set<string>();
 
 const FORBIDDEN_UI_PATTERNS = [
-  '@arrivalos/core',
-  '@arrivalos/module-runtime',
-  '@arrivalos/modules',
-  '@arrivalos/observability',
+  '@arrival-atlas/core',
+  '@arrival-atlas/module-runtime',
+  '@arrival-atlas/modules',
+  '@arrival-atlas/observability',
   'moduleResult',
   'result?.data',
   'result.data',
-  '@arrivalos/module-runtime',
+  '@arrival-atlas/module-runtime',
   'GovernedModuleRegistry',
   'globalRegistry',
   'execution.result',

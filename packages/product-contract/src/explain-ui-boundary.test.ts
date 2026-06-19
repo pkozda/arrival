@@ -14,7 +14,7 @@ const FORBIDDEN_EXPLAIN_PATTERNS = [
   'GovernedModuleRegistry',
   'RegisteredModuleContract',
   'globalRegistry',
-  '@arrivalos/module-runtime',
+  '@arrival-atlas/module-runtime',
   'projection.explanation',
   'recommendation.reason',
 ] as const;

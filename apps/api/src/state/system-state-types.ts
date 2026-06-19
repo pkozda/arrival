@@ -1,8 +1,8 @@
-import type { Session, TrackedEvent } from '@arrivalos/core';
-import type { ModuleResult } from '@arrivalos/module-runtime';
-import type { ModuleUIProjection } from '@arrivalos/product-contract';
-import type { ExecutionTrace } from '@arrivalos/profile';
-import type { ProfileRecord, ProfileRevision } from '@arrivalos/profile';
+import type { Session, TrackedEvent } from '@arrival-atlas/core';
+import type { ModuleResult } from '@arrival-atlas/module-runtime';
+import type { ModuleUIProjection } from '@arrival-atlas/product-contract';
+import type { ExecutionTrace } from '@arrival-atlas/profile';
+import type { ProfileRecord, ProfileRevision } from '@arrival-atlas/profile';
 
 export type StoredModuleExecution = {
   moduleId: string;

@@ -1,8 +1,27 @@
+---
+id: ui-architecture-audit
+title: UI Architecture Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: platform
+status: active
+maturity: stable
+owner: system
+tags:
+  - contract-driven-ui
+  - module-scalability
+  - web-architecture
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # UI Architecture Audit — Frontend Scalability & Contract Alignment
 
 **Mode:** Read-only Architecture Audit  
 **Scope:** Entire `apps/web` application  
-**System:** Arrival Atlas (ArrivalOS)  
+**System:** Arrival Atlas  
 **Date:** 2026-06-18  
 **Purpose:** Assess frontend architecture after UI Ready Gate completion
 
@@ -37,7 +56,7 @@ Remaining gaps are **architectural maturity items**, not contract violations: ca
 **Justification:**
 
 - All module flows route through `PublicModuleContract`, `ContractSnapshot`, `ModuleUIProjection`, `ModuleExplanationView`, and `UiSnapshot` projection fields.
-- `@/lib/product-contract` is the sole bridge to `@arrivalos/product-contract`; CI enforces boundary via `web-package-boundary.test.ts`.
+- `@/lib/product-contract` is the sole bridge to `@arrival-atlas/product-contract`; CI enforces boundary via `web-package-boundary.test.ts`.
 - No `switch(moduleId)`, no module-specific components, no legacy domain payload parsing.
 
 **Why not Level 5:**
@@ -285,7 +304,7 @@ Architecture debt only. Excludes styling, design, accessibility, animations.
 | `metadata.category` unused — flat module list | **Medium** | `Header.tsx`, `HomeSnapshotRenderer.tsx` | Blocks category-based navigation at scale |
 | `fetchModuleContract()` dead code | **Low** | `api.ts` L111–117 | Unused API wrapper; catalog sufficient today |
 | Dead snapshot selectors exported but unused | **Low** | `get-module-ux.ts`, `hasGlobalUx`, `getUiPreferences`, `getTheme` | Maintenance noise |
-| Stale `transpilePackages: ['@arrivalos/core']` | **Low** | `next.config.mjs` L3 | Config drift; no runtime impact |
+| Stale `transpilePackages: ['@arrival-atlas/core']` | **Low** | `next.config.mjs` L3 | Config drift; no runtime impact |
 | Dashboard priority heuristics in frontend selectors | **Medium** | `get-global-ux.ts` | Presentation rules should eventually live in snapshot aggregation or contract metadata |
 | Schema form JSON Schema subset | **Medium** | `SchemaForm.tsx` | Complex future modules may need richer form generation |
 | Shallow `mergeProfileIntoDefaults` | **Low** | Contract helper used by web | Nested profile fields may not map to schema paths |
@@ -383,4 +402,4 @@ Secondary follow-on (when catalog exceeds ~15 modules): **category-aware discove
 | Dynamic routes | 1 (`/modules/[moduleId]`) |
 | Forbidden package imports in source | 0 |
 | Boundary tests | `web-package-boundary.test.ts`, `explain-ui-boundary.test.ts`, `snapshot-boundary.test.ts` |
-| Related audits | [ui-ready-gate-audit.md](./ui-ready-gate-audit.md), [roadmap-vs-current-state.md](./roadmap-vs-current-state.md) |
+| Related audits | [ui-ready-gate-audit.md](../audits/ui-ready-gate-audit.md), [roadmap-vs-current-state.md](../platform/roadmap-vs-current-state.md) |

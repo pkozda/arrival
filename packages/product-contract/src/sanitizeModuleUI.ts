@@ -1,6 +1,6 @@
-import type { ActionItem } from '@arrivalos/module-runtime';
-import type { ModuleExplanation, ExplanationFactor } from '@arrivalos/module-runtime';
-import type { Recommendation } from '@arrivalos/module-runtime';
+import type { ActionItem } from '@arrival-atlas/module-runtime';
+import type { ModuleExplanation, ExplanationFactor } from '@arrival-atlas/module-runtime';
+import type { Recommendation } from '@arrival-atlas/module-runtime';
 import type {
   SanitizedAction,
   SanitizedExplanation,

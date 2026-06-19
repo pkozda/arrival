@@ -1,11 +1,11 @@
-import type { AppContext, ModuleExecutionResult } from '@arrivalos/core';
-import type { ModuleResult } from '@arrivalos/module-runtime';
-import { wrapLegacyExecutionResult } from '@arrivalos/module-runtime';
+import type { AppContext, ModuleExecutionResult } from '@arrival-atlas/core';
+import type { ModuleResult } from '@arrival-atlas/module-runtime';
+import { wrapLegacyExecutionResult } from '@arrival-atlas/module-runtime';
 import type {
   ContractSnapshot,
   ModuleExecuteProjectionResponse,
-} from '@arrivalos/product-contract';
-import { projectModuleUI } from '@arrivalos/product-contract';
+} from '@arrival-atlas/product-contract';
+import { projectModuleUI } from '@arrival-atlas/product-contract';
 import { attachModuleResultEnvelope } from './mrc-envelope.js';
 import type { AttachModuleResultEnvelopeContext } from './mrc-envelope.js';
 import { buildExecuteApiResponse } from './mrc-envelope.js';

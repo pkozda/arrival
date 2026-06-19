@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import type { AppContext, ModuleExecutionResult } from '@arrivalos/core';
-import type { ExecutionTrace, ProfileEngine } from '@arrivalos/profile';
-import { resolveExecutionContext } from '@arrivalos/profile';
+import type { AppContext, ModuleExecutionResult } from '@arrival-atlas/core';
+import type { ExecutionTrace, ProfileEngine } from '@arrival-atlas/profile';
+import { resolveExecutionContext } from '@arrival-atlas/profile';
 import { toModuleRuntimeContext } from '../adapters/toModuleRuntimeContext.js';
 import { buildModuleResultEnvelope } from '../enrichment/buildModuleResultEnvelope.js';
 import { isMrcEnvelopeEnabled } from '../config/mrc-envelope.js';

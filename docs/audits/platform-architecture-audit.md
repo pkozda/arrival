@@ -1,4 +1,22 @@
-# Arrive Atlas Platform Architecture Audit
+---
+id: platform-architecture-audit
+title: Platform Architecture Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: platform
+status: active
+maturity: stable
+owner: system
+tags:
+  - system-design
+  - module-ecosystem
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
+# Arrival Atlas Platform Architecture Audit
 
 **Date:** June 2026  
 **Auditor role:** Principal Platform Architect  
@@ -7,18 +25,18 @@
 
 **Related audits:**  
 `docs/audits/financial-platform-readiness-audit.md`,  
-`docs/audits/system-translation-v2.md`,  
-`docs/audits/benefits-simulator-design.md`,  
-`docs/audits/user-profile-engine-design.md`,  
-`docs/audits/user-profile-engine-policy-layer-report.md`,  
-`docs/audits/user-profile-engine-execution-trace-report.md`,  
-`docs/audits/user-profile-engine-ui-contract-report.md`
+`docs/product/system-translation-v2.md`,  
+`docs/benefits/benefits-simulator-design.md`,  
+`docs/identity/user-profile-engine-design.md`,  
+`docs/archive/user-profile-engine/policy-layer-report.md`,  
+`docs/archive/user-profile-engine/execution-trace-report.md`,  
+`docs/archive/user-profile-engine/ui-contract-report.md`
 
 ---
 
 ## Executive Summary
 
-Arrive Atlas has successfully evolved from a **single financial calculator** into a **modular decision platform** with a credible vertical slice: Profile Engine → Policy → Input Merge → Trace → Module execution, backed by a substantial Financial v2 engine and a thin Benefits Simulator orchestration layer.
+Arrival Atlas has successfully evolved from a **single financial calculator** into a **modular decision platform** with a credible vertical slice: Profile Engine → Policy → Input Merge → Trace → Module execution, backed by a substantial Financial v2 engine and a thin Benefits Simulator orchestration layer.
 
 That slice is **not yet a migrant operating system**. The platform can scale **within the financial/benefits corridor** with disciplined refactors. Scaling across Housing, Employment, Healthcare, and Knowledge as first-class domains will fail without structural changes — not because the module contract is wrong, but because **shared ownership, package boundaries, and cross-domain abstractions are immature**.
 
@@ -28,7 +46,7 @@ That slice is **not yet a migrant operating system**. The platform can scale **w
 |----------|--------|
 | Can the current architecture scale to a multi-domain migrant OS? | **Conditionally — with a deliberate hybrid evolution, not as-is** |
 | Is the module registry the right kernel? | **Yes** — keep it |
-| Is `@arrivalos/shared-services` the right long-term home for domain logic? | **No** — it is already a monolith hiding domain boundaries |
+| Is `@arrival-atlas/shared-services` the right long-term home for domain logic? | **No** — it is already a monolith hiding domain boundaries |
 | Is Profile Engine correctly positioned as platform infrastructure? | **Mostly yes — but it now imports financial code; that is a boundary violation** |
 | Is event-driven architecture needed now? | **No for MVP; yes selectively at Beta for cross-module signals** |
 | Recommended target | **D) Hybrid Architecture** — domain-bounded packages + existing module registry + selective async events |
@@ -56,7 +74,7 @@ Scored against **multi-domain migrant OS scalability**, not against "does financ
         │                 │                      │
         ▼                 ▼                      ▼
 ┌───────────────┐  ┌──────────────┐      ┌─────────────────┐
-│ @arrivalos/   │  │ @arrivalos/  │      │ @arrivalos/     │
+│ @arrival-atlas/   │  │ @arrival-atlas/  │      │ @arrival-atlas/     │
 │ modules (6)   │  │ profile      │      │ core            │
 │ thin orch.    │  │ engine       │      │ types, registry │
 └───────┬───────┘  └──────┬───────┘      │ session, events │
@@ -66,7 +84,7 @@ Scored against **multi-domain migrant OS scalability**, not against "does financ
                  │                                  │
                  ▼                                  │
         ┌────────────────────┐                     │
-        │ @arrivalos/        │─────────────────────┘
+        │ @arrival-atlas/        │─────────────────────┘
         │ shared-services    │
         │ (monolithic grab-  │
         │  bag)              │
@@ -142,7 +160,7 @@ The context builder bridges both worlds. This is **technical debt with a purpose
 
 ### 1.6 Event system (observability only)
 
-`@arrivalos/core/events` provides in-memory `trackEvent()` for:
+`@arrival-atlas/core/events` provides in-memory `trackEvent()` for:
 
 - `module.registered`, `module.execute.start|success|error`
 - Session-less, not durable, not consumed by other modules
@@ -155,11 +173,11 @@ Events are **telemetry hooks**, not an orchestration bus. No pub/sub, no sagas, 
 
 ### 2.1 Profile
 
-**Ownership today:** `@arrivalos/profile` — engine, policy registry, trace, UI contract, in-memory store.
+**Ownership today:** `@arrival-atlas/profile` — engine, policy registry, trace, UI contract, in-memory store.
 
 | Strength | Weakness |
 |----------|----------|
-| Single execution entry (`resolveExecutionContext`) | Depends on `@arrivalos/shared-services` for benefits-simulator merge |
+| Single execution entry (`resolveExecutionContext`) | Depends on `@arrival-atlas/shared-services` for benefits-simulator merge |
 | Module-scoped policy with sensitive-field redaction | Only 3 of 6 modules have explicit policies |
 | Versioned `ProfileDocument` + revision conflict | In-memory only; lost on API restart |
 | UI contract isolation (`UIProfileResponse`) | Legacy `AppContext` fields still populated and read |
@@ -197,7 +215,7 @@ Events are **telemetry hooks**, not an orchestration bus. No pub/sub, no sagas, 
 
 ### 2.4 Knowledge
 
-**Ownership today:** `shared-services/translation/` + `modules/system-translation` + proposed System Understanding Engine (SUE) in `docs/audits/system-translation-v2.md`.
+**Ownership today:** `shared-services/translation/` + `modules/system-translation` + proposed System Understanding Engine (SUE) in `docs/product/system-translation-v2.md`.
 
 | Strength | Weakness |
 |----------|----------|
@@ -248,7 +266,7 @@ Events are **telemetry hooks**, not an orchestration bus. No pub/sub, no sagas, 
 
 | Domain | Declared owner | Actual owner | Maturity (0–5) | Blocks multi-domain OS? |
 |--------|----------------|--------------|:--------------:|:-----------------------:|
-| Profile | `@arrivalos/profile` | Profile Engine | **4** | ⚠️ If financial coupling grows |
+| Profile | `@arrival-atlas/profile` | Profile Engine | **4** | ⚠️ If financial coupling grows |
 | Financial | `shared-services/financial` | Shared Services | **4** | No — anchor domain |
 | Benefits | `modules/benefits-simulator` | Financial engine + profile merge | **3** | ⚠️ Naming + cross-domain triggers |
 | Knowledge | (proposed SUE) | Translation glossary | **1** | **Yes** — no graph, no bridges |
@@ -335,7 +353,7 @@ The **profile → shared-services** edge is the dangerous precedent. One more do
 
 **What works**
 
-- Uniform `Module.execute(input, context)` contract in `@arrivalos/core`
+- Uniform `Module.execute(input, context)` contract in `@arrival-atlas/core`
 - `ModuleRegistry` with enablement, feature flags, validation, execution telemetry
 - No direct module-to-module imports
 - Benefits Simulator demonstrates **thin orchestration** pattern correctly
@@ -458,7 +476,7 @@ Per `system-translation-v2.md`, SUE requires:
 
 ### Option B — Domain-Driven Platform
 
-**Description:** Split into domain packages: `@arrivalos/domain-financial`, `@arrivalos/domain-knowledge`, `@arrivalos/domain-healthcare`, etc. Profile and core remain platform layers. Modules become thin API adapters per domain.
+**Description:** Split into domain packages: `@arrival-atlas/domain-financial`, `@arrival-atlas/domain-knowledge`, `@arrival-atlas/domain-healthcare`, etc. Profile and core remain platform layers. Modules become thin API adapters per domain.
 
 | Dimension | Assessment |
 |-----------|------------|
@@ -492,12 +510,12 @@ Per `system-translation-v2.md`, SUE requires:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Platform Kernel (@arrivalos/core)         │
+│                    Platform Kernel (@arrival-atlas/core)         │
 │         ModuleRegistry · AppContext · Session · EventPort    │
 └────────────────────────────┬────────────────────────────────┘
                              │
 ┌────────────────────────────┼────────────────────────────────┐
-│              Platform Services (@arrivalos/profile)          │
+│              Platform Services (@arrival-atlas/profile)          │
 │    resolveExecutionContext · Policy · Trace · UI Contract    │
 │    Merge orchestration (module plugins via ports, not imports)│
 └────────────────────────────┬────────────────────────────────┘
@@ -525,7 +543,7 @@ Per `system-translation-v2.md`, SUE requires:
 | **Migration cost** | **Medium** — phased extraction over MVP→Beta |
 | **Operational complexity** | **Medium** — bounded; event infra only where cross-domain needed |
 
-**Fit:** **Best match** for Arrive Atlas migrant OS trajectory.
+**Fit:** **Best match** for Arrival Atlas migrant OS trajectory.
 
 ---
 
@@ -566,14 +584,14 @@ Per `system-translation-v2.md`, SUE requires:
 
 | Domain | Target package | Module adapter |
 |--------|----------------|----------------|
-| Profile (platform) | `@arrivalos/profile` | — |
-| Financial | `@arrivalos/domain-financial` | `financial-reality` |
-| Benefits (product) | `@arrivalos/domain-financial/benefits` + `modules/benefits-simulator` | `benefits-simulator` |
-| Knowledge | `@arrivalos/domain-knowledge` | `system-understanding` (evolved) |
-| Healthcare | `@arrivalos/domain-healthcare` | `healthcare-navigation` |
-| Housing | `@arrivalos/domain-housing` | new module (future) |
-| Employment | `@arrivalos/domain-employment` | new module or life-event split |
-| Cross-domain narratives | `@arrivalos/domain-orchestration` | `life-event` (subscriber) |
+| Profile (platform) | `@arrival-atlas/profile` | — |
+| Financial | `@arrival-atlas/domain-financial` | `financial-reality` |
+| Benefits (product) | `@arrival-atlas/domain-financial/benefits` + `modules/benefits-simulator` | `benefits-simulator` |
+| Knowledge | `@arrival-atlas/domain-knowledge` | `system-understanding` (evolved) |
+| Healthcare | `@arrival-atlas/domain-healthcare` | `healthcare-navigation` |
+| Housing | `@arrival-atlas/domain-housing` | new module (future) |
+| Employment | `@arrival-atlas/domain-employment` | new module or life-event split |
+| Cross-domain narratives | `@arrival-atlas/domain-orchestration` | `life-event` (subscriber) |
 
 ### 6.3 Cross-domain signal flow (Beta)
 
@@ -638,8 +656,8 @@ Priority is **boundary integrity and financial trust**, not new domains.
 
 | ID | Refactor | Rationale | Domain |
 |----|----------|-----------|--------|
-| BETA-R1 | **Extract `@arrivalos/domain-financial`** from `shared-services` | Domain ownership | Financial |
-| BETA-R2 | **Create `@arrivalos/domain-knowledge`** + SUE M0 graph store | Knowledge domain exists | Knowledge |
+| BETA-R1 | **Extract `@arrival-atlas/domain-financial`** from `shared-services` | Domain ownership | Financial |
+| BETA-R2 | **Create `@arrival-atlas/domain-knowledge`** + SUE M0 graph store | Knowledge domain exists | Knowledge |
 | BETA-R3 | **Cross-module signal schema** in core (`PlatformSignal` envelope) | SUE + life-event integration | Platform |
 | BETA-R4 | **Selective event bus** (in-process → Redis/NATS later) for domain signals | Cross-domain side effects | Platform |
 | BETA-R5 | **Extract housing domain** — KdU rules move out of financial benefits | Housing is not financial subfolder | Housing |
@@ -699,7 +717,7 @@ Priority is **boundary integrity and financial trust**, not new domains.
 |-------|---------|
 | 80–100 | Production migrant OS platform |
 | 60–79 | Beta-ready multi-domain platform with known gaps |
-| 40–59 | **← Arrive Atlas is here** — credible single-domain platform, multi-domain needs structural work |
+| 40–59 | **← Arrival Atlas is here** — credible single-domain platform, multi-domain needs structural work |
 | 20–39 | Prototype |
 | 0–19 | Demo |
 
@@ -713,7 +731,7 @@ Priority is **boundary integrity and financial trust**, not new domains.
 
 ## 11. Conclusion
 
-Arrive Atlas has made the **right foundational bets**: module registry, typed execution context, profile engine with policy and trace, and financial engine depth. The Benefits Simulator proves the **orchestrator-over-domain-engine** pattern works.
+Arrival Atlas has made the **right foundational bets**: module registry, typed execution context, profile engine with policy and trace, and financial engine depth. The Benefits Simulator proves the **orchestrator-over-domain-engine** pattern works.
 
 The platform **will not scale** to a multi-domain migrant operating system if development continues on the current trajectory — especially profile importing financial code, `shared-services` absorbing every new domain, and content modules shipping without platform governance.
 

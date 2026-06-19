@@ -1,14 +1,14 @@
-# Arrive Atlas
+# Arrival Atlas
 
 > Your integration and life navigation system
 
-Arrive Atlas transforms complex administrative, financial, and healthcare structures into **actionable decisions** and **scenario-based guidance**.
+Arrival Atlas transforms complex administrative, financial, and healthcare structures into **actionable decisions** and **scenario-based guidance**.
 
 ---
 
-## What is Arrive Atlas?
+## What is Arrival Atlas?
 
-Moving to Germany means navigating a dense web of institutions — Jobcenter, Krankenkasse, Finanzamt — each with its own rules, deadlines, and terminology. Arrive Atlas doesn't just deliver information; it helps you **decide what to do next**.
+Moving to Germany means navigating a dense web of institutions — Jobcenter, Krankenkasse, Finanzamt — each with its own rules, deadlines, and terminology. Arrival Atlas doesn't just deliver information; it helps you **decide what to do next**.
 
 | Principle | Meaning |
 |-----------|---------|
@@ -103,7 +103,7 @@ Reusable system services:
 ## Project Structure
 
 ```
-ArrivalOS/
+Arrival Atlas/
 ├── apps/
 │   ├── api/          # Fastify REST API
 │   └── web/          # Next.js frontend
@@ -251,7 +251,7 @@ export const myModule: Module<MyInput, MyOutput> = {
 
 ## Long-Term Vision
 
-Arrive Atlas evolves into a **life operating system** for migrants in Europe:
+Arrival Atlas evolves into a **life operating system** for migrants in Europe:
 
 - Financial decision intelligence
 - Healthcare navigation

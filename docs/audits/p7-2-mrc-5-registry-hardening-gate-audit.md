@@ -1,6 +1,24 @@
+---
+id: p7-2-mrc-5-registry-hardening-gate-audit
+title: P7.2 MRC-5 Registry Hardening Gate Audit
+project: Arrival Atlas
+system: Arrival Atlas
+type: audit
+domain: core
+status: active
+maturity: stable
+owner: system
+tags:
+  - module-registry
+  - governance-kernel
+created: 2026-06-01
+updated: 2026-06-19
+related:
+---
+
 # P7.2 — MRC-5 Registry Hardening Gate Audit
 
-**Project:** Arrival Atlas (ArrivalOS)  
+**Project:** Arrival Atlas  
 **Document Type:** Architecture Gate Audit  
 **Domain:** Module Runtime Platform (MRC)  
 **Phase:** MRC-5 — Registry Hardening & Contract Enforcement  
@@ -11,12 +29,12 @@
 
 **Reference documents:**
 
-- [Module Runtime Contract v1.0 — Specification](../architecture/module-runtime-contract-v1-specification.md) §5
-- [MRC ADL — Architecture Decision Layer v1.0](../architecture/mrc-adl-architecture-decision-layer.md)
-- [Module Runtime Evolution Roadmap](../architecture/module-runtime-evolution-roadmap.md) — MRC-5
+- [Module Runtime Contract v1.0 — Specification](../core/module-runtime-contract-v1.md) §5
+- [MRC ADL — Architecture Decision Layer v1.0](../core/mrc-adl.md)
+- [Module Runtime Evolution Roadmap](../archive/module-runtime-evolution-roadmap.md) — MRC-5
 - [P7.0 — Module Runtime Architecture Audit](./p7-0-module-runtime-architecture-audit.md)
 
-**Baseline claimed by implementation team:** MRC-5 complete; 45/45 `@arrivalos/module-runtime` tests; 155/155 API tests.
+**Baseline claimed by implementation team:** MRC-5 complete; 45/45 `@arrival-atlas/module-runtime` tests; 155/155 API tests.
 
 **Scope:** Read-only audit of actual implementation. No code changes performed.
 

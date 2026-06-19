@@ -1,4 +1,4 @@
-import { defineModuleFromRegistration, registerModulesFromSDK } from '@arrivalos/module-sdk';
+import { defineModuleFromRegistration, registerModulesFromSDK } from '@arrival-atlas/module-sdk';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { financialRealityRegistration } from './financial-reality/index.js';

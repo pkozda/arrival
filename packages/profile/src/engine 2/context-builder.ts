@@ -1,4 +1,4 @@
-import type { AppContext, DataProvenanceEntry } from '@arrivalos/core';
+import type { AppContext, DataProvenanceEntry } from '@arrival-atlas/core';
 import type { ProfileDocument } from '../types/profile-document.js';
 import type { ProfileRecord } from '../types/profile-record.js';
 import type { ProfileSlice } from '../types/profile-slice.js';

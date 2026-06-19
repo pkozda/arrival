@@ -1,5 +1,5 @@
 import { sha256Checksum } from '../sha256.js';
-import type { ContractSnapshot } from '@arrivalos/product-contract';
+import type { ContractSnapshot } from '@arrival-atlas/product-contract';
 import type { ObservabilityBootstrapInput, BootstrapIntegritySnapshot } from './types.js';
 
 function snapshotPayloadWithoutTimestamps(snapshots: Record<string, ContractSnapshot>): unknown {
