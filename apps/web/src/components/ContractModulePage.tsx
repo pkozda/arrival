@@ -111,6 +111,7 @@ export function ContractModulePage({ moduleId, contract }: Props) {
         <ResultPanel loading={loading || uiState.isStale} error={error}>
           <ModuleExecutionPanel
             moduleId={moduleId}
+            contract={contract}
             sessionId={sessionId}
             executionId={executionId}
             projection={uiState.projection}

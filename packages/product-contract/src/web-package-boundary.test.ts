@@ -80,6 +80,6 @@ describe('web package boundary policy', () => {
     expect(modulePageSource).toContain('ContractModulePage');
     expect(modulePageSource).toContain('modules.find');
     expect(headerSource).not.toContain('NAV_ITEMS');
-    expect(headerSource).toContain('navModules');
+    expect(headerSource).toContain('groupModulesByCategory');
   });
 });

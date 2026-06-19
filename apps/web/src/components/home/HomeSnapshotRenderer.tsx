@@ -1,10 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import { useMemo } from 'react';
 import type { UiSnapshot } from '@/lib/api';
-import type { ActionCard, SnapshotRecommendation } from '@/lib/product-contract';
+import type {
+  ActionCard,
+  PublicModuleContract,
+  SnapshotRecommendation,
+} from '@/lib/product-contract';
 import { ModuleProjectionRenderer } from '@/components/ModuleProjectionRenderer';
 import { ExecutionExplainToggle } from '@/components/ExecutionExplainToggle';
+import {
+  buildModuleContractLookup,
+  capabilityVisibilityFromContract,
+  formatCategoryLabel,
+  groupModulesByCategory,
+} from '@/lib/module-catalog-utils';
 import {
   getAttentionLayer,
   getGlobalUxActions,
@@ -134,13 +145,83 @@ function RecommendationsSection({
   );
 }
 
+function ModuleCard({
+  module,
+  summary,
+}: {
+  module: PublicModuleContract;
+  summary?: { recommendationCount: number; actionCount: number };
+}) {
+  const visibility = capabilityVisibilityFromContract(module);
+
+  return (
+    <Link
+      href={`/modules/${module.id}`}
+      className="card"
+      style={{ textDecoration: 'none', color: 'inherit' }}
+    >
+      <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+        {module.title}
+      </h3>
+      {module.description && (
+        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+          {module.description}
+        </p>
+      )}
+      {summary && (
+        <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
+          {visibility.showRecommendations && (
+            <span>{summary.recommendationCount} recommendations</span>
+          )}
+          {visibility.showRecommendations && visibility.showActions && <span> · </span>}
+          {visibility.showActions && <span>{summary.actionCount} actions</span>}
+        </p>
+      )}
+    </Link>
+  );
+}
+
+function filterActionCardsByCapability(
+  items: ActionCard[],
+  moduleLookup: Map<string, PublicModuleContract>
+): ActionCard[] {
+  return items.filter((item) => {
+    const contract = moduleLookup.get(item.moduleId);
+    return contract ? contract.capabilities.supports.actions : false;
+  });
+}
+
+function filterRecommendationsByCapability(
+  items: SnapshotRecommendation[],
+  moduleLookup: Map<string, PublicModuleContract>
+): SnapshotRecommendation[] {
+  return items.filter((item) => {
+    const contract = moduleLookup.get(item.moduleId);
+    return contract ? contract.capabilities.supports.recommendations : false;
+  });
+}
+
 export function HomeSnapshotRenderer({ snapshot }: Props) {
   const { session, profile, executions, ftu, summaries } = snapshot;
   const { modules } = useApp();
-  const actionCards = getGlobalUxActions(snapshot);
-  const prioritySignals = getPrioritySignals(snapshot);
-  const attentionLayer = getAttentionLayer(snapshot);
+  const moduleLookup = useMemo(() => buildModuleContractLookup(modules), [modules]);
+  const groupedModules = useMemo(() => groupModulesByCategory(modules), [modules]);
   const summaryByModuleId = new Map(summaries.map((summary) => [summary.moduleId, summary]));
+
+  const showActionsSection = modules.some((module) => module.capabilities.supports.actions);
+  const showRecommendationsSection = modules.some(
+    (module) => module.capabilities.supports.recommendations
+  );
+
+  const actionCards = showActionsSection
+    ? filterActionCardsByCapability(getGlobalUxActions(snapshot), moduleLookup)
+    : [];
+  const prioritySignals = showRecommendationsSection
+    ? filterRecommendationsByCapability(getPrioritySignals(snapshot), moduleLookup)
+    : [];
+  const attentionLayer = showActionsSection
+    ? filterActionCardsByCapability(getAttentionLayer(snapshot), moduleLookup)
+    : [];
 
   return (
     <>
@@ -172,47 +253,52 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
         </section>
       )}
 
-      <ActionCardsSection title="Attention layer" items={attentionLayer} />
-      <ActionCardsSection title="Action cards" items={actionCards} />
-      <RecommendationsSection title="Priority signals" items={prioritySignals} />
+      {showActionsSection && (
+        <>
+          <ActionCardsSection title="Attention layer" items={attentionLayer} />
+          <ActionCardsSection title="Action cards" items={actionCards} />
+        </>
+      )}
 
-          {modules.filter((module) => module.status === 'available').length > 0 && (
+      {showRecommendationsSection && (
+        <RecommendationsSection title="Priority signals" items={prioritySignals} />
+      )}
+
+      {groupedModules.length > 0 && (
         <section style={cardStyle}>
           <SectionTitle>Modules</SectionTitle>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '1rem',
-            }}
-          >
-            {modules
-              .filter((module) => module.status === 'available')
-              .map((module) => {
-              const summary = summaryByModuleId.get(module.id);
-              return (
-                <Link
-                  key={module.id}
-                  href={`/modules/${module.id}`}
-                  className="card"
-                  style={{ textDecoration: 'none', color: 'inherit' }}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {groupedModules.map(({ category, modules: categoryModules }) => (
+              <div key={category}>
+                <h3
+                  style={{
+                    fontSize: '0.875rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    color: 'var(--color-text-muted)',
+                    marginBottom: '0.75rem',
+                  }}
                 >
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                    {module.title}
-                  </h3>
-                  {module.description && (
-                    <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-                      {module.description}
-                    </p>
-                  )}
-                  {summary && (
-                    <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
-                      {summary.recommendationCount} recommendations · {summary.actionCount} actions
-                    </p>
-                  )}
-                </Link>
-              );
-            })}
+                  {formatCategoryLabel(category)}
+                </h3>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gap: '1rem',
+                  }}
+                >
+                  {categoryModules.map((module) => (
+                    <ModuleCard
+                      key={module.id}
+                      module={module}
+                      summary={summaryByModuleId.get(module.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       )}
@@ -221,24 +307,45 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
         <section style={cardStyle}>
           <SectionTitle>Recent executions</SectionTitle>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {executions.map((execution) => (
-              <div key={execution.executionId} className="card">
-                <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                  {execution.projection.title}
-                </h3>
-                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.75rem' }}>
-                  {execution.moduleId} · {execution.createdAt}
-                </p>
-                <ModuleProjectionRenderer projection={execution.projection} />
-                {execution.projection.status === 'success' && (
-                  <ExecutionExplainToggle
-                    moduleId={execution.moduleId}
-                    executionId={execution.executionId}
-                    sessionId={snapshot.session.sessionId}
+            {executions.map((execution) => {
+              const contract = moduleLookup.get(execution.moduleId);
+              const visibility = contract
+                ? capabilityVisibilityFromContract(contract)
+                : {
+                    showRecommendations: false,
+                    showActions: false,
+                    showExplanation: false,
+                    showRiskModel: false,
+                  };
+
+              return (
+                <div key={execution.executionId} className="card">
+                  <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                    {execution.projection.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--color-text-muted)',
+                      marginBottom: '0.75rem',
+                    }}
+                  >
+                    {execution.moduleId} · {execution.createdAt}
+                  </p>
+                  <ModuleProjectionRenderer
+                    projection={execution.projection}
+                    visibility={visibility}
                   />
-                )}
-              </div>
-            ))}
+                  {visibility.showExplanation && execution.projection.status === 'success' && (
+                    <ExecutionExplainToggle
+                      moduleId={execution.moduleId}
+                      executionId={execution.executionId}
+                      sessionId={snapshot.session.sessionId}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
       )}

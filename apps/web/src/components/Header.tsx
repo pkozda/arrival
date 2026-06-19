@@ -1,9 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useApp } from './AppProvider';
+import {
+  formatCategoryLabel,
+  groupModulesByCategory,
+} from '@/lib/module-catalog-utils';
 import { PRODUCT_NAME, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@/lib/product-contract';
 
 function ThemeIcon({ theme }: { theme: 'light' | 'dark' }) {
@@ -44,14 +48,62 @@ const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
   ua: 'UA',
 };
 
+function CategoryNavSection({
+  category,
+  modules,
+  pathname,
+  onNavigate,
+}: {
+  category: string;
+  modules: ReturnType<typeof groupModulesByCategory>[number]['modules'];
+  pathname: string;
+  onNavigate: () => void;
+}) {
+  const [expanded, setExpanded] = useState(true);
+  const sectionId = `nav-category-${category.replace(/\s+/g, '-').toLowerCase()}`;
+
+  return (
+    <li className="header-nav-category">
+      <button
+        type="button"
+        className="header-nav-category-toggle"
+        onClick={() => setExpanded((current) => !current)}
+        aria-expanded={expanded}
+        aria-controls={sectionId}
+      >
+        <span>{formatCategoryLabel(category)}</span>
+        <span aria-hidden>{expanded ? '−' : '+'}</span>
+      </button>
+      {expanded && (
+        <ul id={sectionId} className="header-nav-category-list">
+          {modules.map((module) => {
+            const href = `/modules/${module.id}`;
+            const active = pathname === href;
+
+            return (
+              <li key={module.id}>
+                <Link
+                  href={href}
+                  className={`header-nav-link${active ? ' header-nav-link--active' : ''}`}
+                  onClick={onNavigate}
+                >
+                  <span className="header-nav-icon">{module.metadata.icon ?? '•'}</span>
+                  <span>{module.title}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </li>
+  );
+}
+
 export function Header() {
   const pathname = usePathname();
   const { language, changeLanguage, theme, toggleTheme, t, modules } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const navModules = modules
-    .filter((module) => module.status === 'available')
-    .sort((left, right) => left.title.localeCompare(right.title));
+  const groupedModules = useMemo(() => groupModulesByCategory(modules), [modules]);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -131,22 +183,15 @@ export function Header() {
         </div>
 
         <ul className="header-nav-list">
-          {navModules.map((module) => {
-            const href = `/modules/${module.id}`;
-            const active = pathname === href;
-            return (
-              <li key={module.id}>
-                <Link
-                  href={href}
-                  className={`header-nav-link${active ? ' header-nav-link--active' : ''}`}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <span className="header-nav-icon">{module.metadata.icon ?? '•'}</span>
-                  <span>{module.title}</span>
-                </Link>
-              </li>
-            );
-          })}
+          {groupedModules.map(({ category, modules: categoryModules }) => (
+            <CategoryNavSection
+              key={category}
+              category={category}
+              modules={categoryModules}
+              pathname={pathname}
+              onNavigate={() => setMenuOpen(false)}
+            />
+          ))}
         </ul>
 
         <div className="header-drawer-footer">
