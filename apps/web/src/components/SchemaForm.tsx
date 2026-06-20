@@ -3,6 +3,11 @@
 import type { SchemaField } from '@/lib/product-contract';
 import { getNestedValue, schemaEnumLabel, schemaFieldLabel } from '@/lib/schema-form-utils';
 
+export type SchemaLabelResolver = {
+  fieldLabel: (field: SchemaField, path: string) => string;
+  enumLabel: (field: SchemaField, path: string, value: unknown) => string;
+};
+
 type Props = {
   fields: SchemaField[];
   defaults: Record<string, unknown>;
@@ -10,6 +15,7 @@ type Props = {
   disabled?: boolean;
   submitLabel: string;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  labelResolver?: SchemaLabelResolver;
 };
 
 function SchemaFieldInput({
@@ -17,14 +23,18 @@ function SchemaFieldInput({
   defaults,
   prefix = '',
   disabled = false,
+  labelResolver,
 }: {
   field: SchemaField;
   defaults: Record<string, unknown>;
   prefix?: string;
   disabled?: boolean;
+  labelResolver?: SchemaLabelResolver;
 }) {
   const fieldName = prefix ? `${prefix}.${field.name}` : field.name;
-  const label = schemaFieldLabel(field);
+  const label = labelResolver
+    ? labelResolver.fieldLabel(field, fieldName)
+    : schemaFieldLabel(field);
   const defaultValue = getNestedValue(defaults, fieldName);
 
   if (field.type === 'object' && field.properties) {
@@ -38,6 +48,7 @@ function SchemaFieldInput({
             defaults={defaults}
             prefix={fieldName}
             disabled={disabled}
+            labelResolver={labelResolver}
           />
         ))}
       </fieldset>
@@ -66,7 +77,9 @@ function SchemaFieldInput({
         <select id={fieldName} name={fieldName} defaultValue={String(defaultValue ?? field.enumValues[0])} disabled={disabled}>
           {field.enumValues.map((option) => (
             <option key={String(option)} value={String(option)}>
-              {schemaEnumLabel(option)}
+              {labelResolver
+                ? labelResolver.enumLabel(field, fieldName, option)
+                : schemaEnumLabel(option)}
             </option>
           ))}
         </select>
@@ -113,6 +126,7 @@ export function SchemaForm({
   disabled = false,
   submitLabel,
   onSubmit,
+  labelResolver,
 }: Props) {
   return (
     <form className="card" onSubmit={onSubmit}>
@@ -123,6 +137,7 @@ export function SchemaForm({
           defaults={defaults}
           prefix={prefix}
           disabled={disabled}
+          labelResolver={labelResolver}
         />
       ))}
       <button type="submit" className="btn btn-primary" disabled={disabled} style={{ width: '100%' }}>

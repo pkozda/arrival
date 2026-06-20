@@ -34,6 +34,8 @@ export type CrossModuleSignalV1 = {
   targetModuleId?: ModuleId;
   actionId: string;
   message: string;
+  messageKey?: string;
+  messageParams?: Record<string, string>;
   advisoryOnly: true;
 };
 

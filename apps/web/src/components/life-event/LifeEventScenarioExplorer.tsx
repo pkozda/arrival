@@ -15,6 +15,7 @@ import {
 import { mergeUserProfileIntoDefaults } from '@/lib/mutations';
 import { selectUserContextProfile } from '@/lib/user-context';
 import { resolvePrefillConfidenceMessage } from '@/lib/profile-insights';
+import { createLifeEventSchemaLabelResolver } from '@/lib/life-event/content-labels';
 import { buildInputFromFormData, stableFormDefaultsKey } from '@/lib/schema-form-utils';
 import { profilePrefillApplied } from '@/lib/situation-utils';
 import { useModuleSnapshot } from '@/lib/snapshot';
@@ -48,6 +49,8 @@ export function LifeEventScenarioExplorer({ contract, initialScenarioEvent }: Pr
     [profileInsights]
   );
 
+  const schemaLabelResolver = useMemo(() => createLifeEventSchemaLabelResolver(t), [t]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -71,7 +74,7 @@ export function LifeEventScenarioExplorer({ contract, initialScenarioEvent }: Pr
         if (cancelled) {
           return;
         }
-        setSchemaError(fetchError instanceof Error ? fetchError.message : 'Unable to load scenarios');
+        setSchemaError(fetchError instanceof Error ? fetchError.message : t('life-event.explorer.schemaError'));
       });
 
     return () => {
@@ -115,11 +118,10 @@ export function LifeEventScenarioExplorer({ contract, initialScenarioEvent }: Pr
   return (
     <section className="card">
       <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-        Explore life scenarios
+        {t('life-event.explorer.title')}
       </h2>
       <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-        Run a guided scenario for a specific life change. This is separate from your personalized
-        plan above.
+        {t('life-event.explorer.description')}
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.5rem' }}>
@@ -134,6 +136,7 @@ export function LifeEventScenarioExplorer({ contract, initialScenarioEvent }: Pr
               defaults={defaults}
               disabled={loading || uiState.isStale}
               submitLabel={loading ? t('common.loading') : t('common.submit')}
+              labelResolver={schemaLabelResolver}
               onSubmit={handleSubmit}
             />
           </>

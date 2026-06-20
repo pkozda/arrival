@@ -1,10 +1,16 @@
+'use client';
+
 import type { CrossModuleSignalV1, RuntimeActionEffectV1 } from './types';
+import { useApp } from '@/components/AppProvider';
+import { localizeRuntimeSignal } from '@/lib/life-event/content-labels';
 
 type Props = {
   effect?: RuntimeActionEffectV1 | null;
 };
 
 export function RuntimeCrossModuleFeedback({ effect }: Props) {
+  const { t } = useApp();
+
   if (!effect || effect.stateSignals.length === 0) {
     return null;
   }
@@ -24,13 +30,15 @@ export function RuntimeCrossModuleFeedback({ effect }: Props) {
       }}
     >
       <strong style={{ display: 'block', marginBottom: '0.25rem', color: 'inherit' }}>
-        Cross-module impact detected
+        {t('life-event.runtime.crossModuleImpact')}
       </strong>
-      <span>{primarySignal.message}</span>
+      <span>{localizeRuntimeSignal(t, primarySignal)}</span>
       {effect.stateSignals.length > 1 && (
         <span style={{ display: 'block', marginTop: '0.25rem', opacity: 0.85 }}>
-          +{effect.stateSignals.length - 1} additional runtime signal
-          {effect.stateSignals.length > 2 ? 's' : ''}
+          +{effect.stateSignals.length - 1}{' '}
+          {effect.stateSignals.length > 2
+            ? t('life-event.runtime.additionalSignals')
+            : t('life-event.runtime.additionalSignal')}
         </span>
       )}
     </div>
