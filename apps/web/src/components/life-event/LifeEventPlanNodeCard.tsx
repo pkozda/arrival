@@ -1,6 +1,10 @@
+'use client';
+
 import type { LifeEventPlanNode } from '@/lib/product-contract';
-import { humanizePriority } from '@/lib/ux-labels';
 import { LifeEventPlanNodeActions } from '@/components/life-event/LifeEventPlanNodeActions';
+import { useApp } from '@/components/AppProvider';
+import { lifeEventSeverityLabel } from '@/lib/life-event/ui-labels';
+import { lifeEventNodeDescription, lifeEventNodeTitle } from '@/lib/life-event/content-labels';
 
 type Props = {
   node: LifeEventPlanNode;
@@ -28,6 +32,7 @@ const variantStyles = {
 } as const;
 
 export function LifeEventPlanNodeCard({ node, variant = 'action', forceDisabled = false }: Props) {
+  const { t } = useApp();
   const style = variantStyles[variant];
   const actionsDisabled = forceDisabled || variant === 'blocker' || (variant === 'action' && node.blocked);
 
@@ -48,12 +53,12 @@ export function LifeEventPlanNodeCard({ node, variant = 'action', forceDisabled 
             margin: 0,
           }}
         >
-          {node.title}
+          {lifeEventNodeTitle(t, node)}
         </h3>
-        <span className={`badge badge-${node.priority}`}>{humanizePriority(node.priority)}</span>
+        <span className={`badge badge-${node.priority}`}>{lifeEventSeverityLabel(t, node.priority)}</span>
         {node.blocked && variant !== 'blocker' && (
           <span className="badge badge-medium" style={{ opacity: 0.85 }}>
-            Blocked
+            {t('life-event.node.blocked')}
           </span>
         )}
       </div>
@@ -66,7 +71,7 @@ export function LifeEventPlanNodeCard({ node, variant = 'action', forceDisabled 
           lineHeight: 1.5,
         }}
       >
-        {node.description}
+        {lifeEventNodeDescription(t, node)}
       </p>
       <LifeEventPlanNodeActions actions={node.actions} disabled={actionsDisabled} />
     </article>

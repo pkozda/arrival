@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@arrival-atlas/core": "*",
     "@arrival-atlas/product-contract": "*",
     "next": "^15.1.4",
     "react": "^19.0.0",

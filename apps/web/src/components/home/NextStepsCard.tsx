@@ -13,6 +13,8 @@ import {
   projectActionSurface,
 } from '@/lib/life-event-plan';
 import { LifeEventPlanNodeCard } from '@/components/life-event/LifeEventPlanNodeCard';
+import { useApp } from '@/components/AppProvider';
+import { localizeScenarioReasoning } from '@/lib/life-event/content-labels';
 
 type Props = {
   plan: LifeEventPlanV1 | null;
@@ -24,6 +26,8 @@ type Props = {
 };
 
 export function NextStepsCard({ plan, loading, error, executionSurface, scenario, runtimeEffect }: Props) {
+  const { t } = useApp();
+
   if (loading || error || !plan) {
     return null;
   }
@@ -53,10 +57,10 @@ export function NextStepsCard({ plan, loading, error, executionSurface, scenario
         }}
       >
         <h2 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>
-          Your next steps in Germany
+          {t('life-event.home.title')}
         </h2>
         <Link href="/modules/life-event" className="btn btn-secondary" style={{ flexShrink: 0 }}>
-          View full plan
+          {t('life-event.home.viewFullPlan')}
         </Link>
       </div>
 
@@ -71,10 +75,10 @@ export function NextStepsCard({ plan, loading, error, executionSurface, scenario
           }}
         >
           <p style={{ fontSize: '0.8125rem', fontWeight: 600, margin: '0 0 0.25rem' }}>
-            Context shift detected
+            {t('life-event.scenario.contextShiftTitle')}
           </p>
           <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: 0 }}>
-            {scenario.reasoning}
+            {localizeScenarioReasoning(t, scenario.scenarioId, scenario.reasoning)}
           </p>
         </div>
       )}
@@ -97,7 +101,7 @@ export function NextStepsCard({ plan, loading, error, executionSurface, scenario
               color: 'var(--color-text-muted)',
             }}
           >
-            Why you cannot proceed yet
+            {t('life-event.home.blockedTitle')}
           </h3>
           {blockedNodes.map((node) => (
             <LifeEventPlanNodeCard
@@ -120,7 +124,7 @@ export function NextStepsCard({ plan, loading, error, executionSurface, scenario
               color: 'var(--color-text-muted)',
             }}
           >
-            Next best actions
+            {t('life-event.home.secondaryTitle')}
           </h3>
           {secondaryNodes.map((node) => (
             <LifeEventPlanNodeCard

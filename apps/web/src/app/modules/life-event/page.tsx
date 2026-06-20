@@ -6,11 +6,14 @@ import { Header } from '@/components/Header';
 import { useApp } from '@/components/AppProvider';
 import { LifeEventPlanView } from '@/components/life-event/LifeEventPlanView';
 import { LifeEventScenarioExplorer } from '@/components/life-event/LifeEventScenarioExplorer';
+import { lifeEventModuleDescription, lifeEventModuleTitle } from '@/lib/life-event/content-labels';
 
 function LoadingState() {
+  const { t } = useApp();
+
   return (
     <div className="card" style={{ padding: '1.5rem' }}>
-      Loading your plan...
+      {t('life-event.empty.loadingPlan')}
     </div>
   );
 }
@@ -24,6 +27,7 @@ function LifeEventModulePageContent() {
     lifeEventPlan,
     lifeEventPlanLoading,
     lifeEventPlanError,
+    t,
   } = useApp();
   const contract = modules.find((module) => module.id === 'life-event');
   const initialScenarioEvent = searchParams.get('event') ?? undefined;
@@ -31,7 +35,7 @@ function LifeEventModulePageContent() {
   if (modulesLoading) {
     return (
       <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
-        Loading module...
+        {t('life-event.empty.loadingModule')}
       </div>
     );
   }
@@ -39,7 +43,7 @@ function LifeEventModulePageContent() {
   if (modulesError || !contract || contract.status !== 'available') {
     return (
       <div className="card" style={{ padding: '2rem' }}>
-        {modulesError ?? 'Module not found.'}
+        {modulesError ?? t('life-event.empty.moduleNotFound')}
       </div>
     );
   }
@@ -48,11 +52,11 @@ function LifeEventModulePageContent() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <header>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-          {contract.title}
+          {lifeEventModuleTitle(t, contract.title)}
         </h1>
         {contract.description && (
           <p style={{ color: 'var(--color-text-muted)', maxWidth: '48rem', lineHeight: 1.6 }}>
-            {contract.description}
+            {lifeEventModuleDescription(t, contract.description)}
           </p>
         )}
       </header>

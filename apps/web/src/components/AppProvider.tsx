@@ -39,6 +39,7 @@ import type {
   UiSnapshot,
   UserContextV1,
 } from '@/lib/product-contract';
+import { getTranslations } from '@arrival-atlas/core';
 import {
   getSessionLanguage,
   getThemePreference,
@@ -444,7 +445,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [theme, changeTheme]);
 
   const t = useCallback(
-    (key: string) => translations[key] ?? key,
+    (key: string) => translations[key] ?? getTranslations('en')[key] ?? key,
     [translations]
   );
 
