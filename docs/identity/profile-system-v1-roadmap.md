@@ -16,6 +16,9 @@ created: 2026-06-01
 updated: 2026-06-19
 related:
   - profile-ux-spec
+  - ux-contract-v1
+  - ux-contract-v2
+  - profile-mutation-model-v1
 ---
 
 # User Profile System v1 — Architecture Research & Roadmap
@@ -56,6 +59,8 @@ The platform is **UI READY** and **contract-driven**. Profile System v1 must evo
 - using profile to alter deterministic execution outcomes (constraint of this research)
 
 **Recommendation:** Profile System v1 should be anchored as a **Dedicated User Context Layer** (`@arrival-atlas/profile` + product-contract projection types), with **session-scoped persistence in v1** and explicit boundary rules separating **UI preferences**, **domain profile**, and **execution context**.
+
+**P1 reframe:** Domain profile authority follows [profile-mutation-model-v1.md](./profile-mutation-model-v1.md) — Profile is `reduce(MutationEvent[])`, not an editable document. P1 deliverables implement the mutation pipeline, not CRUD.
 
 Target maturity: a **coherent, UI-addressable user context** that modules consume through existing pipelines — not a large user database or account-centric identity platform in v1.
 
@@ -473,26 +478,45 @@ type UserContextV1 = {
 
 ---
 
-### Phase P1 — User Context Contract
+### Phase P1 — User Context Contract + Mutation Model ✅ COMPLETE
 
-**Goal:** Stable UI-facing user context projection in snapshot and profile API.
+**Status:** Complete (P1 Final Hardening / Contract Lock Pass).  
+**Goal:** Stable UI-facing user context projection and typed mutation pipeline per [profile-mutation-model-v1.md](./profile-mutation-model-v1.md).
 
-| Item | Deliverable |
-|------|-------------|
-| P1.1 | Snapshot projects `userContext: UserContextV1` (or extends UiSnapshot) |
-| P1.2 | `UserProfileViewV1` replaces loose `UiSnapshot.profile` typing |
-| P1.3 | Language sync: PATCH session language ↔ `profile.preferredLanguage` |
-| P1.4 | Web: `fetchProfile`, `updateProfile`, `updateSessionPreferences` clients |
-| P1.5 | Web: consume typed `userContext` in AppProvider |
+**Final architecture (locked):**
 
-**Affected packages:** `apps/api`, `packages/product-contract`, `apps/web`  
+```text
+Mutation Engine (C2/C3)
+        │
+        ▼
+UserContextV1  ← GET /api/user-context (AUTHORITATIVE)
+        │
+        ├── Home / Profile mirror / Module prefill (web: selectUserContextProfile)
+        │
+UiSnapshot (execution-only: FTU, executions, actionCards, session)
+        └── userContext = derived transport copy (MUST NOT drive UI business logic)
+```
+
+| Item | Deliverable | Status |
+|------|-------------|--------|
+| P1.1 | Snapshot projects `userContext: UserContextV1` (transport only) | ✅ |
+| P1.2 | `UserProfileViewV1` replaces loose `UiSnapshot.profile` typing | ✅ |
+| P1.3 | Language sync: `pref.update` mutation ↔ `profile.preferredLanguage` | ✅ |
+| P1.4 | Web: `submitMutation()`, `fetchUserContext()` — **not** direct `updateProfile()` | ✅ |
+| P1.5 | Web: consume typed `userContext` in AppProvider | ✅ |
+| P1.6 | `MutationRequest` / `MutationEvent` types in product-contract | ✅ |
+| P1.7 | Event log append + reducer shim alongside materialized `ProfileDocument` | ✅ |
+| P1.8 | Contract lock: no dual-read; `SnapshotUserContextTransport` annotated | ✅ |
+
+**Affected packages:** `apps/api`, `packages/product-contract`, `packages/profile`, `apps/web`  
 **Risks:** R1, R2, R5  
 **Success criteria:**
 
-- Web reads/writes profile via API with revision headers
+- Web submits corrections via `submitMutation({ type: 'fact.correct', ... })` with revision guards
 - Single effective language across session + profile
 - Snapshot contains typed UserContext; web has zero `Record<string, unknown>` profile access
-- All existing tests green; new contract projection tests
+- `ProfileState === reduce(events)` parity tests pass against materialized document
+- All existing tests green; new mutation contract tests
 
 ---
 
@@ -586,7 +610,7 @@ type UserContextV1 = {
 
 ```text
 P0  Architecture foundations     (1 sprint)
-P1  User Context Contract         (1–2 sprints)  ← blocking
+P1  User Context Contract         (1–2 sprints)  ✅ COMPLETE
 P2  Snapshot & Form Integration   (1–2 sprints)
 P3  Explain presentation          (0.5 sprint)   ← parallel after P1
 P4  UI Personalization            (1 sprint)

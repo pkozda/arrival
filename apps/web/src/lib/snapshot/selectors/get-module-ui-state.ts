@@ -5,13 +5,14 @@ import { getModuleExecution } from './get-module-execution';
 
 function resolveStatus(
   snapshot: UiSnapshot | null,
-  hasProjection: boolean
+  hasProjection: boolean,
+  hasUserProfile: boolean
 ): ModuleUIStatus {
   if (hasProjection) {
     return 'executed';
   }
 
-  if (snapshot?.profile) {
+  if (hasUserProfile) {
     return 'partial';
   }
 
@@ -20,14 +21,15 @@ function resolveStatus(
 
 export function getModuleUIState(
   snapshot: UiSnapshot | null,
-  moduleId: string
+  moduleId: string,
+  hasUserProfile = false
 ): ModuleUIState {
   const execution = getModuleExecution(snapshot, moduleId);
   const projection = (execution?.projection as ModuleUIProjection | undefined) ?? null;
 
   return {
     projection,
-    status: resolveStatus(snapshot, projection != null),
+    status: resolveStatus(snapshot, projection != null, hasUserProfile),
     executionId: execution?.executionId ?? null,
     snapshotVersion: snapshot?.snapshotVersion ?? 0,
   };

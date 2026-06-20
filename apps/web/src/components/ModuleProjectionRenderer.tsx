@@ -2,6 +2,7 @@
 
 import type { ModuleUIProjection, SanitizedRecommendation } from '@/lib/product-contract';
 import type { ModuleCapabilityVisibility } from '@/lib/module-catalog-utils';
+import { humanizeActionKind, humanizePriority } from '@/lib/ux-labels';
 
 type Props = {
   projection: ModuleUIProjection | null;
@@ -33,7 +34,9 @@ function RecommendationList({
               marginBottom: '0.25rem',
             }}
           >
-            <span className={`badge badge-${recommendation.priority}`}>{recommendation.priority}</span>
+            <span className={`badge badge-${recommendation.priority}`}>
+              {humanizePriority(recommendation.priority)}
+            </span>
             <strong style={{ fontSize: '0.9375rem' }}>{recommendation.title}</strong>
           </div>
           <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
@@ -53,7 +56,7 @@ export function ModuleProjectionRenderer({ projection, visibility }: Props) {
   if (projection.status === 'error') {
     return (
       <div className="card" style={{ color: 'var(--color-danger)' }}>
-        {projection.error?.message ?? 'Execution failed'}
+        {projection.error?.message ?? 'Something went wrong while running this tool'}
       </div>
     );
   }
@@ -148,7 +151,9 @@ export function ModuleProjectionRenderer({ projection, visibility }: Props) {
                   marginBottom: '0.25rem',
                 }}
               >
-                <span className={`badge badge-${action.priority}`}>{action.kind}</span>
+                <span className={`badge badge-${action.priority}`}>
+                  {humanizeActionKind(action.kind)}
+                </span>
                 <strong style={{ fontSize: '0.9375rem' }}>{action.label}</strong>
               </div>
               <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>

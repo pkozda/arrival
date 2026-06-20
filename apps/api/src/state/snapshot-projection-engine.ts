@@ -1,6 +1,10 @@
 import { ThemePreferenceSchema, type SupportedLanguage } from '@arrival-atlas/core';
 import { getLegacyDomainResult } from '@arrival-atlas/module-runtime';
 import type { ProfileDocument } from '@arrival-atlas/profile';
+import type {
+  SnapshotUserContextTransport,
+  UserContextV1,
+} from '@arrival-atlas/product-contract';
 import { buildUXActionPlan, type UXSource } from '@arrival-atlas/ux';
 import {
   buildUiSnapshotProjection,
@@ -15,6 +19,7 @@ import {
 } from './snapshot-schema.js';
 import type { AccountEntitlements } from '../entitlements/entitlement.types.js';
 import { entitlementService } from '../entitlements/entitlement.service.js';
+import { resolveUserContext } from './profile-mutation-state.js';
 import type { SystemState, StoredModuleExecution } from './system-state-types.js';
 
 const UX_SOURCES = new Set<UXSource>([
@@ -73,13 +78,14 @@ export type UiSnapshot = {
   lastMutationId: string | null;
   generatedAt: string;
   session: LegacyUiSnapshot['session'];
-  profile: ProfileDocument | null;
   modules: LegacyUiSnapshot['modules'];
   executions: ExecutionSnapshot[];
   executionsByModuleId: Record<string, ExecutionSnapshot[]>;
   actionCards: ActionCard[];
   recommendations: SnapshotRecommendation[];
   summaries: ModuleSnapshotSummary[];
+  /** Derived transport copy — NOT authoritative. Use GET /api/user-context for situation reads. */
+  userContext: SnapshotUserContextTransport;
   ftu: LegacyUiSnapshot['ftu'];
 };
 
@@ -125,7 +131,7 @@ function readSessionFtuMeta(context: Record<string, unknown>): SessionFtuMeta | 
 
 function resolveFtuState(
   context: Record<string, unknown>,
-  profile: ProfileDocument | null,
+  hasUserProfile: boolean,
   executionCount: number
 ): UiSnapshot['ftu'] {
   const meta = readSessionFtuMeta(context);
@@ -138,7 +144,7 @@ function resolveFtuState(
     return { isFirstTimeUser: true, step: meta.lastStep };
   }
 
-  if (!profile && executionCount === 0) {
+  if (!hasUserProfile && executionCount === 0) {
     return { isFirstTimeUser: true, step: 1 };
   }
 
@@ -207,7 +213,6 @@ function buildSnapshotMetadata(
   options?: { entitlements?: AccountEntitlements | null }
 ) {
   const userProfile = state.session.context.userProfile;
-  const profile = state.profileRecord?.document ?? null;
   const entitlements =
     state.accountId !== null
       ? (options?.entitlements ?? null)
@@ -223,7 +228,6 @@ function buildSnapshotMetadata(
       language: resolveLanguage(userProfile?.language),
       uiPreferences: resolveUiPreferences(userProfile),
     },
-    profile,
     modules: state.modules.map((module) => {
       const access = entitlementService.resolveModuleAccess(
         entitlements,
@@ -284,6 +288,8 @@ export function buildUiSnapshot(
     .sort((left, right) => left.createdAt.localeCompare(right.createdAt));
 
   const projectionPayload = buildUiSnapshotProjection(executionInputs);
+  // Transport-only duplicate of authoritative UserContextV1 — must not be consumed for domain logic.
+  const userContext: SnapshotUserContextTransport = resolveUserContext(state);
 
   return {
     ...metadata,
@@ -292,9 +298,10 @@ export function buildUiSnapshot(
     actionCards: projectionPayload.actionCards,
     recommendations: projectionPayload.recommendations,
     summaries: projectionPayload.summaries,
+    userContext,
     ftu: resolveFtuState(
       state.session.context as Record<string, unknown>,
-      metadata.profile,
+      userContext.profile != null,
       latestExecutions.length
     ),
   };
@@ -320,15 +327,17 @@ export function buildLegacyUiSnapshot(
     .sort((left, right) => left.timestamp - right.timestamp);
 
   const uxSnapshot = buildLegacyUxSnapshotFromState(state, executions);
+  const legacyProfile = state.profileRecord?.document ?? null;
 
   return {
     ...metadata,
+    profile: legacyProfile,
     executions,
     executionsByModuleId,
     uxSnapshot,
     ftu: resolveFtuState(
       state.session.context as Record<string, unknown>,
-      metadata.profile,
+      legacyProfile != null,
       executions.length
     ),
   };

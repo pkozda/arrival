@@ -15,6 +15,10 @@ tags:
 created: 2026-06-01
 updated: 2026-06-19
 related:
+  - ux-contract-v1
+  - ux-contract-v2
+  - profile-mutation-model-v1
+  - profile-ux-design-prompt
   - profile-ux-discovery
   - profile-system-v1-roadmap
 ---

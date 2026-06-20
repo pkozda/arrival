@@ -14,3 +14,7 @@ export type {
   UiSnapshotFallback,
   ModuleCatalogResponse,
 } from './UiSnapshot.js';
+export type {
+  LegacySnapshotContract,
+  SnapshotUserContextTransport,
+} from './snapshot-user-context-transport.js';

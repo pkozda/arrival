@@ -1,4 +1,5 @@
 import type { SchemaField } from '@/lib/product-contract';
+import { humanizeEnumValue, humanizeFieldName } from '@/lib/ux-labels';
 
 export function getNestedValue(source: Record<string, unknown>, path: string): unknown {
   const segments = path.split('.');
@@ -50,13 +51,14 @@ export function buildInputFromFormData(
   return input;
 }
 
-function formatFieldLabel(name: string): string {
-  return name
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, (char) => char.toUpperCase())
-    .trim();
+export function schemaFieldLabel(field: SchemaField): string {
+  return humanizeFieldName(field.name);
 }
 
-export function schemaFieldLabel(field: SchemaField): string {
-  return formatFieldLabel(field.name);
+export function schemaEnumLabel(value: unknown): string {
+  return humanizeEnumValue(value);
+}
+
+export function stableFormDefaultsKey(defaults: Record<string, unknown>): string {
+  return JSON.stringify(defaults);
 }

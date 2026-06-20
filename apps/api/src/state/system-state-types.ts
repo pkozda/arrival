@@ -1,6 +1,10 @@
 import type { Session, TrackedEvent } from '@arrival-atlas/core';
 import type { ModuleResult } from '@arrival-atlas/module-runtime';
-import type { ModuleUIProjection } from '@arrival-atlas/product-contract';
+import type {
+  ModuleUIProjection,
+  MutationEvent,
+  UserContextV1,
+} from '@arrival-atlas/product-contract';
 import type { ExecutionTrace } from '@arrival-atlas/profile';
 import type { ProfileRecord, ProfileRevision } from '@arrival-atlas/profile';
 
@@ -45,6 +49,11 @@ export type SystemState = {
   session: Session;
   profileRecord: ProfileRecord | null;
   profileRevisions: ProfileRevision[];
+  /** Append-only profile mutation event log — source of truth for situation facts. */
+  profileMutationEvents: MutationEvent[];
+  profileMutationProfileId: string | null;
+  /** Materialized UI projection cache derived from mutation log. */
+  userContext: UserContextV1 | null;
   executionsByModuleId: Record<string, StoredModuleExecution[]>;
   executionTracesByModuleId: Record<string, ExecutionTrace[]>;
   events: TrackedEvent[];

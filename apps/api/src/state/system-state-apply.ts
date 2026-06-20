@@ -14,7 +14,7 @@ import {
   type ProfileRecord,
   type ProfileRevision,
 } from '@arrival-atlas/profile';
-import { moduleInputToProfilePatch } from '../profile-activation.js';
+import { applyModuleProfileMutations } from './apply-profile-mutation.js';
 import { finalizeSystemState } from './system-state-hash.js';
 import type {
   StoredModuleExecution,
@@ -39,7 +39,7 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
-function mergeSessionContext(session: Session, context: Partial<AppContext>): Session {
+export function mergeSessionContext(session: Session, context: Partial<AppContext>): Session {
   return {
     ...session,
     lastActiveAt: nowIso(),
@@ -123,61 +123,6 @@ function updateProfileRecord(
   };
 }
 
-function applyProfileActivation(
-  state: SystemState,
-  moduleId: string,
-  requestInput: Record<string, unknown>,
-  preferredLanguage?: string
-): {
-  session: Session;
-  profileRecord: ProfileRecord | null;
-  profileRevisions: ProfileRevision[];
-  activated: boolean;
-} {
-  const patch = moduleInputToProfilePatch(moduleId, requestInput);
-  if (!patch) {
-    return {
-      session: state.session,
-      profileRecord: state.profileRecord,
-      profileRevisions: state.profileRevisions,
-      activated: false,
-    };
-  }
-
-  if (preferredLanguage) {
-    patch.preferredLanguage = preferredLanguage as ProfilePatch['preferredLanguage'];
-  }
-
-  if (!state.profileRecord) {
-    const createInput = ProfileCreateInputSchema.parse({
-      preferredLanguage: preferredLanguage ?? 'en',
-      ...patch,
-    });
-    const created = createProfileRecord(createInput, 'module');
-    return {
-      session: mergeSessionContext(state.session, { profileId: created.record.id }),
-      profileRecord: created.record,
-      profileRevisions: created.revisions,
-      activated: true,
-    };
-  }
-
-  const updated = updateProfileRecord(
-    state.profileRecord,
-    patch,
-    state.profileRecord.revision,
-    'module',
-    moduleId
-  );
-
-  return {
-    session: state.session,
-    profileRecord: updated.record,
-    profileRevisions: [...state.profileRevisions, ...updated.revisions],
-    activated: true,
-  };
-}
-
 export function createInitialSystemState(params: {
   context: AppContext;
   modules: SystemModuleDescriptor[];
@@ -198,6 +143,9 @@ export function createInitialSystemState(params: {
       session,
       profileRecord: null,
       profileRevisions: [],
+      profileMutationEvents: [],
+      profileMutationProfileId: null,
+      userContext: null,
       executionsByModuleId: {},
       executionTracesByModuleId: {},
       events: [],
@@ -410,19 +358,15 @@ export function applyModuleExecute(params: {
     generatedAt: params.executedAt,
   };
 
-  const activation = applyProfileActivation(
+  const mutationApplied = applyModuleProfileMutations(
     nextContent,
     params.moduleId,
+    params.executionId,
     params.requestInput,
-    params.preferredLanguage
+    params.preferredLanguage as import('@arrival-atlas/core').SupportedLanguage | undefined
   );
 
-  nextContent = {
-    ...nextContent,
-    session: activation.session,
-    profileRecord: activation.profileRecord,
-    profileRevisions: activation.profileRevisions,
-  };
+  nextContent = mutationApplied.state;
 
   const finalized = finalizeSystemState(nextContent, params.mutationId);
   const history = finalized.executionsByModuleId[params.moduleId] ?? [];

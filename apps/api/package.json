@@ -17,6 +17,7 @@
     "@arrival-atlas/modules": "*",
     "@arrival-atlas/observability": "*",
     "@arrival-atlas/product-contract": "*",
+    "@arrival-atlas/profile-engine": "*",
     "@arrival-atlas/shared-services": "*",
     "@arrival-atlas/ux": "*",
     "@fastify/cors": "^10.0.2",

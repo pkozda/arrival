@@ -12,6 +12,7 @@ export type {
   ModuleSchemaProjection,
   ModuleSnapshotSummary,
   ModuleUIProjection,
+  MutationRequest,
   NormalizedCapabilities,
   PublicModuleContract,
   PublicModuleContractMetadata,
@@ -19,13 +20,15 @@ export type {
   SchemaField,
   SchemaFieldType,
   SnapshotRecommendation,
+  SanitizedRecommendation,
   SupportedLanguage,
   ThemePreference,
   UiSnapshot,
   UiSnapshotFallback,
-  UiSnapshotProfile,
   UiSnapshotProjection,
   UiSnapshotSession,
+  UserContextV1,
+  UserProfileViewV1,
 } from '@arrival-atlas/product-contract';
 
 export {
@@ -37,6 +40,7 @@ export {
   deriveDefaultValues,
   extractSchemaFields,
   mergeProfileIntoDefaults,
+  parseUserContextV1,
 } from '@arrival-atlas/product-contract';
 
 export type ModuleExecuteResponse = ModuleExecuteProjectionResponse;

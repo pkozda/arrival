@@ -14,12 +14,16 @@ import {
   createInitialSystemState,
   getLatestExecutionTrace,
 } from './system-state-apply.js';
+import { commitProfileMutationRequest } from './apply-profile-mutation.js';
+import { ProfileMutationCommitError } from './profile-mutation-errors.js';
+import { finalizeSystemState } from './system-state-hash.js';
 import type { SystemState } from './system-state-types.js';
 import type {
   AccountClaimMutation,
   AccountLinkMutation,
   ModuleExecuteMutation,
   ProfileCreateMutation,
+  ProfileMutationApplyMutation,
   ProfileUpdateMutation,
   SessionCreateMutation,
   SessionPatchMutation,
@@ -31,6 +35,7 @@ type SessionCreateResult = Extract<SystemMutationResult, { type: 'SESSION_CREATE
 type SessionPatchResult = Extract<SystemMutationResult, { type: 'SESSION_PATCH' }>;
 type ProfileCreateResult = Extract<SystemMutationResult, { type: 'PROFILE_CREATE' }>;
 type ProfileUpdateResult = Extract<SystemMutationResult, { type: 'PROFILE_UPDATE' }>;
+type ProfileMutationApplyResult = Extract<SystemMutationResult, { type: 'PROFILE_MUTATION_APPLY' }>;
 type ModuleExecuteResult = Extract<SystemMutationResult, { type: 'MODULE_EXECUTE' }>;
 type AccountClaimResult = Extract<SystemMutationResult, { type: 'ACCOUNT_CLAIM' }>;
 type AccountLinkResult = Extract<SystemMutationResult, { type: 'ACCOUNT_LINK' }>;
@@ -74,6 +79,7 @@ export class SystemStateCoordinator {
   async applyMutation(mutation: SessionPatchMutation): Promise<SessionPatchResult>;
   async applyMutation(mutation: ProfileCreateMutation): Promise<ProfileCreateResult>;
   async applyMutation(mutation: ProfileUpdateMutation): Promise<ProfileUpdateResult>;
+  async applyMutation(mutation: ProfileMutationApplyMutation): Promise<ProfileMutationApplyResult>;
   async applyMutation(mutation: ModuleExecuteMutation): Promise<ModuleExecuteResult>;
   async applyMutation(mutation: AccountClaimMutation): Promise<AccountClaimResult>;
   async applyMutation(mutation: AccountLinkMutation): Promise<AccountLinkResult>;
@@ -158,6 +164,27 @@ export class SystemStateCoordinator {
         return {
           type: 'PROFILE_UPDATE',
           profile: enriched.profileRecord!,
+          state: enriched,
+        };
+      }
+      case 'PROFILE_MUTATION_APPLY': {
+        const current = await this.requireState(mutation.sessionId, true);
+        const committed = commitProfileMutationRequest(current, mutation.request);
+        if (!committed.result.ok) {
+          throw new ProfileMutationCommitError(
+            committed.result.code,
+            committed.result.message,
+            committed.result.issues
+          );
+        }
+
+        const state = finalizeSystemState(committed.state, mutation.request.requestId);
+        const enriched = await this.persistState(state, this.getMutationActor(mutation));
+        return {
+          type: 'PROFILE_MUTATION_APPLY',
+          eventId: committed.result.eventId,
+          revision: committed.result.revision,
+          userContext: enriched.userContext ?? { profile: null },
           state: enriched,
         };
       }

@@ -1,7 +1,7 @@
 'use client';
 
 import type { SchemaField } from '@/lib/product-contract';
-import { getNestedValue, schemaFieldLabel } from '@/lib/schema-form-utils';
+import { getNestedValue, schemaEnumLabel, schemaFieldLabel } from '@/lib/schema-form-utils';
 
 type Props = {
   fields: SchemaField[];
@@ -66,7 +66,7 @@ function SchemaFieldInput({
         <select id={fieldName} name={fieldName} defaultValue={String(defaultValue ?? field.enumValues[0])} disabled={disabled}>
           {field.enumValues.map((option) => (
             <option key={String(option)} value={String(option)}>
-              {String(option)}
+              {schemaEnumLabel(option)}
             </option>
           ))}
         </select>

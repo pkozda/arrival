@@ -105,7 +105,7 @@ describe('profile activation integration', () => {
     expect(profile.profile.household?.maritalStatus).toBe('single');
   });
 
-  it('scenario 2: ui-snapshot exposes persisted profile after execution', async () => {
+  it('scenario 2: ui-snapshot exposes userContext after execution (not legacy profile field)', async () => {
     const app = await buildApp();
 
     const sessionRes = await app.inject({
@@ -140,14 +140,19 @@ describe('profile activation integration', () => {
 
     expect(snapshotRes.statusCode).toBe(200);
     const snapshot = snapshotRes.json() as {
-      profile: {
-        employment?: { grossMonthlyIncome?: number };
-        housing?: { monthlyColdRent?: number };
-      } | null;
+      userContext: {
+        profile: {
+          domains: {
+            income?: { grossMonthlyIncome?: number };
+            housing?: { monthlyColdRent?: number };
+          };
+        } | null;
+      };
     };
 
-    expect(snapshot.profile?.employment?.grossMonthlyIncome).toBe(3200);
-    expect(snapshot.profile?.housing?.monthlyColdRent).toBe(950);
+    expect(snapshot).not.toHaveProperty('profile');
+    expect(snapshot.userContext.profile?.domains.income?.grossMonthlyIncome).toBe(3200);
+    expect(snapshot.userContext.profile?.domains.housing?.monthlyColdRent).toBe(950);
   });
 
   it('scenario 3: second execution merges profile values when request input is empty', async () => {

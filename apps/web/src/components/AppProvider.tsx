@@ -20,11 +20,20 @@ import {
   updateSessionLanguage,
   updateSessionTheme,
 } from '@/lib/api';
+import {
+  fetchUserContext,
+  submitMutation as submitMutationRequest,
+  buildHeaderLanguageMutation,
+  buildHeaderThemeMutation,
+} from '@/lib/mutations';
+import { selectAppDisplayLanguage } from '@/lib/user-context';
 import type {
+  MutationRequest,
   PublicModuleContract,
   SupportedLanguage,
   ThemePreference,
   UiSnapshot,
+  UserContextV1,
 } from '@/lib/product-contract';
 import {
   getSessionLanguage,
@@ -41,11 +50,17 @@ interface AppState {
   modules: PublicModuleContract[];
   modulesLoading: boolean;
   modulesError: string | null;
+  userContext: UserContextV1 | null;
+  userContextLoading: boolean;
+  userContextError: string | null;
   uiSnapshot: UiSnapshot | null;
   uiSnapshotLoading: boolean;
   uiSnapshotError: string | null;
   translations: Record<string, string>;
+  refreshUserContext: () => Promise<void>;
   refreshUiSnapshot: () => Promise<void>;
+  refreshSessionState: () => Promise<void>;
+  submitMutation: (request: MutationRequest) => Promise<UserContextV1>;
   changeLanguage: (lang: SupportedLanguage) => Promise<void>;
   changeTheme: (theme: ThemePreference) => Promise<void>;
   toggleTheme: () => Promise<void>;
@@ -77,6 +92,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [modules, setModules] = useState<PublicModuleContract[]>([]);
   const [modulesLoading, setModulesLoading] = useState(true);
   const [modulesError, setModulesError] = useState<string | null>(null);
+  const [userContext, setUserContext] = useState<UserContextV1 | null>(null);
+  const [userContextLoading, setUserContextLoading] = useState(true);
+  const [userContextError, setUserContextError] = useState<string | null>(null);
   const [uiSnapshot, setUiSnapshot] = useState<UiSnapshot | null>(null);
   const [uiSnapshotLoading, setUiSnapshotLoading] = useState(true);
   const [uiSnapshotError, setUiSnapshotError] = useState<string | null>(null);
@@ -84,10 +102,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const lastAppliedSnapshotVersionRef = useRef(-1);
   const snapshotFetchGenerationRef = useRef(0);
+  const userContextFetchGenerationRef = useRef(0);
 
-  const language = useMemo(() => getSessionLanguage(uiSnapshot), [uiSnapshot]);
   const themePreference = useMemo(() => getThemePreference(uiSnapshot), [uiSnapshot]);
   const systemTheme = useSystemColorScheme();
+  const sessionLanguage = useMemo(() => getSessionLanguage(uiSnapshot), [uiSnapshot]);
+  const language = useMemo(
+    () => selectAppDisplayLanguage(userContext, sessionLanguage),
+    [userContext, sessionLanguage]
+  );
   const theme = useMemo(
     () => (themePreference === 'system' ? systemTheme : resolveTheme(themePreference)),
     [themePreference, systemTheme]
@@ -143,42 +166,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
       .catch(console.error);
   }, []);
 
-  useEffect(() => {
-    if (!sessionId) {
-      return;
+  const refreshUserContext = useCallback(async () => {
+    if (!sessionId) return;
+
+    const requestId = ++userContextFetchGenerationRef.current;
+
+    setUserContextLoading(true);
+    setUserContextError(null);
+
+    try {
+      const context = await fetchUserContext(sessionId);
+      if (requestId !== userContextFetchGenerationRef.current) {
+        return;
+      }
+      setUserContext(context);
+    } catch (err: unknown) {
+      if (requestId !== userContextFetchGenerationRef.current) {
+        return;
+      }
+      setUserContextError(err instanceof Error ? err.message : 'Failed to load your situation');
+    } finally {
+      if (requestId === userContextFetchGenerationRef.current) {
+        setUserContextLoading(false);
+      }
     }
-
-    const requestId = ++snapshotFetchGenerationRef.current;
-    let cancelled = false;
-
-    setUiSnapshotLoading(true);
-    setUiSnapshotError(null);
-
-    fetchUiSnapshot(sessionId)
-      .then((snapshot) => {
-        if (cancelled || requestId !== snapshotFetchGenerationRef.current) {
-          return;
-        }
-        applySnapshotIfNewer(snapshot);
-        setUiSnapshotLoading(false);
-      })
-      .catch((err: unknown) => {
-        if (cancelled || requestId !== snapshotFetchGenerationRef.current) {
-          return;
-        }
-        setUiSnapshot(null);
-        setUiSnapshotError(err instanceof Error ? err.message : 'Failed to load snapshot');
-        setUiSnapshotLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [sessionId, applySnapshotIfNewer]);
-
-  useEffect(() => {
-    fetchTranslations(language).then(setTranslations).catch(console.error);
-  }, [language]);
+  }, [sessionId]);
 
   const refreshUiSnapshot = useCallback(async () => {
     if (!sessionId) return;
@@ -198,7 +210,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (requestId !== snapshotFetchGenerationRef.current) {
         return;
       }
-      setUiSnapshotError(err instanceof Error ? err.message : 'Failed to refresh snapshot');
+      setUiSnapshotError(err instanceof Error ? err.message : 'Failed to refresh your situation');
     } finally {
       if (requestId === snapshotFetchGenerationRef.current) {
         setUiSnapshotLoading(false);
@@ -206,17 +218,97 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [sessionId, applySnapshotIfNewer]);
 
-  const changeLanguage = useCallback(async (lang: SupportedLanguage) => {
-    if (!sessionId) return;
-    await updateSessionLanguage(sessionId, lang);
-    await refreshUiSnapshot();
-  }, [sessionId, refreshUiSnapshot]);
+  const refreshSessionState = useCallback(async () => {
+    await Promise.all([refreshUserContext(), refreshUiSnapshot()]);
+  }, [refreshUserContext, refreshUiSnapshot]);
 
-  const changeTheme = useCallback(async (next: ThemePreference) => {
-    if (!sessionId) return;
-    await updateSessionTheme(sessionId, next);
-    await refreshUiSnapshot();
-  }, [sessionId, refreshUiSnapshot]);
+  useEffect(() => {
+    if (!sessionId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    setUserContextLoading(true);
+    setUiSnapshotLoading(true);
+    setUserContextError(null);
+    setUiSnapshotError(null);
+
+    const userContextRequestId = ++userContextFetchGenerationRef.current;
+    const snapshotRequestId = ++snapshotFetchGenerationRef.current;
+
+    Promise.all([fetchUserContext(sessionId), fetchUiSnapshot(sessionId)])
+      .then(([context, snapshot]) => {
+        if (cancelled) {
+          return;
+        }
+        if (userContextRequestId === userContextFetchGenerationRef.current) {
+          setUserContext(context);
+          setUserContextLoading(false);
+        }
+        if (snapshotRequestId === snapshotFetchGenerationRef.current) {
+          applySnapshotIfNewer(snapshot);
+          setUiSnapshotLoading(false);
+        }
+      })
+      .catch((err: unknown) => {
+        if (cancelled) {
+          return;
+        }
+        const message = err instanceof Error ? err.message : 'Failed to load your situation';
+        if (userContextRequestId === userContextFetchGenerationRef.current) {
+          setUserContext(null);
+          setUserContextError(message);
+          setUserContextLoading(false);
+        }
+        if (snapshotRequestId === snapshotFetchGenerationRef.current) {
+          setUiSnapshot(null);
+          setUiSnapshotError(message);
+          setUiSnapshotLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId, applySnapshotIfNewer]);
+
+  useEffect(() => {
+    fetchTranslations(language).then(setTranslations).catch(console.error);
+  }, [language]);
+
+  const submitMutation = useCallback(
+    async (request: MutationRequest): Promise<UserContextV1> => {
+      if (!sessionId) {
+        throw new Error('Session is not ready');
+      }
+
+      const nextContext = await submitMutationRequest(request, sessionId);
+      setUserContext(nextContext);
+      return nextContext;
+    },
+    [sessionId]
+  );
+
+  const changeLanguage = useCallback(
+    async (lang: SupportedLanguage) => {
+      if (!sessionId) return;
+      await submitMutation(buildHeaderLanguageMutation(lang));
+      await updateSessionLanguage(sessionId, lang);
+      await refreshUiSnapshot();
+    },
+    [sessionId, submitMutation, refreshUiSnapshot]
+  );
+
+  const changeTheme = useCallback(
+    async (next: ThemePreference) => {
+      if (!sessionId) return;
+      await submitMutation(buildHeaderThemeMutation(next));
+      await updateSessionTheme(sessionId, next);
+      await refreshUiSnapshot();
+    },
+    [sessionId, submitMutation, refreshUiSnapshot]
+  );
 
   const toggleTheme = useCallback(async () => {
     const next: ThemePreference = theme === 'dark' ? 'light' : 'dark';
@@ -229,24 +321,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <AppContext.Provider value={{
-      language,
-      theme,
-      themePreference,
-      sessionId,
-      modules,
-      modulesLoading,
-      modulesError,
-      uiSnapshot,
-      uiSnapshotLoading,
-      uiSnapshotError,
-      translations,
-      refreshUiSnapshot,
-      changeLanguage,
-      changeTheme,
-      toggleTheme,
-      t,
-    }}>
+    <AppContext.Provider
+      value={{
+        language,
+        theme,
+        themePreference,
+        sessionId,
+        modules,
+        modulesLoading,
+        modulesError,
+        userContext,
+        userContextLoading,
+        userContextError,
+        uiSnapshot,
+        uiSnapshotLoading,
+        uiSnapshotError,
+        translations,
+        refreshUserContext,
+        refreshUiSnapshot,
+        refreshSessionState,
+        submitMutation,
+        changeLanguage,
+        changeTheme,
+        toggleTheme,
+        t,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

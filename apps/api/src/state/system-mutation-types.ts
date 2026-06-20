@@ -7,6 +7,7 @@ import type {
   ProfileRecord,
 } from '@arrival-atlas/profile';
 import type { ExecutionTrace } from '@arrival-atlas/profile';
+import type { MutationRequest, UserContextV1 } from '@arrival-atlas/product-contract';
 import type { SystemModuleDescriptor, SystemProjectionConfig } from './system-state-types.js';
 import type { SystemState } from './system-state-types.js';
 import type { MutationActor } from './mutation-actor.js';
@@ -73,11 +74,19 @@ export type AccountLinkMutation = {
   actor?: MutationActor;
 };
 
+export type ProfileMutationApplyMutation = {
+  type: 'PROFILE_MUTATION_APPLY';
+  sessionId: string;
+  request: MutationRequest;
+  actor?: MutationActor;
+};
+
 export type SystemMutation =
   | SessionCreateMutation
   | SessionPatchMutation
   | ProfileCreateMutation
   | ProfileUpdateMutation
+  | ProfileMutationApplyMutation
   | ModuleExecuteMutation
   | AccountClaimMutation
   | AccountLinkMutation;
@@ -124,11 +133,20 @@ export type AccountLinkResult = {
   state: SystemState;
 };
 
+export type ProfileMutationApplyResult = {
+  type: 'PROFILE_MUTATION_APPLY';
+  eventId: string;
+  revision: number;
+  userContext: UserContextV1;
+  state: SystemState;
+};
+
 export type SystemMutationResult =
   | SessionCreateResult
   | SessionPatchResult
   | ProfileCreateResult
   | ProfileUpdateResult
+  | ProfileMutationApplyResult
   | ModuleExecuteResult
   | AccountClaimResult
   | AccountLinkResult;
