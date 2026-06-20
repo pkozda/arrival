@@ -92,6 +92,7 @@ Reserved empty domains (`housing/`, `legal/`, `integrations/`) have stub indexes
 | Profile System v1 roadmap | [identity/profile-system-v1-roadmap.md](./identity/profile-system-v1-roadmap.md) |
 | Profile Mutation Model v1 | [identity/profile-mutation-model-v1.md](./identity/profile-mutation-model-v1.md) |
 | Profile System P3 — correction layer (UX-P3) | [identity/profile-system-p3-roadmap.md](./identity/profile-system-p3-roadmap.md) |
+| Profile System P4 — intelligence layer (UX-P4) | [identity/profile-system-p4-roadmap.md](./identity/profile-system-p4-roadmap.md) |
 | Profile mutation contract summary | [contracts/profile-mutation-contract-summary.md](./contracts/profile-mutation-contract-summary.md) |
 | User Profile Engine design | [identity/user-profile-engine-design.md](./identity/user-profile-engine-design.md) |
 

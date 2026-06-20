@@ -27,8 +27,10 @@ import {
   buildHeaderThemeMutation,
 } from '@/lib/mutations';
 import { selectAppDisplayLanguage } from '@/lib/user-context';
+import { fetchProfileInsights } from '@/lib/profile-insights';
 import type {
   MutationRequest,
+  ProfileInsightViewV1,
   PublicModuleContract,
   SupportedLanguage,
   ThemePreference,
@@ -53,11 +55,15 @@ interface AppState {
   userContext: UserContextV1 | null;
   userContextLoading: boolean;
   userContextError: string | null;
+  profileInsights: ProfileInsightViewV1 | null;
+  profileInsightsLoading: boolean;
+  profileInsightsError: string | null;
   uiSnapshot: UiSnapshot | null;
   uiSnapshotLoading: boolean;
   uiSnapshotError: string | null;
   translations: Record<string, string>;
   refreshUserContext: () => Promise<void>;
+  refreshProfileInsights: () => Promise<void>;
   refreshUiSnapshot: () => Promise<void>;
   refreshSessionState: () => Promise<void>;
   submitMutation: (request: MutationRequest) => Promise<{ userContext: UserContextV1; revision: number }>;
@@ -96,6 +102,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [userContext, setUserContext] = useState<UserContextV1 | null>(null);
   const [userContextLoading, setUserContextLoading] = useState(true);
   const [userContextError, setUserContextError] = useState<string | null>(null);
+  const [profileInsights, setProfileInsights] = useState<ProfileInsightViewV1 | null>(null);
+  const [profileInsightsLoading, setProfileInsightsLoading] = useState(true);
+  const [profileInsightsError, setProfileInsightsError] = useState<string | null>(null);
   const [uiSnapshot, setUiSnapshot] = useState<UiSnapshot | null>(null);
   const [uiSnapshotLoading, setUiSnapshotLoading] = useState(true);
   const [uiSnapshotError, setUiSnapshotError] = useState<string | null>(null);
@@ -105,6 +114,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const lastAppliedSnapshotVersionRef = useRef(-1);
   const snapshotFetchGenerationRef = useRef(0);
   const userContextFetchGenerationRef = useRef(0);
+  const profileInsightsFetchGenerationRef = useRef(0);
 
   const themePreference = useMemo(() => getThemePreference(uiSnapshot), [uiSnapshot]);
   const systemTheme = useSystemColorScheme();
@@ -194,6 +204,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [sessionId]);
 
+  const refreshProfileInsights = useCallback(async () => {
+    if (!sessionId) return;
+
+    const requestId = ++profileInsightsFetchGenerationRef.current;
+
+    setProfileInsightsLoading(true);
+    setProfileInsightsError(null);
+
+    try {
+      const insights = await fetchProfileInsights(sessionId);
+      if (requestId !== profileInsightsFetchGenerationRef.current) {
+        return;
+      }
+      setProfileInsights(insights);
+    } catch (err: unknown) {
+      if (requestId !== profileInsightsFetchGenerationRef.current) {
+        return;
+      }
+      setProfileInsightsError(err instanceof Error ? err.message : 'Failed to load situation insights');
+    } finally {
+      if (requestId === profileInsightsFetchGenerationRef.current) {
+        setProfileInsightsLoading(false);
+      }
+    }
+  }, [sessionId]);
+
   const refreshUiSnapshot = useCallback(async () => {
     if (!sessionId) return;
 
@@ -221,8 +257,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [sessionId, applySnapshotIfNewer]);
 
   const refreshSessionState = useCallback(async () => {
-    await Promise.all([refreshUserContext(), refreshUiSnapshot()]);
-  }, [refreshUserContext, refreshUiSnapshot]);
+    await Promise.all([refreshUserContext(), refreshProfileInsights(), refreshUiSnapshot()]);
+  }, [refreshUserContext, refreshProfileInsights, refreshUiSnapshot]);
 
   useEffect(() => {
     if (!sessionId) {
@@ -232,21 +268,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     setUserContextLoading(true);
+    setProfileInsightsLoading(true);
     setUiSnapshotLoading(true);
     setUserContextError(null);
+    setProfileInsightsError(null);
     setUiSnapshotError(null);
 
     const userContextRequestId = ++userContextFetchGenerationRef.current;
+    const profileInsightsRequestId = ++profileInsightsFetchGenerationRef.current;
     const snapshotRequestId = ++snapshotFetchGenerationRef.current;
 
-    Promise.all([fetchUserContext(sessionId), fetchUiSnapshot(sessionId)])
-      .then(([context, snapshot]) => {
+    Promise.all([
+      fetchUserContext(sessionId),
+      fetchProfileInsights(sessionId),
+      fetchUiSnapshot(sessionId),
+    ])
+      .then(([context, insights, snapshot]) => {
         if (cancelled) {
           return;
         }
         if (userContextRequestId === userContextFetchGenerationRef.current) {
           setUserContext(context);
           setUserContextLoading(false);
+        }
+        if (profileInsightsRequestId === profileInsightsFetchGenerationRef.current) {
+          setProfileInsights(insights);
+          setProfileInsightsLoading(false);
         }
         if (snapshotRequestId === snapshotFetchGenerationRef.current) {
           applySnapshotIfNewer(snapshot);
@@ -262,6 +309,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           setUserContext(null);
           setUserContextError(message);
           setUserContextLoading(false);
+        }
+        if (profileInsightsRequestId === profileInsightsFetchGenerationRef.current) {
+          setProfileInsights(null);
+          setProfileInsightsError(message);
+          setProfileInsightsLoading(false);
         }
         if (snapshotRequestId === snapshotFetchGenerationRef.current) {
           setUiSnapshot(null);
@@ -288,9 +340,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const result = await submitMutationRequest(request, sessionId);
       setUserContext(result.userContext);
       setProfileHeadRevision(result.revision);
+      void refreshProfileInsights();
       return result;
     },
-    [sessionId]
+    [sessionId, refreshProfileInsights]
   );
 
   const changeLanguage = useCallback(
@@ -336,11 +389,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
         userContext,
         userContextLoading,
         userContextError,
+        profileInsights,
+        profileInsightsLoading,
+        profileInsightsError,
         uiSnapshot,
         uiSnapshotLoading,
         uiSnapshotError,
         translations,
         refreshUserContext,
+        refreshProfileInsights,
         refreshUiSnapshot,
         refreshSessionState,
         submitMutation,

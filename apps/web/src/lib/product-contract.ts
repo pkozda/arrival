@@ -29,6 +29,10 @@ export type {
   UiSnapshotSession,
   UserContextV1,
   UserProfileViewV1,
+  ProfileInsightViewV1,
+  ProfileDomain,
+  DomainInsight,
+  MissingContextHint,
 } from '@arrival-atlas/product-contract';
 
 export {
@@ -41,6 +45,7 @@ export {
   extractSchemaFields,
   mergeProfileIntoDefaults,
   parseUserContextV1,
+  parseProfileInsightViewV1,
 } from '@arrival-atlas/product-contract';
 
 export type ModuleExecuteResponse = ModuleExecuteProjectionResponse;

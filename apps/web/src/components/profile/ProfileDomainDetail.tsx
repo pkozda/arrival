@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useApp } from '@/components/AppProvider';
 import { DomainStatusBadge } from '@/components/profile/DomainStatusBadge';
 import { ProfileCorrectionToast } from '@/components/profile/ProfileCorrectionToast';
+import { DomainInsightBlock, findDomainInsight } from '@/components/profile/DomainInsightBlock';
 import { ProfileEditCTA } from '@/components/profile/ProfileEditCTA';
 import { findProfileMirrorDomain, resolveDomainCtaTitle } from '@/lib/profile-mirror-utils';
 import { isProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
@@ -17,7 +18,7 @@ type Props = {
 
 export function ProfileDomainDetail({ domainSlug }: Props) {
   const searchParams = useSearchParams();
-  const { uiSnapshot, userContext, modules } = useApp();
+  const { uiSnapshot, userContext, profileInsights, modules } = useApp();
   const profile = selectUserContextProfile(userContext);
   const showUpdatedToast = searchParams.get('updated') === '1';
 
@@ -43,6 +44,9 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
   const ctaTitle = resolveDomainCtaTitle(domain, modules);
   const hasData = domain.fields.length > 0;
   const editSlug = isProfileMirrorDomainSlug(domainSlug) ? domainSlug : domain.slug;
+  const domainInsight = isProfileMirrorDomainSlug(editSlug)
+    ? findDomainInsight(profileInsights?.domainInsights, editSlug)
+    : undefined;
 
   return (
     <>
@@ -124,6 +128,8 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
           <ProfileEditCTA domainSlug={editSlug} />
         </div>
       </div>
+
+      <DomainInsightBlock insight={domainInsight} />
 
       <section className="card">
         <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem' }}>

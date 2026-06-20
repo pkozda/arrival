@@ -1,12 +1,12 @@
 import type { MutationRequest, ProfileDomain } from '@/lib/product-contract';
 import { generateMutationRequestId } from '@/lib/mutations';
-import type { DomainDraftValues, DomainEditFieldDefinition, DomainEditSection } from './domain-field-definitions.js';
+import type { DomainDraftValues, DomainEditFieldDefinition, DomainEditSection } from './domain-field-definitions';
 import {
   isSupportedLanguage,
   isThemePreference,
   normalizeDraftFieldValue,
   readDraftValueFromProfile,
-} from './domain-field-definitions.js';
+} from './domain-field-definitions';
 
 function fieldsEqual(
   left: unknown,

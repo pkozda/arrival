@@ -29,7 +29,7 @@ describe('mutation boundary (P1.4–P1.5 + P1 cleanup)', () => {
 
     for (const filePath of listSourceFiles(webSrcRoot)) {
       const source = readFileSync(filePath, 'utf8');
-      if (source.includes('/api/profile')) {
+      if (source.includes('/api/profile') && !source.includes('/api/profile-insights')) {
         violations.push(filePath);
       }
     }

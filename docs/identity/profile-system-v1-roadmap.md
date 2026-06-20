@@ -520,6 +520,8 @@ UiSnapshot (execution-only: FTU, executions, actionCards, session)
 
 **Next track:** [Profile System P3 — Profile Edit & Correction Layer (UX-P3)](./profile-system-p3-roadmap.md)
 
+After UX-P3 core: [Profile System P4 — Adaptive Profile Intelligence Layer (UX-P4)](./profile-system-p4-roadmap.md)
+
 ---
 
 ### Phase P2 — Snapshot & Form Integration

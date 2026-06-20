@@ -5,10 +5,11 @@ import { useMemo } from 'react';
 import { useApp } from '@/components/AppProvider';
 import { ProfileDomainSectionCard } from '@/components/profile/ProfileDomainSectionCard';
 import { buildProfileMirrorDomains, buildProfileMirrorHeadline } from '@/lib/profile-mirror-utils';
+import { findMirrorInsight } from '@/lib/profile-insights/selectors';
 import { selectUserContextProfile } from '@/lib/user-context';
 
 export function ProfileMirrorOverview() {
-  const { uiSnapshot, userContext, modules } = useApp();
+  const { uiSnapshot, userContext, modules, profileInsights } = useApp();
   const profile = selectUserContextProfile(userContext);
 
   const domains = useMemo(
@@ -54,6 +55,7 @@ export function ProfileMirrorOverview() {
             domain={domain}
             modules={modules}
             detailHref={`/profile/${domain.slug}`}
+            domainInsight={findMirrorInsight(profileInsights, domain.slug)}
           />
         ))}
       </section>

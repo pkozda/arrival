@@ -16,6 +16,11 @@ export const LEGACY_SNAPSHOT_CONTRACT_HEADERS = {
   'x-snapshot-contract': 'legacy-compatibility-only',
 } as const;
 
+export const PROFILE_INSIGHTS_AUTHORITY_HEADERS = {
+  'x-profile-insights-authority': 'derived-non-authoritative',
+  'x-read-model': 'ProfileInsightViewV1',
+} as const;
+
 export function applyUserContextAuthorityHeaders(
   reply: { header: (name: string, value: string) => void }
 ): void {
@@ -33,6 +38,14 @@ export function applyUiSnapshotTransportHeaders(
     : UI_SNAPSHOT_TRANSPORT_HEADERS;
 
   for (const [name, value] of Object.entries(headers)) {
+    reply.header(name, value);
+  }
+}
+
+export function applyProfileInsightsAuthorityHeaders(
+  reply: { header: (name: string, value: string) => void }
+): void {
+  for (const [name, value] of Object.entries(PROFILE_INSIGHTS_AUTHORITY_HEADERS)) {
     reply.header(name, value);
   }
 }

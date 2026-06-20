@@ -15,6 +15,7 @@ import {
 } from '@/lib/product-contract';
 import { mergeUserProfileIntoDefaults } from '@/lib/mutations';
 import { selectUserContextProfile } from '@/lib/user-context';
+import { resolvePrefillConfidenceMessage } from '@/lib/profile-insights';
 import { buildInputFromFormData, stableFormDefaultsKey } from '@/lib/schema-form-utils';
 import { profilePrefillApplied } from '@/lib/situation-utils';
 import { useModuleSnapshot } from '@/lib/snapshot';
@@ -26,7 +27,7 @@ type Props = {
 };
 
 export function ContractModulePage({ moduleId, contract }: Props) {
-  const { sessionId, language, t, refreshSessionState, userContext } = useApp();
+  const { sessionId, language, t, refreshSessionState, userContext, profileInsights } = useApp();
   const userProfile = selectUserContextProfile(userContext);
   const uiState = useModuleSnapshot(moduleId);
   const { executionId, registerExecution } = useExplainExecutionId(uiState.executionId);
@@ -40,6 +41,10 @@ export function ContractModulePage({ moduleId, contract }: Props) {
   const showProfilePrefillBanner = useMemo(
     () => profilePrefillApplied(schemaDefaults, defaults),
     [schemaDefaults, defaults]
+  );
+  const prefillMessage = useMemo(
+    () => resolvePrefillConfidenceMessage(profileInsights),
+    [profileInsights]
   );
 
   useEffect(() => {
@@ -113,7 +118,7 @@ export function ContractModulePage({ moduleId, contract }: Props) {
           <div className="card" style={{ color: 'var(--color-danger)' }}>{schemaError}</div>
         ) : (
           <>
-            <ProfilePrefillBanner visible={showProfilePrefillBanner} />
+            <ProfilePrefillBanner visible={showProfilePrefillBanner} message={prefillMessage} />
             <SchemaForm
             key={formKey}
             fields={fields}

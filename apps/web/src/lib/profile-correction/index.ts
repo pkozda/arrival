@@ -2,6 +2,8 @@ export {
   DOMAIN_EDIT_SECTIONS,
   buildInitialDraft,
   getDomainEditSection,
+  isSupportedLanguage,
+  isThemePreference,
   normalizeDraftFieldValue,
   readDraftValueFromProfile,
 } from './domain-field-definitions';
