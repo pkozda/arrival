@@ -1636,6 +1636,34 @@
       ]
     },
     {
+      "id": "profile-mutation-contract-summary",
+      "title": "Profile Mutation Contract Summary",
+      "path": "docs/contracts/profile-mutation-contract-summary.md",
+      "type": "contract",
+      "domain": "identity",
+      "status": "active",
+      "maturity": "stable",
+      "tags": [
+        "profile-mutation"
+      ],
+      "created": "2026-06-19",
+      "updated": "2026-06-19",
+      "related": [
+        "profile-mutation-model-v1"
+      ],
+      "summary": "Short reference for `@arrival-atlas/product-contract` profile mutation types.",
+      "headings": [
+        "Profile Mutation Contract Summary",
+        "Package location",
+        "MutationRequest",
+        "MutationEvent",
+        "Registries",
+        "UserProfileViewV1",
+        "Validation primitives",
+        "Not in this package (C2+)"
+      ]
+    },
+    {
       "id": "current-state",
       "title": "Arrival Atlas Current State",
       "path": "docs/core/current-state.md",
@@ -2020,6 +2048,83 @@
       ]
     },
     {
+      "id": "profile-mutation-model-v1",
+      "title": "Profile Mutation Model v1",
+      "path": "docs/identity/profile-mutation-model-v1.md",
+      "type": "spec",
+      "domain": "identity",
+      "status": "draft",
+      "maturity": "proposed",
+      "tags": [
+        "profile-engine"
+      ],
+      "created": "2026-06-19",
+      "updated": "2026-06-19",
+      "related": [
+        "ux-contract-v2"
+      ],
+      "summary": "**Document type:** System architecture specification (machine contract)",
+      "headings": [
+        "Profile Mutation Model v1",
+        "0. Specification Summary",
+        "1. Core Concepts",
+        "1.1 Definitions",
+        "1.2 Profile is NOT a document",
+        "1.3 Migration note (current codebase)",
+        "2. MutationRequest",
+        "2.1 Purpose",
+        "2.2 Type definition",
+        "2.3 Intent \u2194 type consistency (enforceable)",
+        "2.4 Payload rules",
+        "3. Mutation Types (Strict)",
+        "3.1 Fact-level mutations",
+        "3.2 Meta mutations (non-authoritative until promoted)",
+        "3.3 Non-profile mutations (session plane)",
+        "3.4 Source authorization matrix",
+        "4. Conflict Resolution Model",
+        "4.1 Principles",
+        "4.2 Precedence ladder (highest wins)",
+        "4.3 Conflict scenarios",
+        "4.4 Conflict resolution function (spec)",
+        "5. Domain Partitioning Model",
+        "5.1 Domain registry",
+        "5.2 Field ownership (cross-module writes)",
+        "5.3 Scenario blocklist (never in ProfileState)",
+        "5.4 Sensitive domain rules",
+        "6. Profile State Construction",
+        "6.1 Reducer model",
+        "6.2 MutationEvent (committed)",
+        "6.3 Reducer algorithm (deterministic)",
+        "6.4 Idempotency rules",
+        "6.5 Snapshot derivation",
+        "7. Revision Model",
+        "7.1 ProfileRevision (trust layer)",
+        "7.2 Reason strings (generation rules)",
+        "7.3 UI exposure",
+        "8. Mutation Lifecycle",
+        "8.1 Pipeline (normative)",
+        "8.2 Stage ownership",
+        "8.3 Module execute path (compound)",
+        "9. System Guarantees (Invariants)",
+        "10. UI Implications (Consequences Only)",
+        "11. Hard Constraints",
+        "12. Implementation Mapping (Profile System P1)",
+        "13. Violation Scenarios",
+        "V1 \u2014 Direct document PATCH",
+        "V2 \u2014 Profile UI sends ProfilePatch",
+        "V3 \u2014 Scenario field in activation map",
+        "V4 \u2014 Client-side merge after correction",
+        "V5 \u2014 Blind last-write-wins resolver",
+        "V6 \u2014 suggest_correction appended to log",
+        "V7 \u2014 Schema path in payload",
+        "V8 \u2014 Home initiates fact mutation",
+        "V9 \u2014 Dual-write module + profile without coordinator",
+        "V10 \u2014 Rebuild non-determinism",
+        "14. Acceptance (Self-Check)",
+        "15. Canonical Principle"
+      ]
+    },
+    {
       "id": "profile-system-v1-roadmap",
       "title": "Profile System v1 Roadmap",
       "path": "docs/identity/profile-system-v1-roadmap.md",
@@ -2066,7 +2171,7 @@
         "8. Migration Risks",
         "9. Detailed Phased Roadmap",
         "Phase P0 \u2014 Architecture Foundations",
-        "Phase P1 \u2014 User Context Contract",
+        "Phase P1 \u2014 User Context Contract + Mutation Model",
         "Phase P2 \u2014 Snapshot & Form Integration",
         "Phase P3 \u2014 Explain Presentation Personalization",
         "Phase P4 \u2014 UI Personalization",
@@ -2080,6 +2185,45 @@
         "Success statement",
         "Appendix A \u2014 Related Documents",
         "Appendix B \u2014 Research Method"
+      ]
+    },
+    {
+      "id": "profile-ux-design-prompt",
+      "title": "Profile UX Design Prompt v1",
+      "path": "docs/identity/profile-ux-design-prompt.md",
+      "type": "ux",
+      "domain": "identity",
+      "status": "active",
+      "maturity": "stable",
+      "tags": [
+        "profile-mirror"
+      ],
+      "created": "2026-06-19",
+      "updated": "2026-06-19",
+      "related": [
+        "profile-ux-spec"
+      ],
+      "summary": "**Role:** Senior UX architect and product designer on Arrival Atlas \u2014 a decision-support system for newcomers in Germany.",
+      "headings": [
+        "Profile UX Design Prompt v1",
+        "Core Product Principle (Non-negotiable)",
+        "Target User Context",
+        "What Profile MUST DO",
+        "What Profile MUST NOT DO",
+        "UX Architecture \u2014 Profile Sections",
+        "Key UX Behaviors",
+        "1. Module-first capture",
+        "2. Profile-as-mirror",
+        "3. Onboarding-as-checklist (Home UX)",
+        "4. Completeness model (critical constraint)",
+        "5. Home dashboard integration",
+        "Lifecycle States",
+        "Critical UX Rules",
+        "Core User Promise",
+        "Design Goals",
+        "Output Expectations (Design Tasks)",
+        "Optional Design Constraint (High Priority)",
+        "Related Documents"
       ]
     },
     {
@@ -2170,7 +2314,7 @@
       "created": "2026-06-01",
       "updated": "2026-06-19",
       "related": [
-        "profile-ux-discovery"
+        "ux-contract-v1"
       ],
       "summary": "**Document type:** UX Design Specification (Discovery \u2192 Design)",
       "headings": [
@@ -3002,7 +3146,155 @@
         "Known Limitations (unchanged / out of scope)",
         "Success Criteria Checklist"
       ]
+    },
+    {
+      "id": "ux-domain-index",
+      "title": "UX Domain Index",
+      "path": "docs/ux/README.md",
+      "type": "system",
+      "domain": "product",
+      "status": "active",
+      "maturity": "stable",
+      "tags": [
+        "ux-boundaries"
+      ],
+      "created": "2026-06-19",
+      "updated": "2026-06-19",
+      "related": [
+        "ux-contract-v1"
+      ],
+      "summary": "UX architecture contracts and guardrails for Arrival Atlas user surfaces.",
+      "headings": [
+        "UX Domain",
+        "Primary document",
+        "Related"
+      ]
+    },
+    {
+      "id": "ux-contract-v1",
+      "title": "UX Contract v1 \u2014 System Boundaries & Guardrails",
+      "path": "docs/ux/ux-contract-v1.md",
+      "type": "contract",
+      "domain": "product",
+      "status": "active",
+      "maturity": "stable",
+      "tags": [
+        "ux-boundaries"
+      ],
+      "created": "2026-06-19",
+      "updated": "2026-06-19",
+      "related": [
+        "profile-ux-design-prompt"
+      ],
+      "summary": "**Document type:** UX architecture contract (enforcement reference)",
+      "headings": [
+        "UX Contract v1 \u2014 System Boundaries & Guardrails",
+        "0. Contract Summary",
+        "1. System Roles (Mandatory)",
+        "1.1 Home",
+        "1.2 Modules",
+        "1.3 Profile (Situation Mirror)",
+        "2. Data Ownership Rules",
+        "Ownership invariants",
+        "3. Data Flow Contract",
+        "Directional rules",
+        "Prefill contract (Modules)",
+        "4. UI Leak Prevention Rules",
+        "Allowed internal use (non-UI)",
+        "Review checklist (PR gate)",
+        "5. UX Stability Rules",
+        "Versioning",
+        "6. Terminology Contract",
+        "User-facing (required)",
+        "User-facing (avoid)",
+        "Internal (engineering/docs OK)",
+        "7. Failure Modes",
+        "8. Principle (Canonical)",
+        "9. Enforcement Reference",
+        "Phase alignment",
+        "Related documents",
+        "Contract change process",
+        "10. Acceptance (Self-Check)"
+      ]
+    },
+    {
+      "id": "ux-contract-v2",
+      "title": "UX Contract v2 \u2014 Mutation Semantics Layer",
+      "path": "docs/ux/ux-contract-v2.md",
+      "type": "contract",
+      "domain": "product",
+      "status": "draft",
+      "maturity": "proposed",
+      "tags": [
+        "ux-boundaries"
+      ],
+      "created": "2026-06-19",
+      "updated": "2026-06-19",
+      "related": [
+        "ux-contract-v1"
+      ],
+      "summary": "**Document type:** UX architecture contract (enforcement reference)",
+      "headings": [
+        "UX Contract v2 \u2014 Mutation Semantics Layer",
+        "0. Contract Summary",
+        "1. Mutation Authority Model",
+        "1.1 Authority tiers",
+        "1.2 Per-surface authority",
+        "1.3 Mutation Layer (required abstraction)",
+        "1.4 Default rule (resolved)",
+        "2. Mutation Types",
+        "2.1 Type catalog",
+        "2.2 Type semantics (enforceable)",
+        "2.3 Initiator matrix (normative)",
+        "3. Surface Responsibility Matrix",
+        "3.1 Operations matrix (refined)",
+        "3.2 Read vs write coupling rules",
+        "3.3 Profile edit (UX-P3) position in matrix",
+        "4. Correction vs Scenario Separation",
+        "4.1 Definitions",
+        "4.2 Critical rule",
+        "4.3 Separation diagram",
+        "4.4 Enforcement",
+        "5. Source of Truth Rules",
+        "5.1 Authoritative stores",
+        "5.2 Conflict resolution",
+        "5.3 Determinism requirement",
+        "5.4 Non-goals",
+        "6. Mutation Lifecycle",
+        "6.1 End-to-end flow",
+        "6.2 Stage responsibilities",
+        "6.3 Path A \u2014 Module write (primary)",
+        "6.4 Path B \u2014 Profile correction (mediated)",
+        "6.5 Path C \u2014 Preference update",
+        "6.6 Audit trail",
+        "6.7 Deferred vs immediate snapshot refresh",
+        "7. UI Implications (Conceptual \u2014 UX-P3 Foundation)",
+        "7.1 Profile edit UI (UX-P3)",
+        "7.2 Home",
+        "7.3 Modules",
+        "7.4 Post-mutation user narrative",
+        "8. Hard Constraints (Normative)",
+        "9. Mapping to Profile System P1 / Implementation",
+        "10. Enforcement Reference",
+        "10.1 Phase alignment",
+        "10.2 PR checklist (mutation-specific)",
+        "10.3 Related documents",
+        "10.4 Contract change process",
+        "11. Violation Examples",
+        "V1 \u2014 Profile as direct CRUD",
+        "V2 \u2014 Home inline edit",
+        "V3 \u2014 Scenario persisted to Profile",
+        "V4 \u2014 Profile scenario playground",
+        "V5 \u2014 Dual-write race",
+        "V6 \u2014 UI-side merge",
+        "V7 \u2014 Schema leak in correction flow",
+        "V8 \u2014 Bypass module validation",
+        "V9 \u2014 Silent profile overwrite from module result",
+        "V10 \u2014 Optimistic Home write",
+        "12. Acceptance (Self-Check)",
+        "13. Canonical Principle (v2)"
+      ]
     }
   ],
-  "count": 64
+  "count": 70
 }

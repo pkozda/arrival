@@ -183,6 +183,20 @@ export function Header() {
         </div>
 
         <ul className="header-nav-list">
+          <li>
+            <Link
+              href="/profile"
+              className={`header-nav-link header-nav-link--situation${
+                pathname === '/profile' || pathname.startsWith('/profile/')
+                  ? ' header-nav-link--active'
+                  : ''
+              }`}
+              onClick={() => setMenuOpen(false)}
+            >
+              <span className="header-nav-icon">◎</span>
+              <span>Your situation</span>
+            </Link>
+          </li>
           {groupedModules.map(({ category, modules: categoryModules }) => (
             <CategoryNavSection
               key={category}

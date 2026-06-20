@@ -1,6 +1,10 @@
 'use client';
 
 import type { ExplanationFactor, ModuleExplanationView } from '@/lib/product-contract';
+import {
+  explanationEntryTitle,
+  humanizeConfidence,
+} from '@/lib/ux-labels';
 
 type Props = {
   explanation: ModuleExplanationView;
@@ -49,7 +53,7 @@ export function ExplainPanel({ explanation }: Props) {
 
       <div style={{ marginBottom: '1rem' }}>
         <span className={`badge badge-${explanation.confidence}`} style={{ marginRight: '0.5rem' }}>
-          {explanation.confidence} confidence
+          {humanizeConfidence(explanation.confidence)}
         </span>
       </div>
 
@@ -68,13 +72,13 @@ export function ExplainPanel({ explanation }: Props) {
             Recommendation details
           </h4>
           <div style={{ display: 'grid', gap: '0.75rem' }}>
-            {explanation.recommendations.map((entry) => (
+            {explanation.recommendations.map((entry, index) => (
               <div
-                key={entry.recommendationId}
+                key={`recommendation-${index}`}
                 style={{ paddingBottom: '0.75rem', borderBottom: '1px solid var(--color-border)' }}
               >
                 <p style={{ fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.375rem' }}>
-                  {entry.recommendationId}
+                  {explanationEntryTitle(entry.because, `Suggestion ${index + 1}`)}
                 </p>
                 <FactorsList factors={entry.because} />
               </div>
@@ -89,13 +93,13 @@ export function ExplainPanel({ explanation }: Props) {
             Suggested action details
           </h4>
           <div style={{ display: 'grid', gap: '0.75rem' }}>
-            {explanation.actions.map((entry) => (
+            {explanation.actions.map((entry, index) => (
               <div
-                key={entry.actionId}
+                key={`action-${index}`}
                 style={{ paddingBottom: '0.75rem', borderBottom: '1px solid var(--color-border)' }}
               >
                 <p style={{ fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.375rem' }}>
-                  {entry.actionId}
+                  {explanationEntryTitle(entry.because, `Suggested step ${index + 1}`)}
                 </p>
                 <FactorsList factors={entry.because} />
               </div>

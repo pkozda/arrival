@@ -1,0 +1,45 @@
+'use client';
+
+import Link from 'next/link';
+import type { ModuleSuggestion } from '@/lib/situation-utils';
+
+type Props = {
+  suggestions: ModuleSuggestion[];
+};
+
+export function SuggestedModulesSection({ suggestions }: Props) {
+  if (suggestions.length === 0) {
+    return null;
+  }
+
+  return (
+    <section style={{ marginBottom: '1rem' }}>
+      <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+        Suggested for you
+      </h2>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: '1rem',
+        }}
+      >
+        {suggestions.map(({ module, reason }) => (
+          <Link
+            key={module.id}
+            href={`/modules/${module.id}`}
+            className="card"
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <h3 style={{ fontSize: '1.0625rem', fontWeight: 600, marginBottom: '0.375rem' }}>
+              {module.title}
+            </h3>
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+              {reason}
+            </p>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}

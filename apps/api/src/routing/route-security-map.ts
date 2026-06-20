@@ -147,6 +147,18 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
   },
   {
     method: 'GET',
+    path: '/api/user-context',
+    tier: 'credential-required',
+    description: 'UI-safe profile projection (UserContextV1)',
+  },
+  {
+    method: 'POST',
+    path: '/api/mutations',
+    tier: 'credential-required',
+    description: 'Commit typed profile mutation request',
+  },
+  {
+    method: 'GET',
     path: '/api/ui-snapshot',
     tier: 'credential-required',
     description: 'UI snapshot projection',

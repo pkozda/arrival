@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { ProfilePrefillBanner } from '@/components/ProfilePrefillBanner';
 import { ModuleLayout } from '@/components/ModuleLayout';
 import { ModuleExecutionPanel } from '@/components/ModuleExecutionPanel';
 import { ResultPanel } from '@/components/ResultPanel';
@@ -10,10 +11,12 @@ import { executeModule, fetchModuleSchema } from '@/lib/api';
 import {
   deriveDefaultValues,
   extractSchemaFields,
-  mergeProfileIntoDefaults,
   type PublicModuleContract,
 } from '@/lib/product-contract';
-import { buildInputFromFormData } from '@/lib/schema-form-utils';
+import { mergeUserProfileIntoDefaults } from '@/lib/mutations';
+import { selectUserContextProfile } from '@/lib/user-context';
+import { buildInputFromFormData, stableFormDefaultsKey } from '@/lib/schema-form-utils';
+import { profilePrefillApplied } from '@/lib/situation-utils';
 import { useModuleSnapshot } from '@/lib/snapshot';
 import { useExplainExecutionId } from '@/lib/useModuleExplanation';
 
@@ -23,14 +26,21 @@ type Props = {
 };
 
 export function ContractModulePage({ moduleId, contract }: Props) {
-  const { sessionId, language, t, refreshUiSnapshot, uiSnapshot } = useApp();
+  const { sessionId, language, t, refreshSessionState, userContext } = useApp();
+  const userProfile = selectUserContextProfile(userContext);
   const uiState = useModuleSnapshot(moduleId);
   const { executionId, registerExecution } = useExplainExecutionId(uiState.executionId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
   const [schemaError, setSchemaError] = useState<string>();
   const [fields, setFields] = useState<ReturnType<typeof extractSchemaFields>>([]);
+  const [schemaDefaults, setSchemaDefaults] = useState<Record<string, unknown>>({});
   const [defaults, setDefaults] = useState<Record<string, unknown>>({});
+
+  const showProfilePrefillBanner = useMemo(
+    () => profilePrefillApplied(schemaDefaults, defaults),
+    [schemaDefaults, defaults]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -41,9 +51,13 @@ export function ContractModulePage({ moduleId, contract }: Props) {
           return;
         }
 
-        const schemaDefaults = deriveDefaultValues(schema.inputSchema);
-        const mergedDefaults = mergeProfileIntoDefaults(schemaDefaults, uiSnapshot?.profile ?? null);
+        const nextSchemaDefaults = deriveDefaultValues(schema.inputSchema);
+        const mergedDefaults = mergeUserProfileIntoDefaults(
+          nextSchemaDefaults,
+          userProfile
+        );
         setFields(extractSchemaFields(schema.inputSchema));
+        setSchemaDefaults(nextSchemaDefaults);
         setDefaults(mergedDefaults);
         setSchemaError(undefined);
       })
@@ -51,16 +65,16 @@ export function ContractModulePage({ moduleId, contract }: Props) {
         if (cancelled) {
           return;
         }
-        setSchemaError(fetchError instanceof Error ? fetchError.message : 'Unable to load module schema');
+        setSchemaError(fetchError instanceof Error ? fetchError.message : 'Unable to load this tool');
       });
 
     return () => {
       cancelled = true;
     };
-  }, [moduleId, uiSnapshot?.profile]);
+  }, [moduleId, userProfile]);
 
   const formKey = useMemo(
-    () => `${moduleId}-${uiState.snapshotVersion}-${JSON.stringify(defaults)}`,
+    () => `${moduleId}-${uiState.snapshotVersion}-${stableFormDefaultsKey(defaults)}`,
     [moduleId, uiState.snapshotVersion, defaults]
   );
 
@@ -83,7 +97,7 @@ export function ContractModulePage({ moduleId, contract }: Props) {
         setError(response.projection.error?.message ?? t('common.error'));
       } else {
         registerExecution(response.meta?.executionId);
-        await refreshUiSnapshot();
+        await refreshSessionState();
       }
     } catch {
       setError(t('common.error'));
@@ -98,7 +112,9 @@ export function ContractModulePage({ moduleId, contract }: Props) {
         {schemaError ? (
           <div className="card" style={{ color: 'var(--color-danger)' }}>{schemaError}</div>
         ) : (
-          <SchemaForm
+          <>
+            <ProfilePrefillBanner visible={showProfilePrefillBanner} />
+            <SchemaForm
             key={formKey}
             fields={fields}
             defaults={defaults}
@@ -106,6 +122,7 @@ export function ContractModulePage({ moduleId, contract }: Props) {
             submitLabel={loading ? t('common.loading') : t('common.submit')}
             onSubmit={handleSubmit}
           />
+          </>
         )}
 
         <ResultPanel loading={loading || uiState.isStale} error={error}>

@@ -63,6 +63,9 @@ describe('GET /api/ui-snapshot', () => {
     });
 
     expect(res.statusCode).toBe(200);
+    expect(res.headers['x-snapshot-layer']).toBe('execution-ui-transport');
+    expect(res.headers['x-user-context-authority']).toBe('derived-non-authoritative');
+    expect(res.headers['x-read-model']).toBe('UiSnapshot');
     const snapshot = res.json() as UiSnapshot;
 
     expect(snapshot.session).toEqual({
@@ -70,7 +73,8 @@ describe('GET /api/ui-snapshot', () => {
       language: 'de',
       uiPreferences: { theme: 'light' },
     });
-    expect(snapshot.profile).toBeNull();
+    expect(snapshot).not.toHaveProperty('profile');
+    expect(snapshot.userContext.profile).toBeNull();
     expect(snapshot.executions).toEqual([]);
     expect(snapshot.executionsByModuleId).toEqual({});
     expect(snapshot.schemaVersion).toBe(1);
@@ -94,7 +98,7 @@ describe('GET /api/ui-snapshot', () => {
     );
   });
 
-  it('includes profile, executions, and projection snapshot after module execution', async () => {
+  it('includes userContext, executions, and projection snapshot after module execution', async () => {
     process.env.ATLAS_UX_ENABLED = 'true';
     const app = await buildApp();
 
@@ -139,8 +143,10 @@ describe('GET /api/ui-snapshot', () => {
     expect(res.statusCode).toBe(200);
     const snapshot = res.json() as UiSnapshot;
 
-    expect(snapshot.profile).not.toBeNull();
-    expect(snapshot.profile?.preferredLanguage).toBe('en');
+    expect(snapshot).not.toHaveProperty('profile');
+    expect(snapshot.userContext.profile).not.toBeNull();
+    expect(snapshot.userContext.profile?.preferences.preferredLanguage).toBe('en');
+    expect(snapshot.userContext.profile?.domains.income?.grossMonthlyIncome).toBe(2500);
     expect(snapshot.executions).toHaveLength(1);
     expect(snapshot.executions[0]?.moduleId).toBe('financial-reality');
     expect(snapshot.executions[0]?.executionId).toEqual(expect.any(String));
@@ -185,6 +191,8 @@ describe('GET /api/ui-snapshot', () => {
     });
 
     expect(res.statusCode).toBe(200);
+    expect(res.headers['x-snapshot-contract']).toBe('legacy-compatibility-only');
+    expect(res.headers['x-snapshot-layer']).toBe('execution-ui-transport');
     const snapshot = res.json() as {
       executions: Array<{ result: unknown; projection?: unknown }>;
       uxSnapshot: { actionCards: unknown[] };
@@ -401,7 +409,8 @@ describe('GET /api/ui-snapshot', () => {
     const afterRestart = afterRestartRes.json() as UiSnapshot;
 
     expect(afterRestart.session.sessionId).toBe(sessionId);
-    expect(afterRestart.profile).not.toBeNull();
+    expect(afterRestart).not.toHaveProperty('profile');
+    expect(afterRestart.userContext.profile).not.toBeNull();
     expect(afterRestart.executions).toHaveLength(1);
     expect(afterRestart.snapshotVersion).toBe(beforeRestart.snapshotVersion);
     expect(afterRestart.generatedAt).toBe(beforeRestart.generatedAt);

@@ -84,9 +84,14 @@ Reserved empty domains (`housing/`, `legal/`, `integrations/`) have stub indexes
 
 | Document | Path |
 |----------|------|
+| UX Contract v1 (Home · Modules · Profile) | [ux/ux-contract-v1.md](./ux/ux-contract-v1.md) |
+| UX Contract v2 (Mutation Semantics) | [ux/ux-contract-v2.md](./ux/ux-contract-v2.md) |
+| Profile UX design prompt | [identity/profile-ux-design-prompt.md](./identity/profile-ux-design-prompt.md) |
 | Profile UX discovery | [identity/profile-ux-discovery.md](./identity/profile-ux-discovery.md) |
 | Profile UX design spec | [identity/profile-ux-spec.md](./identity/profile-ux-spec.md) |
 | Profile System v1 roadmap | [identity/profile-system-v1-roadmap.md](./identity/profile-system-v1-roadmap.md) |
+| Profile Mutation Model v1 | [identity/profile-mutation-model-v1.md](./identity/profile-mutation-model-v1.md) |
+| Profile mutation contract summary | [contracts/profile-mutation-contract-summary.md](./contracts/profile-mutation-contract-summary.md) |
 | User Profile Engine design | [identity/user-profile-engine-design.md](./identity/user-profile-engine-design.md) |
 
 ### Benefits & finance

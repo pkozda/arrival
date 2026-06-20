@@ -15,7 +15,7 @@ function LoadingState() {
 function ErrorState({ message }: { message: string }) {
   return (
     <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
-      <p style={{ color: 'var(--color-danger)', marginBottom: '0.5rem' }}>Unable to load dashboard</p>
+      <p style={{ color: 'var(--color-danger)', marginBottom: '0.5rem' }}>Unable to load home</p>
       <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>{message}</p>
     </div>
   );
