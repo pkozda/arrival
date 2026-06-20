@@ -2,9 +2,13 @@
 
 import Link from 'next/link';
 import { useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useApp } from '@/components/AppProvider';
 import { DomainStatusBadge } from '@/components/profile/DomainStatusBadge';
+import { ProfileCorrectionToast } from '@/components/profile/ProfileCorrectionToast';
+import { ProfileEditCTA } from '@/components/profile/ProfileEditCTA';
 import { findProfileMirrorDomain, resolveDomainCtaTitle } from '@/lib/profile-mirror-utils';
+import { isProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
 import { selectUserContextProfile } from '@/lib/user-context';
 
 type Props = {
@@ -12,12 +16,16 @@ type Props = {
 };
 
 export function ProfileDomainDetail({ domainSlug }: Props) {
+  const searchParams = useSearchParams();
   const { uiSnapshot, userContext, modules } = useApp();
   const profile = selectUserContextProfile(userContext);
+  const showUpdatedToast = searchParams.get('updated') === '1';
 
   const domain = useMemo(
     () =>
-      uiSnapshot ? findProfileMirrorDomain(uiSnapshot, modules, domainSlug, profile) : undefined,
+      uiSnapshot && isProfileMirrorDomainSlug(domainSlug)
+        ? findProfileMirrorDomain(uiSnapshot, modules, domainSlug, profile)
+        : undefined,
     [uiSnapshot, modules, domainSlug, profile]
   );
 
@@ -34,9 +42,12 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
 
   const ctaTitle = resolveDomainCtaTitle(domain, modules);
   const hasData = domain.fields.length > 0;
+  const editSlug = isProfileMirrorDomainSlug(domainSlug) ? domainSlug : domain.slug;
 
   return (
     <>
+      {showUpdatedToast && <ProfileCorrectionToast />}
+
       <header style={{ marginBottom: '1.5rem' }}>
         <p style={{ marginBottom: '0.75rem' }}>
           <Link href="/profile" style={{ fontSize: '0.875rem', color: 'var(--color-accent)' }}>
@@ -108,6 +119,10 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
             )}
           </>
         )}
+
+        <div style={{ marginTop: '1rem' }}>
+          <ProfileEditCTA domainSlug={editSlug} />
+        </div>
       </div>
 
       <section className="card">

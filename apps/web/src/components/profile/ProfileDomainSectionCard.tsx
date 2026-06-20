@@ -5,6 +5,7 @@ import type { ProfileMirrorDomain } from '@/lib/profile-mirror-utils';
 import { resolveDomainCtaTitle } from '@/lib/profile-mirror-utils';
 import type { PublicModuleContract } from '@/lib/product-contract';
 import { DomainStatusBadge } from '@/components/profile/DomainStatusBadge';
+import { ProfileEditCTA } from '@/components/profile/ProfileEditCTA';
 
 type Props = {
   domain: ProfileMirrorDomain;
@@ -58,17 +59,18 @@ export function ProfileDomainSectionCard({ domain, modules, detailHref }: Props)
             </p>
           )}
           {detailHref && (
-            <Link
-              href={detailHref}
-              style={{
-                display: 'inline-block',
-                marginTop: '0.5rem',
-                fontSize: '0.875rem',
-                color: 'var(--color-accent)',
-              }}
-            >
-              View details →
-            </Link>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+              <Link
+                href={detailHref}
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--color-accent)',
+                }}
+              >
+                View details →
+              </Link>
+              <ProfileEditCTA domainSlug={domain.slug} variant="link" label="Correct information →" />
+            </div>
           )}
         </>
       ) : (
@@ -93,6 +95,9 @@ export function ProfileDomainSectionCard({ domain, modules, detailHref }: Props)
               Open {ctaTitle}
             </Link>
           )}
+          <div style={{ marginTop: '0.75rem' }}>
+            <ProfileEditCTA domainSlug={domain.slug} variant="link" label="Correct information →" />
+          </div>
         </>
       )}
     </article>

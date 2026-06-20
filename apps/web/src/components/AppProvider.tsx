@@ -60,7 +60,8 @@ interface AppState {
   refreshUserContext: () => Promise<void>;
   refreshUiSnapshot: () => Promise<void>;
   refreshSessionState: () => Promise<void>;
-  submitMutation: (request: MutationRequest) => Promise<UserContextV1>;
+  submitMutation: (request: MutationRequest) => Promise<{ userContext: UserContextV1; revision: number }>;
+  profileHeadRevision: number;
   changeLanguage: (lang: SupportedLanguage) => Promise<void>;
   changeTheme: (theme: ThemePreference) => Promise<void>;
   toggleTheme: () => Promise<void>;
@@ -99,6 +100,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [uiSnapshotLoading, setUiSnapshotLoading] = useState(true);
   const [uiSnapshotError, setUiSnapshotError] = useState<string | null>(null);
   const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [profileHeadRevision, setProfileHeadRevision] = useState(0);
 
   const lastAppliedSnapshotVersionRef = useRef(-1);
   const snapshotFetchGenerationRef = useRef(0);
@@ -278,14 +280,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   const submitMutation = useCallback(
-    async (request: MutationRequest): Promise<UserContextV1> => {
+    async (request: MutationRequest): Promise<{ userContext: UserContextV1; revision: number }> => {
       if (!sessionId) {
         throw new Error('Session is not ready');
       }
 
-      const nextContext = await submitMutationRequest(request, sessionId);
-      setUserContext(nextContext);
-      return nextContext;
+      const result = await submitMutationRequest(request, sessionId);
+      setUserContext(result.userContext);
+      setProfileHeadRevision(result.revision);
+      return result;
     },
     [sessionId]
   );
@@ -341,6 +344,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         refreshUiSnapshot,
         refreshSessionState,
         submitMutation,
+        profileHeadRevision,
         changeLanguage,
         changeTheme,
         toggleTheme,
