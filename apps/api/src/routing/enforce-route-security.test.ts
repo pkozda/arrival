@@ -68,6 +68,7 @@ describe('RouteSecurityMap', () => {
       ['POST', '/api/modules/financial-reality/execute'],
       ['POST', '/api/mutations'],
       ['GET', '/api/user-context'],
+      ['GET', '/api/profile-insights'],
       ['GET', '/api/ui-snapshot'],
       ['POST', '/api/profile'],
       ['GET', '/api/profile'],

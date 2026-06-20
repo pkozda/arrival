@@ -4,16 +4,19 @@ import Link from 'next/link';
 import type { ProfileMirrorDomain } from '@/lib/profile-mirror-utils';
 import { resolveDomainCtaTitle } from '@/lib/profile-mirror-utils';
 import type { PublicModuleContract } from '@/lib/product-contract';
+import type { DomainInsight } from '@/lib/product-contract';
 import { DomainStatusBadge } from '@/components/profile/DomainStatusBadge';
+import { ConfidenceBadge } from '@/components/profile/ConfidenceBadge';
 import { ProfileEditCTA } from '@/components/profile/ProfileEditCTA';
 
 type Props = {
   domain: ProfileMirrorDomain;
   modules: PublicModuleContract[];
   detailHref?: string;
+  domainInsight?: DomainInsight;
 };
 
-export function ProfileDomainSectionCard({ domain, modules, detailHref }: Props) {
+export function ProfileDomainSectionCard({ domain, modules, detailHref, domainInsight }: Props) {
   const ctaTitle = resolveDomainCtaTitle(domain, modules);
   const hasData = domain.fields.length > 0;
 
@@ -43,7 +46,10 @@ export function ProfileDomainSectionCard({ domain, modules, detailHref }: Props)
         ) : (
           <h3 style={{ fontSize: '1rem', fontWeight: 600, margin: 0 }}>{domain.title}</h3>
         )}
-        <DomainStatusBadge status={domain.status} />
+        <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          {domainInsight && <ConfidenceBadge level={domainInsight.confidence.level} compact />}
+          <DomainStatusBadge status={domain.status} />
+        </div>
       </div>
 
       {hasData ? (

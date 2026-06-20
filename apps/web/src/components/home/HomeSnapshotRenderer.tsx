@@ -12,6 +12,7 @@ import {
 } from '@/components/home/OnboardingChecklistCard';
 import { SuggestedModulesSection } from '@/components/home/SuggestedModulesSection';
 import { YourSituationSummaryCard } from '@/components/home/YourSituationSummaryCard';
+import { MissingContextHintsCard } from '@/components/home/MissingContextHintsCard';
 import {
   buildModuleContractLookup,
   capabilityVisibilityFromContract,
@@ -131,7 +132,7 @@ function mergePriorityActions(
 
 export function HomeSnapshotRenderer({ snapshot }: Props) {
   const { executions, session } = snapshot;
-  const { modules, userContext } = useApp();
+  const { modules, userContext, profileInsights } = useApp();
   const profile = selectUserContextProfile(userContext);
   const [onboardingDismissed, dismissOnboarding] = useOnboardingDismissed();
 
@@ -168,6 +169,8 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
       )}
 
       <YourSituationSummaryCard summary={situationSummary} />
+
+      <MissingContextHintsCard insights={profileInsights} />
 
       <SuggestedModulesSection suggestions={moduleSuggestions} />
 

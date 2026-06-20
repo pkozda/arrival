@@ -2,9 +2,10 @@
 
 type Props = {
   visible: boolean;
+  message?: string;
 };
 
-export function ProfilePrefillBanner({ visible }: Props) {
+export function ProfilePrefillBanner({ visible, message = 'Using information from your situation' }: Props) {
   if (!visible) {
     return null;
   }
@@ -19,9 +20,7 @@ export function ProfilePrefillBanner({ visible }: Props) {
         borderColor: 'var(--color-accent)',
       }}
     >
-      <p style={{ fontSize: '0.875rem', margin: 0, lineHeight: 1.5 }}>
-        Using information from your situation
-      </p>
+      <p style={{ fontSize: '0.875rem', margin: 0, lineHeight: 1.5 }}>{message}</p>
     </div>
   );
 }

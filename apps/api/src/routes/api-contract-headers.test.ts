@@ -3,6 +3,7 @@ import {
   applyUiSnapshotTransportHeaders,
   applyUserContextAuthorityHeaders,
   LEGACY_SNAPSHOT_CONTRACT_HEADERS,
+  PROFILE_INSIGHTS_AUTHORITY_HEADERS,
   UI_SNAPSHOT_TRANSPORT_HEADERS,
   USER_CONTEXT_AUTHORITY_HEADERS,
 } from './api-contract-headers.js';
@@ -21,6 +22,13 @@ describe('api contract headers (P1 lock)', () => {
 
   it('marks legacy snapshot contract as compatibility-only', () => {
     expect(LEGACY_SNAPSHOT_CONTRACT_HEADERS['x-snapshot-contract']).toBe('legacy-compatibility-only');
+  });
+
+  it('defines profile insights derived headers', () => {
+    expect(PROFILE_INSIGHTS_AUTHORITY_HEADERS['x-profile-insights-authority']).toBe(
+      'derived-non-authoritative'
+    );
+    expect(PROFILE_INSIGHTS_AUTHORITY_HEADERS['x-read-model']).toBe('ProfileInsightViewV1');
   });
 
   it('apply helpers set reply headers', () => {

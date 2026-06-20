@@ -159,6 +159,12 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
   },
   {
     method: 'GET',
+    path: '/api/profile-insights',
+    tier: 'credential-required',
+    description: 'Derived profile interpretation (ProfileInsightViewV1)',
+  },
+  {
+    method: 'GET',
     path: '/api/ui-snapshot',
     tier: 'credential-required',
     description: 'UI snapshot projection',

@@ -3,7 +3,6 @@ import { getLegacyDomainResult } from '@arrival-atlas/module-runtime';
 import type { ProfileDocument } from '@arrival-atlas/profile';
 import type {
   SnapshotUserContextTransport,
-  UserContextV1,
 } from '@arrival-atlas/product-contract';
 import { buildUXActionPlan, type UXSource } from '@arrival-atlas/ux';
 import {

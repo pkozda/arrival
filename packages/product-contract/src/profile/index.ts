@@ -162,6 +162,29 @@ export {
 } from './user-profile-view.js';
 
 export {
+  PROFILE_INSIGHT_VIEW_SCHEMA_VERSION,
+  ProfileInsightViewSchemaVersionSchema,
+  ConfidenceLevelSchema,
+  DomainConfidenceSchema,
+  ProfileMirrorDomainSlugSchema,
+  AdvisorySuggestionActionSchema,
+  AdvisorySuggestionSchema,
+  MissingContextHintSchema,
+  DomainInsightSchema,
+  ProfileInsightViewV1Schema,
+  parseProfileInsightViewV1,
+  safeParseProfileInsightViewV1,
+  type ConfidenceLevel,
+  type DomainConfidence,
+  type ProfileMirrorDomainSlug,
+  type AdvisorySuggestionAction,
+  type AdvisorySuggestion,
+  type MissingContextHint,
+  type DomainInsight,
+  type ProfileInsightViewV1,
+} from './profile-insight-view.js';
+
+export {
   validatePersistentPayloadFields,
   extractDomainFactFieldKeys,
   assertPersistentFactFieldId,

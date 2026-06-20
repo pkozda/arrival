@@ -509,6 +509,8 @@ Read-only mirror was delivered in **P1 web track**, not Profile System v1 P2.
 
 Surfaces propose; the Mutation Layer disposes.
 
+**Next track:** [Profile System P4 — Adaptive Profile Intelligence Layer (UX-P4)](./profile-system-p4-roadmap.md)
+
 ---
 
 ## 15. References
@@ -519,6 +521,7 @@ Surfaces propose; the Mutation Layer disposes.
 | [profile-mutation-model-v1.md](./profile-mutation-model-v1.md) | Event log, reducer, source authorization |
 | [profile-ux-spec.md](./profile-ux-spec.md) §6.4 | Section-scoped edit UX |
 | [profile-system-v1-roadmap.md](./profile-system-v1-roadmap.md) | P1 complete; P2/P3/P4/P5 tracks |
+| [profile-system-p4-roadmap.md](./profile-system-p4-roadmap.md) | Read-side intelligence (UX-P4) |
 | [contracts/profile-mutation-contract-summary.md](../contracts/profile-mutation-contract-summary.md) | Type catalog |
 
 ---

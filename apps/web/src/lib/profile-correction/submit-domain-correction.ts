@@ -1,6 +1,6 @@
 import type { MutationRequest, UserContextV1 } from '@/lib/product-contract';
 import type { MutationSubmitResult } from '@/lib/mutations';
-import { isRevisionConflictError, parseRevisionConflictCurrentHead } from './revision-conflict.js';
+import { isRevisionConflictError, parseRevisionConflictCurrentHead } from './revision-conflict';
 
 export type SubmitDomainCorrectionOptions = {
   requests: MutationRequest[];
