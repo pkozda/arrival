@@ -64,7 +64,7 @@ describe('submitMutation', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    const context = await submitMutation(request, 'sess_1');
+    const result = await submitMutation(request, 'sess_1');
 
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:3001/api/mutations',
@@ -73,7 +73,8 @@ describe('submitMutation', () => {
         body: JSON.stringify(request),
       })
     );
-    expect(context.profile?.preferences.preferredLanguage).toBe('de');
+    expect(result.userContext.profile?.preferences.preferredLanguage).toBe('de');
+    expect(result.revision).toBe(2);
   });
 
   it('requires requestId for idempotency', async () => {

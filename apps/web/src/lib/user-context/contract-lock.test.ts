@@ -105,6 +105,7 @@ describe('P1 contract lock (web boundary enforcement)', () => {
       join(webSrcRoot, 'components/home/HomeSnapshotRenderer.tsx'),
       join(webSrcRoot, 'components/profile/ProfileMirrorOverview.tsx'),
       join(webSrcRoot, 'components/profile/ProfileDomainDetail.tsx'),
+      join(webSrcRoot, 'components/profile/DomainMutationEditor.tsx'),
       join(webSrcRoot, 'components/ContractModulePage.tsx'),
       join(webSrcRoot, 'lib/snapshot/useSnapshotReconstruction.ts'),
     ];

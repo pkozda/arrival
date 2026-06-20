@@ -18,7 +18,25 @@ export type MutationSubmitError = {
   success: false;
   code: string;
   error: string;
+  issues?: Array<{ code: string; message: string; fieldId?: string }>;
 };
+
+export type MutationSubmitResult = {
+  userContext: UserContextV1;
+  revision: number;
+};
+
+export class MutationClientError extends Error {
+  readonly code: string;
+  readonly issues?: MutationSubmitError['issues'];
+
+  constructor(message: string, code: string, issues?: MutationSubmitError['issues']) {
+    super(message);
+    this.name = 'MutationClientError';
+    this.code = code;
+    this.issues = issues;
+  }
+}
 
 export async function fetchUserContext(sessionId?: string): Promise<UserContextV1> {
   const res = await fetch(`${API_URL}/api/user-context`, {
@@ -37,7 +55,7 @@ export async function fetchUserContext(sessionId?: string): Promise<UserContextV
 export async function submitMutation(
   request: MutationRequest,
   sessionId?: string
-): Promise<UserContextV1> {
+): Promise<MutationSubmitResult> {
   if (!request.requestId || request.requestId.trim().length === 0) {
     throw new Error('MutationRequest.requestId is required for idempotency');
   }
@@ -55,8 +73,15 @@ export async function submitMutation(
 
   if (!res.ok || !('success' in body) || body.success !== true) {
     const errorBody = body as MutationSubmitError;
-    throw new Error(errorBody.error ?? `Mutation request failed (${res.status})`);
+    throw new MutationClientError(
+      errorBody.error ?? `Mutation request failed (${res.status})`,
+      errorBody.code ?? 'MUTATION_FAILED',
+      errorBody.issues
+    );
   }
 
-  return parseUserContextV1(body.userContext);
+  return {
+    userContext: parseUserContextV1(body.userContext),
+    revision: body.revision,
+  };
 }

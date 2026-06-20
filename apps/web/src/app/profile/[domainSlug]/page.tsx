@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { ProfileDomainDetail } from '@/components/profile/ProfileDomainDetail';
@@ -14,7 +15,7 @@ function LoadingState() {
   );
 }
 
-export default function ProfileDomainPage() {
+function ProfileDomainDetailPageContent() {
   const params = useParams<{ domainSlug: string }>();
   const domainSlug = params.domainSlug;
   const { uiSnapshotLoading } = useApp();
@@ -23,11 +24,21 @@ export default function ProfileDomainPage() {
 
   return (
     <>
+      {uiSnapshotLoading && <LoadingState />}
+      {!uiSnapshotLoading && <ProfileDomainDetail domainSlug={validSlug || domainSlug} />}
+    </>
+  );
+}
+
+export default function ProfileDomainPage() {
+  return (
+    <>
       <Header />
       <main style={{ padding: '2rem 0 4rem' }}>
         <div className="container" style={{ maxWidth: '720px' }}>
-          {uiSnapshotLoading && <LoadingState />}
-          {!uiSnapshotLoading && <ProfileDomainDetail domainSlug={validSlug || domainSlug} />}
+          <Suspense fallback={<LoadingState />}>
+            <ProfileDomainDetailPageContent />
+          </Suspense>
         </div>
       </main>
     </>

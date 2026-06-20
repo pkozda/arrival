@@ -518,6 +518,8 @@ UiSnapshot (execution-only: FTU, executions, actionCards, session)
 - `ProfileState === reduce(events)` parity tests pass against materialized document
 - All existing tests green; new mutation contract tests
 
+**Next track:** [Profile System P3 — Profile Edit & Correction Layer (UX-P3)](./profile-system-p3-roadmap.md)
+
 ---
 
 ### Phase P2 — Snapshot & Form Integration

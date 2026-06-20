@@ -1,5 +1,5 @@
-export { fetchUserContext, submitMutation } from './client';
-export type { MutationSubmitError, MutationSubmitResponse } from './client';
+export { fetchUserContext, submitMutation, MutationClientError } from './client';
+export type { MutationSubmitError, MutationSubmitResponse, MutationSubmitResult } from './client';
 export {
   buildHeaderLanguageMutation,
   buildHeaderThemeMutation,
