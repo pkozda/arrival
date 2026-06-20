@@ -13,6 +13,7 @@ import {
 import { SuggestedModulesSection } from '@/components/home/SuggestedModulesSection';
 import { YourSituationSummaryCard } from '@/components/home/YourSituationSummaryCard';
 import { MissingContextHintsCard } from '@/components/home/MissingContextHintsCard';
+import { NextStepsCard } from '@/components/home/NextStepsCard';
 import {
   buildModuleContractLookup,
   capabilityVisibilityFromContract,
@@ -27,6 +28,8 @@ import {
   shouldShowOnboardingChecklist,
   suggestModules,
 } from '@/lib/situation-utils';
+import { buildHomePlanViewModelV2 } from '@/lib/life-event-plan';
+import { resolveScenario } from '@/lib/life-event/scenarios';
 import { humanizePriority } from '@/lib/ux-labels';
 import { useApp } from '@/components/AppProvider';
 import { selectUserContextProfile } from '@/lib/user-context';
@@ -132,7 +135,7 @@ function mergePriorityActions(
 
 export function HomeSnapshotRenderer({ snapshot }: Props) {
   const { executions, session } = snapshot;
-  const { modules, userContext, profileInsights } = useApp();
+  const { modules, userContext, profileInsights, lifeEventPlan, lifeEventPlanLoading, lifeEventPlanError } = useApp();
   const profile = selectUserContextProfile(userContext);
   const [onboardingDismissed, dismissOnboarding] = useOnboardingDismissed();
 
@@ -152,6 +155,27 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
     [snapshot, modules, profile]
   );
 
+  const homePlanView = useMemo(
+    () =>
+      buildHomePlanViewModelV2({
+        plan: lifeEventPlan,
+        insights: profileInsights,
+        moduleSuggestions,
+      }),
+    [lifeEventPlan, profileInsights, moduleSuggestions]
+  );
+
+  const scenarioMatch = useMemo(() => {
+    if (!lifeEventPlan || !userContext) {
+      return null;
+    }
+
+    return resolveScenario({
+      userContext,
+      currentPlan: lifeEventPlan,
+    });
+  }, [lifeEventPlan, userContext]);
+
   const showOnboarding = shouldShowOnboardingChecklist(snapshot, profile, onboardingDismissed);
   const showActionsSection = modules.some((module) => module.capabilities.supports.actions);
 
@@ -170,9 +194,24 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
 
       <YourSituationSummaryCard summary={situationSummary} />
 
-      <MissingContextHintsCard insights={profileInsights} />
+      {homePlanView.p4.showCard && (
+        <MissingContextHintsCard
+          completenessSummary={homePlanView.p4.completenessSummary}
+          hints={homePlanView.p4.hints}
+        />
+      )}
 
-      <SuggestedModulesSection suggestions={moduleSuggestions} />
+      <NextStepsCard
+        plan={lifeEventPlan}
+        loading={lifeEventPlanLoading}
+        error={lifeEventPlanError}
+        executionSurface={homePlanView.nextSteps.executionSurface}
+        scenario={scenarioMatch}
+      />
+
+      {homePlanView.suggestedModules.showSection && (
+        <SuggestedModulesSection suggestions={homePlanView.suggestedModules.items} />
+      )}
 
       <PriorityActionsSection items={priorityActions} />
 

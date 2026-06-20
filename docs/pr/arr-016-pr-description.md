@@ -1,12 +1,18 @@
-# UX-P4: Adaptive Profile Intelligence Layer — read-side interpretation
+# arr-016 — UX-P4 Profile Intelligence + Life Event v2 v1.0 Architecture Freeze
+
+**Branch:** `arr-016`  
+**Tracks:** UX-P4 (Profile Intelligence) · Life Event Module v2 (LE-1 → LE-8) · v1.0 architecture freeze
+
+---
+
+# Part 1 — UX-P4: Adaptive Profile Intelligence Layer
 
 Implements **UX-P4 (Profile Intelligence P4)** — a deterministic, read-only interpretation layer on top of `UserContextV1`. Profile becomes **transparent**: the system can explain what it knows, how confidently, and what might be missing — without new facts, writes, or a second profile model.
 
-**Branch:** `arr-016`  
 **Depends on:** P1 mutation pipeline (`UserContextV1`, contract lock) · UX-P3 correction UI (`fact.correct` via `profile_ui`)  
 **Roadmap:** [profile-system-p4-roadmap.md](../identity/profile-system-p4-roadmap.md)
 
-## Summary
+## Summary (P4)
 
 P4 adds a separate read path for interpretation metadata. Situation **facts** still flow through `GET /api/user-context`; **insights** flow through `GET /api/profile-insights`. The web never sees raw mutation events.
 
@@ -27,7 +33,7 @@ GET /api/profile-insights  (derived-non-authoritative)
         └── Module prefill — confidence-aware banner copy
 ```
 
-## What was done
+## What was done (P4)
 
 ### Profile Intelligence engine (`packages/profile-intelligence/`)
 
@@ -41,161 +47,145 @@ New package `@arrival-atlas/profile-intelligence` — read-only, no mutation com
 | `missing-context.ts` | Actionable gap hints with stable priority ordering (cap ≤ 3) |
 | `types.ts` | Mirror section definitions, execution metadata shapes |
 
-**Confidence rules (v1, all testable):**
+### Product contract · API · Web
 
-| Level | Signals (examples) |
-|-------|-------------------|
-| **high** | Data present + multiple module sources, or Profile correction cross-checked by module |
-| **medium** | Single module source or lone `fact.correct` from Profile |
-| **low** | Partial data, stale (90-day window), or conflicting field writers |
-| **none** | Section empty |
+See [profile-system-p4-roadmap.md](../identity/profile-system-p4-roadmap.md) for full P4 file list and test counts.
 
-### Product contract (`packages/product-contract/`)
+## P4 architecture compliance
 
-New types in `profile/profile-insight-view.ts`:
+- ✅ Situation facts via `selectUserContextProfile(userContext)` only
+- ✅ Writes via `submitMutation()` only
+- ✅ `MutationEvent[]` stays server-side
+- ✅ P4 suggestions are advisory — no auto-write
 
-| Type | Role |
-|------|------|
-| `ProfileInsightViewV1` | Top-level interpretation projection |
-| `DomainInsight` | Per mirror section: confidence, provenance, suggestions |
-| `DomainConfidence` | Level + human-readable reasons |
-| `MissingContextHint` | Gap message + CTA (`correct_in_profile` / `open_module`) |
-| `AdvisorySuggestion` | Non-authoritative advisory links |
+---
 
-Explicitly **not** authoritative for situation facts — same non-authority pattern as `SnapshotUserContextTransport`.
+# Part 2 — Life Event Module v2 v1.0 Architecture Freeze
 
-### API (`apps/api/`)
+Implements **Life Event Module v2** (LE-1 → LE-8): deterministic planning core, optional overlay layers, ADRs, and v1.0 architecture freeze documentation.
+
+**Freeze spec:** [life-event-module-v2-v1.0-architecture-freeze.md](../life-events/life-event-module-v2-v1.0-architecture-freeze.md)  
+**Roadmap:** [life-event-module-v2-roadmap.md](../life-events/life-event-module-v2-roadmap.md)
+
+## Summary (Life Event)
+
+Life Event Module v2 turns `life-event` from static scenario tables into a **profile-aware planning engine** with a strict linear pipeline. v1.0 **freezes the core at LE-5**; LE-6–LE-8 are optional, removable overlays.
+
+```text
+UserContextV1 → LifeEventPlanV1 → API → UI → ActionSurfaceV1 → ExecutionSurfaceV1 (AEAL)
+     LE-1           LE-1/2         LE-2   LE-3      LE-4              LE-5  ← FROZEN CORE
+
+Optional overlays (non-authoritative):
+  LE-6  Presentation Dedup (active on Home)
+  LE-7  Scenario Overlay (active banner on Home)
+  LE-8  Runtime MRC (library-only, not wired)
+```
+
+P4 insights feed LE-1 at the API boundary (`buildProfileInsightsFromState` → `buildLifeEventPlan`). LE-6 deduplicates P4 hints against plan on Home.
+
+## What was done (Life Event)
+
+### LE-1 — Planner (`packages/modules/src/life-event/plan/`)
 
 | Piece | Role |
 |-------|------|
-| `GET /api/profile-insights` | Returns `ProfileInsightViewV1` for session |
-| `state/profile-insights-projection.ts` | Wires `UserContextV1` + events + execution metadata into engine |
-| `routes/api-contract-headers.ts` | `x-profile-insights-authority: derived-non-authoritative` |
-| `routing/route-security-map.ts` | Secured route registration |
+| `buildLifeEventPlan()` | Deterministic plan from `UserContextV1` |
+| `classifyLifeState()` | 7 life states (F01–F24 fixtures) |
+| `GRAPH_CATALOG_V1` | G1–G7 graph catalog |
+| `LifeEventPlanV1` | Product contract |
 
-**Server-side inputs (never exposed to web):**
+### LE-2 — API (`apps/api/`)
 
-- `MutationEvent[]` from `SystemState.profileMutationEvents`
-- Module execution history from `SystemState.executionsByModuleId`
+| Piece | Role |
+|-------|------|
+| `GET /api/modules/life-event/plan` | Plan read endpoint |
+| `buildLifeEventPlanFromState()` | P4 insights at API boundary |
+| `life-event-plan.api.test.ts` | 28 fixture parity tests |
 
-Response **must not** include raw events — enforced by API test.
+### LE-3 — UI (`apps/web/`)
 
-### Web client & UI (`apps/web/`)
+| Piece | Role |
+|-------|------|
+| `fetchLifeEventPlan()` | API client — no planner in web |
+| `NextStepsCard` | Home "Your next steps in Germany" |
+| `LifeEventPlanView` | `/modules/life-event` plan page |
+| `LifeEventScenarioExplorer` | Legacy `execute()` below plan |
 
-| Area | Change |
-|------|--------|
-| `lib/profile-insights/client.ts` | `fetchProfileInsights()` — sole web read path |
-| `lib/profile-insights/selectors.ts` | Completeness summary, prefill confidence copy, mirror lookup |
-| `AppProvider` | Hydrates `profileInsights` alongside `userContext` (separate fetch) |
-| `DomainInsightBlock` | "What we know" section on domain detail — provenance + reasons + links |
-| `ConfidenceBadge` | Plain labels on overview cards and detail block |
-| `MissingContextHintsCard` | Home additive card — ≤ 3 hints + completeness summary |
-| `ProfilePrefillBanner` | Confidence-aware message via `resolvePrefillConfidenceMessage()` |
-| `ProfileDomainDetail` | Renders `DomainInsightBlock` below read-only facts |
-| `ProfileMirrorOverview` | Confidence badges on section cards |
-| `HomeSnapshotRenderer` | Renders `MissingContextHintsCard` |
+### LE-4 — ActionSurfaceV1 · LE-5 — ExecutionSurfaceV1 (AEAL)
 
-**Unchanged:** `DomainMutationEditor`, P3 save flow, `submitMutation()` write path.
+Planning-time buckets + identity-preserving execution metadata. 76 + 54 tests.
 
-### Documentation
+### LE-6 — Presentation Dedup
 
-- New roadmap: `docs/identity/profile-system-p4-roadmap.md` (UX-P4, tagged `arr-016`)
-- Link added to `docs/README.md` and `profile-system-v1-roadmap.md`
-- P3 roadmap cross-references P4 as follow-on track
+`mergeP4WithPlan`, `dedupeHomeSurfaces`, `buildHomePlanViewModelV2` — **active** on Home.
 
-## Architecture compliance (P1–P3 lock preserved)
+### LE-7 — Scenario Overlay
 
-- ✅ Situation facts via `selectUserContextProfile(userContext)` only — unchanged
-- ✅ Writes via `submitMutation()` only — insight layer never calls `/api/mutations`
-- ✅ No reads from `snapshot.userContext` for domain logic
-- ✅ `MutationEvent[]` stays server-side — web receives derived `ProfileInsightViewV1` only
-- ✅ `UiSnapshot` used only for module titles / FTU — not for confidence derivation
-- ✅ P4 suggestions are advisory links — no `MutationRequest`, no `fact.suggest` persistence
-- ✅ API authority headers distinguish the three read models:
+`resolveScenario()` — interpretive only. Optional banner on `NextStepsCard`. ADR-004.
 
-```text
-GET /api/user-context       → x-user-context-authority: authoritative
-GET /api/ui-snapshot        → x-snapshot-layer: execution-ui-transport
-GET /api/profile-insights   → x-profile-insights-authority: derived-non-authoritative
+### LE-8 — Runtime MRC
+
+`processModuleRuntimeEvent()` — **library-only**, **not wired**. ADR-005.
+
+### Architecture documentation
+
+| Document | Role |
+|----------|------|
+| ADR-001–005 | Layered architecture through runtime MRC |
+| `life-event-module-v2-v1.0-architecture-freeze.md` | **v1.0 freeze spec** |
+| `le-6-consistency-rules.md` | LE-6 invariants |
+| Roadmap + checklist realignment | LE-1–LE-8 aligned to code |
+
+## v1.0 freeze boundary
+
+| In scope (frozen) | Out of scope (v1.1+ backlog) |
+|-------------------|------------------------------|
+| LE-1 → LE-5 core pipeline | LE-2.5 execute `currentStatus` prefill |
+| LE-6 dedup (active) | Full `SuggestedModulesSection` removal |
+| LE-7 overlay (active banner) | Counterfactual `buildScenarioPlan` |
+| LE-8 library | LE-8 execution wiring |
+| 8 legacy `execute()` scenarios | `EVENT_HANDLERS` → `scenarios/` extract |
+
+## Test plan (full branch)
+
+### P4
+
+- [x] `@arrival-atlas/profile-intelligence` — determinism, missing-context, provenance, confidence
+- [x] `@arrival-atlas/api` — `profile-insights.api.test.ts`
+- [x] `@arrival-atlas/web` — `profile-insights-boundary.test.ts`
+
+### Life Event
+
+- [x] `packages/modules` — 45 classifier/plan tests (F01–F24)
+- [x] `apps/api` — 28 life-event-plan API tests
+- [x] `apps/web` — 213 life-event + life-event-plan tests
+- [x] Boundary tests: planner, scenario, runtime isolation
+
+```bash
+npm run test --workspace=@arrival-atlas/profile-intelligence
+npm run test --workspace=@arrival-atlas/modules -- --run src/life-event
+npm run test --workspace=apps/api -- --run life-event profile-insights
+npm run test --workspace=apps/web -- --run src/lib/life-event src/lib/life-event-plan src/lib/profile-insights
 ```
 
-## Data flow
+### Smoke (manual)
 
-```text
-AppProvider bootstrap / refreshSessionState()
-  → fetchUserContext()          (facts — authoritative)
-  → fetchProfileInsights()      (interpretation — derived)
-  → fetchUiSnapshot()           (execution transport)
+- [ ] Home: plan card + P4 hints deduped when plan covers same intent
+- [ ] `/modules/life-event`: plan view + legacy scenario execute
+- [ ] Profile: confidence badges + missing-context hints
+- [ ] Scenario banner on Home when `resolveScenario` matches
 
-/profile/[slug]
-  → read facts from userContext
-  → render DomainInsightBlock from profileInsights.domainInsights
+## Architecture invariants (Life Event v1.0)
 
-/profile
-  → section cards with ConfidenceBadge
+- Action identity = `node.id` through LE-5
+- `ExecutionSurfaceV1` decorates only — never reinterprets plan
+- LE-6 dedup does not mutate plan or surfaces
+- LE-7 cannot influence planner, execution, or dedup
+- LE-8 is post-execution only; library not wired
+- All overlays removable without affecting LE-1–LE-5
 
-/  (Home)
-  → MissingContextHintsCard (≤ 3 hints)
+## Related docs
 
-/modules/[id]
-  → ProfilePrefillBanner with confidence-aware copy
-  → prefill values still from userContext
-```
-
-## Key files
-
-```
-packages/profile-intelligence/src/**
-packages/product-contract/src/profile/profile-insight-view.ts
-apps/api/src/routes/profile-insights.ts
-apps/api/src/state/profile-insights-projection.ts
-apps/api/src/routes/api-contract-headers.ts
-apps/web/src/lib/profile-insights/**
-apps/web/src/components/profile/DomainInsightBlock.tsx
-apps/web/src/components/profile/ConfidenceBadge.tsx
-apps/web/src/components/home/MissingContextHintsCard.tsx
-apps/web/src/components/AppProvider.tsx
-docs/identity/profile-system-p4-roadmap.md
-```
-
-## Test plan
-
-- [x] `@arrival-atlas/profile-intelligence` — **4/4** (determinism, missing-context cap, provenance, confidence)
-- [x] `@arrival-atlas/api` — **193/193** (`profile-insights.api.test.ts` — shape, headers, no event leak)
-- [x] `@arrival-atlas/web` — **53/53** (`profile-insights-boundary.test.ts`, `mutation-boundary.test.ts` updated)
-- [ ] Smoke: `/profile/work-income` shows confidence badge + "What we know" block after module execute
-- [ ] Smoke: Profile correction updates provenance narrative ("You updated this…")
-- [ ] Smoke: Home shows ≤ 3 missing-context hints with working links
-- [ ] Smoke: Module prefill banner reflects global confidence level
-- [ ] Smoke: P3 edit/save flow unchanged — no regression
-- [ ] Verify `/api/profile-insights` authority headers in network tab
-
-## Out of scope (P4-C and follow-up)
-
-- Field-group insights, staleness detail, explanation graph (Phase P4-C)
-- `headRevision` on `GET /api/user-context`
-- ML / probabilistic scoring
-- Embedding insights on user-context response (separate endpoint preferred)
-- Auto-write or prefill mutations from hints
-- Backend reducer / mutation engine changes
-
-## Non-goals (confirmed)
-
-- ❌ No new mutation types or write paths
-- ❌ No second editable profile model
-- ❌ No raw event log in web UI
-- ❌ No schema keys or mutation terminology in user-facing copy
-- ❌ No Home situation writes or optimistic fact mutations
-
-## Definition of Done (UX-P4 Phase P4-A/B)
-
-- [x] `interpretProfileInsights()` produces deterministic `ProfileInsightViewV1`
-- [x] `GET /api/profile-insights` with contract authority headers
-- [x] Profile domain detail shows provenance + confidence
-- [x] Profile overview shows per-section confidence badges
-- [x] Home surfaces missing-context hints (≤ 3)
-- [x] Module prefill banner uses confidence-aware copy
-- [x] P1 boundary tests still green; P3 correction flow untouched
-- [x] Golden tests prove determinism
-
-**Remaining for full UX-P4 lock:** Phase P4-C explanation depth (field groups, staleness narratives, explanation graph) — see roadmap.
+- [life-state-model.md](../life-events/life-state-model.md)
+- [life-event-graph-catalog-v1.md](../life-events/life-event-graph-catalog-v1.md)
+- [life-event-architecture-consistency-checklist.md](../adr/life-event-architecture-consistency-checklist.md)

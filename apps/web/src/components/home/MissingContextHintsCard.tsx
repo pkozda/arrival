@@ -5,7 +5,9 @@ import type { MissingContextHint, ProfileInsightViewV1 } from '@/lib/product-con
 import { buildCompletenessSummary } from '@/lib/profile-insights/selectors';
 
 type Props = {
-  insights: ProfileInsightViewV1 | null;
+  insights?: ProfileInsightViewV1 | null;
+  hints?: MissingContextHint[];
+  completenessSummary?: string | null;
 };
 
 function MissingContextItem({ hint }: { hint: MissingContextHint }) {
@@ -18,13 +20,18 @@ function MissingContextItem({ hint }: { hint: MissingContextHint }) {
   );
 }
 
-export function MissingContextHintsCard({ insights }: Props) {
-  if (!insights) {
+export function MissingContextHintsCard({ insights, hints: hintsOverride, completenessSummary: summaryOverride }: Props) {
+  if (!insights && hintsOverride === undefined) {
     return null;
   }
 
-  const completenessSummary = buildCompletenessSummary(insights);
-  const hints = insights.missingContext;
+  const completenessSummary =
+    summaryOverride !== undefined
+      ? summaryOverride
+      : insights
+        ? buildCompletenessSummary(insights)
+        : null;
+  const hints = hintsOverride ?? insights?.missingContext ?? [];
 
   if (!completenessSummary && hints.length === 0) {
     return null;

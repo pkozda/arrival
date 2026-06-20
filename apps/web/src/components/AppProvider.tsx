@@ -28,9 +28,11 @@ import {
 } from '@/lib/mutations';
 import { selectAppDisplayLanguage } from '@/lib/user-context';
 import { fetchProfileInsights } from '@/lib/profile-insights';
+import { fetchLifeEventPlan } from '@/lib/life-event-plan';
 import type {
   MutationRequest,
   ProfileInsightViewV1,
+  LifeEventPlanV1,
   PublicModuleContract,
   SupportedLanguage,
   ThemePreference,
@@ -58,12 +60,16 @@ interface AppState {
   profileInsights: ProfileInsightViewV1 | null;
   profileInsightsLoading: boolean;
   profileInsightsError: string | null;
+  lifeEventPlan: LifeEventPlanV1 | null;
+  lifeEventPlanLoading: boolean;
+  lifeEventPlanError: string | null;
   uiSnapshot: UiSnapshot | null;
   uiSnapshotLoading: boolean;
   uiSnapshotError: string | null;
   translations: Record<string, string>;
   refreshUserContext: () => Promise<void>;
   refreshProfileInsights: () => Promise<void>;
+  refreshLifeEventPlan: () => Promise<void>;
   refreshUiSnapshot: () => Promise<void>;
   refreshSessionState: () => Promise<void>;
   submitMutation: (request: MutationRequest) => Promise<{ userContext: UserContextV1; revision: number }>;
@@ -105,6 +111,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [profileInsights, setProfileInsights] = useState<ProfileInsightViewV1 | null>(null);
   const [profileInsightsLoading, setProfileInsightsLoading] = useState(true);
   const [profileInsightsError, setProfileInsightsError] = useState<string | null>(null);
+  const [lifeEventPlan, setLifeEventPlan] = useState<LifeEventPlanV1 | null>(null);
+  const [lifeEventPlanLoading, setLifeEventPlanLoading] = useState(true);
+  const [lifeEventPlanError, setLifeEventPlanError] = useState<string | null>(null);
   const [uiSnapshot, setUiSnapshot] = useState<UiSnapshot | null>(null);
   const [uiSnapshotLoading, setUiSnapshotLoading] = useState(true);
   const [uiSnapshotError, setUiSnapshotError] = useState<string | null>(null);
@@ -115,6 +124,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const snapshotFetchGenerationRef = useRef(0);
   const userContextFetchGenerationRef = useRef(0);
   const profileInsightsFetchGenerationRef = useRef(0);
+  const lifeEventPlanFetchGenerationRef = useRef(0);
 
   const themePreference = useMemo(() => getThemePreference(uiSnapshot), [uiSnapshot]);
   const systemTheme = useSystemColorScheme();
@@ -230,6 +240,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [sessionId]);
 
+  const refreshLifeEventPlan = useCallback(async () => {
+    if (!sessionId) return;
+
+    const requestId = ++lifeEventPlanFetchGenerationRef.current;
+
+    setLifeEventPlanLoading(true);
+    setLifeEventPlanError(null);
+
+    try {
+      const plan = await fetchLifeEventPlan(sessionId);
+      if (requestId !== lifeEventPlanFetchGenerationRef.current) {
+        return;
+      }
+      setLifeEventPlan(plan);
+    } catch (err: unknown) {
+      if (requestId !== lifeEventPlanFetchGenerationRef.current) {
+        return;
+      }
+      setLifeEventPlan(null);
+      setLifeEventPlanError(
+        err instanceof Error ? err.message : 'Failed to load your next steps plan'
+      );
+    } finally {
+      if (requestId === lifeEventPlanFetchGenerationRef.current) {
+        setLifeEventPlanLoading(false);
+      }
+    }
+  }, [sessionId]);
+
   const refreshUiSnapshot = useCallback(async () => {
     if (!sessionId) return;
 
@@ -257,8 +296,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [sessionId, applySnapshotIfNewer]);
 
   const refreshSessionState = useCallback(async () => {
-    await Promise.all([refreshUserContext(), refreshProfileInsights(), refreshUiSnapshot()]);
-  }, [refreshUserContext, refreshProfileInsights, refreshUiSnapshot]);
+    await Promise.all([refreshUserContext(), refreshProfileInsights(), refreshLifeEventPlan(), refreshUiSnapshot()]);
+  }, [refreshUserContext, refreshProfileInsights, refreshLifeEventPlan, refreshUiSnapshot]);
 
   useEffect(() => {
     if (!sessionId) {
@@ -269,58 +308,90 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     setUserContextLoading(true);
     setProfileInsightsLoading(true);
+    setLifeEventPlanLoading(true);
     setUiSnapshotLoading(true);
     setUserContextError(null);
     setProfileInsightsError(null);
+    setLifeEventPlanError(null);
     setUiSnapshotError(null);
 
     const userContextRequestId = ++userContextFetchGenerationRef.current;
     const profileInsightsRequestId = ++profileInsightsFetchGenerationRef.current;
+    const lifeEventPlanRequestId = ++lifeEventPlanFetchGenerationRef.current;
     const snapshotRequestId = ++snapshotFetchGenerationRef.current;
 
-    Promise.all([
+    void Promise.allSettled([
       fetchUserContext(sessionId),
       fetchProfileInsights(sessionId),
+      fetchLifeEventPlan(sessionId),
       fetchUiSnapshot(sessionId),
-    ])
-      .then(([context, insights, snapshot]) => {
-        if (cancelled) {
-          return;
-        }
-        if (userContextRequestId === userContextFetchGenerationRef.current) {
-          setUserContext(context);
-          setUserContextLoading(false);
-        }
-        if (profileInsightsRequestId === profileInsightsFetchGenerationRef.current) {
-          setProfileInsights(insights);
-          setProfileInsightsLoading(false);
-        }
-        if (snapshotRequestId === snapshotFetchGenerationRef.current) {
-          applySnapshotIfNewer(snapshot);
-          setUiSnapshotLoading(false);
-        }
-      })
-      .catch((err: unknown) => {
-        if (cancelled) {
-          return;
-        }
-        const message = err instanceof Error ? err.message : 'Failed to load your situation';
-        if (userContextRequestId === userContextFetchGenerationRef.current) {
+    ]).then((results) => {
+      if (cancelled) {
+        return;
+      }
+
+      const [contextResult, insightsResult, planResult, snapshotResult] = results;
+
+      if (userContextRequestId === userContextFetchGenerationRef.current) {
+        if (contextResult.status === 'fulfilled') {
+          setUserContext(contextResult.value);
+          setUserContextError(null);
+        } else {
           setUserContext(null);
-          setUserContextError(message);
-          setUserContextLoading(false);
+          setUserContextError(
+            contextResult.reason instanceof Error
+              ? contextResult.reason.message
+              : 'Failed to load your situation'
+          );
         }
-        if (profileInsightsRequestId === profileInsightsFetchGenerationRef.current) {
+        setUserContextLoading(false);
+      }
+
+      if (profileInsightsRequestId === profileInsightsFetchGenerationRef.current) {
+        if (insightsResult.status === 'fulfilled') {
+          setProfileInsights(insightsResult.value);
+          setProfileInsightsError(null);
+        } else {
           setProfileInsights(null);
-          setProfileInsightsError(message);
-          setProfileInsightsLoading(false);
+          setProfileInsightsError(
+            insightsResult.reason instanceof Error
+              ? insightsResult.reason.message
+              : 'Failed to load situation insights'
+          );
         }
-        if (snapshotRequestId === snapshotFetchGenerationRef.current) {
+        setProfileInsightsLoading(false);
+      }
+
+      if (lifeEventPlanRequestId === lifeEventPlanFetchGenerationRef.current) {
+        if (planResult.status === 'fulfilled') {
+          setLifeEventPlan(planResult.value);
+          setLifeEventPlanError(null);
+        } else {
+          setLifeEventPlan(null);
+          setLifeEventPlanError(
+            planResult.reason instanceof Error
+              ? planResult.reason.message
+              : 'Failed to load your next steps plan'
+          );
+        }
+        setLifeEventPlanLoading(false);
+      }
+
+      if (snapshotRequestId === snapshotFetchGenerationRef.current) {
+        if (snapshotResult.status === 'fulfilled') {
+          applySnapshotIfNewer(snapshotResult.value);
+          setUiSnapshotError(null);
+        } else {
           setUiSnapshot(null);
-          setUiSnapshotError(message);
-          setUiSnapshotLoading(false);
+          setUiSnapshotError(
+            snapshotResult.reason instanceof Error
+              ? snapshotResult.reason.message
+              : 'Failed to refresh your situation'
+          );
         }
-      });
+        setUiSnapshotLoading(false);
+      }
+    });
 
     return () => {
       cancelled = true;
@@ -341,9 +412,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setUserContext(result.userContext);
       setProfileHeadRevision(result.revision);
       void refreshProfileInsights();
+      void refreshLifeEventPlan();
       return result;
     },
-    [sessionId, refreshProfileInsights]
+    [sessionId, refreshProfileInsights, refreshLifeEventPlan]
   );
 
   const changeLanguage = useCallback(
@@ -392,12 +464,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         profileInsights,
         profileInsightsLoading,
         profileInsightsError,
+        lifeEventPlan,
+        lifeEventPlanLoading,
+        lifeEventPlanError,
         uiSnapshot,
         uiSnapshotLoading,
         uiSnapshotError,
         translations,
         refreshUserContext,
         refreshProfileInsights,
+        refreshLifeEventPlan,
         refreshUiSnapshot,
         refreshSessionState,
         submitMutation,

@@ -165,6 +165,12 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
   },
   {
     method: 'GET',
+    path: '/api/modules/life-event/plan',
+    tier: 'credential-required',
+    description: 'Deterministic life event plan (LifeEventPlanV1)',
+  },
+  {
+    method: 'GET',
     path: '/api/ui-snapshot',
     tier: 'credential-required',
     description: 'UI snapshot projection',

@@ -185,6 +185,34 @@ export {
 } from './profile-insight-view.js';
 
 export {
+  LIFE_EVENT_PLAN_SCHEMA_VERSION,
+  LifeEventPlanSchemaVersionSchema,
+  LifeStateIdSchema,
+  PlanningSeveritySchema,
+  SecondaryConditionIdSchema,
+  LifeEventNodeCategorySchema,
+  LifeEventNodePrioritySchema,
+  LifeActionKindSchema,
+  LifeActionRefSchema,
+  LifeEventPlanNodeSchema,
+  LifeEventReasoningSchema,
+  LifeEventPlanV1Schema,
+  parseLifeEventPlanV1,
+  safeParseLifeEventPlanV1,
+  PLANNING_SEVERITY_BY_STATE,
+  type LifeStateId,
+  type PlanningSeverity,
+  type SecondaryConditionId,
+  type LifeEventNodeCategory,
+  type LifeEventNodePriority,
+  type LifeActionKind,
+  type LifeActionRef,
+  type LifeEventPlanNode,
+  type LifeEventReasoning,
+  type LifeEventPlanV1,
+} from './life-event-plan.js';
+
+export {
   validatePersistentPayloadFields,
   extractDomainFactFieldKeys,
   assertPersistentFactFieldId,
