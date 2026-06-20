@@ -325,6 +325,10 @@ export const lifeEventModule: Module<LifeEventInput, LifeEventOutput> = {
 export const lifeEventRegistration: ModuleRegistration = {
   ...lifeEventModule,
   enabled: true,
-  featureFlags: { personalizedTimeline: false },
+  featureFlags: { personalizedTimeline: true },
   module: lifeEventModule,
 };
+
+export { buildLifeEventPlan, classifyLifeState } from './plan/index.js';
+export { CLASSIFIER_FIXTURES } from './plan/fixtures.js';
+export type { ClassifierFixture } from './plan/fixtures.js';

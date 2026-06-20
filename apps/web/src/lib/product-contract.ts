@@ -30,6 +30,10 @@ export type {
   UserContextV1,
   UserProfileViewV1,
   ProfileInsightViewV1,
+  LifeEventPlanV1,
+  LifeEventPlanNode,
+  LifeEventReasoning,
+  LifeActionRef,
   ProfileDomain,
   DomainInsight,
   MissingContextHint,
@@ -46,6 +50,8 @@ export {
   mergeProfileIntoDefaults,
   parseUserContextV1,
   parseProfileInsightViewV1,
+  parseLifeEventPlanV1,
+  safeParseLifeEventPlanV1,
 } from '@arrival-atlas/product-contract';
 
 export type ModuleExecuteResponse = ModuleExecuteProjectionResponse;

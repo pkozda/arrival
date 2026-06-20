@@ -69,6 +69,7 @@ describe('RouteSecurityMap', () => {
       ['POST', '/api/mutations'],
       ['GET', '/api/user-context'],
       ['GET', '/api/profile-insights'],
+      ['GET', '/api/modules/life-event/plan'],
       ['GET', '/api/ui-snapshot'],
       ['POST', '/api/profile'],
       ['GET', '/api/profile'],

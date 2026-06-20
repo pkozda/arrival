@@ -3,6 +3,7 @@ import {
   applyUiSnapshotTransportHeaders,
   applyUserContextAuthorityHeaders,
   LEGACY_SNAPSHOT_CONTRACT_HEADERS,
+  LIFE_EVENT_PLAN_AUTHORITY_HEADERS,
   PROFILE_INSIGHTS_AUTHORITY_HEADERS,
   UI_SNAPSHOT_TRANSPORT_HEADERS,
   USER_CONTEXT_AUTHORITY_HEADERS,
@@ -29,6 +30,13 @@ describe('api contract headers (P1 lock)', () => {
       'derived-non-authoritative'
     );
     expect(PROFILE_INSIGHTS_AUTHORITY_HEADERS['x-read-model']).toBe('ProfileInsightViewV1');
+  });
+
+  it('defines life event plan derived headers', () => {
+    expect(LIFE_EVENT_PLAN_AUTHORITY_HEADERS['x-module-id']).toBe('life-event');
+    expect(LIFE_EVENT_PLAN_AUTHORITY_HEADERS['x-module-version']).toBe('v2');
+    expect(LIFE_EVENT_PLAN_AUTHORITY_HEADERS['x-read-model']).toBe('LifeEventPlanV1');
+    expect(LIFE_EVENT_PLAN_AUTHORITY_HEADERS['x-plan-authority']).toBe('derived-deterministic');
   });
 
   it('apply helpers set reply headers', () => {

@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./life-event": {
+      "types": "./dist/life-event/index.d.ts",
+      "import": "./dist/life-event/index.js"
     }
   },
   "scripts": {
@@ -20,6 +24,7 @@
   },
   "dependencies": {
     "@arrival-atlas/core": "*",
+    "@arrival-atlas/product-contract": "*",
     "@arrival-atlas/module-sdk": "*",
     "@arrival-atlas/profile": "*",
     "@arrival-atlas/shared-services": "*",

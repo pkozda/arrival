@@ -21,6 +21,13 @@ export const PROFILE_INSIGHTS_AUTHORITY_HEADERS = {
   'x-read-model': 'ProfileInsightViewV1',
 } as const;
 
+export const LIFE_EVENT_PLAN_AUTHORITY_HEADERS = {
+  'x-module-id': 'life-event',
+  'x-module-version': 'v2',
+  'x-read-model': 'LifeEventPlanV1',
+  'x-plan-authority': 'derived-deterministic',
+} as const;
+
 export function applyUserContextAuthorityHeaders(
   reply: { header: (name: string, value: string) => void }
 ): void {
@@ -46,6 +53,14 @@ export function applyProfileInsightsAuthorityHeaders(
   reply: { header: (name: string, value: string) => void }
 ): void {
   for (const [name, value] of Object.entries(PROFILE_INSIGHTS_AUTHORITY_HEADERS)) {
+    reply.header(name, value);
+  }
+}
+
+export function applyLifeEventPlanAuthorityHeaders(
+  reply: { header: (name: string, value: string) => void }
+): void {
+  for (const [name, value] of Object.entries(LIFE_EVENT_PLAN_AUTHORITY_HEADERS)) {
     reply.header(name, value);
   }
 }
