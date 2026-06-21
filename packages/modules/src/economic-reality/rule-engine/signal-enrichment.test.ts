@@ -29,6 +29,35 @@ describe('signal enrichment EP-12', () => {
     expect(fixture.userContext.profile?.domains.employment?.employmentStatus).toBe('unemployed');
   });
 
+  it('sets sozialamt institution axis from sozialamt intent feedback', () => {
+    const baseSignals = {
+      incomeAxis: 'none' as const,
+      employmentAxis: 'unemployed' as const,
+      institutionAxis: 'none' as const,
+      supportSystem: 'none' as const,
+      isStudent: false,
+      survivalCrisis: true,
+      recentArrivalUnregistered: false,
+      benefitApplicationIntent: false,
+    };
+
+    const feedback = mapEventsToFeedbackSignals([
+      {
+        schemaVersion: '1.0.0',
+        type: 'INTENT_TRIGGERED',
+        actionId: 'intent-sozialamt',
+        actionType: 'system_intent',
+        systemIntent: 'start_sozialamt_process',
+        contextHash: 'hash',
+        timestamp: 1,
+      },
+    ]);
+
+    const enriched = enrichSignalsWithFeedback(baseSignals, feedback);
+    expect(enriched.institutionAxis).toBe('sozialamt');
+    expect(enriched.supportSystem).toBe('pending');
+  });
+
   it('does not mutate signals when feedback is empty', () => {
     const fixture = ECONOMIC_FIXTURES[0]!;
     const baseSignals = computeEconomicSignals(fixture.userContext);

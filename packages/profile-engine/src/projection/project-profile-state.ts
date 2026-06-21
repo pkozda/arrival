@@ -52,15 +52,16 @@ function computeCompleteness(state: ProfileState): UserProfileViewV1['completene
 
 /** UI-safe projection — no event log, reducer metadata, or schema paths. */
 export function projectProfileState(state: ProfileState): UserProfileViewV1 {
-  const preferredLanguage =
-    (readField<SupportedLanguage>(state, 'preferredLanguage') ?? 'en') as SupportedLanguage;
+  const preferredLanguage = readField<SupportedLanguage>(state, 'preferredLanguage');
+  const theme = readField<UserProfileViewV1['preferences']['theme']>(state, 'theme');
+  const uiDensity = readField<UserProfileViewV1['preferences']['uiDensity']>(state, 'uiDensity');
 
   const view: UserProfileViewV1 = {
     schemaVersion: USER_PROFILE_VIEW_SCHEMA_VERSION,
     preferences: {
-      preferredLanguage,
-      theme: readField(state, 'theme'),
-      uiDensity: readField(state, 'uiDensity'),
+      ...(preferredLanguage !== undefined ? { preferredLanguage } : {}),
+      ...(theme !== undefined ? { theme } : {}),
+      ...(uiDensity !== undefined ? { uiDensity } : {}),
     },
     completeness: computeCompleteness(state),
     domains: {

@@ -27,10 +27,10 @@ export function SuggestedModulesSection({ suggestions }: Props) {
           gap: '1rem',
         }}
       >
-        {suggestions.map(({ module, reason }) => (
+        {suggestions.map(({ module, reason, href }) => (
           <Link
             key={module.id}
-            href={`/modules/${module.id}`}
+            href={href ?? `/modules/${module.id}`}
             className="card"
             style={{ textDecoration: 'none', color: 'inherit' }}
           >

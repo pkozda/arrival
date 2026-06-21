@@ -12,8 +12,8 @@ export function hasUserContextProfile(userContext: UserContextV1 | null | undefi
 }
 
 /**
- * Profile preference comes from authoritative userContext only;
- * sessionLanguage is session transport metadata (uiSnapshot.session.language).
+ * Profile preference when explicitly set; otherwise session transport language.
+ * Avoids phantom `en` defaults from profile projection overriding a user-chosen session locale.
  */
 export function selectAppDisplayLanguage(
   userContext: UserContextV1 | null | undefined,

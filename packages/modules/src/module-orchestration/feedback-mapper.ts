@@ -24,9 +24,11 @@ function isIncomeProfileEvent(event: EconomicRealityEventV1): boolean {
   );
 }
 
-function isJobcenterIntentEvent(event: EconomicRealityEventV1): boolean {
+function isInstitutionStartIntentEvent(event: EconomicRealityEventV1): boolean {
   return (
-    event.systemIntent === 'start_jobcenter_process' &&
+    (event.systemIntent === 'start_jobcenter_process' ||
+      event.systemIntent === 'start_sozialamt_process' ||
+      event.systemIntent === 'initiate_benefit_application') &&
     (event.type === 'ACTION_EXECUTED' || event.type === 'INTENT_TRIGGERED')
   );
 }
@@ -48,6 +50,7 @@ export function mapEventsToFeedbackSignals(
 
   let employmentSignalDelta = 0;
   let institutionEngagementDelta = 0;
+  let institutionEngagementTarget: EconomicFeedbackSignalsV1['institutionEngagementTarget'] = 'none';
   let crisisStabilityDelta = 0;
 
   let externalResourceCount = 0;
@@ -58,10 +61,15 @@ export function mapEventsToFeedbackSignals(
       employmentSignalDelta = clampUnit(employmentSignalDelta + INCOME_PROFILE_DELTA);
     }
 
-    if (isJobcenterIntentEvent(event)) {
+    if (isInstitutionStartIntentEvent(event)) {
       institutionEngagementDelta = clampUnit(
         institutionEngagementDelta + INSTITUTION_INTENT_DELTA
       );
+      if (event.systemIntent === 'start_sozialamt_process') {
+        institutionEngagementTarget = 'sozialamt';
+      } else {
+        institutionEngagementTarget = 'jobcenter';
+      }
     }
 
     if (isExternalResourceEvent(event)) {
@@ -84,6 +92,7 @@ export function mapEventsToFeedbackSignals(
     schemaVersion: EMPTY_ECONOMIC_FEEDBACK_SIGNALS.schemaVersion,
     employmentSignalDelta,
     institutionEngagementDelta,
+    institutionEngagementTarget,
     crisisStabilityDelta,
   };
 }

@@ -41,6 +41,7 @@ export type OnboardingStep = {
 export type ModuleSuggestion = {
   module: PublicModuleContract;
   reason: string;
+  href?: string;
 };
 
 const EMPLOYMENT_LABELS: Record<string, string> = {

@@ -36,7 +36,7 @@ export const UserProfileDomainViewsSchema = z.object({
 export type UserProfileDomainViews = z.infer<typeof UserProfileDomainViewsSchema>;
 
 export const UserProfilePreferencesViewSchema = z.object({
-  preferredLanguage: SupportedLanguageSchema,
+  preferredLanguage: SupportedLanguageSchema.optional(),
   theme: ThemePreferenceSchema.optional(),
   uiDensity: z.enum(['comfortable', 'compact']).optional(),
 });

@@ -110,11 +110,12 @@ describe('EP-9 UI surface contract', () => {
     ).toBe(true);
   });
 
-  it('deterministic hash gating prevents redundant hydration', () => {
+  it('reconcile always returns a fresh client state object for React updates', () => {
     const response = buildFixtureResponse('EF03');
     const hydrated = hydrateEconomicPlan(response);
     const reconciled = reconcileEconomicPlanState(hydrated, response);
-    expect(reconciled).toBe(hydrated);
+    expect(reconciled).not.toBe(hydrated);
+    expect(reconciled).toEqual(hydrated);
   });
 
   it('home card projection uses highlights only without secondary sections', () => {

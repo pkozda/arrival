@@ -6,16 +6,26 @@ export type EconomicActionExecutionContext = {
   actionSet: EconomicActionSetV1;
 };
 
-let activeContext: EconomicActionExecutionContext | null = null;
+export const economicActionContextRef: {
+  current: EconomicActionExecutionContext | null;
+} = {
+  current: null,
+};
 
-export function bindEconomicActionContext(context: EconomicActionExecutionContext | null): void {
-  activeContext = context;
+export function setEconomicActionContext(context: EconomicActionExecutionContext | null): void {
+  economicActionContextRef.current = context;
 }
 
 export function readEconomicActionContext(): EconomicActionExecutionContext | null {
-  return activeContext;
+  return economicActionContextRef.current;
 }
 
+/** @deprecated Use setEconomicActionContext during render */
+export function bindEconomicActionContext(context: EconomicActionExecutionContext | null): void {
+  setEconomicActionContext(context);
+}
+
+/** @deprecated Use setEconomicActionContext(null) */
 export function clearEconomicActionContext(): void {
-  activeContext = null;
+  setEconomicActionContext(null);
 }

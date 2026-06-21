@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AppliedRuleSchema, EconomicStateIdSchema } from './economic-evaluation.js';
+import { EconomicStateIdSchema } from './economic-evaluation.js';
 
 export const ECONOMIC_GRAPH_CONTEXT_SCHEMA_VERSION = '1.0.0';
 

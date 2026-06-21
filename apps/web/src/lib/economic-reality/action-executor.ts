@@ -1,7 +1,11 @@
 import { buildAuthHeaders } from '@/lib/api';
 import type { EconomicActionSetV1 } from '@/lib/product-contract';
 import { ER_COPY_KEYS } from '@/lib/product-contract';
-import { readEconomicActionContext } from './action-context';
+import {
+  economicActionContextRef,
+  readEconomicActionContext,
+  type EconomicActionExecutionContext,
+} from './action-context';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
@@ -25,13 +29,16 @@ function assertActionInSet(actionSet: EconomicActionSetV1, actionId: string): vo
   }
 }
 
-export async function executeEconomicAction(actionId: string): Promise<{
+export async function executeEconomicAction(
+  actionId: string,
+  contextOverride?: EconomicActionExecutionContext | null
+): Promise<{
   actionId: string;
   previousDeterministicHash: string;
   deterministicHash: string;
   planChanged: boolean;
 }> {
-  const context = readEconomicActionContext();
+  const context = contextOverride ?? readEconomicActionContext() ?? economicActionContextRef.current;
   if (!context) {
     throw new EconomicActionExecutionError(
       'E_NO_CONTEXT',

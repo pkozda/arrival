@@ -102,10 +102,13 @@ function CategoryNavSection({
   );
 }
 
+const LANGUAGE_DRAWER_LABEL = 'Language';
+
 export function Header() {
   const pathname = usePathname();
   const { language, changeLanguage, theme, toggleTheme, t, modules, resetUserData, loadDemoPreset } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [resetting, setResetting] = useState<'session' | 'all' | null>(null);
   const [loadingPreset, setLoadingPreset] = useState<DemoPersonaId | null>(null);
   const groupedModules = useMemo(() => groupModulesByCategory(modules), [modules]);
@@ -147,6 +150,10 @@ export function Header() {
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -290,7 +297,9 @@ export function Header() {
             </div>
           )}
 
-          <span className="header-drawer-label">{t('common.language')}</span>
+          <span className="header-drawer-label">
+            {mounted ? t('common.language') : LANGUAGE_DRAWER_LABEL}
+          </span>
           <div className="header-lang-group">
             {SUPPORTED_LANGUAGES.map((lang) => (
               <button

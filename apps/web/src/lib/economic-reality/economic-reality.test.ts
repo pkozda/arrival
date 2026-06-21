@@ -44,13 +44,14 @@ describe('reconcileEconomicPlanState hash guard', () => {
     clearEconomicPlanCache();
   });
 
-  it('returns the same state reference when deterministicHash is unchanged', () => {
+  it('returns a fresh object when deterministicHash is unchanged', () => {
     const response = buildFixtureResponse();
     const initial = hydrateEconomicPlan(response);
     writeEconomicPlanCache(initial);
 
     const reconciled = reconcileEconomicPlanState(initial, response);
-    expect(reconciled).toBe(initial);
+    expect(reconciled).not.toBe(initial);
+    expect(reconciled).toEqual(initial);
   });
 
   it('hydrates and caches when deterministicHash changes', () => {
@@ -60,10 +61,12 @@ describe('reconcileEconomicPlanState hash guard', () => {
     const reconciled = reconcileEconomicPlanState(first, secondResponse);
     expect(reconciled.deterministicHash).toBe(secondResponse.meta.deterministicHash);
     expect(reconciled.evaluation?.economicState).toBe('employment_active');
-    expect(readEconomicPlanCache(secondResponse.meta.deterministicHash)).toEqual(reconciled);
+    expect(readEconomicPlanCache(secondResponse.meta.deterministicHash)).toEqual(
+      structuredClone(reconciled)
+    );
   });
 
-  it('reuses cache entry for identical hash without recomputing hydration', () => {
+  it('hydrates from network even when cache has the same hash', () => {
     const response = buildFixtureResponse();
     const hydrated = hydrateEconomicPlan(response);
     writeEconomicPlanCache(hydrated);
@@ -75,7 +78,8 @@ describe('reconcileEconomicPlanState hash guard', () => {
       deterministicHash: null,
     };
     const reconciled = reconcileEconomicPlanState(emptyState, response);
-    expect(reconciled).toBe(hydrated);
+    expect(reconciled).not.toBe(hydrated);
+    expect(reconciled).toEqual(hydrated);
   });
 });
 
@@ -160,16 +164,14 @@ describe('fetchEconomicPlan client contract', () => {
 });
 
 describe('useEconomicRealityPlan hook contract', () => {
-  it('loads once per sessionId without refetch dependency loops', async () => {
+  it('reads economic plan from runtime consistency provider', async () => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const source = readFileSync(join(__dirname, 'useEconomicRealityPlan.tsx'), 'utf8');
 
-    expect(source).toContain('useEffect');
-    expect(source).toContain('[load]');
-    expect(source).not.toContain('[state]');
-    expect(source).toContain('reconcileEconomicPlanState');
-    expect(source).toContain('EconomicRealityPlanProvider');
-    expect(source).toContain('bindEconomicActionContext');
+    expect(source).toContain('useRuntimeConsistency');
+    expect(source).toContain('requestSync');
+    expect(source).not.toContain('fetchEconomicPlan');
+    expect(source).not.toContain('subscribe(');
   });
 });

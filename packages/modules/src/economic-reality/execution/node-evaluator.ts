@@ -5,8 +5,8 @@ import type {
 import {
   areSatisfactionKeysMet,
   countMetSatisfactionKeys,
-  type EconomicSatisfactionSnapshot,
 } from './satisfaction-keys.js';
+import type { EconomicSatisfactionSnapshot } from './types.js';
 
 export type InstantiatedNode = {
   nodeId: string;

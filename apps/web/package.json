@@ -19,9 +19,11 @@
   },
   "devDependencies": {
     "@arrival-atlas/modules": "*",
+    "@testing-library/react": "^16.3.0",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.4",
     "@types/react-dom": "^19.0.2",
+    "happy-dom": "^17.4.4",
     "typescript": "^5.7.3",
     "vitest": "^3.2.6"
   }

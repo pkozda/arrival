@@ -82,6 +82,39 @@ describe('POST /api/modules/economic-reality/action/execute', () => {
     expect(updatedState?.userContext).toEqual(state!.userContext);
   });
 
+  it('sets planChanged when sozialamt intent advances graph execution', async () => {
+    const app = await buildApp();
+    const sessionId = await createSession(app);
+    await seedSessionUserContext(sessionId, ECONOMIC_FIXTURES.find((f) => f.id === 'EF18')!.userContext);
+
+    const state = await systemStateCoordinator.getState(sessionId);
+    const plan = buildEconomicRealityPlanFromState(state!, 'req-action');
+    const actionId = plan.actionSet.actions.find((action) =>
+      action.id.includes('intent-start-sozialamt')
+    )!.id;
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/modules/economic-reality/action/execute',
+      headers: { 'x-session-id': sessionId },
+      payload: {
+        actionId,
+        deterministicHash: plan.meta.deterministicHash,
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json() as {
+      accepted: boolean;
+      planChanged: boolean;
+      previousDeterministicHash: string;
+      deterministicHash: string;
+    };
+    expect(body.accepted).toBe(true);
+    expect(body.planChanged).toBe(true);
+    expect(body.deterministicHash).not.toBe(body.previousDeterministicHash);
+  });
+
   it('returns E_STALE_ACTION_SET when deterministicHash mismatches', async () => {
     const app = await buildApp();
     const sessionId = await createSession(app);

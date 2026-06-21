@@ -44,7 +44,9 @@ export function buildEconomicRealityPlan(
 
   let execution;
   try {
-    execution = buildExecutionState(graph, userContext);
+    execution = buildExecutionState(graph, userContext, {
+      feedbackSignals: meta.feedbackSignals,
+    });
   } catch (error) {
     throw new EconomicRealityPlanError(
       'EXECUTION_BUILD_FAILED',

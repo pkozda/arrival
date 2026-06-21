@@ -1,5 +1,5 @@
 export type { SectionBuildInput } from './types.js';
-export { SECTION_ORDER, SECTION_TITLES, resolveUiStrategy, RULE_IDS } from './types.js';
+export { SECTION_ORDER, SECTION_TITLE_KEYS, resolveUiStrategy, RULE_IDS } from './types.js';
 export {
   resolveIntentUiType,
   isInstitutionIntent,

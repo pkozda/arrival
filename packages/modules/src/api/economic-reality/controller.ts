@@ -1,9 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { UserContextV1 } from '@arrival-atlas/product-contract';
-import {
-  buildEconomicRealityPlan,
-  EconomicRealityPlanError,
-} from './pipeline.js';
+import { buildEconomicRealityPlan } from './pipeline.js';
+import { EconomicRealityPlanError } from './guards.js';
 
 export type EconomicRealityPlanControllerDeps = {
   resolveUserContext: (request: FastifyRequest) => Promise<UserContextV1 | null>;

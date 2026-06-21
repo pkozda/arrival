@@ -2,6 +2,7 @@ import type { SupportedLanguage } from '@arrival-atlas/ui-contract';
 import {
   ECONOMIC_REALITY_COPY_DE,
   ECONOMIC_REALITY_COPY_EN,
+  ECONOMIC_REALITY_COPY_RU,
   ER_COPY_KEYS,
   SECTION_TYPE_COPY_KEYS,
   SYSTEM_INTENT_COPY_KEYS,
@@ -17,7 +18,7 @@ export type CopyResolveContext = {
 const COPY_BUNDLES: Record<SupportedLanguage, Record<string, string>> = {
   en: ECONOMIC_REALITY_COPY_EN,
   de: ECONOMIC_REALITY_COPY_DE,
-  ru: ECONOMIC_REALITY_COPY_EN,
+  ru: ECONOMIC_REALITY_COPY_RU,
   ua: ECONOMIC_REALITY_COPY_EN,
 };
 

@@ -3,15 +3,21 @@ import {
   type EconomicRealityPlanResponseV1,
 } from '@/lib/product-contract';
 import { buildAuthHeaders } from '@/lib/api';
+import { isMissingUserContextProfilePlanResponse } from '@/lib/plan-fetch';
 import { EconomicRealityPlanFetchError, isEconomicRealityPlanErrorCode } from './errors';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function fetchEconomicPlan(
   sessionId?: string
-): Promise<EconomicRealityPlanResponseV1> {
+): Promise<EconomicRealityPlanResponseV1 | null> {
+  if (!sessionId) {
+    return null;
+  }
+
   const res = await fetch(`${API_URL}/api/modules/economic-reality/plan`, {
     headers: buildAuthHeaders({ sessionId }),
+    cache: 'no-store',
   });
 
   if (!res.ok) {
@@ -19,6 +25,10 @@ export async function fetchEconomicPlan(
       error?: string;
       code?: string;
     } | null;
+
+    if (isMissingUserContextProfilePlanResponse(res.status, body)) {
+      return null;
+    }
 
     const code = body?.code;
     throw new EconomicRealityPlanFetchError(

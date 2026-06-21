@@ -1,9 +1,9 @@
-import { ECONOMIC_REALITY_COPY_DE, ECONOMIC_REALITY_COPY_EN } from '@arrival-atlas/product-contract';
+import { ECONOMIC_REALITY_COPY_DE, ECONOMIC_REALITY_COPY_EN, ECONOMIC_REALITY_COPY_RU } from '@arrival-atlas/product-contract';
 
 export const ECONOMIC_REALITY_I18N = {
   en: ECONOMIC_REALITY_COPY_EN,
   de: ECONOMIC_REALITY_COPY_DE,
-  ru: ECONOMIC_REALITY_COPY_EN,
+  ru: ECONOMIC_REALITY_COPY_RU,
   ua: ECONOMIC_REALITY_COPY_EN,
 } as const;
 

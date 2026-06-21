@@ -10,8 +10,15 @@ describe('resolveCopy EP-11', () => {
     );
   });
 
+  it('resolves RU locale strings', () => {
+    expect(resolveCopy(ER_COPY_KEYS.MODULE_TITLE, 'ru')).toBe('Экономическая реальность');
+    expect(resolveCopy(ER_COPY_KEYS.INTENT_START_SOZIALAMT, 'ru')).toBe(
+      'Начать процесс в Sozialamt'
+    );
+  });
+
   it('falls back to EN for unsupported locales', () => {
-    expect(resolveCopy(ER_COPY_KEYS.MODULE_TITLE, 'ru')).toBe('Economic Reality');
+    expect(resolveCopy(ER_COPY_KEYS.MODULE_TITLE, 'ua')).toBe('Economic Reality');
   });
 
   it('throws deterministic error for missing keys in non-production', () => {

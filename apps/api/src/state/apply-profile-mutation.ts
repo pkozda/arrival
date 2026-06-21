@@ -141,6 +141,19 @@ export function commitProfileMutationRequest(
 
   workingState = materializeCaches(workingState, identity.profileId, submitResult.profileState);
 
+  if (
+    request.type === 'pref.update' &&
+    request.payload.kind === 'pref' &&
+    request.payload.field === 'preferredLanguage'
+  ) {
+    workingState = {
+      ...workingState,
+      session: mergeSessionContext(workingState.session, {
+        userProfile: { language: request.payload.value },
+      }),
+    };
+  }
+
   return {
     state: workingState,
     result: {

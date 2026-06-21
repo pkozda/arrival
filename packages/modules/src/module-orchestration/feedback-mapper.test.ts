@@ -28,8 +28,8 @@ describe('mapEventsToFeedbackSignals EP-12', () => {
     expect(signals.crisisStabilityDelta).toBe(0);
   });
 
-  it('F3 maps jobcenter intent execution to institutionEngagementDelta', () => {
-    const signals = mapEventsToFeedbackSignals([
+  it('F3 maps institution start intents to institutionEngagementDelta', () => {
+    const jobcenter = mapEventsToFeedbackSignals([
       {
         schemaVersion: ECONOMIC_REALITY_EVENT_SCHEMA_VERSION,
         type: 'INTENT_TRIGGERED',
@@ -40,8 +40,21 @@ describe('mapEventsToFeedbackSignals EP-12', () => {
         timestamp: 1,
       },
     ]);
+    expect(jobcenter.institutionEngagementDelta).toBe(0.5);
 
-    expect(signals.institutionEngagementDelta).toBe(0.5);
+    const sozialamt = mapEventsToFeedbackSignals([
+      {
+        schemaVersion: ECONOMIC_REALITY_EVENT_SCHEMA_VERSION,
+        type: 'INTENT_TRIGGERED',
+        actionId: 'intent-sozialamt',
+        actionType: 'system_intent',
+        systemIntent: 'start_sozialamt_process',
+        contextHash: 'hash-1',
+        timestamp: 1,
+      },
+    ]);
+    expect(sozialamt.institutionEngagementDelta).toBe(0.5);
+    expect(sozialamt.institutionEngagementTarget).toBe('sozialamt');
   });
 
   it('F2 maps repeated external resources and failed intents to crisisStabilityDelta', () => {
