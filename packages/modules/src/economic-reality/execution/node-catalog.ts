@@ -61,7 +61,7 @@ export const ECONOMIC_NODE_CATALOG: Record<string, NodeCatalogEntry> = {
   },
   'g6-status-confirm': { satisfactionKeys: ['employment_status_known'] },
   'g6-sozialamt-contact': {
-    satisfactionKeys: ['benefits_active_sozialamt'],
+    satisfactionKeys: ['sozialamt_case_open'],
     dependsOnNodeIds: ['g6-status-confirm'],
   },
   'g6-arrival-proof': { satisfactionKeys: ['registration_confirmed'] },

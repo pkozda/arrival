@@ -36,4 +36,18 @@ describe('user-context selectors', () => {
     expect(selectAppDisplayLanguage(null, 'de')).toBe('de');
     expect(selectAppDisplayLanguage(null, undefined)).toBe('en');
   });
+
+  it('selectAppDisplayLanguage falls back to session when profile has no explicit language', () => {
+    const context: UserContextV1 = {
+      profile: {
+        schemaVersion: '1.0.0',
+        preferences: {},
+        completeness: { score: 10, missingDomains: [] },
+        domains: { income: { grossMonthlyIncome: 2500 } },
+      },
+    };
+
+    expect(selectAppDisplayLanguage(context, 'ru')).toBe('ru');
+    expect(selectAppDisplayLanguage(context, undefined)).toBe('en');
+  });
 });

@@ -5,11 +5,14 @@ import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { useApp } from '@/components/AppProvider';
 import { LifeEventPlanView } from '@/components/life-event/LifeEventPlanView';
+import { LifeEventPlanIntake } from '@/components/life-event/LifeEventPlanIntake';
 import { LifeEventScenarioExplorer } from '@/components/life-event/LifeEventScenarioExplorer';
 import { ScenarioExplorerPanel } from '@/components/life-event/ScenarioExplorerPanel';
 import { lifeEventModuleDescription, lifeEventModuleTitle } from '@/lib/life-event/content-labels';
+import { shouldShowLifeEventPlanIntake } from '@/lib/life-event/cold-start-intake';
 import { resolveScenario } from '@/lib/life-event/scenarios';
 import { defaultScenarioExplorerOpen } from '@/lib/presentation/home-p0';
+import { hasUserContextProfile } from '@/lib/user-context';
 import { WireframeSkeleton } from '@/lib/presentation/le-ux';
 
 function LoadingState() {
@@ -50,6 +53,13 @@ function LifeEventModulePageContent() {
   const explorerDefaultOpen = defaultScenarioExplorerOpen({
     hasPlan: Boolean(lifeEventPlan),
     mode: scenariosMode ? 'scenarios' : null,
+  });
+
+  const showPlanIntake = shouldShowLifeEventPlanIntake({
+    planLoading: lifeEventPlanLoading,
+    hasPlan: Boolean(lifeEventPlan),
+    hasProfile: hasUserContextProfile(userContext),
+    scenariosMode,
   });
 
   const scenarioExplorer = contract ? (
@@ -102,7 +112,9 @@ function LifeEventModulePageContent() {
         />
       )}
 
-      {!lifeEventPlanLoading && !lifeEventPlan && !lifeEventPlanError && scenarioExplorer && (
+      {showPlanIntake && <LifeEventPlanIntake />}
+
+      {!showPlanIntake && !lifeEventPlanLoading && !lifeEventPlan && !lifeEventPlanError && scenarioExplorer && (
         <ScenarioExplorerPanel defaultOpen={explorerDefaultOpen}>
           {scenarioExplorer}
         </ScenarioExplorerPanel>

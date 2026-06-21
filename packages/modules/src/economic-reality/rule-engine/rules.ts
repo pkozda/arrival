@@ -183,7 +183,7 @@ function ruleR6(signals: EconomicSignalBundle): RuleMatch {
   };
 }
 
-function ruleR7(signals: EconomicSignalBundle): RuleMatch {
+function ruleR7(_signals: EconomicSignalBundle): RuleMatch {
   return {
     id: 'R7',
     matched: true,
@@ -197,9 +197,9 @@ function ruleR7(signals: EconomicSignalBundle): RuleMatch {
 
 export function buildEvaluationFromRules(
   signals: EconomicSignalBundle,
-  blockers: EconomicBlockerId[],
-  confidenceScore: number,
-  planConfidence: EconomicEvaluationV1['planConfidence']
+  _blockers: EconomicBlockerId[],
+  _confidenceScore: number,
+  _planConfidence: EconomicEvaluationV1['planConfidence']
 ): Pick<
   EconomicEvaluationV1,
   'economicState' | 'supportSystem' | 'axes' | 'appliedRules'

@@ -69,6 +69,7 @@ export const ER_COPY_KEYS = {
   UI_SESSION_NOT_READY: 'ER.UI.SESSION_NOT_READY',
   UI_ACTION_STALE: 'ER.UI.ACTION_STALE',
   UI_ACTION_FAILED: 'ER.UI.ACTION_FAILED',
+  UI_ACTION_RECORDED: 'ER.UI.ACTION_RECORDED',
 } as const;
 
 export type EconomicRealityCopyKey = (typeof ER_COPY_KEYS)[keyof typeof ER_COPY_KEYS];

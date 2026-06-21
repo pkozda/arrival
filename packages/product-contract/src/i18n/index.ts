@@ -11,3 +11,4 @@ export {
 } from './economic-reality-copy.js';
 export { ECONOMIC_REALITY_COPY_EN } from './economic-reality-strings.en.js';
 export { ECONOMIC_REALITY_COPY_DE } from './economic-reality-strings.de.js';
+export { ECONOMIC_REALITY_COPY_RU } from './economic-reality-strings.ru.js';

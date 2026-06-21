@@ -29,9 +29,11 @@ export { useEconomicRealityPlan, EconomicRealityPlanProvider } from './useEconom
 export { resolveEconomicCopy } from './copy';
 export { useEconomicCopy } from './useEconomicCopy';
 export {
+  setEconomicActionContext,
+  readEconomicActionContext,
+  economicActionContextRef,
   bindEconomicActionContext,
   clearEconomicActionContext,
-  readEconomicActionContext,
   type EconomicActionExecutionContext,
 } from './action-context';
 export {

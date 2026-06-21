@@ -31,6 +31,7 @@ import {
   suggestModules,
 } from '@/lib/situation-utils';
 import { buildHomePlanViewModelV2 } from '@/lib/life-event-plan';
+import { buildCatalogModuleSuggestions } from '@/lib/module-orchestration/life-event-bridge';
 import { resolveScenario } from '@/lib/life-event/scenarios';
 import { humanizePriority } from '@/lib/ux-labels';
 import { useApp } from '@/components/AppProvider';
@@ -168,10 +169,13 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
     () => deriveOnboardingSteps(snapshot, profile),
     [snapshot, profile]
   );
-  const moduleSuggestions = useMemo(
-    () => suggestModules(snapshot, modules, profile),
-    [snapshot, modules, profile]
-  );
+  const moduleSuggestions = useMemo(() => {
+    const catalogSuggestions = buildCatalogModuleSuggestions(lifeEventPlan, modules);
+    if (catalogSuggestions.length > 0) {
+      return catalogSuggestions;
+    }
+    return suggestModules(snapshot, modules, profile);
+  }, [lifeEventPlan, modules, snapshot, profile]);
 
   const homePlanView = useMemo(
     () =>

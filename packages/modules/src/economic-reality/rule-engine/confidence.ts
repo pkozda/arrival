@@ -1,7 +1,5 @@
 import type { UserContextV1, EconomicBlockerId } from '@arrival-atlas/product-contract';
 import { computeSituationSignals } from '../../life-event/plan/signals.js';
-import { computeEconomicSignals } from './axes.js';
-import { buildEvaluationFromRules } from './rules.js';
 
 const STABLE_INCOME_THRESHOLD_EUR = 1200;
 

@@ -37,6 +37,7 @@ export type {
   EconomicRealityPlanResponseV1,
   EconomicRealityPlanErrorCode,
   EconomicEvaluationV1,
+  EconomicStateId,
   GraphContextV1,
   GraphExecutionStateV1,
   EconomicActionSetV1,
@@ -44,11 +45,16 @@ export type {
   EconomicPresentationV1,
   PresentationSectionV1,
   PresentationCardV1,
+  PresentationFocusV1,
   PresentationSectionType,
   PresentationUiType,
   ProfileDomain,
   DomainInsight,
   MissingContextHint,
+  ConfidenceLevel,
+  ProfileMirrorDomainSlug,
+  LifeStateId,
+  SecondaryConditionId,
 } from '@arrival-atlas/product-contract';
 
 export {

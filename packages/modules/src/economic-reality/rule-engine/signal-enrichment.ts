@@ -27,7 +27,14 @@ export function enrichSignalsWithFeedback(
     feedback.institutionEngagementDelta >= INSTITUTION_ENGAGEMENT_THRESHOLD &&
     enriched.institutionAxis === 'none'
   ) {
-    enriched.institutionAxis = 'jobcenter';
+    enriched.institutionAxis =
+      feedback.institutionEngagementTarget === 'sozialamt'
+        ? 'sozialamt'
+        : feedback.institutionEngagementTarget === 'jobcenter'
+          ? 'jobcenter'
+          : enriched.supportSystem === 'sozialamt'
+            ? 'sozialamt'
+            : 'jobcenter';
     if (enriched.supportSystem === 'none') {
       enriched.supportSystem = 'pending';
     }

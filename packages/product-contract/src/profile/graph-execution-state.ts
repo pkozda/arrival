@@ -17,6 +17,7 @@ export const EconomicSatisfactionKeySchema = z.enum([
   'benefits_active_jobcenter',
   'benefits_active_sozialamt',
   'jobcenter_case_open',
+  'sozialamt_case_open',
 ]);
 
 export type EconomicSatisfactionKey = z.infer<typeof EconomicSatisfactionKeySchema>;

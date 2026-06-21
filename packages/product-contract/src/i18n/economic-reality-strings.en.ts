@@ -48,6 +48,7 @@ export const ECONOMIC_REALITY_COPY_EN = {
   [ER_COPY_KEYS.UI_SESSION_NOT_READY]: 'Session is not ready',
   [ER_COPY_KEYS.UI_ACTION_STALE]: 'Action set is stale; refresh the economic plan',
   [ER_COPY_KEYS.UI_ACTION_FAILED]: 'Economic action execution failed',
+  [ER_COPY_KEYS.UI_ACTION_RECORDED]: 'Step recorded — your plan will update when your situation changes',
 } as const;
 
 export type EconomicRealityCopyEnKey = keyof typeof ECONOMIC_REALITY_COPY_EN;

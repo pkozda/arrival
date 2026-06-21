@@ -2,12 +2,12 @@
 
 import {
   createContext,
-  useContext,
-  useState,
   useCallback,
+  useContext,
   useEffect,
-  useRef,
   useMemo,
+  useRef,
+  useState,
   useSyncExternalStore,
   type ReactNode,
 } from 'react';
@@ -16,7 +16,6 @@ import {
   ensureSession,
   fetchModuleCatalog,
   fetchTranslations,
-  fetchUiSnapshot,
   updateSessionLanguage,
   updateSessionTheme,
 } from '@/lib/api';
@@ -27,14 +26,20 @@ import {
 import { loadDemoPreset as loadDemoPresetRequest } from '@/lib/demo/load-demo-preset';
 import type { DemoPersonaId } from '@arrival-atlas/life-event-demo/personas';
 import {
-  fetchUserContext,
   submitMutation as submitMutationRequest,
   buildHeaderLanguageMutation,
   buildHeaderThemeMutation,
 } from '@/lib/mutations';
 import { selectAppDisplayLanguage } from '@/lib/user-context';
-import { fetchProfileInsights } from '@/lib/profile-insights';
-import { fetchLifeEventPlan } from '@/lib/life-event-plan';
+import {
+  readStoredDisplayLanguage,
+  writeStoredDisplayLanguage,
+} from '@/lib/i18n/display-language';
+import { getRuntimeConsistencyModel } from '@/lib/runtime/runtimeConsistencyModel';
+import {
+  RuntimeConsistencyProvider,
+  useRuntimeConsistency,
+} from '@/lib/runtime/RuntimeConsistencyProvider';
 import { EconomicRealityPlanProvider } from '@/lib/economic-reality';
 import type {
   MutationRequest,
@@ -110,60 +115,226 @@ function useSystemColorScheme(): ResolvedTheme {
 
 const AppContext = createContext<AppState | null>(null);
 
-export function AppProvider({ children }: { children: ReactNode }) {
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [modules, setModules] = useState<PublicModuleContract[]>([]);
-  const [modulesLoading, setModulesLoading] = useState(true);
-  const [modulesError, setModulesError] = useState<string | null>(null);
-  const [userContext, setUserContext] = useState<UserContextV1 | null>(null);
-  const [userContextLoading, setUserContextLoading] = useState(true);
-  const [userContextError, setUserContextError] = useState<string | null>(null);
-  const [profileInsights, setProfileInsights] = useState<ProfileInsightViewV1 | null>(null);
-  const [profileInsightsLoading, setProfileInsightsLoading] = useState(true);
-  const [profileInsightsError, setProfileInsightsError] = useState<string | null>(null);
-  const [lifeEventPlan, setLifeEventPlan] = useState<LifeEventPlanV1 | null>(null);
-  const [lifeEventPlanLoading, setLifeEventPlanLoading] = useState(true);
-  const [lifeEventPlanError, setLifeEventPlanError] = useState<string | null>(null);
-  const [uiSnapshot, setUiSnapshot] = useState<UiSnapshot | null>(null);
-  const [uiSnapshotLoading, setUiSnapshotLoading] = useState(true);
-  const [uiSnapshotError, setUiSnapshotError] = useState<string | null>(null);
-  const [translations, setTranslations] = useState<Record<string, string>>({});
-  const [profileHeadRevision, setProfileHeadRevision] = useState(0);
+type ShellState = {
+  sessionId: string | null;
+  setSessionId: (sessionId: string) => void;
+  modules: PublicModuleContract[];
+  modulesLoading: boolean;
+  modulesError: string | null;
+  translations: Record<string, string>;
+  setTranslations: (translations: Record<string, string>) => void;
+};
 
-  const lastAppliedSnapshotVersionRef = useRef(-1);
-  const snapshotFetchGenerationRef = useRef(0);
-  const userContextFetchGenerationRef = useRef(0);
-  const profileInsightsFetchGenerationRef = useRef(0);
-  const lifeEventPlanFetchGenerationRef = useRef(0);
+const ShellContext = createContext<ShellState | null>(null);
 
-  const themePreference = useMemo(() => getThemePreference(uiSnapshot), [uiSnapshot]);
-  const systemTheme = useSystemColorScheme();
-  const sessionLanguage = useMemo(() => getSessionLanguage(uiSnapshot), [uiSnapshot]);
-  const language = useMemo(
-    () => selectAppDisplayLanguage(userContext, sessionLanguage),
-    [userContext, sessionLanguage]
+function useShell(): ShellState {
+  const shell = useContext(ShellContext);
+  if (!shell) {
+    throw new Error('useShell must be used within AppProvider');
+  }
+  return shell;
+}
+
+function AppProviderSessionLayer({ children }: { children: ReactNode }) {
+  const shell = useShell();
+  const consistency = useRuntimeConsistency();
+
+  const themePreference = useMemo(
+    () => getThemePreference(consistency.uiSnapshot),
+    [consistency.uiSnapshot]
   );
+  const systemTheme = useSystemColorScheme();
+  const sessionLanguage = useMemo(
+    () => getSessionLanguage(consistency.uiSnapshot),
+    [consistency.uiSnapshot]
+  );
+  const derivedLanguage = useMemo(
+    () => selectAppDisplayLanguage(consistency.userContext, sessionLanguage),
+    [consistency.userContext, sessionLanguage]
+  );
+  const languageRef = useRef<SupportedLanguage>('en');
+  const [clientLocaleReady, setClientLocaleReady] = useState(false);
+  const language = useMemo(() => {
+    const bootstrapping =
+      !clientLocaleReady ||
+      (consistency.userContext === null &&
+        consistency.uiSnapshot === null &&
+        (consistency.userContextLoading || consistency.uiSnapshotLoading));
+
+    if (!bootstrapping) {
+      languageRef.current = derivedLanguage;
+      writeStoredDisplayLanguage(derivedLanguage);
+    }
+
+    return languageRef.current;
+  }, [
+    derivedLanguage,
+    clientLocaleReady,
+    consistency.userContext,
+    consistency.uiSnapshot,
+    consistency.userContextLoading,
+    consistency.uiSnapshotLoading,
+  ]);
+
+  useEffect(() => {
+    const stored = readStoredDisplayLanguage();
+    if (stored) {
+      languageRef.current = stored;
+    }
+    setClientLocaleReady(true);
+  }, []);
   const theme = useMemo(
     () => (themePreference === 'system' ? systemTheme : resolveTheme(themePreference)),
     [themePreference, systemTheme]
   );
 
-  const applySnapshotIfNewer = useCallback((snapshot: UiSnapshot): boolean => {
-    if (snapshot.snapshotVersion > lastAppliedSnapshotVersionRef.current) {
-      lastAppliedSnapshotVersionRef.current = snapshot.snapshotVersion;
-      setUiSnapshot(snapshot);
-      return true;
-    }
-    return false;
-  }, []);
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  useEffect(() => {
+    const bundled = getTranslations(language);
+    fetchTranslations(language)
+      .then((fetched) => shell.setTranslations({ ...bundled, ...fetched }))
+      .catch(() => shell.setTranslations(bundled));
+  }, [language, shell.setTranslations]);
+
+  const refreshSessionState = useCallback(
+    () => consistency.requestSync('FULL'),
+    [consistency]
+  );
+
+  const refreshProfileScope = useCallback(
+    () => consistency.requestSync('PROFILE'),
+    [consistency]
+  );
+
+  const resetUserData = useCallback(
+    async (scope: DevResetScope = 'session') => {
+      const newSessionId = await resetDevUserData({
+        scope,
+        sessionId: shell.sessionId,
+        language,
+        theme: themePreference,
+      });
+      shell.setSessionId(newSessionId);
+    },
+    [shell, language, themePreference]
+  );
+
+  const loadDemoPreset = useCallback(
+    async (presetId: DemoPersonaId) => {
+      if (!shell.sessionId) {
+        throw new Error('Session not ready');
+      }
+      await loadDemoPresetRequest(shell.sessionId, presetId);
+      await consistency.requestSync('FULL');
+    },
+    [shell.sessionId, consistency]
+  );
+
+  const submitMutation = useCallback(
+    async (request: MutationRequest): Promise<{ userContext: UserContextV1; revision: number }> => {
+      if (!shell.sessionId) {
+        throw new Error('Session is not ready');
+      }
+
+      const result = await submitMutationRequest(request, shell.sessionId);
+      await getRuntimeConsistencyModel().ingest({
+        type: 'PROFILE_MUTATED',
+        revision: result.revision,
+        userContext: result.userContext,
+      });
+      return result;
+    },
+    [shell.sessionId]
+  );
+
+  const changeLanguage = useCallback(
+    async (lang: SupportedLanguage) => {
+      if (!shell.sessionId) return;
+      languageRef.current = lang;
+      writeStoredDisplayLanguage(lang);
+      await submitMutation(buildHeaderLanguageMutation(lang));
+      await updateSessionLanguage(shell.sessionId, lang);
+      await consistency.requestSync('FULL');
+    },
+    [shell.sessionId, submitMutation, consistency]
+  );
+
+  const changeTheme = useCallback(
+    async (next: ThemePreference) => {
+      if (!shell.sessionId) return;
+      await submitMutation(buildHeaderThemeMutation(next));
+      await updateSessionTheme(shell.sessionId, next);
+      await consistency.requestSync('PROFILE');
+    },
+    [shell.sessionId, submitMutation, consistency]
+  );
+
+  const toggleTheme = useCallback(async () => {
+    const next: ThemePreference = theme === 'dark' ? 'light' : 'dark';
+    await changeTheme(next);
+  }, [theme, changeTheme]);
+
+  const t = useCallback(
+    (key: string) => shell.translations[key] ?? getTranslations(language)[key] ?? key,
+    [shell.translations, language]
+  );
+
+  return (
+    <AppContext.Provider
+      value={{
+        language,
+        theme,
+        themePreference,
+        sessionId: shell.sessionId,
+        modules: shell.modules,
+        modulesLoading: shell.modulesLoading,
+        modulesError: shell.modulesError,
+        userContext: consistency.userContext,
+        userContextLoading: consistency.userContextLoading,
+        userContextError: consistency.userContextError,
+        profileInsights: consistency.profileInsights,
+        profileInsightsLoading: consistency.profileInsightsLoading,
+        profileInsightsError: consistency.profileInsightsError,
+        lifeEventPlan: consistency.lifeEventPlan,
+        lifeEventPlanLoading: consistency.lifeEventPlanLoading,
+        lifeEventPlanError: consistency.lifeEventPlanError,
+        uiSnapshot: consistency.uiSnapshot,
+        uiSnapshotLoading: consistency.uiSnapshotLoading,
+        uiSnapshotError: consistency.uiSnapshotError,
+        translations: shell.translations,
+        refreshUserContext: refreshProfileScope,
+        refreshProfileInsights: refreshProfileScope,
+        refreshLifeEventPlan: refreshProfileScope,
+        refreshUiSnapshot: refreshProfileScope,
+        refreshSessionState,
+        resetUserData,
+        loadDemoPreset,
+        submitMutation,
+        profileHeadRevision: consistency.profileHeadRevision,
+        changeLanguage,
+        changeTheme,
+        toggleTheme,
+        t,
+      }}
+    >
+      <EconomicRealityPlanProvider>{children}</EconomicRealityPlanProvider>
+    </AppContext.Provider>
+  );
+}
+
+export function AppProvider({ children }: { children: ReactNode }) {
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [modules, setModules] = useState<PublicModuleContract[]>([]);
+  const [modulesLoading, setModulesLoading] = useState(true);
+  const [modulesError, setModulesError] = useState<string | null>(null);
+  const [translations, setTranslations] = useState<Record<string, string>>({});
 
   useEffect(() => {
     clearLegacyThemeStorage();
   }, []);
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
 
   useEffect(() => {
     let cancelled = false;
@@ -190,7 +361,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     ensureSession({
       userProfile: {
-        language: 'en',
+        language: readStoredDisplayLanguage() ?? 'en',
         uiPreferences: { theme: 'light' },
       },
     })
@@ -198,339 +369,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
       .catch(console.error);
   }, []);
 
-  const refreshUserContext = useCallback(async () => {
-    if (!sessionId) return;
-
-    const requestId = ++userContextFetchGenerationRef.current;
-
-    setUserContextLoading(true);
-    setUserContextError(null);
-
-    try {
-      const context = await fetchUserContext(sessionId);
-      if (requestId !== userContextFetchGenerationRef.current) {
-        return;
-      }
-      setUserContext(context);
-    } catch (err: unknown) {
-      if (requestId !== userContextFetchGenerationRef.current) {
-        return;
-      }
-      setUserContextError(err instanceof Error ? err.message : 'Failed to load your situation');
-    } finally {
-      if (requestId === userContextFetchGenerationRef.current) {
-        setUserContextLoading(false);
-      }
-    }
-  }, [sessionId]);
-
-  const refreshProfileInsights = useCallback(async () => {
-    if (!sessionId) return;
-
-    const requestId = ++profileInsightsFetchGenerationRef.current;
-
-    setProfileInsightsLoading(true);
-    setProfileInsightsError(null);
-
-    try {
-      const insights = await fetchProfileInsights(sessionId);
-      if (requestId !== profileInsightsFetchGenerationRef.current) {
-        return;
-      }
-      setProfileInsights(insights);
-    } catch (err: unknown) {
-      if (requestId !== profileInsightsFetchGenerationRef.current) {
-        return;
-      }
-      setProfileInsightsError(err instanceof Error ? err.message : 'Failed to load situation insights');
-    } finally {
-      if (requestId === profileInsightsFetchGenerationRef.current) {
-        setProfileInsightsLoading(false);
-      }
-    }
-  }, [sessionId]);
-
-  const refreshLifeEventPlan = useCallback(async () => {
-    if (!sessionId) return;
-
-    const requestId = ++lifeEventPlanFetchGenerationRef.current;
-
-    setLifeEventPlanLoading(true);
-    setLifeEventPlanError(null);
-
-    try {
-      const plan = await fetchLifeEventPlan(sessionId);
-      if (requestId !== lifeEventPlanFetchGenerationRef.current) {
-        return;
-      }
-      setLifeEventPlan(plan);
-    } catch (err: unknown) {
-      if (requestId !== lifeEventPlanFetchGenerationRef.current) {
-        return;
-      }
-      setLifeEventPlan(null);
-      setLifeEventPlanError(
-        err instanceof Error ? err.message : 'Failed to load your next steps plan'
-      );
-    } finally {
-      if (requestId === lifeEventPlanFetchGenerationRef.current) {
-        setLifeEventPlanLoading(false);
-      }
-    }
-  }, [sessionId]);
-
-  const refreshUiSnapshot = useCallback(async () => {
-    if (!sessionId) return;
-
-    const requestId = ++snapshotFetchGenerationRef.current;
-
-    setUiSnapshotLoading(true);
-    setUiSnapshotError(null);
-
-    try {
-      const snapshot = await fetchUiSnapshot(sessionId);
-      if (requestId !== snapshotFetchGenerationRef.current) {
-        return;
-      }
-      applySnapshotIfNewer(snapshot);
-    } catch (err: unknown) {
-      if (requestId !== snapshotFetchGenerationRef.current) {
-        return;
-      }
-      setUiSnapshotError(err instanceof Error ? err.message : 'Failed to refresh your situation');
-    } finally {
-      if (requestId === snapshotFetchGenerationRef.current) {
-        setUiSnapshotLoading(false);
-      }
-    }
-  }, [sessionId, applySnapshotIfNewer]);
-
-  const refreshSessionState = useCallback(async () => {
-    await Promise.all([refreshUserContext(), refreshProfileInsights(), refreshLifeEventPlan(), refreshUiSnapshot()]);
-  }, [refreshUserContext, refreshProfileInsights, refreshLifeEventPlan, refreshUiSnapshot]);
-
-  const resetUserData = useCallback(
-    async (scope: DevResetScope = 'session') => {
-      const newSessionId = await resetDevUserData({
-        scope,
-        sessionId,
-        language,
-        theme: themePreference,
-      });
-
-      lastAppliedSnapshotVersionRef.current = -1;
-      setProfileHeadRevision(0);
-      setUserContext(null);
-      setProfileInsights(null);
-      setLifeEventPlan(null);
-      setUiSnapshot(null);
-      setSessionId(newSessionId);
-    },
-    [sessionId, language, themePreference]
-  );
-
-  const loadDemoPreset = useCallback(
-    async (presetId: DemoPersonaId) => {
-      if (!sessionId) {
-        throw new Error('Session not ready');
-      }
-
-      await loadDemoPresetRequest(sessionId, presetId);
-      lastAppliedSnapshotVersionRef.current = -1;
-      await refreshSessionState();
-    },
-    [sessionId, refreshSessionState]
-  );
-
-  useEffect(() => {
-    if (!sessionId) {
-      return;
-    }
-
-    let cancelled = false;
-
-    setUserContextLoading(true);
-    setProfileInsightsLoading(true);
-    setLifeEventPlanLoading(true);
-    setUiSnapshotLoading(true);
-    setUserContextError(null);
-    setProfileInsightsError(null);
-    setLifeEventPlanError(null);
-    setUiSnapshotError(null);
-
-    const userContextRequestId = ++userContextFetchGenerationRef.current;
-    const profileInsightsRequestId = ++profileInsightsFetchGenerationRef.current;
-    const lifeEventPlanRequestId = ++lifeEventPlanFetchGenerationRef.current;
-    const snapshotRequestId = ++snapshotFetchGenerationRef.current;
-
-    void Promise.allSettled([
-      fetchUserContext(sessionId),
-      fetchProfileInsights(sessionId),
-      fetchLifeEventPlan(sessionId),
-      fetchUiSnapshot(sessionId),
-    ]).then((results) => {
-      if (cancelled) {
-        return;
-      }
-
-      const [contextResult, insightsResult, planResult, snapshotResult] = results;
-
-      if (userContextRequestId === userContextFetchGenerationRef.current) {
-        if (contextResult.status === 'fulfilled') {
-          setUserContext(contextResult.value);
-          setUserContextError(null);
-        } else {
-          setUserContext(null);
-          setUserContextError(
-            contextResult.reason instanceof Error
-              ? contextResult.reason.message
-              : 'Failed to load your situation'
-          );
-        }
-        setUserContextLoading(false);
-      }
-
-      if (profileInsightsRequestId === profileInsightsFetchGenerationRef.current) {
-        if (insightsResult.status === 'fulfilled') {
-          setProfileInsights(insightsResult.value);
-          setProfileInsightsError(null);
-        } else {
-          setProfileInsights(null);
-          setProfileInsightsError(
-            insightsResult.reason instanceof Error
-              ? insightsResult.reason.message
-              : 'Failed to load situation insights'
-          );
-        }
-        setProfileInsightsLoading(false);
-      }
-
-      if (lifeEventPlanRequestId === lifeEventPlanFetchGenerationRef.current) {
-        if (planResult.status === 'fulfilled') {
-          setLifeEventPlan(planResult.value);
-          setLifeEventPlanError(null);
-        } else {
-          setLifeEventPlan(null);
-          setLifeEventPlanError(
-            planResult.reason instanceof Error
-              ? planResult.reason.message
-              : 'Failed to load your next steps plan'
-          );
-        }
-        setLifeEventPlanLoading(false);
-      }
-
-      if (snapshotRequestId === snapshotFetchGenerationRef.current) {
-        if (snapshotResult.status === 'fulfilled') {
-          applySnapshotIfNewer(snapshotResult.value);
-          setUiSnapshotError(null);
-        } else {
-          setUiSnapshot(null);
-          setUiSnapshotError(
-            snapshotResult.reason instanceof Error
-              ? snapshotResult.reason.message
-              : 'Failed to refresh your situation'
-          );
-        }
-        setUiSnapshotLoading(false);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [sessionId, applySnapshotIfNewer]);
-
-  useEffect(() => {
-    fetchTranslations(language).then(setTranslations).catch(console.error);
-  }, [language]);
-
-  const submitMutation = useCallback(
-    async (request: MutationRequest): Promise<{ userContext: UserContextV1; revision: number }> => {
-      if (!sessionId) {
-        throw new Error('Session is not ready');
-      }
-
-      const result = await submitMutationRequest(request, sessionId);
-      setUserContext(result.userContext);
-      setProfileHeadRevision(result.revision);
-      void refreshProfileInsights();
-      void refreshLifeEventPlan();
-      return result;
-    },
-    [sessionId, refreshProfileInsights, refreshLifeEventPlan]
-  );
-
-  const changeLanguage = useCallback(
-    async (lang: SupportedLanguage) => {
-      if (!sessionId) return;
-      await submitMutation(buildHeaderLanguageMutation(lang));
-      await updateSessionLanguage(sessionId, lang);
-      await refreshUiSnapshot();
-    },
-    [sessionId, submitMutation, refreshUiSnapshot]
-  );
-
-  const changeTheme = useCallback(
-    async (next: ThemePreference) => {
-      if (!sessionId) return;
-      await submitMutation(buildHeaderThemeMutation(next));
-      await updateSessionTheme(sessionId, next);
-      await refreshUiSnapshot();
-    },
-    [sessionId, submitMutation, refreshUiSnapshot]
-  );
-
-  const toggleTheme = useCallback(async () => {
-    const next: ThemePreference = theme === 'dark' ? 'light' : 'dark';
-    await changeTheme(next);
-  }, [theme, changeTheme]);
-
-  const t = useCallback(
-    (key: string) => translations[key] ?? getTranslations('en')[key] ?? key,
-    [translations]
+  const shellValue = useMemo<ShellState>(
+    () => ({
+      sessionId,
+      setSessionId,
+      modules,
+      modulesLoading,
+      modulesError,
+      translations,
+      setTranslations,
+    }),
+    [sessionId, modules, modulesLoading, modulesError, translations]
   );
 
   return (
-    <AppContext.Provider
-      value={{
-        language,
-        theme,
-        themePreference,
-        sessionId,
-        modules,
-        modulesLoading,
-        modulesError,
-        userContext,
-        userContextLoading,
-        userContextError,
-        profileInsights,
-        profileInsightsLoading,
-        profileInsightsError,
-        lifeEventPlan,
-        lifeEventPlanLoading,
-        lifeEventPlanError,
-        uiSnapshot,
-        uiSnapshotLoading,
-        uiSnapshotError,
-        translations,
-        refreshUserContext,
-        refreshProfileInsights,
-        refreshLifeEventPlan,
-        refreshUiSnapshot,
-        refreshSessionState,
-        resetUserData,
-        loadDemoPreset,
-        submitMutation,
-        profileHeadRevision,
-        changeLanguage,
-        changeTheme,
-        toggleTheme,
-        t,
-      }}
-    >
-      <EconomicRealityPlanProvider sessionId={sessionId}>{children}</EconomicRealityPlanProvider>
-    </AppContext.Provider>
+    <ShellContext.Provider value={shellValue}>
+      <RuntimeConsistencyProvider sessionId={sessionId}>
+        <AppProviderSessionLayer>{children}</AppProviderSessionLayer>
+      </RuntimeConsistencyProvider>
+    </ShellContext.Provider>
   );
 }
 

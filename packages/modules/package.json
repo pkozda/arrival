@@ -21,10 +21,14 @@
     "./module-orchestration": {
       "types": "./dist/module-orchestration/index.d.ts",
       "import": "./dist/module-orchestration/index.js"
+    },
+    "./i18n": {
+      "types": "./dist/i18n/index.d.ts",
+      "import": "./dist/i18n/index.js"
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

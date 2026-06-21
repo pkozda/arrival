@@ -145,7 +145,8 @@ describe('GET /api/ui-snapshot', () => {
 
     expect(snapshot).not.toHaveProperty('profile');
     expect(snapshot.userContext.profile).not.toBeNull();
-    expect(snapshot.userContext.profile?.preferences.preferredLanguage).toBe('en');
+    expect(snapshot.userContext.profile?.preferences.preferredLanguage).toBeUndefined();
+    expect(snapshot.session.language).toBe('en');
     expect(snapshot.userContext.profile?.domains.income?.grossMonthlyIncome).toBe(2500);
     expect(snapshot.executions).toHaveLength(1);
     expect(snapshot.executions[0]?.moduleId).toBe('financial-reality');

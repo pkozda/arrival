@@ -1,5 +1,4 @@
 import type {
-  EconomicEvaluationV1,
   EconomicFeedbackSignalsV1,
   EconomicRealityEventV1,
   EconomicStateId,

@@ -22,8 +22,7 @@ type Props = {
 
 export function EconomicRealityPage({ mode, state, showDebug = false }: Props) {
   const copy = useEconomicCopy();
-  const { refetch } = useEconomicRealityPlan();
-  const { trackModuleEntered } = useEconomicFeedbackTracker(refetch);
+  const { trackModuleEntered } = useEconomicFeedbackTracker();
 
   useEffect(() => {
     if (state.deterministicHash) {

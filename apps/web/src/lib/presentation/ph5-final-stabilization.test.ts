@@ -27,6 +27,9 @@ const PH5_HOME_KEYS = [
   'life-event.explorer.notPersonalizedPlan',
   'life-event.explorer.simulationOnly',
   'life-event.explorer.doesNotAffectPlan',
+  'life-event.intake.title',
+  'life-event.intake.description',
+  'life-event.intake.submit',
 ] as const;
 
 const LEGACY_EN_MARKERS = [

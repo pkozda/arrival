@@ -48,4 +48,5 @@ export const ECONOMIC_REALITY_COPY_DE = {
   [ER_COPY_KEYS.UI_SESSION_NOT_READY]: 'Sitzung ist nicht bereit',
   [ER_COPY_KEYS.UI_ACTION_STALE]: 'Aktionsliste veraltet; Wirtschaftsplan aktualisieren',
   [ER_COPY_KEYS.UI_ACTION_FAILED]: 'Wirtschaftsaktion konnte nicht ausgeführt werden',
+  [ER_COPY_KEYS.UI_ACTION_RECORDED]: 'Schritt erfasst — der Plan aktualisiert sich bei Änderungen Ihrer Situation',
 } as const;
