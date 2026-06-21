@@ -30,6 +30,8 @@ import {
   isLegacyExecuteContract,
   sealModuleResultForProjection,
 } from './module-execute-response.js';
+import { registerDemoToolsRoutes } from './routes/demo-tools.js';
+import { registerDevToolsRoutes } from './routes/dev-tools.js';
 import { registerSessionLifecycleRoutes } from './routes/session-lifecycle.js';
 import { registerAccountRoutes } from './routes/account.js';
 import { registerProfileRoutes } from './routes/profile.js';
@@ -441,6 +443,8 @@ export async function buildApp(options: { logger?: boolean } = {}) {
   await registerUiSnapshotRoutes(app);
   await registerAccountRoutes(app);
   await registerSessionLifecycleRoutes(app);
+  await registerDevToolsRoutes(app);
+  await registerDemoToolsRoutes(app);
 
   securedRoute(
     app,

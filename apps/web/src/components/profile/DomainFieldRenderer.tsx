@@ -14,7 +14,7 @@ export function DomainFieldRenderer({ field, value, onChange, disabled = false }
 
   if (field.type === 'boolean') {
     return (
-      <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className="form-group">
         <input
           id={inputId}
           type="checkbox"
@@ -22,9 +22,7 @@ export function DomainFieldRenderer({ field, value, onChange, disabled = false }
           disabled={disabled}
           onChange={(event) => onChange(field.formKey, event.target.checked)}
         />
-        <label htmlFor={inputId} style={{ margin: 0 }}>
-          {field.label}
-        </label>
+        <label htmlFor={inputId}>{field.label}</label>
       </div>
     );
   }

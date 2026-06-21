@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-label="Explorer completed (placeholder)">
+  <rect width="1280" height="800" fill="#f4f6f8"/>
+  <rect x="40" y="80" width="1200" height="520" rx="16" fill="#fff" stroke="#16a34a" stroke-width="2"/>
+  <text x="64" y="130" font-family="system-ui,sans-serif" font-size="22" fill="#166534">Simulation complete</text>
+  <text x="64" y="180" font-family="system-ui,sans-serif" font-size="16" fill="#334155">Focus shifts to income stabilization and support eligibility.</text>
+</svg>

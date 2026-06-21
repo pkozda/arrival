@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-label="Timeline (placeholder)">
+  <rect width="1280" height="800" fill="#f4f6f8"/>
+  <text x="40" y="60" font-family="system-ui,sans-serif" font-size="22" fill="#1a2b3c">Plan timeline</text>
+  <line x1="120" y1="400" x2="1160" y2="400" stroke="#94a3b8" stroke-width="4"/>
+  <circle cx="200" cy="400" r="16" fill="#2563eb"/>
+  <circle cx="480" cy="400" r="16" fill="#2563eb"/>
+  <circle cx="760" cy="400" r="16" fill="#cbd5e1"/>
+  <circle cx="1040" cy="400" r="16" fill="#cbd5e1"/>
+  <text x="160" y="450" font-family="system-ui,sans-serif" font-size="13" fill="#475569">Identify programs</text>
+  <text x="420" y="450" font-family="system-ui,sans-serif" font-size="13" fill="#475569">Application path</text>
+</svg>

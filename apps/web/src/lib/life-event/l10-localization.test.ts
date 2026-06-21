@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getTranslations, t as platformT } from '@arrival-atlas/core';
+import { getTranslations } from '@arrival-atlas/core';
 import {
   lifeEventPlanConfidenceLabel,
   lifeEventSeverityLabel,
@@ -39,10 +39,9 @@ describe('L10-A life event localization', () => {
     expect(de['common.submit']).toBe('Beratung erhalten');
   });
 
-  it('does not crash on missing keys and uses platform fallback', () => {
-    expect(() => platformT('life-event.state.unknown_state', 'de')).not.toThrow();
-    expect(platformT('life-event.state.unknown_state', 'de')).toBe('life-event.state.unknown_state');
-    expect(platformT('life-event.state.arrival_unregistered', 'de')).toBe('Neu angekommen');
+  it('falls back to unknown state label for missing keys', () => {
+    expect(lifeEventStateLabel(localeT('de'), 'unknown_state')).toBe('Unbekannte Situation');
+    expect(lifeEventSeverityLabel(localeT('de'), 'unknown_severity')).toBe('Unbekannte Priorität');
   });
 
   it('localizes plan confidence labels', () => {

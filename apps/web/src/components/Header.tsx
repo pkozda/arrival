@@ -9,6 +9,8 @@ import {
   groupModulesByCategory,
 } from '@/lib/module-catalog-utils';
 import { PRODUCT_NAME, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@/lib/product-contract';
+import { isDevToolsUiEnabled } from '@/lib/dev-tools/reset-user-data';
+import { DEMO_PERSONA_IDS, getDemoPersona, type DemoPersonaId } from '@arrival-atlas/life-event-demo/personas';
 
 function ThemeIcon({ theme }: { theme: 'light' | 'dark' }) {
   if (theme === 'dark') {
@@ -101,9 +103,45 @@ function CategoryNavSection({
 
 export function Header() {
   const pathname = usePathname();
-  const { language, changeLanguage, theme, toggleTheme, t, modules } = useApp();
+  const { language, changeLanguage, theme, toggleTheme, t, modules, resetUserData, loadDemoPreset } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [resetting, setResetting] = useState<'session' | 'all' | null>(null);
+  const [loadingPreset, setLoadingPreset] = useState<DemoPersonaId | null>(null);
   const groupedModules = useMemo(() => groupModulesByCategory(modules), [modules]);
+  const devToolsEnabled = isDevToolsUiEnabled();
+
+  async function handleReset(scope: 'session' | 'all') {
+    const label = scope === 'all' ? 'all local dev state' : 'your session data';
+    if (!window.confirm(`Clear ${label}? This cannot be undone.`)) {
+      return;
+    }
+
+    setResetting(scope);
+    try {
+      await resetUserData(scope);
+      setMenuOpen(false);
+    } catch (error) {
+      console.error(error);
+      window.alert(error instanceof Error ? error.message : 'Reset failed');
+    } finally {
+      setResetting(null);
+    }
+  }
+
+  async function handleLoadPreset(presetId: DemoPersonaId) {
+    const persona = getDemoPersona(presetId);
+    setLoadingPreset(presetId);
+    try {
+      await loadDemoPreset(presetId);
+      setMenuOpen(false);
+      window.alert(`Demo loaded: ${persona.title}`);
+    } catch (error) {
+      console.error(error);
+      window.alert(error instanceof Error ? error.message : 'Failed to load demo preset');
+    } finally {
+      setLoadingPreset(null);
+    }
+  }
 
   useEffect(() => {
     setMenuOpen(false);
@@ -209,6 +247,47 @@ export function Header() {
         </ul>
 
         <div className="header-drawer-footer">
+          {devToolsEnabled && (
+            <div className="header-dev-tools">
+              <span className="header-drawer-label">Dev tools</span>
+              <div className="header-dev-tools-actions">
+                <button
+                  type="button"
+                  className="header-dev-btn"
+                  disabled={resetting !== null}
+                  onClick={() => void handleReset('session')}
+                >
+                  {resetting === 'session' ? 'Resetting…' : 'Reset my data'}
+                </button>
+                <button
+                  type="button"
+                  className="header-dev-btn header-dev-btn--danger"
+                  disabled={resetting !== null}
+                  onClick={() => void handleReset('all')}
+                >
+                  {resetting === 'all' ? 'Clearing…' : 'Clear all local state'}
+                </button>
+              </div>
+              <span className="header-drawer-label">Life Event demos</span>
+              <div className="header-dev-tools-actions header-dev-tools-actions--stack">
+                {DEMO_PERSONA_IDS.map((presetId) => {
+                  const persona = getDemoPersona(presetId);
+                  return (
+                    <button
+                      key={presetId}
+                      type="button"
+                      className="header-dev-btn"
+                      disabled={loadingPreset !== null || resetting !== null}
+                      onClick={() => void handleLoadPreset(presetId)}
+                    >
+                      {loadingPreset === presetId ? 'Loading…' : persona.title.replace('Persona ', '')}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <span className="header-drawer-label">{t('common.language')}</span>
           <div className="header-lang-group">
             {SUPPORTED_LANGUAGES.map((lang) => (

@@ -75,6 +75,19 @@ export function writeStoredSessionAuth(sessionId: string, token: string | null |
   }
 }
 
+export function clearStoredSessionAuth(): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    localStorage.removeItem(SESSION_STORAGE_KEY);
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 export function buildAuthHeaders(options: AuthHeaderOptions = {}): Record<string, string> {
   const sessionId = options.sessionId ?? readStoredSessionId();
   const token = options.token ?? readStoredToken();

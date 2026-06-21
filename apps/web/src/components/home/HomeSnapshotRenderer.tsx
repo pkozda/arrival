@@ -12,8 +12,8 @@ import {
 } from '@/components/home/OnboardingChecklistCard';
 import { SuggestedModulesSection } from '@/components/home/SuggestedModulesSection';
 import { YourSituationSummaryCard } from '@/components/home/YourSituationSummaryCard';
-import { MissingContextHintsCard } from '@/components/home/MissingContextHintsCard';
 import { NextStepsCard } from '@/components/home/NextStepsCard';
+import { LifeEventColdStartCard } from '@/components/home/LifeEventColdStartCard';
 import {
   buildModuleContractLookup,
   capabilityVisibilityFromContract,
@@ -33,6 +33,7 @@ import { resolveScenario } from '@/lib/life-event/scenarios';
 import { humanizePriority } from '@/lib/ux-labels';
 import { useApp } from '@/components/AppProvider';
 import { selectUserContextProfile } from '@/lib/user-context';
+import { shouldShowLifeEventColdStart, shouldHideHomeSecondarySections } from '@/lib/presentation/home-p0';
 
 type Props = {
   snapshot: UiSnapshot;
@@ -70,13 +71,15 @@ function ActionCardItem({ card }: { card: ActionCard }) {
 }
 
 function PriorityActionsSection({ items }: { items: ActionCard[] }) {
+  const { t } = useApp();
+
   if (items.length === 0) {
     return null;
   }
 
   return (
     <section style={cardStyle}>
-      <SectionTitle>Priority actions</SectionTitle>
+      <SectionTitle>{t('life-event.home.priorityActions')}</SectionTitle>
       <div className="card">
         {items.map((item) => (
           <ActionCardItem key={item.actionId} card={item} />
@@ -135,7 +138,15 @@ function mergePriorityActions(
 
 export function HomeSnapshotRenderer({ snapshot }: Props) {
   const { executions, session } = snapshot;
-  const { modules, userContext, profileInsights, lifeEventPlan, lifeEventPlanLoading, lifeEventPlanError } = useApp();
+  const {
+    modules,
+    userContext,
+    profileInsights,
+    lifeEventPlan,
+    lifeEventPlanLoading,
+    lifeEventPlanError,
+    t,
+  } = useApp();
   const profile = selectUserContextProfile(userContext);
   const [onboardingDismissed, dismissOnboarding] = useOnboardingDismissed();
 
@@ -186,20 +197,27 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
       )
     : [];
 
+  const showColdStart = shouldShowLifeEventColdStart({
+    plan: lifeEventPlan,
+    planLoading: lifeEventPlanLoading,
+    executionSurface: homePlanView.nextSteps.executionSurface,
+  });
+
+  const hideSecondarySections = shouldHideHomeSecondarySections({
+    planLoading: lifeEventPlanLoading,
+    showPlanCard: homePlanView.nextSteps.showCard,
+    showColdStart,
+  });
+
   return (
     <>
       {showOnboarding && (
         <OnboardingChecklistCard steps={onboardingSteps} onDismiss={dismissOnboarding} />
       )}
 
-      <YourSituationSummaryCard summary={situationSummary} />
+      {!showColdStart && <YourSituationSummaryCard summary={situationSummary} />}
 
-      {homePlanView.p4.showCard && (
-        <MissingContextHintsCard
-          completenessSummary={homePlanView.p4.completenessSummary}
-          hints={homePlanView.p4.hints}
-        />
-      )}
+      {showColdStart && <LifeEventColdStartCard />}
 
       <NextStepsCard
         plan={lifeEventPlan}
@@ -207,17 +225,27 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
         error={lifeEventPlanError}
         executionSurface={homePlanView.nextSteps.executionSurface}
         scenario={scenarioMatch}
+        insight={{
+          completenessSummary: homePlanView.p4.completenessSummary,
+          hints: homePlanView.p4.showCard ? homePlanView.p4.hints : [],
+        }}
       />
 
-      {homePlanView.suggestedModules.showSection && (
-        <SuggestedModulesSection suggestions={homePlanView.suggestedModules.items} />
+      {homePlanView.suggestedModules.showSection &&
+        !hideSecondarySections &&
+        !homePlanView.nextSteps.showCard && (
+        <div style={{ opacity: 0.88, marginTop: '0.25rem' }}>
+          <SuggestedModulesSection suggestions={homePlanView.suggestedModules.items} />
+        </div>
       )}
 
-      <PriorityActionsSection items={priorityActions} />
+      {!hideSecondarySections && !homePlanView.nextSteps.showCard && (
+        <PriorityActionsSection items={priorityActions} />
+      )}
 
-      {groupedModules.length > 0 && (
+      {!hideSecondarySections && groupedModules.length > 0 && (
         <section style={cardStyle}>
-          <SectionTitle>Browse topics by category</SectionTitle>
+          <SectionTitle>{t('life-event.home.browseTopics')}</SectionTitle>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {groupedModules.map(({ category, modules: categoryModules }) => (
               <div key={category}>
@@ -252,7 +280,7 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
 
       {executions.length > 0 && (
         <section style={cardStyle}>
-          <SectionTitle>Recent results</SectionTitle>
+          <SectionTitle>{t('life-event.home.recentResults')}</SectionTitle>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {executions.map((execution) => {
               const contract = moduleLookup.get(execution.moduleId);

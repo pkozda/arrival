@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-label="Module hero (placeholder)">
+  <rect width="1280" height="800" fill="#f4f6f8"/>
+  <rect x="40" y="80" width="1200" height="220" rx="20" fill="#1e3a5f"/>
+  <text x="72" y="150" font-family="system-ui,sans-serif" font-size="28" fill="#ffffff">Complete Anmeldung</text>
+  <text x="72" y="190" font-family="system-ui,sans-serif" font-size="16" fill="#cbd5e1">arrival_unregistered · critical</text>
+  <rect x="72" y="220" width="220" height="48" rx="10" fill="#2563eb"/>
+  <text x="96" y="250" font-family="system-ui,sans-serif" font-size="15" fill="#fff">Primary action</text>
+</svg>

@@ -14,6 +14,7 @@
     "@arrival-atlas/core": "*",
     "@arrival-atlas/module-runtime": "*",
     "@arrival-atlas/module-sdk": "*",
+    "@arrival-atlas/life-event-demo": "*",
     "@arrival-atlas/modules": "*",
     "@arrival-atlas/observability": "*",
     "@arrival-atlas/product-contract": "*",

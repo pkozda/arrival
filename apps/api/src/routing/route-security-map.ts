@@ -229,6 +229,30 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
     tier: 'account-required',
     description: 'Revoke single session',
   },
+  {
+    method: 'POST',
+    path: '/api/dev/reset-user-data',
+    tier: 'credential-required',
+    description: 'Dev-only: delete current session persisted state',
+  },
+  {
+    method: 'POST',
+    path: '/api/dev/reset-all-state',
+    tier: 'credential-required',
+    description: 'Dev-only: wipe local persisted state store',
+  },
+  {
+    method: 'GET',
+    path: '/api/dev/demo/presets',
+    tier: 'credential-required',
+    description: 'Dev-only: list life-event demo presets',
+  },
+  {
+    method: 'POST',
+    path: '/api/dev/demo/load-preset',
+    tier: 'credential-required',
+    description: 'Dev-only: seed session with life-event demo persona',
+  },
 ];
 
 export const RouteSecurityMap: readonly RouteSecurityRule[] = Object.freeze(

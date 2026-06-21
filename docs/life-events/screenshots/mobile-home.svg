@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" role="img" aria-label="Mobile home (placeholder)">
+  <rect width="390" height="844" fill="#f4f6f8"/>
+  <rect x="16" y="60" width="358" height="48" rx="10" fill="#e8f0fe"/>
+  <text x="28" y="90" font-family="system-ui,sans-serif" font-size="14" fill="#1a2b3c">Active plan · Anmeldung</text>
+  <rect x="16" y="130" width="358" height="280" rx="14" fill="#fff" stroke="#c5cdd6"/>
+</svg>

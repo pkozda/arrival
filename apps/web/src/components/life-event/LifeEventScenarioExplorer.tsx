@@ -26,9 +26,14 @@ const MODULE_ID = 'life-event';
 type Props = {
   contract: PublicModuleContract;
   initialScenarioEvent?: string;
+  embeddedInPanel?: boolean;
 };
 
-export function LifeEventScenarioExplorer({ contract, initialScenarioEvent }: Props) {
+export function LifeEventScenarioExplorer({
+  contract,
+  initialScenarioEvent,
+  embeddedInPanel = false,
+}: Props) {
   const { sessionId, language, t, refreshSessionState, userContext, profileInsights } = useApp();
   const userProfile = selectUserContextProfile(userContext);
   const uiState = useModuleSnapshot(MODULE_ID);
@@ -44,10 +49,11 @@ export function LifeEventScenarioExplorer({ contract, initialScenarioEvent }: Pr
     () => profilePrefillApplied(schemaDefaults, defaults),
     [schemaDefaults, defaults]
   );
-  const prefillMessage = useMemo(
+  const prefillMessageKey = useMemo(
     () => resolvePrefillConfidenceMessage(profileInsights),
     [profileInsights]
   );
+  const prefillMessage = t(prefillMessageKey);
 
   const schemaLabelResolver = useMemo(() => createLifeEventSchemaLabelResolver(t), [t]);
 
@@ -80,7 +86,7 @@ export function LifeEventScenarioExplorer({ contract, initialScenarioEvent }: Pr
     return () => {
       cancelled = true;
     };
-  }, [userProfile, initialScenarioEvent]);
+  }, [userProfile, initialScenarioEvent, t]);
 
   const formKey = useMemo(
     () => `${MODULE_ID}-${uiState.snapshotVersion}-${stableFormDefaultsKey(defaults)}`,
@@ -116,17 +122,25 @@ export function LifeEventScenarioExplorer({ contract, initialScenarioEvent }: Pr
   }
 
   return (
-    <section className="card">
-      <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-        {t('life-event.explorer.title')}
-      </h2>
-      <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-        {t('life-event.explorer.description')}
-      </p>
+    <section
+      className={`le-explorer${embeddedInPanel ? ' le-explorer--embedded' : ' card'}`}
+      aria-labelledby={embeddedInPanel ? undefined : 'le-explorer-title'}
+    >
+      {!embeddedInPanel && (
+        <header className="le-explorer__header">
+          <span className="le-explorer__badge">{t('life-event.explorer.simulationBadge')}</span>
+          <h2 id="le-explorer-title" className="le-explorer__title">
+            {t('life-event.explorer.title')}
+          </h2>
+          <p className="le-explorer__description">{t('life-event.explorer.description')}</p>
+        </header>
+      )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.5rem' }}>
+      <div className="le-explorer__grid">
         {schemaError ? (
-          <div style={{ color: 'var(--color-danger)' }}>{schemaError}</div>
+          <div style={{ color: 'var(--color-danger)' }} role="alert">
+            {schemaError}
+          </div>
         ) : (
           <>
             <ProfilePrefillBanner visible={showProfilePrefillBanner} message={prefillMessage} />
@@ -135,7 +149,7 @@ export function LifeEventScenarioExplorer({ contract, initialScenarioEvent }: Pr
               fields={fields}
               defaults={defaults}
               disabled={loading || uiState.isStale}
-              submitLabel={loading ? t('common.loading') : t('common.submit')}
+              submitLabel={loading ? t('common.loading') : t('life-event.explorer.submit')}
               labelResolver={schemaLabelResolver}
               onSubmit={handleSubmit}
             />

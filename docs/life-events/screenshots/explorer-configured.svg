@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-label="Explorer configured (placeholder)">
+  <rect width="1280" height="800" fill="#f4f6f8"/>
+  <rect x="40" y="80" width="1200" height="520" rx="16" fill="#fff" stroke="#c5cdd6"/>
+  <text x="64" y="130" font-family="system-ui,sans-serif" font-size="22" fill="#1a2b3c">Scenario Explorer  Job loss</text>
+  <rect x="64" y="160" width="400" height="48" rx="8" fill="#e2e8f0"/>
+  <text x="80" y="190" font-family="system-ui,sans-serif" font-size="14" fill="#334155">Event selected · not yet submitted</text>
+  <rect x="64" y="240" width="200" height="44" rx="8" fill="#2563eb"/>
+  <text x="88" y="268" font-family="system-ui,sans-serif" font-size="14" fill="#fff">Simulate</text>
+</svg>

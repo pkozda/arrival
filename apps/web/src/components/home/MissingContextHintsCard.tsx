@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { MissingContextHint, ProfileInsightViewV1 } from '@/lib/product-contract';
 import { buildCompletenessSummary } from '@/lib/profile-insights/selectors';
+import { useApp } from '@/components/AppProvider';
 
 type Props = {
   insights?: ProfileInsightViewV1 | null;
@@ -20,17 +21,35 @@ function MissingContextItem({ hint }: { hint: MissingContextHint }) {
   );
 }
 
-export function MissingContextHintsCard({ insights, hints: hintsOverride, completenessSummary: summaryOverride }: Props) {
+function resolveSummaryText(
+  value: string | null | undefined,
+  t: (key: string) => string
+): string | null {
+  if (!value) {
+    return null;
+  }
+
+  return value.startsWith('life-event.') ? t(value) : value;
+}
+
+export function MissingContextHintsCard({
+  insights,
+  hints: hintsOverride,
+  completenessSummary: summaryOverride,
+}: Props) {
+  const { t } = useApp();
+
   if (!insights && hintsOverride === undefined) {
     return null;
   }
 
-  const completenessSummary =
+  const completenessSummaryKey =
     summaryOverride !== undefined
       ? summaryOverride
       : insights
         ? buildCompletenessSummary(insights)
         : null;
+  const completenessSummary = resolveSummaryText(completenessSummaryKey, t);
   const hints = hintsOverride ?? insights?.missingContext ?? [];
 
   if (!completenessSummary && hints.length === 0) {
@@ -40,7 +59,7 @@ export function MissingContextHintsCard({ insights, hints: hintsOverride, comple
   return (
     <section className="card" style={{ marginBottom: '1rem' }}>
       <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
-        Situation insights
+        {t('life-event.plan.currentSituation')}
       </h2>
 
       {completenessSummary && (
