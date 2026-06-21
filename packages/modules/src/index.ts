@@ -47,6 +47,29 @@ export {
 } from './module-contracts.js';
 
 export { compiledModuleCatalog, allModuleRegistrations } from './catalog.js';
+export {
+  resolveCrossModuleLink,
+  resolveSystemIntentModuleOpenAction,
+  suggestModulesForLifeContext,
+  listCatalogBackedModuleRoutes,
+  mapEventsToFeedbackSignals,
+  deriveLifeEventFeedbackHints,
+  type CrossModuleLinkSource,
+  type CrossModuleLinkTarget,
+  type LifeEventFeedbackHintV1,
+  type LifeEventFeedbackHintType,
+} from './module-orchestration/index.js';
+export {
+  resolveCopy,
+  listRegisteredCopyKeys,
+  assertResolvableCopyKey,
+  validateActionSetCopyKeys,
+  validatePresentationCopyKeys,
+  validateNoRawStringsInPresentation,
+  EconomicCopyResolutionError,
+  EconomicCopyValidationError,
+  type CopyResolveContext,
+} from './i18n/index.js';
 
 import { registerModuleMergeStrategy } from '@arrival-atlas/profile';
 import type { ModuleRegistration } from '@arrival-atlas/core';

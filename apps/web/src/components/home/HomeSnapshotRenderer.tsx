@@ -14,6 +14,8 @@ import { SuggestedModulesSection } from '@/components/home/SuggestedModulesSecti
 import { YourSituationSummaryCard } from '@/components/home/YourSituationSummaryCard';
 import { NextStepsCard } from '@/components/home/NextStepsCard';
 import { LifeEventColdStartCard } from '@/components/home/LifeEventColdStartCard';
+import { EconomicRealityCard } from '@/components/home/EconomicRealityCard';
+import { useEconomicRealityPlan } from '@/lib/economic-reality';
 import {
   buildModuleContractLookup,
   capabilityVisibilityFromContract,
@@ -136,6 +138,11 @@ function mergePriorityActions(
   return merged;
 }
 
+function EconomicRealityHomeSection() {
+  const economicState = useEconomicRealityPlan();
+  return <EconomicRealityCard state={economicState} />;
+}
+
 export function HomeSnapshotRenderer({ snapshot }: Props) {
   const { executions, session } = snapshot;
   const {
@@ -230,6 +237,8 @@ export function HomeSnapshotRenderer({ snapshot }: Props) {
           hints: homePlanView.p4.showCard ? homePlanView.p4.hints : [],
         }}
       />
+
+      {!hideSecondarySections && <EconomicRealityHomeSection />}
 
       {homePlanView.suggestedModules.showSection &&
         !hideSecondarySections &&

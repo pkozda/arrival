@@ -9,6 +9,7 @@ export function normalizeSystemState(state: SystemState): SystemState {
     profileMutationEvents: state.profileMutationEvents ?? [],
     profileMutationProfileId: state.profileMutationProfileId ?? null,
     userContext: state.userContext ?? null,
+    economicRealityEvents: state.economicRealityEvents ?? [],
   };
 }
 

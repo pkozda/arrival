@@ -7,7 +7,7 @@ import type {
   ProfileRecord,
 } from '@arrival-atlas/profile';
 import type { ExecutionTrace } from '@arrival-atlas/profile';
-import type { MutationRequest, UserContextV1 } from '@arrival-atlas/product-contract';
+import type { MutationRequest, UserContextV1, EconomicRealityEventV1 } from '@arrival-atlas/product-contract';
 import type { SystemModuleDescriptor, SystemProjectionConfig } from './system-state-types.js';
 import type { SystemState } from './system-state-types.js';
 import type { MutationActor } from './mutation-actor.js';
@@ -81,6 +81,13 @@ export type ProfileMutationApplyMutation = {
   actor?: MutationActor;
 };
 
+export type EconomicRealityEventAppendMutation = {
+  type: 'ECONOMIC_REALITY_EVENT_APPEND';
+  sessionId: string;
+  event: EconomicRealityEventV1;
+  actor?: MutationActor;
+};
+
 export type SystemMutation =
   | SessionCreateMutation
   | SessionPatchMutation
@@ -89,7 +96,8 @@ export type SystemMutation =
   | ProfileMutationApplyMutation
   | ModuleExecuteMutation
   | AccountClaimMutation
-  | AccountLinkMutation;
+  | AccountLinkMutation
+  | EconomicRealityEventAppendMutation;
 
 export type SessionCreateResult = {
   type: 'SESSION_CREATE';
@@ -141,6 +149,12 @@ export type ProfileMutationApplyResult = {
   state: SystemState;
 };
 
+export type EconomicRealityEventAppendResult = {
+  type: 'ECONOMIC_REALITY_EVENT_APPEND';
+  event: EconomicRealityEventV1;
+  state: SystemState;
+};
+
 export type SystemMutationResult =
   | SessionCreateResult
   | SessionPatchResult
@@ -149,4 +163,5 @@ export type SystemMutationResult =
   | ProfileMutationApplyResult
   | ModuleExecuteResult
   | AccountClaimResult
-  | AccountLinkResult;
+  | AccountLinkResult
+  | EconomicRealityEventAppendResult;

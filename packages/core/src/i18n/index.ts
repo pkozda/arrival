@@ -2,9 +2,14 @@ import { PRODUCT_NAME, PRODUCT_TAGLINE } from '@arrival-atlas/ui-contract';
 import type { SupportedLanguage } from '@arrival-atlas/ui-contract';
 import { LIFE_EVENT_I18N } from './life-event-translations.js';
 import { LIFE_EVENT_CONTENT_I18N } from './life-event-content-translations.js';
+import { ECONOMIC_REALITY_I18N } from './economic-reality-translations.js';
 
 export { LIFE_EVENT_I18N, LIFE_EVENT_I18N_KEYS } from './life-event-translations.js';
 export { LIFE_EVENT_CONTENT_I18N, LIFE_EVENT_CONTENT_I18N_KEYS } from './life-event-content-translations.js';
+export {
+  ECONOMIC_REALITY_I18N,
+  ECONOMIC_REALITY_I18N_KEYS,
+} from './economic-reality-translations.js';
 
 type TranslationKey = string;
 type Translations = Record<TranslationKey, string>;
@@ -34,6 +39,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     'lifeEvent.description': 'Scenario-based guidance for major life changes',
     ...LIFE_EVENT_I18N.en,
     ...LIFE_EVENT_CONTENT_I18N.en,
+    ...ECONOMIC_REALITY_I18N.en,
   },
   de: {
     'app.title': PRODUCT_NAME,
@@ -59,6 +65,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     'lifeEvent.description': 'Szenariobasierte Beratung bei wichtigen Lebensveränderungen',
     ...LIFE_EVENT_I18N.de,
     ...LIFE_EVENT_CONTENT_I18N.de,
+    ...ECONOMIC_REALITY_I18N.de,
   },
   ru: {
     'app.title': PRODUCT_NAME,
@@ -84,6 +91,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     'lifeEvent.description': 'Сценарная помощь при важных жизненных изменениях',
     ...LIFE_EVENT_I18N.ru,
     ...LIFE_EVENT_CONTENT_I18N.ru,
+    ...ECONOMIC_REALITY_I18N.ru,
   },
   ua: {
     'app.title': PRODUCT_NAME,
@@ -109,6 +117,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     'lifeEvent.description': 'Сценарна допомога при важливих життєвих змінах',
     ...LIFE_EVENT_I18N.ua,
     ...LIFE_EVENT_CONTENT_I18N.ua,
+    ...ECONOMIC_REALITY_I18N.ua,
   },
 };
 

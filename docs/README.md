@@ -74,6 +74,7 @@ Reserved empty domains (`housing/`, `legal/`, `integrations/`) have stub indexes
 | Document | Path |
 |----------|------|
 | Living platform state | [core/current-state.md](./core/current-state.md) |
+| **Platform Planning Constitution v1** | [platform/platform-planning-constitution-v1.md](./platform/platform-planning-constitution-v1.md) |
 | MRC-6 → Platform roadmap | [platform/mrc-6-to-platform-roadmap.md](./platform/mrc-6-to-platform-roadmap.md) |
 | Roadmap vs current state | [platform/roadmap-vs-current-state.md](./platform/roadmap-vs-current-state.md) |
 | Module Runtime Contract v1 | [core/module-runtime-contract-v1.md](./core/module-runtime-contract-v1.md) |
@@ -119,6 +120,16 @@ Reserved empty domains (`housing/`, `legal/`, `integrations/`) have stub indexes
 | Benefits simulator design | [benefits/benefits-simulator-design.md](./benefits/benefits-simulator-design.md) |
 | Benefits UI contract | [benefits/benefits-simulator-ui-contract.md](./benefits/benefits-simulator-ui-contract.md) |
 | Financial module v2 plan | [finance/financial-module-v2-plan.md](./finance/financial-module-v2-plan.md) |
+| **Economic Reality Module v1 — spec** | [economic-reality/economic-reality-module-v1-spec.md](./economic-reality/economic-reality-module-v1-spec.md) |
+| Economic State Model (canonical) | [economic-reality/economic-state-model.md](./economic-reality/economic-state-model.md) |
+| Economic classifier fixtures | [economic-reality/economic-classifier-fixtures.md](./economic-reality/economic-classifier-fixtures.md) |
+| Economic graph catalog v1 | [economic-reality/economic-graph-catalog-v1.md](./economic-reality/economic-graph-catalog-v1.md) |
+| Economic Reality Module v1 — roadmap | [economic-reality/economic-reality-module-v1-roadmap.md](./economic-reality/economic-reality-module-v1-roadmap.md) |
+| **Economic Rule Engine v1** | [economic-reality/economic-rule-engine-v1.md](./economic-reality/economic-rule-engine-v1.md) |
+| **Economic Reality v1 — closure spec** | [economic-reality/economic-reality-v1-closure-spec.md](./economic-reality/economic-reality-v1-closure-spec.md) |
+| Economic Reality v1 — readiness audit | [audits/economic-reality-module-v1-readiness-audit.md](./audits/economic-reality-module-v1-readiness-audit.md) |
+| Economic Reality — system audit v1 | [audits/economic-reality-system-audit-v1.md](./audits/economic-reality-system-audit-v1.md) |
+| Economic Reality — system audit v2 | [audits/economic-reality-system-audit-v2.md](./audits/economic-reality-system-audit-v2.md) |
 
 ### Gate audit chain
 

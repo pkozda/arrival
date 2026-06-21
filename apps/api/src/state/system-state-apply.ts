@@ -1,6 +1,6 @@
 import type { AppContext, Session, TrackedEvent } from '@arrival-atlas/core';
 import type { ModuleResult } from '@arrival-atlas/module-runtime';
-import type { ModuleUIProjection } from '@arrival-atlas/product-contract';
+import type { ModuleUIProjection, EconomicRealityEventV1 } from '@arrival-atlas/product-contract';
 import {
   ProfileCreateInputSchema,
   ProfileDocumentSchema,
@@ -146,6 +146,7 @@ export function createInitialSystemState(params: {
       profileMutationEvents: [],
       profileMutationProfileId: null,
       userContext: null,
+      economicRealityEvents: [],
       executionsByModuleId: {},
       executionTracesByModuleId: {},
       events: [],
@@ -388,6 +389,21 @@ export function applyModuleExecute(params: {
       [params.moduleId]: updatedHistory,
     },
   };
+}
+
+export function applyEconomicRealityEventAppend(
+  state: SystemState,
+  event: EconomicRealityEventV1,
+  mutationId: string
+): SystemState {
+  return finalizeSystemState(
+    {
+      ...state,
+      economicRealityEvents: [...(state.economicRealityEvents ?? []), event],
+      generatedAt: nowIso(),
+    },
+    mutationId
+  );
 }
 
 export function getLatestExecutionTrace(

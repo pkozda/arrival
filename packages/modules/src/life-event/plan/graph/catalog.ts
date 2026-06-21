@@ -50,18 +50,18 @@ const healthcareModule: LifeActionRef = {
   label: 'Explore health insurance options',
 };
 
-const financialModule: LifeActionRef = {
-  kind: 'open_module',
-  moduleId: 'financial-reality',
-  href: '/modules/financial-reality',
-  label: 'Open Financial Reality',
-};
-
 const benefitsModule: LifeActionRef = {
   kind: 'open_module',
   moduleId: 'benefits-simulator',
   href: '/modules/benefits-simulator',
   label: 'Explore benefits support',
+};
+
+const economicRealityModule: LifeActionRef = {
+  kind: 'open_module',
+  moduleId: 'economic-reality',
+  href: '/modules/economic-reality',
+  label: 'Open Economic Reality plan',
 };
 
 const arrivalScenario: LifeActionRef = {
@@ -116,7 +116,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Anmeldung requires a valid address — housing and registration are coupled.',
         satisfactionKey: 'registrable_address',
         blockedByNodeIds: [],
-        actions: [profileHousing, moveCityScenario, financialModule],
+        actions: [profileHousing, moveCityScenario, economicRealityModule],
       },
       {
         id: 'g1-complete-anmeldung',
@@ -155,7 +155,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Financial infrastructure supports housing and employment next steps.',
         satisfactionKey: 'banking_ready',
         blockedByNodeIds: ['g1-complete-anmeldung'],
-        actions: [financialModule, profileHousing],
+        actions: [economicRealityModule, profileHousing],
       },
     ],
   },
@@ -199,7 +199,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Income unlocks sustainable settlement.',
         satisfactionKey: 'employment_basis',
         blockedByNodeIds: [],
-        actions: [financialModule, profileEmployment, arrivalScenario],
+        actions: [economicRealityModule, profileEmployment, arrivalScenario],
       },
       {
         id: 'g2-housing-banking',
@@ -211,7 +211,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Physical and financial base for daily life.',
         satisfactionKey: 'banking_ready',
         blockedByNodeIds: [],
-        actions: [profileHousing, financialModule],
+        actions: [profileHousing, economicRealityModule],
       },
       {
         id: 'g2-benefits-awareness',
@@ -244,7 +244,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Employment status drives insurance, benefits, and daily income.',
         satisfactionKey: 'employment_basis',
         blockedByNodeIds: [],
-        actions: [financialModule, profileEmployment, jobLossScenario],
+        actions: [economicRealityModule, profileEmployment, jobLossScenario],
       },
       {
         id: 'g3-insurance-continuity',
@@ -268,7 +268,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Income clarity unlocks downstream planning.',
         satisfactionKey: 'income_recorded',
         blockedByNodeIds: ['g3-stabilize-employment'],
-        actions: [financialModule, profileEmployment],
+        actions: [economicRealityModule, profileEmployment],
       },
       {
         id: 'g3-benefits-pathway',
@@ -280,7 +280,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Support may be available after economic clarity.',
         satisfactionKey: 'benefits_assessed',
         blockedByNodeIds: ['g3-income-clarity'],
-        actions: [benefitsModule, profileBenefits],
+        actions: [benefitsModule, profileBenefits, economicRealityModule],
       },
     ],
   },
@@ -311,7 +311,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'A registrable address unlocks Anmeldung and benefits.',
         satisfactionKey: 'stable_housing',
         blockedByNodeIds: ['g4-clarify-housing'],
-        actions: [financialModule, profileHousing],
+        actions: [economicRealityModule, profileHousing],
       },
       {
         id: 'g4-register-address',
@@ -366,7 +366,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'The enrollment path depends on employment and residency status.',
         satisfactionKey: 'insurance_coverage',
         blockedByNodeIds: ['g5-assess-coverage'],
-        actions: [healthcareModule, financialModule],
+        actions: [healthcareModule, economicRealityModule],
       },
       {
         id: 'g5-enroll-restore',
@@ -488,7 +488,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Value-add steps without manufactured urgency.',
         satisfactionKey: 'transition_explored',
         blockedByNodeIds: [],
-        actions: [financialModule],
+        actions: [economicRealityModule],
       },
     ],
   },

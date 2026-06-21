@@ -38,6 +38,8 @@ import { registerProfileRoutes } from './routes/profile.js';
 import { registerProfileMutationRoutes } from './routes/profile-mutations.js';
 import { registerProfileInsightsRoutes } from './routes/profile-insights.js';
 import { registerLifeEventPlanRoutes } from './routes/life-event-plan.js';
+import { registerEconomicRealityPlanRoutes } from './routes/economic-reality-plan.js';
+import { registerEconomicRealityActionRoutes } from './routes/economic-reality-action.js';
 import { registerUiSnapshotRoutes } from './routes/ui-snapshot.js';
 import { randomUUID } from 'node:crypto';
 import { systemStateCoordinator } from './state/system-state-coordinator.js';
@@ -440,6 +442,8 @@ export async function buildApp(options: { logger?: boolean } = {}) {
   await registerProfileMutationRoutes(app);
   await registerProfileInsightsRoutes(app);
   await registerLifeEventPlanRoutes(app);
+  await registerEconomicRealityPlanRoutes(app);
+  await registerEconomicRealityActionRoutes(app);
   await registerUiSnapshotRoutes(app);
   await registerAccountRoutes(app);
   await registerSessionLifecycleRoutes(app);
