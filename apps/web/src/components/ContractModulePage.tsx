@@ -42,10 +42,7 @@ export function ContractModulePage({ moduleId, contract }: Props) {
     () => profilePrefillApplied(schemaDefaults, defaults),
     [schemaDefaults, defaults]
   );
-  const prefillMessage = useMemo(
-    () => resolvePrefillConfidenceMessage(profileInsights),
-    [profileInsights]
-  );
+  const prefillMessage = t(resolvePrefillConfidenceMessage(profileInsights));
 
   useEffect(() => {
     let cancelled = false;

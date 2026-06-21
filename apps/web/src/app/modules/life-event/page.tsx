@@ -1,19 +1,21 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { useApp } from '@/components/AppProvider';
 import { LifeEventPlanView } from '@/components/life-event/LifeEventPlanView';
 import { LifeEventScenarioExplorer } from '@/components/life-event/LifeEventScenarioExplorer';
+import { ScenarioExplorerPanel } from '@/components/life-event/ScenarioExplorerPanel';
 import { lifeEventModuleDescription, lifeEventModuleTitle } from '@/lib/life-event/content-labels';
+import { resolveScenario } from '@/lib/life-event/scenarios';
+import { defaultScenarioExplorerOpen } from '@/lib/presentation/home-p0';
+import { WireframeSkeleton } from '@/lib/presentation/le-ux';
 
 function LoadingState() {
-  const { t } = useApp();
-
   return (
-    <div className="card" style={{ padding: '1.5rem' }}>
-      {t('life-event.empty.loadingPlan')}
+    <div className="card le-plan-card">
+      <WireframeSkeleton />
     </div>
   );
 }
@@ -27,10 +29,36 @@ function LifeEventModulePageContent() {
     lifeEventPlan,
     lifeEventPlanLoading,
     lifeEventPlanError,
+    userContext,
     t,
   } = useApp();
   const contract = modules.find((module) => module.id === 'life-event');
   const initialScenarioEvent = searchParams.get('event') ?? undefined;
+  const scenariosMode = searchParams.get('mode') === 'scenarios';
+
+  const scenarioMatch = useMemo(() => {
+    if (!lifeEventPlan || !userContext) {
+      return null;
+    }
+
+    return resolveScenario({
+      userContext,
+      currentPlan: lifeEventPlan,
+    });
+  }, [lifeEventPlan, userContext]);
+
+  const explorerDefaultOpen = defaultScenarioExplorerOpen({
+    hasPlan: Boolean(lifeEventPlan),
+    mode: scenariosMode ? 'scenarios' : null,
+  });
+
+  const scenarioExplorer = contract ? (
+    <LifeEventScenarioExplorer
+      contract={contract}
+      initialScenarioEvent={initialScenarioEvent}
+      embeddedInPanel
+    />
+  ) : null;
 
   if (modulesLoading) {
     return (
@@ -49,15 +77,11 @@ function LifeEventModulePageContent() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <header>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-          {lifeEventModuleTitle(t, contract.title)}
-        </h1>
+    <div className="le-module-page">
+      <header className="le-module-page__header">
+        <h1>{lifeEventModuleTitle(t, contract.title)}</h1>
         {contract.description && (
-          <p style={{ color: 'var(--color-text-muted)', maxWidth: '48rem', lineHeight: 1.6 }}>
-            {lifeEventModuleDescription(t, contract.description)}
-          </p>
+          <p>{lifeEventModuleDescription(t, contract.description)}</p>
         )}
       </header>
 
@@ -69,9 +93,20 @@ function LifeEventModulePageContent() {
         </div>
       )}
 
-      {!lifeEventPlanLoading && lifeEventPlan && <LifeEventPlanView plan={lifeEventPlan} />}
+      {!lifeEventPlanLoading && lifeEventPlan && (
+        <LifeEventPlanView
+          plan={lifeEventPlan}
+          scenario={scenarioMatch}
+          scenarioExplorer={scenarioExplorer}
+          scenarioExplorerDefaultOpen={explorerDefaultOpen}
+        />
+      )}
 
-      <LifeEventScenarioExplorer contract={contract} initialScenarioEvent={initialScenarioEvent} />
+      {!lifeEventPlanLoading && !lifeEventPlan && !lifeEventPlanError && scenarioExplorer && (
+        <ScenarioExplorerPanel defaultOpen={explorerDefaultOpen}>
+          {scenarioExplorer}
+        </ScenarioExplorerPanel>
+      )}
     </div>
   );
 }

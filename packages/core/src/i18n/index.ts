@@ -3,6 +3,9 @@ import type { SupportedLanguage } from '@arrival-atlas/ui-contract';
 import { LIFE_EVENT_I18N } from './life-event-translations.js';
 import { LIFE_EVENT_CONTENT_I18N } from './life-event-content-translations.js';
 
+export { LIFE_EVENT_I18N, LIFE_EVENT_I18N_KEYS } from './life-event-translations.js';
+export { LIFE_EVENT_CONTENT_I18N, LIFE_EVENT_CONTENT_I18N_KEYS } from './life-event-content-translations.js';
+
 type TranslationKey = string;
 type Translations = Record<TranslationKey, string>;
 

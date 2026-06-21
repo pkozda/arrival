@@ -80,6 +80,10 @@ describe('RouteSecurityMap', () => {
       ['POST', '/api/accounts/acct_1/sessions'],
       ['POST', '/api/accounts/acct_1/sessions/revoke-all'],
       ['POST', '/api/sessions/sess_1/revoke'],
+      ['POST', '/api/dev/reset-user-data'],
+      ['POST', '/api/dev/reset-all-state'],
+      ['GET', '/api/dev/demo/presets'],
+      ['POST', '/api/dev/demo/load-preset'],
     ] as const;
 
     for (const [method, path] of routes) {

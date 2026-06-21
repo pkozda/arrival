@@ -3,6 +3,7 @@ import { PRODUCT_NAME, PRODUCT_TAGLINE } from '@/lib/product-contract';
 import { AppProvider } from '@/components/AppProvider';
 import { ThemeScript } from '@/components/ThemeScript';
 import './globals.css';
+import './life-event-polish.css';
 
 export const metadata: Metadata = {
   title: `${PRODUCT_NAME} — Decision Support for Migrants in Germany`,

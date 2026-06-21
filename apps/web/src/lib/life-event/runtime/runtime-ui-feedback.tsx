@@ -18,23 +18,11 @@ export function RuntimeCrossModuleFeedback({ effect }: Props) {
   const primarySignal = effect.stateSignals[0];
 
   return (
-    <div
-      style={{
-        marginBottom: '0.75rem',
-        padding: '0.5rem 0.75rem',
-        borderRadius: '6px',
-        fontSize: '0.8125rem',
-        color: 'var(--color-text-muted)',
-        background: 'var(--color-surface-muted, rgba(0,0,0,0.03))',
-        border: '1px dashed var(--color-border)',
-      }}
-    >
-      <strong style={{ display: 'block', marginBottom: '0.25rem', color: 'inherit' }}>
-        {t('life-event.runtime.crossModuleImpact')}
-      </strong>
+    <div className="le-runtime-feedback" role="status">
+      <strong className="le-runtime-feedback__title">{t('life-event.runtime.crossModuleImpact')}</strong>
       <span>{localizeRuntimeSignal(t, primarySignal)}</span>
       {effect.stateSignals.length > 1 && (
-        <span style={{ display: 'block', marginTop: '0.25rem', opacity: 0.85 }}>
+        <span className="le-runtime-feedback__more">
           +{effect.stateSignals.length - 1}{' '}
           {effect.stateSignals.length > 2
             ? t('life-event.runtime.additionalSignals')

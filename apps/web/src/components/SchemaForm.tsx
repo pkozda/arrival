@@ -57,7 +57,7 @@ function SchemaFieldInput({
 
   if (field.type === 'boolean') {
     return (
-      <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className="form-group">
         <input
           id={fieldName}
           name={fieldName}
@@ -65,7 +65,7 @@ function SchemaFieldInput({
           defaultChecked={Boolean(defaultValue)}
           disabled={disabled}
         />
-        <label htmlFor={fieldName} style={{ margin: 0 }}>{label}</label>
+        <label htmlFor={fieldName}>{label}</label>
       </div>
     );
   }

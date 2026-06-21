@@ -2,7 +2,7 @@ import type { ProfileInsightViewV1 } from '@/lib/product-contract';
 
 export function buildCompletenessSummary(insights: ProfileInsightViewV1): string | null {
   if (insights.globalConfidence === 'high' && insights.missingContext.length <= 1) {
-    return 'Your situation is mostly complete.';
+    return 'life-event.home.situationMostlyComplete';
   }
 
   return null;
@@ -12,17 +12,17 @@ export function resolvePrefillConfidenceMessage(
   insights: ProfileInsightViewV1 | null | undefined
 ): string {
   if (!insights) {
-    return 'Using information from your situation';
+    return 'life-event.home.prefill.default';
   }
 
   switch (insights.globalConfidence) {
     case 'high':
-      return 'Using reliable information from your situation';
+      return 'life-event.home.prefill.high';
     case 'medium':
-      return 'Using your situation — some details may need review';
+      return 'life-event.home.prefill.medium';
     case 'low':
     default:
-      return 'Using your situation — some information may be outdated';
+      return 'life-event.home.prefill.low';
   }
 }
 

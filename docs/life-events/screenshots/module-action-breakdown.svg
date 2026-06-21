@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-label="Action breakdown (placeholder)">
+  <rect width="1280" height="800" fill="#f4f6f8"/>
+  <text x="40" y="60" font-family="system-ui,sans-serif" font-size="22" fill="#1a2b3c">Action breakdown</text>
+  <rect x="40" y="90" width="380" height="140" rx="12" fill="#fff" stroke="#c5cdd6"/>
+  <text x="60" y="130" font-family="system-ui,sans-serif" font-size="16" fill="#1a2b3c">Survival</text>
+  <rect x="440" y="90" width="380" height="140" rx="12" fill="#fff" stroke="#c5cdd6"/>
+  <text x="460" y="130" font-family="system-ui,sans-serif" font-size="16" fill="#1a2b3c">Legal</text>
+  <rect x="840" y="90" width="380" height="140" rx="12" fill="#fff" stroke="#c5cdd6"/>
+  <text x="860" y="130" font-family="system-ui,sans-serif" font-size="16" fill="#1a2b3c">Stabilization</text>
+</svg>

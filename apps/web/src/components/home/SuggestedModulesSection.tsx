@@ -2,12 +2,15 @@
 
 import Link from 'next/link';
 import type { ModuleSuggestion } from '@/lib/situation-utils';
+import { useApp } from '@/components/AppProvider';
 
 type Props = {
   suggestions: ModuleSuggestion[];
 };
 
 export function SuggestedModulesSection({ suggestions }: Props) {
+  const { t } = useApp();
+
   if (suggestions.length === 0) {
     return null;
   }
@@ -15,7 +18,7 @@ export function SuggestedModulesSection({ suggestions }: Props) {
   return (
     <section style={{ marginBottom: '1rem' }}>
       <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
-        Suggested for you
+        {t('life-event.home.suggestedModules')}
       </h2>
       <div
         style={{

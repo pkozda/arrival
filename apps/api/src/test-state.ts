@@ -8,7 +8,7 @@ import {
   FilePersistedSystemStateStore,
   resetPersistedSystemStateStore,
 } from './state/persisted-system-state-store.js';
-import { clearCoordinatorState } from './state/system-state-coordinator.js';
+import { clearAllPersistedDevState } from './dev/reset-local-state.js';
 
 let activeTestDir: string | null = null;
 
@@ -43,25 +43,7 @@ export function setupTestStateStore(): FilePersistedSystemStateStore {
 }
 
 export async function resetTestStateStore(): Promise<void> {
-  const stateDir =
-    process.env.ARRIVAL_ATLAS_STATE_DIR ?? join(tmpdir(), 'arrival-atlas-state-fallback');
-  const store = new FilePersistedSystemStateStore(stateDir);
-  await clearCoordinatorState(store);
-
-  const accountsDir =
-    process.env.ARRIVAL_ATLAS_ACCOUNTS_DIR ?? join(stateDir, 'accounts');
-  const accountStore = new FileAccountStore(accountsDir);
-  await accountStore.clear();
-
-  const entitlementsDir =
-    process.env.ARRIVAL_ATLAS_ENTITLEMENTS_DIR ?? join(stateDir, 'entitlements');
-  const entitlementStore = new FileEntitlementStore(entitlementsDir);
-  await entitlementStore.clear();
-
-  const sessionsDir =
-    process.env.ARRIVAL_ATLAS_SESSIONS_DIR ?? join(stateDir, 'sessions-registry');
-  const sessionRegistryStore = new FileSessionRegistryStore(sessionsDir);
-  await sessionRegistryStore.clear();
+  await clearAllPersistedDevState();
 }
 
 export function teardownTestStateStore(): void {

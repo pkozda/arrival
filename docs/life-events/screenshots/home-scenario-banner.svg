@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-label="Home  scenario banner (placeholder)">
+  <rect width="1280" height="800" fill="#f4f6f8"/>
+  <rect x="40" y="100" width="1200" height="72" rx="12" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
+  <text x="64" y="142" font-family="system-ui,sans-serif" font-size="18" fill="#9a3412">Scenario: Job loss detected  explore what changes</text>
+  <rect x="40" y="200" width="1200" height="120" rx="12" fill="#ffffff" stroke="#c5cdd6"/>
+  <text x="64" y="240" font-family="system-ui,sans-serif" font-size="18" fill="#1a2b3c">Stabilize employment situation (Persona B)</text>
+</svg>

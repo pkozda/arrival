@@ -21,6 +21,12 @@ import {
   updateSessionTheme,
 } from '@/lib/api';
 import {
+  resetDevUserData,
+  type DevResetScope,
+} from '@/lib/dev-tools/reset-user-data';
+import { loadDemoPreset as loadDemoPresetRequest } from '@/lib/demo/load-demo-preset';
+import type { DemoPersonaId } from '@arrival-atlas/life-event-demo/personas';
+import {
   fetchUserContext,
   submitMutation as submitMutationRequest,
   buildHeaderLanguageMutation,
@@ -73,6 +79,8 @@ interface AppState {
   refreshLifeEventPlan: () => Promise<void>;
   refreshUiSnapshot: () => Promise<void>;
   refreshSessionState: () => Promise<void>;
+  resetUserData: (scope?: DevResetScope) => Promise<void>;
+  loadDemoPreset: (presetId: DemoPersonaId) => Promise<void>;
   submitMutation: (request: MutationRequest) => Promise<{ userContext: UserContextV1; revision: number }>;
   profileHeadRevision: number;
   changeLanguage: (lang: SupportedLanguage) => Promise<void>;
@@ -300,6 +308,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await Promise.all([refreshUserContext(), refreshProfileInsights(), refreshLifeEventPlan(), refreshUiSnapshot()]);
   }, [refreshUserContext, refreshProfileInsights, refreshLifeEventPlan, refreshUiSnapshot]);
 
+  const resetUserData = useCallback(
+    async (scope: DevResetScope = 'session') => {
+      const newSessionId = await resetDevUserData({
+        scope,
+        sessionId,
+        language,
+        theme: themePreference,
+      });
+
+      lastAppliedSnapshotVersionRef.current = -1;
+      setProfileHeadRevision(0);
+      setUserContext(null);
+      setProfileInsights(null);
+      setLifeEventPlan(null);
+      setUiSnapshot(null);
+      setSessionId(newSessionId);
+    },
+    [sessionId, language, themePreference]
+  );
+
+  const loadDemoPreset = useCallback(
+    async (presetId: DemoPersonaId) => {
+      if (!sessionId) {
+        throw new Error('Session not ready');
+      }
+
+      await loadDemoPresetRequest(sessionId, presetId);
+      lastAppliedSnapshotVersionRef.current = -1;
+      await refreshSessionState();
+    },
+    [sessionId, refreshSessionState]
+  );
+
   useEffect(() => {
     if (!sessionId) {
       return;
@@ -477,6 +518,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         refreshLifeEventPlan,
         refreshUiSnapshot,
         refreshSessionState,
+        resetUserData,
+        loadDemoPreset,
         submitMutation,
         profileHeadRevision,
         changeLanguage,

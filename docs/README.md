@@ -99,10 +99,16 @@ Reserved empty domains (`housing/`, `legal/`, `integrations/`) have stub indexes
 | Graph catalog v1 | [life-events/life-event-graph-catalog-v1.md](./life-events/life-event-graph-catalog-v1.md) |
 | Life Event Module v2 — roadmap | [life-events/life-event-module-v2-roadmap.md](./life-events/life-event-module-v2-roadmap.md) |
 | **Life Event v1.0 architecture freeze** | [life-events/life-event-module-v2-v1.0-architecture-freeze.md](./life-events/life-event-module-v2-v1.0-architecture-freeze.md) |
+| **PH-4 demo & showcase** | [life-events/life-event-demo-mode.md](./life-events/life-event-demo-mode.md) |
+| PH-4 executive summary | [life-events/life-event-executive-summary.md](./life-events/life-event-executive-summary.md) |
+| PH-4 showcase gallery | [life-events/life-event-showcase-gallery.md](./life-events/life-event-showcase-gallery.md) |
+| **Life Event v1.0 product acceptance review** | [life-events/life-event-v1.0-product-acceptance-review.md](./life-events/life-event-v1.0-product-acceptance-review.md) |
+| PH-5 final stabilization | [life-events/ph-5-final-stabilization-completion.md](./life-events/ph-5-final-stabilization-completion.md) |
 | Life Event ADRs (LE-1–LE-5 architecture) | [adr/adr-001-life-event-layered-architecture.md](./adr/adr-001-life-event-layered-architecture.md) |
 | LE-7 scenario overlay ADR | [adr/adr-004-le-7-scenario-overlay.md](./adr/adr-004-le-7-scenario-overlay.md) |
 | Life Event architecture checklist | [adr/life-event-architecture-consistency-checklist.md](./adr/life-event-architecture-consistency-checklist.md) |
 | Life Event Module v2 — readiness audit | [audits/life-event-module-v2-readiness-audit.md](./audits/life-event-module-v2-readiness-audit.md) |
+| **Life Event platform integration audit (ARR-018)** | [audits/life-event-platform-integration-audit.md](./audits/life-event-platform-integration-audit.md) |
 | Profile mutation contract summary | [contracts/profile-mutation-contract-summary.md](./contracts/profile-mutation-contract-summary.md) |
 | User Profile Engine design | [identity/user-profile-engine-design.md](./identity/user-profile-engine-design.md) |
 
@@ -122,6 +128,7 @@ Reserved empty domains (`housing/`, `legal/`, `integrations/`) have stub indexes
 | P7.0 | [audits/p7-0-module-runtime-architecture-audit.md](./audits/p7-0-module-runtime-architecture-audit.md) |
 | P7.1 | [audits/p7-1-mrc-3-semantic-layer-gate-audit.md](./audits/p7-1-mrc-3-semantic-layer-gate-audit.md) |
 | P7.2 | [audits/p7-2-mrc-5-registry-hardening-gate-audit.md](./audits/p7-2-mrc-5-registry-hardening-gate-audit.md) |
+| ARR-018 | [audits/life-event-platform-integration-audit.md](./audits/life-event-platform-integration-audit.md) |
 
 ## Adding new documentation
 
