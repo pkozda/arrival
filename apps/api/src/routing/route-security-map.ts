@@ -171,6 +171,24 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
   },
   {
     method: 'GET',
+    path: '/api/modules/economic-reality/plan',
+    tier: 'credential-required',
+    description: 'Deterministic economic reality plan (EP-1 through EP-6)',
+  },
+  {
+    method: 'POST',
+    path: '/api/modules/economic-reality/action/execute',
+    tier: 'credential-required',
+    description: 'Execute economic reality action against current deterministic action set',
+  },
+  {
+    method: 'POST',
+    path: '/api/modules/economic-reality/events',
+    tier: 'credential-required',
+    description: 'Emit economic reality interaction events for feedback loop (EP-12)',
+  },
+  {
+    method: 'GET',
     path: '/api/ui-snapshot',
     tier: 'credential-required',
     description: 'UI snapshot projection',

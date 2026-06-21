@@ -11,6 +11,7 @@ import {
 import { PRODUCT_NAME, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@/lib/product-contract';
 import { isDevToolsUiEnabled } from '@/lib/dev-tools/reset-user-data';
 import { DEMO_PERSONA_IDS, getDemoPersona, type DemoPersonaId } from '@arrival-atlas/life-event-demo/personas';
+import { EconomicRealityNavLink } from '@/app-shell/navigation/EconomicRealityNavLink';
 
 function ThemeIcon({ theme }: { theme: 'light' | 'dark' }) {
   if (theme === 'dark') {
@@ -235,6 +236,7 @@ export function Header() {
               <span>Your situation</span>
             </Link>
           </li>
+          <EconomicRealityNavLink onNavigate={() => setMenuOpen(false)} />
           {groupedModules.map(({ category, modules: categoryModules }) => (
             <CategoryNavSection
               key={category}

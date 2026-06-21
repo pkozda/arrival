@@ -4,6 +4,7 @@ import type {
   ModuleUIProjection,
   MutationEvent,
   UserContextV1,
+  EconomicRealityEventV1,
 } from '@arrival-atlas/product-contract';
 import type { ExecutionTrace } from '@arrival-atlas/profile';
 import type { ProfileRecord, ProfileRevision } from '@arrival-atlas/profile';
@@ -54,6 +55,8 @@ export type SystemState = {
   profileMutationProfileId: string | null;
   /** Materialized UI projection cache derived from mutation log. */
   userContext: UserContextV1 | null;
+  /** Append-only economic reality interaction events — advisory feedback input only. */
+  economicRealityEvents: EconomicRealityEventV1[];
   executionsByModuleId: Record<string, StoredModuleExecution[]>;
   executionTracesByModuleId: Record<string, ExecutionTrace[]>;
   events: TrackedEvent[];

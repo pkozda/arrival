@@ -4,6 +4,7 @@ import {
   applyUserContextAuthorityHeaders,
   LEGACY_SNAPSHOT_CONTRACT_HEADERS,
   LIFE_EVENT_PLAN_AUTHORITY_HEADERS,
+  ECONOMIC_REALITY_PLAN_AUTHORITY_HEADERS,
   PROFILE_INSIGHTS_AUTHORITY_HEADERS,
   UI_SNAPSHOT_TRANSPORT_HEADERS,
   USER_CONTEXT_AUTHORITY_HEADERS,
@@ -37,6 +38,15 @@ describe('api contract headers (P1 lock)', () => {
     expect(LIFE_EVENT_PLAN_AUTHORITY_HEADERS['x-module-version']).toBe('v2');
     expect(LIFE_EVENT_PLAN_AUTHORITY_HEADERS['x-read-model']).toBe('LifeEventPlanV1');
     expect(LIFE_EVENT_PLAN_AUTHORITY_HEADERS['x-plan-authority']).toBe('derived-deterministic');
+  });
+
+  it('defines economic reality plan derived headers', () => {
+    expect(ECONOMIC_REALITY_PLAN_AUTHORITY_HEADERS['x-module-id']).toBe('economic-reality');
+    expect(ECONOMIC_REALITY_PLAN_AUTHORITY_HEADERS['x-module-version']).toBe('v1');
+    expect(ECONOMIC_REALITY_PLAN_AUTHORITY_HEADERS['x-read-model']).toBe(
+      'EconomicRealityPlanResponseV1'
+    );
+    expect(ECONOMIC_REALITY_PLAN_AUTHORITY_HEADERS['x-pipeline-version']).toBe('ep1-ep6-v1');
   });
 
   it('apply helpers set reply headers', () => {

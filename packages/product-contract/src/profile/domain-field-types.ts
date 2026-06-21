@@ -79,10 +79,19 @@ export type HealthInsuranceDomainFields = {
   hasCoverage?: boolean;
 };
 
+export const SupportApplicationPendingSchema = z.enum(['jobcenter', 'sozialamt']);
+
+export type SupportApplicationPending = z.infer<typeof SupportApplicationPendingSchema>;
+
 export type BenefitsDomainFields = {
   receivingBuergergeld?: boolean;
   receivingAlg1?: boolean;
   receivingWohngeld?: boolean;
+  receivingSozialamtSupport?: boolean;
+  supportApplicationPending?: SupportApplicationPending;
+  savingsDepleted?: boolean;
+  benefitReportingOverdue?: boolean;
+  benefitApplicationIntent?: boolean;
   daysInGermany?: number;
 };
 
@@ -154,6 +163,11 @@ export const BenefitsDomainFieldsSchema = z
     receivingBuergergeld: z.boolean().optional(),
     receivingAlg1: z.boolean().optional(),
     receivingWohngeld: z.boolean().optional(),
+    receivingSozialamtSupport: z.boolean().optional(),
+    supportApplicationPending: SupportApplicationPendingSchema.optional(),
+    savingsDepleted: z.boolean().optional(),
+    benefitReportingOverdue: z.boolean().optional(),
+    benefitApplicationIntent: z.boolean().optional(),
     daysInGermany: z.number().int().nonnegative().optional(),
   })
   .strict();

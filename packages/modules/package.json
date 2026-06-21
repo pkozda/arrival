@@ -13,6 +13,14 @@
     "./life-event": {
       "types": "./dist/life-event/index.d.ts",
       "import": "./dist/life-event/index.js"
+    },
+    "./economic-reality": {
+      "types": "./dist/economic-reality/index.d.ts",
+      "import": "./dist/economic-reality/index.js"
+    },
+    "./module-orchestration": {
+      "types": "./dist/module-orchestration/index.d.ts",
+      "import": "./dist/module-orchestration/index.js"
     }
   },
   "scripts": {

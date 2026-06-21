@@ -35,6 +35,7 @@ import {
 import { selectAppDisplayLanguage } from '@/lib/user-context';
 import { fetchProfileInsights } from '@/lib/profile-insights';
 import { fetchLifeEventPlan } from '@/lib/life-event-plan';
+import { EconomicRealityPlanProvider } from '@/lib/economic-reality';
 import type {
   MutationRequest,
   ProfileInsightViewV1,
@@ -528,7 +529,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         t,
       }}
     >
-      {children}
+      <EconomicRealityPlanProvider sessionId={sessionId}>{children}</EconomicRealityPlanProvider>
     </AppContext.Provider>
   );
 }

@@ -28,6 +28,14 @@ export const LIFE_EVENT_PLAN_AUTHORITY_HEADERS = {
   'x-plan-authority': 'derived-deterministic',
 } as const;
 
+export const ECONOMIC_REALITY_PLAN_AUTHORITY_HEADERS = {
+  'x-module-id': 'economic-reality',
+  'x-module-version': 'v1',
+  'x-read-model': 'EconomicRealityPlanResponseV1',
+  'x-plan-authority': 'derived-deterministic',
+  'x-pipeline-version': 'ep1-ep6-v1',
+} as const;
+
 export function applyUserContextAuthorityHeaders(
   reply: { header: (name: string, value: string) => void }
 ): void {
@@ -61,6 +69,14 @@ export function applyLifeEventPlanAuthorityHeaders(
   reply: { header: (name: string, value: string) => void }
 ): void {
   for (const [name, value] of Object.entries(LIFE_EVENT_PLAN_AUTHORITY_HEADERS)) {
+    reply.header(name, value);
+  }
+}
+
+export function applyEconomicRealityPlanAuthorityHeaders(
+  reply: { header: (name: string, value: string) => void }
+): void {
+  for (const [name, value] of Object.entries(ECONOMIC_REALITY_PLAN_AUTHORITY_HEADERS)) {
     reply.header(name, value);
   }
 }

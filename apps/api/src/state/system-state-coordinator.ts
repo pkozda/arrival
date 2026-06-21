@@ -7,6 +7,7 @@ import { attachMutationActor, type MutationActor } from './mutation-actor.js';
 import {
   applyAccountClaim,
   applyAccountLink,
+  applyEconomicRealityEventAppend,
   applyModuleExecute,
   applyProfileCreate,
   applyProfileUpdate,
@@ -21,6 +22,7 @@ import type { SystemState } from './system-state-types.js';
 import type {
   AccountClaimMutation,
   AccountLinkMutation,
+  EconomicRealityEventAppendMutation,
   ModuleExecuteMutation,
   ProfileCreateMutation,
   ProfileMutationApplyMutation,
@@ -39,6 +41,10 @@ type ProfileMutationApplyResult = Extract<SystemMutationResult, { type: 'PROFILE
 type ModuleExecuteResult = Extract<SystemMutationResult, { type: 'MODULE_EXECUTE' }>;
 type AccountClaimResult = Extract<SystemMutationResult, { type: 'ACCOUNT_CLAIM' }>;
 type AccountLinkResult = Extract<SystemMutationResult, { type: 'ACCOUNT_LINK' }>;
+type EconomicRealityEventAppendResult = Extract<
+  SystemMutationResult,
+  { type: 'ECONOMIC_REALITY_EVENT_APPEND' }
+>;
 
 export class SystemStateCoordinator {
   private readonly cache = new Map<string, SystemState>();
@@ -83,6 +89,9 @@ export class SystemStateCoordinator {
   async applyMutation(mutation: ModuleExecuteMutation): Promise<ModuleExecuteResult>;
   async applyMutation(mutation: AccountClaimMutation): Promise<AccountClaimResult>;
   async applyMutation(mutation: AccountLinkMutation): Promise<AccountLinkResult>;
+  async applyMutation(
+    mutation: EconomicRealityEventAppendMutation
+  ): Promise<EconomicRealityEventAppendResult>;
   async applyMutation(mutation: SystemMutation): Promise<SystemMutationResult> {
     if (mutation.type === 'SESSION_CREATE') {
       return this.applyMutationInternal(mutation);
@@ -232,6 +241,17 @@ export class SystemStateCoordinator {
         return {
           type: 'ACCOUNT_LINK',
           accountId: enriched.accountId!,
+          state: enriched,
+        };
+      }
+      case 'ECONOMIC_REALITY_EVENT_APPEND': {
+        const current = await this.requireState(mutation.sessionId, true);
+        const mutationId = `economic-reality-event:${mutation.event.timestamp}:${mutation.event.type}`;
+        const state = applyEconomicRealityEventAppend(current, mutation.event, mutationId);
+        const enriched = await this.persistState(state, this.getMutationActor(mutation));
+        return {
+          type: 'ECONOMIC_REALITY_EVENT_APPEND',
+          event: mutation.event,
           state: enriched,
         };
       }
