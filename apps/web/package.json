@@ -7,18 +7,23 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "PW_SKIP_WEBSERVER=1 playwright test",
+    "test:e2e:ci": "playwright test",
+    "test:e2e:install": "playwright install chromium"
   },
   "dependencies": {
     "@arrival-atlas/core": "*",
     "@arrival-atlas/life-event-demo": "*",
     "@arrival-atlas/product-contract": "*",
+    "framer-motion": "^12.40.0",
     "next": "^15.1.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@arrival-atlas/modules": "*",
+    "@playwright/test": "^1.61.0",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.4",

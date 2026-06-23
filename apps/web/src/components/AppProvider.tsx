@@ -41,6 +41,8 @@ import {
   useRuntimeConsistency,
 } from '@/lib/runtime/RuntimeConsistencyProvider';
 import { EconomicRealityPlanProvider } from '@/lib/economic-reality';
+import { BootstrapGate } from '@/components/BootstrapGate';
+import { ProfileLoadErrorBanner } from '@/components/ProfileLoadErrorBanner';
 import type {
   MutationRequest,
   ProfileInsightViewV1,
@@ -67,6 +69,9 @@ interface AppState {
   modules: PublicModuleContract[];
   modulesLoading: boolean;
   modulesError: string | null;
+  bootstrapLoading: boolean;
+  bootstrapError: string | null;
+  retryBootstrap: () => Promise<void>;
   userContext: UserContextV1 | null;
   userContextLoading: boolean;
   userContextError: string | null;
@@ -123,6 +128,9 @@ type ShellState = {
   modulesError: string | null;
   translations: Record<string, string>;
   setTranslations: (translations: Record<string, string>) => void;
+  bootstrapLoading: boolean;
+  bootstrapError: string | null;
+  retryBootstrap: () => Promise<void>;
 };
 
 const ShellContext = createContext<ShellState | null>(null);
@@ -292,6 +300,9 @@ function AppProviderSessionLayer({ children }: { children: ReactNode }) {
         modules: shell.modules,
         modulesLoading: shell.modulesLoading,
         modulesError: shell.modulesError,
+        bootstrapLoading: shell.bootstrapLoading,
+        bootstrapError: shell.bootstrapError,
+        retryBootstrap: shell.retryBootstrap,
         userContext: consistency.userContext,
         userContextLoading: consistency.userContextLoading,
         userContextError: consistency.userContextError,
@@ -331,6 +342,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [modulesLoading, setModulesLoading] = useState(true);
   const [modulesError, setModulesError] = useState<string | null>(null);
   const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [bootstrapLoading, setBootstrapLoading] = useState(true);
+  const [bootstrapError, setBootstrapError] = useState<string | null>(null);
+
+  const retryBootstrap = useCallback(async () => {
+    setBootstrapLoading(true);
+    setBootstrapError(null);
+
+    try {
+      const id = await ensureSession({
+        userProfile: {
+          language: readStoredDisplayLanguage() ?? 'en',
+          uiPreferences: { theme: 'light' },
+        },
+      });
+      setSessionId(id);
+    } catch (error) {
+      setBootstrapError(error instanceof Error ? error.message : 'Failed to start session');
+    } finally {
+      setBootstrapLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     clearLegacyThemeStorage();
@@ -359,15 +391,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    ensureSession({
-      userProfile: {
-        language: readStoredDisplayLanguage() ?? 'en',
-        uiPreferences: { theme: 'light' },
-      },
-    })
-      .then(setSessionId)
-      .catch(console.error);
-  }, []);
+    void retryBootstrap();
+  }, [retryBootstrap]);
 
   const shellValue = useMemo<ShellState>(
     () => ({
@@ -378,14 +403,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
       modulesError,
       translations,
       setTranslations,
+      bootstrapLoading,
+      bootstrapError,
+      retryBootstrap,
     }),
-    [sessionId, modules, modulesLoading, modulesError, translations]
+    [
+      sessionId,
+      modules,
+      modulesLoading,
+      modulesError,
+      translations,
+      bootstrapLoading,
+      bootstrapError,
+      retryBootstrap,
+    ]
   );
 
   return (
     <ShellContext.Provider value={shellValue}>
       <RuntimeConsistencyProvider sessionId={sessionId}>
-        <AppProviderSessionLayer>{children}</AppProviderSessionLayer>
+        <BootstrapGate
+          bootstrapLoading={bootstrapLoading}
+          bootstrapError={bootstrapError}
+          retryBootstrap={retryBootstrap}
+        >
+          <AppProviderSessionLayer>
+            <ProfileLoadErrorBanner />
+            {children}
+          </AppProviderSessionLayer>
+        </BootstrapGate>
       </RuntimeConsistencyProvider>
     </ShellContext.Provider>
   );

@@ -14,15 +14,34 @@ Tasks to match [ux.md](./ux.md). BL-* frozen: [implemented-baseline.md](./implem
 | Task | Feature | UX problem | ID | Effort |
 |------|---------|------------|-----|--------|
 | App-shell crash recovery UI | Both | White screen on crash | REL-01 | M |
-| Session bootstrap error + retry | Both | App looks dead on open | REL-02 | M |
-| Home plan failure visible + retry | Life Event | Blank next-steps | UX-H1, UX-RETRY | S |
-| Home ER failure visible + retry | Economic Reality | ER card vanishes | UX-H2, UX-RETRY | S |
-| Profile load error in shell | Life Event | Wrong situation, no error | REL-05 | S |
+| Session bootstrap error + retry | Both | App looks dead on open | REL-02 | S |
 | Shared error component (danger + SR) | Both | Errors look like hints | UX-ENG-01, UX-R1, UX-R2 | S |
-| ER module error panel + retry | Economic Reality | Module blank on API fail | UX-ER1, UX-RETRY | M |
-| Retry refetch wiring (Home + LE + ER) | Both | Retry does nothing | UX-RETRY | M |
+| Home plan failure visible + retry | Life Event | Blank next-steps | UX-H1, UX-RETRY-H | S |
+| Home ER failure visible + retry | Economic Reality | ER card vanishes on API fail **when rendered** | UX-H2, UX-RETRY-ER-H | S |
+| Profile load error in shell | Life Event | Wrong situation, no error | REL-05 | S |
+| LE module loading → plan content on success | Life Event | Module blank / no plan on success | UX-LE3, LE-M01 | S |
+| LE module plan error panel + retry | Life Event | Muted hint on module API fail | UX-LE1, UX-RETRY-LE | S |
+| ER module loading → content on success | Economic Reality | Module blank on successful fetch | UX-ER2, ER-M01 | S |
+| ER module error panel + retry | Economic Reality | Module blank on API fail | UX-ER1, UX-RETRY-ER | M |
 | Playwright: first-time journey | Life Event | Core flow untested | E2E-01 | L |
-| Playwright: profile → plan update | Both | Stale plan/guidance undetected | E2E-03 | L |
+
+### P0 — Retry surface bindings (UX-RETRY)
+
+Each row is one concrete fetch + UI surface. Implement all five before P0 sign-off.
+
+| ID | Surface | Component | Fetch trigger | UI during retry | On success | On failure |
+|----|---------|-----------|---------------|-----------------|------------|------------|
+| UX-RETRY-H | Home next-steps | `NextStepsCard` / plan preview area | `GET /life-event/plan` (or runtime plan domain) fails | Error panel → skeleton in next-steps area; Retry disabled | Skeleton → prioritized plan list | Skeleton → error panel + Retry enabled |
+| UX-RETRY-ER-H | Home ER card | Home ER guidance card | ER Home snippet fetch fails | Error inside card → skeleton inside card | Skeleton → guidance text/actions | Skeleton → error inside card + Retry enabled |
+| UX-RETRY-LE | Life Event module | `/modules/life-event` plan body | LE module plan fetch fails | Error panel → skeleton in module body | Skeleton → plan steps/actions | Skeleton → error panel + Retry enabled |
+| UX-RETRY-ER | Economic Reality module | `/modules/economic-reality` body | ER module data fetch fails | Error panel → skeleton in module body | Skeleton → guidance/content | Skeleton → error panel + Retry enabled |
+| UX-RETRY-BOOT | Session bootstrap | App shell / bootstrap gate | Session create fails | Error screen + Retry within 10s | App loads Home | Error screen + Retry enabled |
+
+**Verify:** RETRY-H01–04 · RETRY-LE01–04 · RETRY-ER01–05 · BOOT-C01 · manual session bootstrap retry
+
+**Home composition (PH-5):** `shouldHideHomeSecondarySections` in `apps/web/src/lib/presentation/home-p0.ts` — LE dominates Home; ER card hidden when LE plan loading, plan card visible, or cold-start. See [runtime-truth.md](./runtime-truth.md).
+
+**ER cache (REL-R3):** Session-scoped `deterministicHash` cache in `apps/web/src/lib/economic-reality/cache.ts`. Cache persistence across reload is valid; error panel when `state.error` set; Retry always refetches.
 
 ---
 
@@ -39,8 +58,7 @@ Tasks to match [ux.md](./ux.md). BL-* frozen: [implemented-baseline.md](./implem
 | Post-edit confirmation toast | Silent save | UX-T2 | S |
 | Profile editor resync on revision | Stale form after sync | REL-R5 | M |
 | Snapshot refresh after profile mutation | Plan doesn't update after edit | REL-R1 | M |
-| LE plan error severity + retry | Errors look like hints in module | UX-LE1, UX-RETRY | S |
-| LE loading skeleton | Module feels broken while loading | UX-LE3 | S |
+| Playwright: profile → plan update | Stale plan/guidance undetected | E2E-03 | L |
 | LE disabled-action SR reasons | Blocked actions unexplained | UX-LE2 | S |
 | LE action feedback (toast/inline) | Silent action result | UX-T5 | S |
 | Home suggestion plan binding | Stale suggestions | REL-R2 | L |
@@ -56,12 +74,11 @@ Tasks to match [ux.md](./ux.md). BL-* frozen: [implemented-baseline.md](./implem
 
 | Task | UX problem | ID | Effort |
 |------|------------|-----|--------|
-| ER module loading skeleton | Module body blank while loading | UX-ER2 | S |
 | ER module empty state | No data shown as success | UX-ER3 | S |
 | ER distinct state styling | Loading/empty/error look the same | UX-E2, UX-C1 | M |
 | ER action feedback (toast/inline) | Silent action result | UX-T5 | S |
 | ER rationale line on Home | User doesn't know why guidance shown | UX-T4 | S |
-| Session-scoped plan cache | Unnecessary refetch flicker | REL-R3 | S |
+| Session-scoped plan cache | Unnecessary refetch flicker; valid cached presentation on reload | REL-R3 | S |
 | Action context lifecycle | Action state lost | REL-R4 | S |
 
 ---
