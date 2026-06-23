@@ -14,6 +14,8 @@ import { resolveScenario } from '@/lib/life-event/scenarios';
 import { defaultScenarioExplorerOpen } from '@/lib/presentation/home-p0';
 import { hasUserContextProfile } from '@/lib/user-context';
 import { WireframeSkeleton } from '@/lib/presentation/le-ux';
+import { SurfaceErrorPanel } from '@/components/surface/SurfaceErrorPanel';
+import { useSurfaceRetry } from '@/components/surface/useSurfaceRetry';
 
 function LoadingState() {
   return (
@@ -34,7 +36,9 @@ function LifeEventModulePageContent() {
     lifeEventPlanError,
     userContext,
     t,
+    refreshLifeEventPlan,
   } = useApp();
+  const { retrying, onRetry } = useSurfaceRetry(refreshLifeEventPlan);
   const contract = modules.find((module) => module.id === 'life-event');
   const initialScenarioEvent = searchParams.get('event') ?? undefined;
   const scenariosMode = searchParams.get('mode') === 'scenarios';
@@ -61,6 +65,11 @@ function LifeEventModulePageContent() {
     hasProfile: hasUserContextProfile(userContext),
     scenariosMode,
   });
+  const isProfileNotReadyPlanError = Boolean(
+    lifeEventPlanError?.includes('UserContext profile is available')
+  );
+  const showPlanIntakeForm =
+    showPlanIntake && !lifeEventPlanLoading && !retrying && (!lifeEventPlanError || isProfileNotReadyPlanError);
 
   const scenarioExplorer = contract ? (
     <LifeEventScenarioExplorer
@@ -95,15 +104,21 @@ function LifeEventModulePageContent() {
         )}
       </header>
 
-      {lifeEventPlanLoading && <LoadingState />}
+      {(lifeEventPlanLoading || retrying) && <LoadingState />}
 
-      {!lifeEventPlanLoading && lifeEventPlanError && (
-        <div className="card" style={{ padding: '1.5rem', color: 'var(--color-text-muted)' }}>
-          {lifeEventPlanError}
+      {!lifeEventPlanLoading && !retrying && lifeEventPlanError && !isProfileNotReadyPlanError && (
+        <div className="card le-plan-card" data-ui-surface="life-event-module-body">
+          <SurfaceErrorPanel
+            message={lifeEventPlanError}
+            onRetry={onRetry}
+            retrying={retrying}
+            title={t('common.error')}
+            retryLabel={t('common.retry')}
+          />
         </div>
       )}
 
-      {!lifeEventPlanLoading && lifeEventPlan && (
+      {!lifeEventPlanLoading && !retrying && lifeEventPlan && (
         <LifeEventPlanView
           plan={lifeEventPlan}
           scenario={scenarioMatch}
@@ -112,9 +127,9 @@ function LifeEventModulePageContent() {
         />
       )}
 
-      {showPlanIntake && <LifeEventPlanIntake />}
+      {showPlanIntakeForm && <LifeEventPlanIntake />}
 
-      {!showPlanIntake && !lifeEventPlanLoading && !lifeEventPlan && !lifeEventPlanError && scenarioExplorer && (
+      {!showPlanIntakeForm && !lifeEventPlanLoading && !retrying && !lifeEventPlan && !lifeEventPlanError && scenarioExplorer && (
         <ScenarioExplorerPanel defaultOpen={explorerDefaultOpen}>
           {scenarioExplorer}
         </ScenarioExplorerPanel>

@@ -6,7 +6,26 @@
 
 Interface **behavior**: UX issue → engineering task → verification check.
 
-[product.md](./product.md) · [engineering.md](./engineering.md) · [verification.md](./verification.md)
+[product.md](./product.md) · [engineering.md](./engineering.md) · [verification.md](./verification.md) · [runtime-truth.md](./runtime-truth.md)
+
+---
+
+## Canonical Home composition (PH-5)
+
+**Life Event dominates Home** when it has meaningful state. This is intentional presentation policy (`shouldHideHomeSecondarySections` in `home-p0.ts`).
+
+When LE plan is **loading**, the **plan card is visible**, or **cold-start** is active, Home **does not render** secondary sections:
+
+- Economic Reality card
+- Suggested modules (when plan card would show)
+- Priority actions
+- Browse-topics grid
+
+ER remains available at `/modules/economic-reality` and via LE wireframe links. **Hiding the ER card is not a failure** — it is the canonical layout when LE is primary.
+
+| UX issue | Engineering | Verify |
+|----------|-------------|--------|
+| ER card expected always on Home | PH-5 home presentation (`home-p0.ts`) | HOME-C01 |
 
 ---
 
@@ -34,14 +53,14 @@ Interface **behavior**: UX issue → engineering task → verification check.
 | 2 | Cold-start or onboarding prompt | Starts intake | Profile intake begins | Main area never blank |
 | 3 | Situation summary filling | Completes basics | Facts saved | Empty state + "Go to Profile" |
 | 4 | Next-steps loading → plan | Waits | Plan generated | Error + retry — not empty space |
-| 5 | ER card loading → guidance | Reads card | Economic guidance shown | Card stays visible; error inside card |
+| 5 | ER card **or** LE-only Home | Reads LE plan; opens ER module if needed | Economic guidance in module; ER card only when PH-5 allows | When ER card visible: error inside card — never silent vanish |
 | 6 | Life Event module with actions | Opens module | Full plan displayed | Error panel — not hint text |
 
 | UX issue | Engineering | Verify |
 |----------|-------------|--------|
 | App looks dead on open | Session bootstrap error (REL-02) | Session bootstrap error visible |
 | Blank next-steps | Home plan failure visible (UX-H1) | Home next-steps never blank on plan failure |
-| ER card disappears | Home ER failure visible (UX-H2) | ER card never silent on failure |
+| ER card disappears on API fail | Home ER failure visible (UX-H2) | ER card never silent on failure **when card is rendered** |
 | Core flow untested | Playwright first-time (E2E-01) | E2E-01 green |
 
 ---
@@ -65,14 +84,14 @@ Interface **behavior**: UX issue → engineering task → verification check.
 | Step | User sees | User does | System response | Failure behavior |
 |------|-----------|-----------|-----------------|------------------|
 | 1 | Edit form | Changes fact, saves | Confirmation within 5s | Clear save error + retry |
-| 2 | Updated Home **without reload** | Returns to Home | Plan + ER reflect edit | Degraded banner if sync partial |
+| 2 | Updated Home **without reload** | Returns to Home | LE plan reflects edit; ER via module (card when PH-5 allows) | Degraded banner if sync partial |
 | 3 | Updated Life Event plan | Opens module | Plan matches new facts | Plan error if engine failed |
 
 | UX issue | Engineering | Verify |
 |----------|-------------|--------|
 | Silent save | Post-edit confirmation (UX-T2) | Save confirmation ≤5s |
 | Plan stale after edit | Snapshot refresh (REL-R1) | Profile edit updates plan without reload |
-| ER stale after edit | ER refresh on sync | E2E-03 green |
+| ER stale after edit | ER refresh on sync | E2E-03 green (LE Home + ER module) |
 | Partial sync invisible | Degraded sync banner (REL-12) | Degraded sync visible |
 
 ---
@@ -123,7 +142,7 @@ Interface **behavior**: UX issue → engineering task → verification check.
 | Blank next-steps on API fail | Home plan failure visible (UX-H1) | Home next-steps never blank on plan failure |
 | Text-only "Loading…" | Shared loading component (UX-L1) | Structured loading Home + Profile |
 | Plan loads before profile ready | Playwright bootstrap guard (E2E-08) | E2E-08 green |
-| Retry does nothing | Retry refetch wiring (UX-RETRY) | Home retry triggers refetch |
+| Retry does nothing | Retry refetch wiring (UX-RETRY-H) | Home retry triggers refetch |
 
 ### Guidance display
 
@@ -136,12 +155,29 @@ Interface **behavior**: UX issue → engineering task → verification check.
 
 | UX issue | Engineering | Verify |
 |----------|-------------|--------|
-| Errors look like hints in module | LE plan error severity (UX-LE1) | LE plan error uses error severity |
-| Module feels broken while loading | LE loading skeleton (UX-LE3) | Visual review |
+| Errors look like hints in module | LE plan error panel (UX-LE1) | LE-M02; LE plan error uses error severity (P1 polish) |
+| Module blank on success | LE loading → plan content (UX-LE3) | LE-M01 |
+| Module feels broken while loading | LE loading → plan content (UX-LE3) | LE-M01 |
 | Blocked actions unexplained | LE disabled-action SR (UX-LE2) | E2E-05 action blocked reason |
 | User unsure about plan quality | LE confidence label (UX-T3) | LE confidence label visible |
 | Silent action result | LE action feedback (UX-T5) | LE action gives visible feedback |
-| Retry does nothing | Retry refetch wiring (UX-RETRY) | LE retry triggers refetch |
+| Retry does nothing | Retry refetch wiring (UX-RETRY-LE) | LE retry triggers refetch |
+
+### Flow — Life Event module
+
+| Step | User sees | User does | System response | Failure behavior |
+|------|-----------|-----------|-----------------|------------------|
+| 1 | Module shell or nav entry | Opens Life Event module | Module route loads | Never blank module body |
+| 2 | Full-layout skeleton | Waits | Plan fetch starts | Skeleton visible — not empty white |
+| 3 | Plan steps, actions | Reads plan; attempts actions | Plan content rendered | — |
+| 4 | Error panel + Retry button | Taps Retry after API fail | Refetch starts; skeleton returns | If retry fails → error stays with Retry |
+| 5 | Updated plan after profile edit | Returns from Profile without reload | Module reflects new facts | Stale plan never shown silently (P1: REL-R1) |
+
+| UX issue | Engineering | Verify |
+|----------|-------------|--------|
+| Module blank on success | LE loading → plan content (UX-LE3) | LE-M01 |
+| Module API failure hidden | LE plan error panel (UX-LE1) | LE-M02 |
+| Retry does nothing | Retry refetch wiring (UX-RETRY-LE) | RETRY-LE01–04 |
 
 ### Life Event — critical failures
 
@@ -164,7 +200,7 @@ Interface **behavior**: UX issue → engineering task → verification check.
 
 | | |
 |---|---|
-| **User sees** | ER card skeleton on Home; full layout skeleton in module |
+| **User sees** | ER card skeleton on Home **when PH-5 allows**; full layout skeleton in module |
 | **User does** | Waits or navigates to module |
 | **System response** | Economic data loads within 10s |
 | **Failure behavior** | Timeout → error message, not infinite spinner |
@@ -172,8 +208,8 @@ Interface **behavior**: UX issue → engineering task → verification check.
 | UX issue | Engineering | Verify |
 |----------|-------------|--------|
 | Infinite spinner | Fetch timeout 10s (REL-11) | API down → error within 10s |
-| ER card vanishes | Home ER failure visible (UX-H2) | ER card never silent on failure |
-| Retry does nothing | Retry refetch wiring (UX-RETRY) | ER card retry triggers refetch |
+| ER card vanishes on API fail | Home ER failure visible (UX-H2) | ER card never silent on failure when rendered |
+| Retry does nothing | Retry refetch wiring (UX-RETRY-ER-H) | ER card retry triggers refetch |
 
 ### Explanation layer
 
@@ -195,17 +231,17 @@ Interface **behavior**: UX issue → engineering task → verification check.
 |------|-----------|-----------|-----------------|------------------|
 | 1 | Module shell or nav entry | Opens Economic Reality module | Module route loads | Never blank module body |
 | 2 | Full-layout skeleton | Waits | Economic data fetch starts | Skeleton visible — not empty white |
-| 3 | Guidance, data, actions | Reads explanation layer | Content rendered | — |
+| 3 | Guidance, data, actions | Reads explanation layer | Content rendered (success path) | — |
 | 4 | Honest empty + CTA | Sees missing-data message | Lists what is missing + next step | No fake guidance |
 | 5 | Error panel + Retry button | Taps Retry after API fail | Refetch starts; skeleton returns | If retry fails → error stays with Retry |
 | 6 | Updated guidance after profile edit | Returns from Profile without reload | Module reflects new facts | Stale data never shown silently |
 
 | UX issue | Engineering | Verify |
 |----------|-------------|--------|
-| Module body blank on open | ER module loading skeleton (UX-ER2) | ER module loading state visible |
-| Module API failure hidden | ER module error panel (UX-ER1) | ER module API failure shows error UI |
-| No data shown as success | ER module empty state (UX-ER3) | ER empty state visible when no data |
-| Retry does nothing | Retry refetch wiring (UX-RETRY) | ER retry restores state or shows failure |
+| Module body blank on open | ER loading → content (UX-ER2) | ER-M01 |
+| Module API failure hidden | ER module error panel (UX-ER1) | ER-M02 |
+| No data shown as success | ER module empty state (UX-ER3) | ER-M03 (P1) |
+| Retry does nothing | Retry refetch wiring (UX-RETRY-ER) | ER retry restores state or shows failure |
 | States indistinguishable | ER distinct state styling (UX-E2) | ER loading / empty / failed visually distinct |
 
 ### Refresh / update
@@ -214,7 +250,7 @@ Interface **behavior**: UX issue → engineering task → verification check.
 |---|---|
 | **User sees** | Brief refresh indicator when data updates |
 | **User does** | Edits profile, returns to Home without reload |
-| **System response** | ER card and module reflect new facts |
+| **System response** | ER module reflects new facts; Home ER card when visible under PH-5 |
 | **Failure behavior** | Stale guidance never shown silently; partial sync shows degraded banner |
 
 | UX issue | Engineering | Verify |
@@ -254,7 +290,8 @@ Interface **behavior**: UX issue → engineering task → verification check.
 
 | Situation | Must NOT see | Must see |
 |-----------|--------------|----------|
-| ER fetch fails | Card disappears | Loading → error inside card |
+| ER fetch fails (card rendered) | Card disappears | Loading → error inside card |
+| ER card hidden by PH-5 | Expecting card on Home | LE primary; open ER module |
 | Missing data | Fake or generic guidance | Honest empty + what to complete |
 | Action done | Silent result | Visible feedback |
 | Profile changed | Old economic guidance | Updated guidance or explicit no-change |
@@ -266,24 +303,72 @@ Interface **behavior**: UX issue → engineering task → verification check.
 
 ## Retry behavior (all surfaces)
 
-Applies to: Home next-steps · Home ER card · Life Event module · Economic Reality module · session bootstrap errors.
+Concrete bindings — no generic retry. See [engineering.md § P0 Retry surface bindings](./engineering.md#p0--retry-surface-bindings-ux-retry).
+
+### Home next-steps (UX-RETRY-H)
 
 | | |
 |---|---|
-| **User sees** | Error panel with message + labeled **Retry** button (same shared error component styling) |
+| **Trigger** | `GET /life-event/plan` (or runtime LIFE_EVENT domain) returns error |
+| **User sees** | Error panel + Retry in next-steps area |
 | **User does** | Taps Retry |
-| **System response** | Error panel replaced by loading skeleton in the same area; original fetch/refetch re-runs |
-| **On success** | Loading skeleton → content (plan, guidance, or economic data) |
-| **On failure** | Loading skeleton → error panel with Retry again (button re-enabled) |
-| **Failure behavior** | Retry never silent; no full-page reload unless user chooses; button disabled only while fetch in flight |
+| **During retry** | Skeleton replaces error panel; Retry button disabled |
+| **On success** | Skeleton → prioritized plan list |
+| **On failure** | Skeleton → error panel; Retry re-enabled |
+| **Verify** | RETRY-H01–04 |
 
-| Surface | Retry appears when | Engineering | Verify |
-|---------|-------------------|-------------|--------|
-| Home next-steps | Plan API fails | UX-RETRY on Home plan fetch | Home retry triggers refetch |
-| Home ER card | ER API fails | UX-RETRY on Home ER fetch | ER card retry triggers refetch |
-| Life Event module | Plan/guidance API fails | UX-RETRY on LE module fetch | LE retry triggers refetch |
-| Economic Reality module | Economic API fails | UX-RETRY on ER module fetch | ER module retry restores or fails visibly |
-| Session bootstrap | Session create fails | REL-02 | Session bootstrap retry works |
+### Home ER card (UX-RETRY-ER-H)
+
+**Precondition:** ER card is rendered (PH-5 does not hide secondary sections). When LE dominates Home, validate ER retry at module surface (`UX-RETRY-ER`).
+
+| | |
+|---|---|
+| **Trigger** | Home ER snippet fetch returns error |
+| **User sees** | Error message inside card (card stays visible) + Retry |
+| **User does** | Taps Retry |
+| **During retry** | Skeleton inside card; Retry disabled |
+| **On success** | Skeleton → guidance text/actions |
+| **On failure** | Skeleton → error inside card; Retry re-enabled |
+| **Verify** | RETRY-ER01–02 |
+
+### Life Event module (UX-RETRY-LE)
+
+| | |
+|---|---|
+| **Trigger** | LE module plan fetch returns error |
+| **User sees** | Error panel + Retry in module body |
+| **User does** | Taps Retry |
+| **During retry** | Skeleton in module body; Retry disabled |
+| **On success** | Skeleton → plan steps/actions |
+| **On failure** | Skeleton → error panel; Retry re-enabled |
+| **Verify** | RETRY-LE01–04 |
+
+### Economic Reality module (UX-RETRY-ER)
+
+Session-scoped presentation cache (`REL-R3`) may show cached content after reload when `deterministicHash` is unchanged — this is **valid**. Error panel applies when fetch fails and `state.error` is set. **Retry always re-triggers fetch.**
+
+| | |
+|---|---|
+| **Trigger** | ER module data fetch returns error (no valid cached presentation for current state) |
+| **User sees** | Error panel + Retry in module body |
+| **User does** | Taps Retry |
+| **During retry** | Skeleton in module body; Retry disabled |
+| **On success** | Skeleton → economic guidance/content |
+| **On failure** | Skeleton → error panel; Retry re-enabled |
+| **Cache note** | Reload after prior success may display cached presentation without error UI |
+| **Verify** | RETRY-ER03–05 · ER-M02–06 (error-state path) |
+
+### Session bootstrap (UX-RETRY-BOOT / REL-02)
+
+| | |
+|---|---|
+| **Trigger** | Session create fails |
+| **User sees** | Error screen + Retry within 10s |
+| **User does** | Taps Retry |
+| **During retry** | Loading indicator; Retry disabled |
+| **On success** | Home loads |
+| **On failure** | Error screen; Retry re-enabled |
+| **Verify** | BOOT-C01 (source contract) · manual session-block check · Playwright optional (may skip if POST intercept flaky) |
 
 ---
 

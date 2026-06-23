@@ -42,6 +42,7 @@ export default function EconomicRealityModulePage() {
             mode="full"
             state={state}
             showDebug={devToolsEnabled && debugOpen}
+            onRetry={state.refetch}
           />
         </div>
       </main>

@@ -11,6 +11,7 @@
 | ux.md | User experience |
 | engineering.md | Implementation tasks |
 | verification.md | Release & QA |
+| runtime-truth.md | Phase 5 runtime ↔ spec alignment (authoritative behavior) |
 | index.md | This index |
 | implemented-baseline.md | BL-* immutable |
 | implementation-first-pass-plan.md | Developer execution plan (first pass) |
@@ -20,7 +21,7 @@
 | ID | UX | Engineering | Verify |
 |----|-----|-------------|--------|
 | UX-H1 | ux.md | UX-H1 | Home next-steps never blank |
-| UX-H2 | ux.md | UX-H2 | ER card never silent |
+| UX-H2 | ux.md | UX-H2 | ER card never silent when rendered |
 | UX-H3 | ux.md | UX-ENG-03 | Structured loading |
 | UX-H4 | ux.md | UX-H4 | P2 visual |
 | UX-H5 | ux.md | UX-H5 | Beta limitations disclosed |
@@ -39,13 +40,17 @@
 | UX-T3 | ux.md | UX-T3 | LE confidence label |
 | UX-T4 | ux.md | UX-T4 | ER rationale line |
 | UX-T5 | ux.md | UX-T5 | LE + ER action feedback |
-| UX-LE1 | ux.md | UX-LE1 | LE plan error severity |
+| UX-LE1 | ux.md | UX-LE1 | LE-M02 |
 | UX-LE2 | ux.md | UX-LE2 | E2E-05 |
-| UX-LE3 | ux.md | UX-LE3 | Visual |
+| UX-LE3 | ux.md | UX-LE3 | LE-M01 |
 | UX-ER1 | ux.md | UX-ER1 | ER-M02 |
-| UX-ER2 | ux.md | UX-ER2 | ER-M01, ER-M04 |
-| UX-ER3 | ux.md | UX-ER3 | ER-M03 |
-| UX-RETRY | ux.md | UX-RETRY | RETRY-* checks |
+| UX-ER2 | ux.md | UX-ER2 | ER-M01 |
+| UX-ER3 | ux.md | UX-ER3 | ER-M03 (P1) |
+| UX-RETRY-H | ux.md | UX-RETRY-H | RETRY-H01–04 |
+| UX-RETRY-ER-H | ux.md | UX-RETRY-ER-H | RETRY-ER01–02 |
+| UX-RETRY-LE | ux.md | UX-RETRY-LE | RETRY-LE01–04 |
+| UX-RETRY-ER | ux.md | UX-RETRY-ER | RETRY-ER03–05 |
+| UX-RETRY-BOOT | ux.md | REL-02 | BOOT-C01 + manual bootstrap retry |
 | UX-R1 | ux.md | UX-ENG-01 | Errors distinct from hints |
 | UX-R2 | ux.md | UX-ENG-01 | Errors distinct from hints |
 | UX-R4 | ux.md | UX-ENG-01 | Error copy matches cause |
@@ -77,7 +82,7 @@
 | REL-12 | ux.md | REL-12 | Degraded sync visible |
 | REL-R1 | ux.md | REL-R1 | Profile edit updates plan |
 | REL-R2 | ux.md | REL-R2 | P1 plan change smoke |
-| REL-R3 | ux.md | REL-R3 | INFRA — cache optimization |
+| REL-R3 | ux.md | REL-R3 | ER cache valid on reload; RETRY refetches |
 | REL-R4 | ux.md | REL-R4 | INFRA — action context |
 | REL-R5 | ux.md | REL-R5 | Form matches server |
 | REL-B2 | engineering.md | REL-B2 | INFRA — catalog warning |
@@ -89,22 +94,25 @@
 
 | ID | UX | Engineering | Verify |
 |----|-----|-------------|--------|
-| GJ-01 | ux.md flows | — | Beta gate #10, GJ-01 check |
+| GJ-01 | ux.md flows | — | Beta gate #13 |
 | GJ-02 | ux.md Flow return | TEST-01 | GJ-02 + E2E-02 |
 | GJ-04 | ux.md Flow profile change | REL-R1 | E2E-03 |
-| E2E-01 | ux.md | E2E-01 | Beta gate #5 |
+| HOME-C01 | runtime-truth.md | home-p0.ts PH-5 | Home LE dominance |
+| BOOT-C01 | runtime-truth.md | BootstrapGate | Bootstrap error + retry binding |
+| E2E-01 | ux.md | E2E-01 | Beta gate #8 |
 | E2E-02 | ux.md | E2E-02 | GJ-02 check |
-| E2E-03 | ux.md | E2E-03 | Beta gate #6 |
+| E2E-03 | ux.md | E2E-03 (P1) | Beta gate #9 (LE Home + ER module) |
 | E2E-04 | — | — | E2E-04 scenario |
 | E2E-05 | ux.md | — | E2E-05 scenario |
 | E2E-06 | ux.md | E2E-06 | E2E-06 scenario |
-| E2E-07 | ux.md | — | Beta gate #7 |
+| E2E-07 | ux.md | — | Beta gate #10 |
 | E2E-08 | ux.md | E2E-08 | Production gate #5 |
 | E2E-09 | ux.md | E2E-09 | Production gate #5 |
-| ER-M01–06 | ux.md ER module flow | UX-ER1/2/3 | ER module checks |
-| RETRY-H01–04 | ux.md Retry | UX-RETRY | Retry checks |
-| RETRY-LE01–04 | ux.md Retry | UX-RETRY | Retry checks |
-| RETRY-ER01–05 | ux.md Retry | UX-RETRY | Retry checks |
+| LE-M01–05 | ux.md Guidance display | UX-LE3, UX-LE1, UX-RETRY-LE | LE module checks |
+| ER-M01–06 | ux.md ER module flow | UX-ER1, UX-ER2, UX-RETRY-ER | ER module checks |
+| RETRY-H01–04 | ux.md UX-RETRY-H | UX-RETRY-H | Retry checks |
+| RETRY-LE01–04 | ux.md UX-RETRY-LE | UX-RETRY-LE | Retry checks |
+| RETRY-ER01–05 | ux.md UX-RETRY-ER-H, UX-RETRY-ER | UX-RETRY-ER-H, UX-RETRY-ER | Retry checks |
 | TEST-01 | ux.md | TEST-01 | GJ-02 check |
 | TEST-03–10 | — | engineering.md | INFRA — CI/test tasks |
 | BL-01–17 | — | — | INFRA — implemented-baseline.md |
@@ -125,5 +133,6 @@
 | REL-13 | Merged into REL-R2 |
 | REL-O1 | Merged into REL-14 |
 | GJ-03 | INFRA — secondary journey, no active check |
+| UX-RETRY | ux.md | — | Split into UX-RETRY-H, UX-RETRY-ER-H, UX-RETRY-LE, UX-RETRY-ER, UX-RETRY-BOOT |
 | TRUST-01–05 | Merged into UX-P1, UX-T2, UX-H5, UX-T4 tasks |
 | A11Y-01–07 | Merged into UX-N1, UX-N3, UX-M2 tasks |

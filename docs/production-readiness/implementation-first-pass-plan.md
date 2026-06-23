@@ -25,7 +25,7 @@
 |------|--------|-------|
 | **Life Event** | Implementable end-to-end | Flows, failures, retry, and P0/P1 tasks defined in ux.md + engineering.md |
 | **Economic Reality** | Implementable with minor gaps | Module flow added in v5; deeper module tasks thinner than LE but sufficient for first pass |
-| **Retry / failure / loading** | Defined and usable | ux.md § Retry behavior + UX-RETRY + RETRY-* / ER-M* checks |
+| **Retry / failure / loading** | Defined and usable | ux.md § Retry behavior + UX-RETRY-H/ER-H/LE/ER/BOOT + RETRY-* / LE-M* / ER-M* checks |
 | **Verification** | Usable, imperfect atomicity | Some compound gate rows; detailed checks in feature sections suffice for QA |
 | **Traceability** | Sufficient for implementation | index.md maps UX → engineering → verify; INFRA IDs are non-blocking |
 | **Runtime baseline** | Frozen | BL-* in implemented-baseline.md — surface failures only, no graph redesign |
@@ -52,8 +52,8 @@
 | Build | UX source | Engineering IDs | Verify |
 |-------|-----------|-----------------|--------|
 | Hydration stable, no boot white screen | ux.md App-wide | REL-01, REL-02 | Crash → recovery; session bootstrap error |
-| Plan fetch error visible on Home | ux.md Plan generation | UX-H1, UX-RETRY | Home next-steps never blank; RETRY-H01–04 |
-| ER card deterministic render (never vanishes) | ux.md Data loading | UX-H2, UX-RETRY | ER card never silent; RETRY-ER01–02 |
+| Plan fetch error visible on Home | ux.md Plan generation | UX-H1, UX-RETRY-H | Home next-steps never blank; RETRY-H01–04 |
+| ER card deterministic render (never vanishes) | ux.md Data loading | UX-H2, UX-RETRY-ER-H | ER card never silent; RETRY-ER01–02 |
 | Shared error + loading components | ux.md Four states | UX-ENG-01, UX-L1 | Errors distinct from hints |
 
 **Exit:** User opens app and always sees content, loading, or error on Home — including plan and ER card areas.
@@ -72,23 +72,24 @@ onboarding → profile → plan → guidance → action → retry → failure ha
 |------|---------|------------|-------------------|
 | 1 | Onboarding / first visit | ux.md § Onboarding | UX-D1, REL-05 |
 | 2 | Profile mirror + edit | ux.md § Profile understanding | UX-P1, UX-P2, UX-P3, UX-T2, REL-R5 |
-| 3 | Home next-steps (plan) | ux.md § Plan generation | UX-H1, UX-L1, UX-H3, UX-RETRY |
-| 4 | LE module guidance | ux.md § Guidance display | UX-LE1, UX-LE2, UX-LE3, UX-T3, UX-T5 |
-| 5 | Profile edit → plan refresh | ux.md Flow profile change | REL-R1, REL-12 |
-| 6 | Retry on all LE error surfaces | ux.md § Retry | UX-RETRY |
+| 3 | Home next-steps (plan) | ux.md § Plan generation | UX-H1, UX-RETRY-H |
+| 4 | LE module plan load + guidance | ux.md § Flow LE module | UX-LE3, UX-LE1, UX-RETRY-LE |
+| 5 | LE module polish (P1) | ux.md § Guidance display | UX-LE2, UX-T3, UX-T5 |
+| 6 | Profile edit → plan refresh (P1) | ux.md Flow profile change | REL-R1, REL-12, E2E-03 |
 
 **Must include:**
 - Plan loading skeletons (not text-only "Loading…")
 - Retry: error → skeleton → content OR error (ux.md § Retry)
 - Action feedback on LE actions (UX-T5)
-- Profile save → Home + LE update without reload (REL-R1)
+- Profile save → Home + LE update without reload (REL-R1, P1)
 
 **Exit criteria:**
 - [ ] No silent states on LE surfaces
 - [ ] Full observable lifecycle: loading / content / empty / error
 - [ ] Retry functional on Home next-steps and LE module (RETRY-H*, RETRY-LE*)
 - [ ] E2E-01 green
-- [ ] E2E-03 green (profile edit updates plan)
+- [ ] LE-M01–05 pass (module loading → content → error → retry)
+- [ ] E2E-03 green (P1 — profile edit updates plan; requires REL-R1)
 
 ---
 
@@ -102,13 +103,12 @@ Home ER card → open module → loading → content → empty → error → ret
 
 | Step | Surface | Build from | Engineering IDs |
 |------|---------|------------|-------------------|
-| 1 | Home ER card | ux.md § Data loading | UX-H2, UX-RETRY, REL-11 |
-| 2 | Open ER module | ux.md Flow ER module | UX-ER2 |
-| 3 | Module content / explanation | ux.md § Explanation layer | UX-T4, UX-E2 |
-| 4 | Module empty state | ux.md Flow ER module step 4 | UX-ER3 |
-| 5 | Module error + retry | ux.md Flow ER module step 5 | UX-ER1, UX-RETRY |
-| 6 | Refresh after profile edit | ux.md § Refresh | REL-R1 |
-| 7 | ER action feedback | ux.md § Clarity | UX-T5 |
+| 1 | Home ER card | ux.md § Data loading | UX-H2, UX-RETRY-ER-H |
+| 2 | ER module loading → content (P0) | ux.md Flow ER module step 2–3 | UX-ER2, ER-M01 |
+| 3 | Module error + retry (P0) | ux.md Flow ER module step 5 | UX-ER1, UX-RETRY-ER |
+| 4 | Module empty state (P1) | ux.md Flow ER module step 4 | UX-ER3, ER-M03 |
+| 5 | Module polish (P1) | ux.md § Explanation layer | UX-T4, UX-E2, UX-T5 |
+| 6 | Refresh after profile edit (P1) | ux.md § Refresh | REL-R1, E2E-03 |
 
 **Must include:**
 - ER module lifecycle parity with LE (skeleton, error panel, empty, retry)
@@ -117,7 +117,7 @@ Home ER card → open module → loading → content → empty → error → ret
 - Distinct loading / empty / failed visuals (UX-E2)
 
 **Exit criteria:**
-- [ ] ER module operable independently (ER-M01–06 pass)
+- [ ] ER module P0 cycle complete (ER-M01, ER-M02, ER-M04–06 pass; ER-M03 P1)
 - [ ] Retry parity with LE on card + module (RETRY-ER*)
 - [ ] Guidance updates after profile edit without reload
 - [ ] Beta Gate #8 pass (ER module API failure shows error UI)
@@ -134,9 +134,9 @@ Home ER card → open module → loading → content → empty → error → ret
 | On tap | Error panel → loading skeleton in same area → refetch |
 | On success | Skeleton → content |
 | On failure | Skeleton → error panel with Retry re-enabled |
-| Surfaces | Home next-steps · Home ER card · LE module · ER module · session bootstrap |
+| Surfaces | Home next-steps (UX-RETRY-H) · Home ER card (UX-RETRY-ER-H) · LE module (UX-RETRY-LE) · ER module (UX-RETRY-ER) · session bootstrap (UX-RETRY-BOOT) |
 
-**Engineering:** UX-RETRY (single implementation, wire to each fetch)  
+**Engineering:** One shared retry component; wire per surface per engineering.md § P0 Retry surface bindings  
 **Verify:** RETRY-H01–04 · RETRY-LE01–04 · RETRY-ER01–05 · session bootstrap retry
 
 **Exit:** Retry never silent; button disabled only while fetch in flight.
@@ -189,7 +189,7 @@ Home ER card → open module → loading → content → empty → error → ret
 - [ ] Explanation layer renders deterministically from profile state
 - [ ] Retry behavior consistent with LE on Home card and module
 - [ ] UX-T5 action feedback on ER actions
-- [ ] ER-M01–06 and RETRY-ER* checks pass
+- [ ] ER-M01, ER-M02, ER-M04–06 and RETRY-ER* checks pass (ER-M03 P1)
 
 ---
 
@@ -208,24 +208,21 @@ Home ER card → open module → loading → content → empty → error → ret
 
 **Week 1 — P0 (both features stable):**
 
-1. REL-01, REL-02 — crash + bootstrap
+1. REL-01, REL-02, UX-RETRY-BOOT — crash + bootstrap
 2. UX-ENG-01 — shared error component
-3. UX-H1, UX-H2, UX-RETRY — Home plan + ER card errors + retry
-4. UX-ER1, UX-RETRY — ER module error + retry
-5. REL-05 — profile load error
+3. UX-H1, UX-H2, UX-RETRY-H, UX-RETRY-ER-H — Home plan + ER card errors + retry
+4. UX-LE3, UX-LE1, UX-RETRY-LE — LE module success + error + retry
+5. UX-ER2, UX-ER1, UX-RETRY-ER — ER module success + error + retry
+6. REL-05 — profile load error
+7. E2E-01 — first-time journey
 
-**Week 2 — P1 Life Event:**
+**Week 2 — P1 Life Event + ER polish:**
 
-6. UX-L1, UX-H3 — loading
-7. UX-P1–P3, UX-D1, UX-T2, REL-R5 — profile flow
-8. UX-LE1–3, UX-T3, UX-T5 — LE module
-9. REL-R1, REL-12 — profile → plan refresh
-
-**Week 3 — P1 Economic Reality + verify:**
-
-10. UX-ER2, UX-ER3, UX-E2 — ER module states
-11. UX-T4, UX-T5 — explanation + action feedback
-12. E2E-01, E2E-03 — Playwright
+8. UX-L1, UX-H3 — loading consistency
+9. UX-P1–P3, UX-D1, UX-T2, REL-R5 — profile flow
+10. UX-LE2, UX-T3, UX-T5 — LE module polish
+11. UX-ER3, UX-E2, UX-T4, UX-T5 — ER module empty + styling + explanation
+12. REL-R1, REL-12, E2E-03 — profile → plan/guidance refresh
 13. Run Beta Ready Gate
 
 **Week 4+ — P2 polish + production gate**

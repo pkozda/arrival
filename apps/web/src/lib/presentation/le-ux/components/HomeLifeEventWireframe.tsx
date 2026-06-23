@@ -9,6 +9,8 @@ import {
   projectActionSurface,
 } from '@/lib/life-event-plan';
 import { useApp } from '@/components/AppProvider';
+import { SurfaceErrorPanel } from '@/components/surface/SurfaceErrorPanel';
+import { useSurfaceRetry } from '@/components/surface/useSurfaceRetry';
 import { LifeEventWireframeLayout } from '@/lib/presentation/le-ux/components/LifeEventWireframeLayout';
 import { WireframeSkeleton } from '@/lib/presentation/le-ux/components/WireframeSkeleton';
 import { assertNoDuplicateWireframeNodes, buildHomeInsightContent } from '@/lib/presentation/le-ux/home-wireframe';
@@ -23,17 +25,36 @@ export function HomeLifeEventWireframe({
   runtimeEffect,
   insight: insightInput,
 }: HomeLifeEventWireframeProps) {
-  const { t } = useApp();
+  const { t, refreshLifeEventPlan } = useApp();
+  const { retrying, onRetry } = useSurfaceRetry(refreshLifeEventPlan);
 
-  if (loading) {
+  if (loading || retrying) {
     return (
-      <section className="card le-home-card le-home-card--loading" style={{ marginBottom: '1rem' }} aria-busy="true" aria-label={t('life-event.empty.loadingPlan')}>
+      <section
+        className="card le-home-card le-home-card--loading"
+        style={{ marginBottom: '1rem' }}
+        data-ui-surface="home-next-steps"
+        aria-busy="true"
+        aria-label={t('life-event.empty.loadingPlan')}
+      >
         <WireframeSkeleton />
       </section>
     );
   }
 
-  if (error || !plan) {
+  if (error) {
+    return (
+      <section
+        className="card le-home-card"
+        style={{ marginBottom: '1rem' }}
+        data-ui-surface="home-next-steps"
+      >
+        <SurfaceErrorPanel message={error} onRetry={onRetry} retrying={retrying} title={t('common.error')} retryLabel={t('common.retry')} />
+      </section>
+    );
+  }
+
+  if (!plan) {
     return null;
   }
 
@@ -53,7 +74,7 @@ export function HomeLifeEventWireframe({
   const insight = buildHomeInsightContent(insightInput, t);
 
   return (
-    <section className="card" style={{ marginBottom: '1rem' }}>
+    <section className="card le-home-card" style={{ marginBottom: '1rem' }} data-ui-surface="home-next-steps">
       <div className="le-home-card__header">
         <h2 className="le-home-card__title">{t('life-event.home.title')}</h2>
         <Link href="/modules/life-event" className="btn btn-secondary" style={{ flexShrink: 0 }}>
