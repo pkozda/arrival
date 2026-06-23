@@ -51,25 +51,6 @@ export function AtlasSlider() {
       <AtlasHUD />
 
       <main className="atlas-slider__main">
-        <nav className="atlas-slider__rail" aria-label="Journey slides">
-          {ATLAS_SLIDES.map((slide, index) => {
-            const isActive = index === activeIndex;
-            return (
-              <button
-                key={slide.id}
-                type="button"
-                className={`atlas-slider__rail-btn${isActive ? ' is-active' : ''}`}
-                onClick={() => goTo(index)}
-                aria-current={isActive ? 'step' : undefined}
-                aria-label={`Slide ${slide.label}: ${slide.sidePanel.title}`}
-              >
-                <span className="atlas-slider__rail-num">{slide.label}</span>
-                <span className="atlas-slider__rail-line" aria-hidden="true" />
-              </button>
-            );
-          })}
-        </nav>
-
         <div className="atlas-slider__stage">
           <motion.div
             className="atlas-slider__map-hero"
@@ -102,6 +83,25 @@ export function AtlasSlider() {
               transform: `translate(${offset('ui').x}px, ${offset('ui').y}px)`,
             }}
           >
+            <nav className="atlas-slider__rail" aria-label="Journey slides">
+              {ATLAS_SLIDES.map((slide, index) => {
+                const isActive = index === activeIndex;
+                return (
+                  <button
+                    key={slide.id}
+                    type="button"
+                    className={`atlas-slider__rail-btn${isActive ? ' is-active' : ''}`}
+                    onClick={() => goTo(index)}
+                    aria-current={isActive ? 'step' : undefined}
+                    aria-label={`Slide ${slide.label}: ${slide.sidePanel.title}`}
+                  >
+                    <span className="atlas-slider__rail-num">{slide.label}</span>
+                    <span className="atlas-slider__rail-line" aria-hidden="true" />
+                  </button>
+                );
+              })}
+            </nav>
+
             <div className="atlas-slider__copy">
               {ATLAS_SLIDES.map((slide, index) => (
                 <AtlasSlide

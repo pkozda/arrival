@@ -15,6 +15,9 @@ type Props = {
   parallaxOffset: ParallaxOffset;
 };
 
+const MAP_CENTER_X = 400;
+const MAP_CENTER_Y = 300;
+
 function connectionKey(from: AtlasNodeId, to: AtlasNodeId): string {
   return `${from}-${to}`;
 }
@@ -62,17 +65,22 @@ export function AtlasMap({ slide, locationLabel, loadPhase, parallaxOffset }: Pr
   const focusNode = slide.focusNode
     ? ATLAS_NODES.find((node) => node.id === slide.focusNode)
     : null;
-  const offsetX = focusNode ? 400 - focusNode.x : 0;
-  const offsetY = focusNode ? 300 - focusNode.y : 0;
+  const panX = focusNode ? (MAP_CENTER_X - focusNode.x) * 0.28 : 0;
+  const panY = focusNode ? (MAP_CENTER_Y - focusNode.y) * 0.28 : 0;
 
   return (
     <div className="atlas-map" data-ui-surface="home-atlas-map">
-      <svg className="atlas-map__constellation-local" viewBox="0 0 800 600" aria-hidden="true">
+      <svg
+        className="atlas-map__constellation-local"
+        viewBox="0 0 800 600"
+        preserveAspectRatio="xMidYMid meet"
+        aria-hidden="true"
+      >
         {ATLAS_NODES.filter((n) => !n.isCenter).map((node) => (
           <line
             key={`local-${node.id}`}
-            x1={400}
-            y1={300}
+            x1={MAP_CENTER_X}
+            y1={MAP_CENTER_Y}
             x2={node.x}
             y2={node.y}
             className="atlas-map__local-line"
@@ -87,17 +95,12 @@ export function AtlasMap({ slide, locationLabel, loadPhase, parallaxOffset }: Pr
           transform: `translate(${parallaxOffset.x}px, ${parallaxOffset.y}px)`,
         }}
       >
-        <motion.svg
+        <svg
           viewBox="0 0 800 600"
           className="atlas-map__svg"
+          preserveAspectRatio="xMidYMid meet"
           role="img"
           aria-label="Life domain map"
-          animate={{
-            scale: zoom,
-            x: offsetX * 0.28,
-            y: offsetY * 0.28,
-          }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
         >
           <defs>
             <radialGradient id="atlas-map-vignette" cx="50%" cy="48%" r="55%">
@@ -110,13 +113,6 @@ export function AtlasMap({ slide, locationLabel, loadPhase, parallaxOffset }: Pr
               <stop offset="50%" stopColor="rgba(129, 140, 248, 0.9)" />
               <stop offset="100%" stopColor="rgba(45, 212, 191, 0.25)" />
             </linearGradient>
-            <filter id="atlas-node-glow" x="-100%" y="-100%" width="300%" height="300%">
-              <feGaussianBlur stdDeviation="8" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
             <filter id="atlas-beacon-glow" x="-150%" y="-150%" width="400%" height="400%">
               <feGaussianBlur stdDeviation="18" result="blur" />
               <feMerge>
@@ -126,38 +122,48 @@ export function AtlasMap({ slide, locationLabel, loadPhase, parallaxOffset }: Pr
             </filter>
           </defs>
 
-          <rect width="800" height="600" fill="url(#atlas-map-vignette)" />
+          <motion.g
+            animate={{
+              scale: zoom,
+              x: panX,
+              y: panY,
+            }}
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            style={{ transformOrigin: `${MAP_CENTER_X}px ${MAP_CENTER_Y}px` }}
+          >
+            <rect width="800" height="600" fill="url(#atlas-map-vignette)" />
 
-          {ATLAS_CONNECTIONS.map((connection) => (
-            <AtlasConnection
-              key={connectionKey(connection.from, connection.to)}
-              from={connection.from}
-              to={connection.to}
-              emphasized={isEmphasized(slide, connection.from, connection.to)}
-              loadPhase={loadPhase}
-            />
-          ))}
+            {ATLAS_CONNECTIONS.map((connection) => (
+              <AtlasConnection
+                key={connectionKey(connection.from, connection.to)}
+                from={connection.from}
+                to={connection.to}
+                emphasized={isEmphasized(slide, connection.from, connection.to)}
+                loadPhase={loadPhase}
+              />
+            ))}
 
-          {ATLAS_NODES.map((node) => (
-            <AtlasNode
-              key={node.id}
-              id={node.id}
-              label={node.label}
-              x={node.x}
-              y={node.y}
-              isCenter={node.isCenter}
-              sublabel={node.isCenter ? locationLabel : undefined}
-              state={resolveNodeState(slide, node.id)}
-              isFocused={slide.focusNode === node.id}
-              loadPhase={loadPhase}
-              revealIndex={
-                node.isCenter
-                  ? DOMAIN_NODE_ORDER.length
-                  : DOMAIN_NODE_ORDER.indexOf(node.id)
-              }
-            />
-          ))}
-        </motion.svg>
+            {ATLAS_NODES.map((node) => (
+              <AtlasNode
+                key={node.id}
+                id={node.id}
+                label={node.label}
+                x={node.x}
+                y={node.y}
+                isCenter={node.isCenter}
+                sublabel={node.isCenter ? locationLabel : undefined}
+                state={resolveNodeState(slide, node.id)}
+                isFocused={slide.focusNode === node.id}
+                loadPhase={loadPhase}
+                revealIndex={
+                  node.isCenter
+                    ? DOMAIN_NODE_ORDER.length
+                    : DOMAIN_NODE_ORDER.indexOf(node.id)
+                }
+              />
+            ))}
+          </motion.g>
+        </svg>
       </motion.div>
     </div>
   );

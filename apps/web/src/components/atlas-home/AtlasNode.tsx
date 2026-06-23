@@ -45,50 +45,51 @@ export function AtlasNode({
   const baseScale = isFocused ? focusScale : 1;
 
   return (
-    <motion.g
-      className={`atlas-node ${STATE_CLASS[state]}${isCenter ? ' atlas-node--center' : ''}${isFocused ? ' atlas-node--focused' : ''}${isLit ? ' atlas-node--lit' : ''}`}
-      data-node-id={id}
-      transform={`translate(${x} ${y})`}
-      initial={{ opacity: 0, scale: 0.4 }}
-      animate={{
-        opacity: isRevealed ? 1 : 0,
-        scale: isRevealed ? baseScale : 0.4,
-      }}
-      whileHover={{ scale: isRevealed ? hoverScale : 0.4 }}
-      transition={{
-        opacity: { duration: 0.5, delay: staggerDelay, ease: [0.16, 1, 0.3, 1] },
-        scale: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
-      }}
-      style={{ transformOrigin: 'center' }}
-    >
-      {isCenter ? (
-        <>
-          <circle className="atlas-node__beacon-pulse" r={95} />
-          <circle className="atlas-node__halo" r={88} />
-          <circle className="atlas-node__ring atlas-node__ring--outer" r={68} />
-          <circle className="atlas-node__ring atlas-node__ring--inner" r={46} />
-          <circle className="atlas-node__glow atlas-node__glow--center" r={52} />
-          <circle className="atlas-node__pulse" r={38} />
-          <circle className="atlas-node__core atlas-node__core--center" r={24} />
-          <text className="atlas-node__label atlas-node__label--center" y={-78} textAnchor="middle">
-            {label}
-          </text>
-          {sublabel && (
-            <text className="atlas-node__sublabel atlas-node__sublabel--center" y={88} textAnchor="middle">
-              {sublabel}
+    <g transform={`translate(${x} ${y})`}>
+      <motion.g
+        className={`atlas-node ${STATE_CLASS[state]}${isCenter ? ' atlas-node--center' : ''}${isFocused ? ' atlas-node--focused' : ''}${isLit ? ' atlas-node--lit' : ''}`}
+        data-node-id={id}
+        initial={{ opacity: 0, scale: 0.4 }}
+        animate={{
+          opacity: isRevealed ? 1 : 0,
+          scale: isRevealed ? baseScale : 0.4,
+        }}
+        whileHover={{ scale: isRevealed ? hoverScale : 0.4 }}
+        transition={{
+          opacity: { duration: 0.5, delay: staggerDelay, ease: [0.16, 1, 0.3, 1] },
+          scale: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
+        }}
+        style={{ transformOrigin: '0px 0px' }}
+      >
+        {isCenter ? (
+          <>
+            <circle className="atlas-node__beacon-pulse" r={95} />
+            <circle className="atlas-node__halo" r={88} />
+            <circle className="atlas-node__ring atlas-node__ring--outer" r={68} />
+            <circle className="atlas-node__ring atlas-node__ring--inner" r={46} />
+            <circle className="atlas-node__glow atlas-node__glow--center" r={52} />
+            <circle className="atlas-node__pulse" r={38} />
+            <circle className="atlas-node__core atlas-node__core--center" r={24} />
+            <text className="atlas-node__label atlas-node__label--center" y={-78} textAnchor="middle">
+              {label}
             </text>
-          )}
-        </>
-      ) : (
-        <>
-          <circle className="atlas-node__glow" r={isFocused ? 44 : 36} />
-          <circle className="atlas-node__pulse" r={isFocused ? 28 : 22} />
-          <circle className="atlas-node__core" r={isFocused ? 16 : 13} />
-          <text className="atlas-node__label" y={isFocused ? -38 : -34} textAnchor="middle">
-            {label}
-          </text>
-        </>
-      )}
-    </motion.g>
+            {sublabel && (
+              <text className="atlas-node__sublabel atlas-node__sublabel--center" y={88} textAnchor="middle">
+                {sublabel}
+              </text>
+            )}
+          </>
+        ) : (
+          <>
+            <circle className="atlas-node__glow" r={isFocused ? 44 : 36} />
+            <circle className="atlas-node__pulse" r={isFocused ? 28 : 22} />
+            <circle className="atlas-node__core" r={isFocused ? 16 : 13} />
+            <text className="atlas-node__label" y={isFocused ? -38 : -34} textAnchor="middle">
+              {label}
+            </text>
+          </>
+        )}
+      </motion.g>
+    </g>
   );
 }
