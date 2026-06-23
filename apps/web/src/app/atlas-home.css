@@ -1270,7 +1270,9 @@ button.atlas-slide__cta {
 .atlas-slider,
 .atlas-slider *,
 .atlas-guest-landing,
-.atlas-guest-landing * {
+.atlas-guest-landing *,
+.celestial-destination-root,
+.celestial-destination-root * {
   color-scheme: dark;
 }
 

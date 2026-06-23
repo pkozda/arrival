@@ -1,6 +1,5 @@
 'use client';
 
-import { Header } from '@/components/Header';
 import { ProfileMirrorOverview } from '@/components/profile/ProfileMirrorOverview';
 import { useApp } from '@/components/AppProvider';
 
@@ -27,17 +26,14 @@ export default function ProfilePage() {
   const { uiSnapshot, uiSnapshotLoading, uiSnapshotError } = useApp();
 
   return (
-    <>
-      <Header />
-      <main style={{ padding: '2rem 0 4rem' }}>
-        <div className="container" style={{ maxWidth: '720px' }}>
-          {uiSnapshotLoading && <LoadingState />}
-          {!uiSnapshotLoading && uiSnapshotError && !uiSnapshot && (
-            <ErrorState message={uiSnapshotError} />
-          )}
-          {uiSnapshot && <ProfileMirrorOverview />}
-        </div>
-      </main>
-    </>
+    <main className="celestial-page-main">
+      <div className="container" style={{ maxWidth: '720px' }}>
+        {uiSnapshotLoading && <LoadingState />}
+        {!uiSnapshotLoading && uiSnapshotError && !uiSnapshot && (
+          <ErrorState message={uiSnapshotError} />
+        )}
+        {uiSnapshot && <ProfileMirrorOverview />}
+      </div>
+    </main>
   );
 }

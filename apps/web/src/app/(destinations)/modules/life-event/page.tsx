@@ -2,7 +2,6 @@
 
 import { Suspense, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Header } from '@/components/Header';
 import { useApp } from '@/components/AppProvider';
 import { LifeEventPlanView } from '@/components/life-event/LifeEventPlanView';
 import { LifeEventPlanIntake } from '@/components/life-event/LifeEventPlanIntake';
@@ -140,15 +139,12 @@ function LifeEventModulePageContent() {
 
 export default function LifeEventModulePage() {
   return (
-    <>
-      <Header />
-      <main style={{ padding: '2rem 0 4rem' }}>
-        <div className="container">
-          <Suspense fallback={<LoadingState />}>
-            <LifeEventModulePageContent />
-          </Suspense>
-        </div>
-      </main>
-    </>
+    <main className="celestial-page-main">
+      <div className="container">
+        <Suspense fallback={<LoadingState />}>
+          <LifeEventModulePageContent />
+        </Suspense>
+      </div>
+    </main>
   );
 }

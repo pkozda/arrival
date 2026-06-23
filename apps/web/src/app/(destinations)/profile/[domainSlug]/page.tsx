@@ -2,7 +2,6 @@
 
 import { Suspense } from 'react';
 import { useParams } from 'next/navigation';
-import { Header } from '@/components/Header';
 import { ProfileDomainDetail } from '@/components/profile/ProfileDomainDetail';
 import { useApp } from '@/components/AppProvider';
 import { isProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
@@ -32,15 +31,12 @@ function ProfileDomainDetailPageContent() {
 
 export default function ProfileDomainPage() {
   return (
-    <>
-      <Header />
-      <main style={{ padding: '2rem 0 4rem' }}>
-        <div className="container" style={{ maxWidth: '720px' }}>
-          <Suspense fallback={<LoadingState />}>
-            <ProfileDomainDetailPageContent />
-          </Suspense>
-        </div>
-      </main>
-    </>
+    <main className="celestial-page-main">
+      <div className="container" style={{ maxWidth: '720px' }}>
+        <Suspense fallback={<LoadingState />}>
+          <ProfileDomainDetailPageContent />
+        </Suspense>
+      </div>
+    </main>
   );
 }
