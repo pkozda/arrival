@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect x="1" y="1" width="30" height="30" rx="7" fill="#050A14" />
+  <g stroke="#58BDFC" stroke-opacity="0.38" stroke-width="1" stroke-linecap="round">
+    <line x1="8" y1="10.5" x2="16" y2="6.75" />
+    <line x1="25.25" y1="12.25" x2="21.75" y2="23.5" />
+    <line x1="8" y1="10.5" x2="7.75" y2="21.25" />
+  </g>
+  <g stroke-linecap="round">
+    <line x1="16" y1="17.25" x2="16" y2="6.75" stroke="#C4B5FD" stroke-width="2" />
+    <line x1="16" y1="17.25" x2="25.25" y2="12.25" stroke="#58BDFC" stroke-width="1.55" />
+    <line x1="16" y1="17.25" x2="7.75" y2="21.25" stroke="#58BDFC" stroke-width="1.55" />
+    <line x1="16" y1="17.25" x2="21.75" y2="23.5" stroke="#58BDFC" stroke-width="1.2" stroke-opacity="0.82" />
+  </g>
+  <g>
+    <circle cx="16" cy="6.75" r="1.35" fill="#C4B5FD" />
+    <circle cx="25.25" cy="12.25" r="1.15" fill="#58BDFC" />
+    <circle cx="7.75" cy="21.25" r="1.15" fill="#58BDFC" />
+    <circle cx="21.75" cy="23.5" r="0.95" fill="#58BDFC" fill-opacity="0.75" />
+    <circle cx="8" cy="10.5" r="0.9" fill="#58BDFC" fill-opacity="0.55" />
+  </g>
+  <circle cx="16" cy="17.25" r="2.1" fill="#050A14" stroke="#C4B5FD" stroke-width="1.65" />
+  <circle cx="16" cy="17.25" r="0.85" fill="#58BDFC" />
+</svg>

@@ -13,6 +13,8 @@ type Props = {
   locationLabel: string;
   loadPhase: AtlasLoadPhase;
   parallaxOffset: ParallaxOffset;
+  interactive: boolean;
+  onNodeSelect?: (nodeId: AtlasNodeId) => void;
 };
 
 const MAP_CENTER_X = 400;
@@ -60,16 +62,27 @@ const DOMAIN_NODE_ORDER: AtlasNodeId[] = [
   'community',
 ];
 
-export function AtlasMap({ slide, locationLabel, loadPhase, parallaxOffset }: Props) {
-  const zoom = slide.mapZoom ?? 1;
-  const focusNode = slide.focusNode
-    ? ATLAS_NODES.find((node) => node.id === slide.focusNode)
-    : null;
+export function AtlasMap({
+  slide,
+  locationLabel,
+  loadPhase,
+  parallaxOffset,
+  interactive,
+  onNodeSelect,
+}: Props) {
+  const zoom = interactive ? (slide.mapZoom ?? 1) : 1;
+  const focusNode =
+    interactive && slide.focusNode
+      ? ATLAS_NODES.find((node) => node.id === slide.focusNode)
+      : null;
   const panX = focusNode ? (MAP_CENTER_X - focusNode.x) * 0.28 : 0;
   const panY = focusNode ? (MAP_CENTER_Y - focusNode.y) * 0.28 : 0;
 
   return (
-    <div className="atlas-map" data-ui-surface="home-atlas-map">
+    <div
+      className={`atlas-map${interactive ? '' : ' atlas-map--static'}`}
+      data-ui-surface="home-atlas-map"
+    >
       <svg
         className="atlas-map__constellation-local"
         viewBox="0 0 800 600"
@@ -128,7 +141,10 @@ export function AtlasMap({ slide, locationLabel, loadPhase, parallaxOffset }: Pr
               x: panX,
               y: panY,
             }}
-            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            transition={{
+              duration: interactive ? 0.85 : 0,
+              ease: [0.16, 1, 0.3, 1],
+            }}
             style={{ transformOrigin: `${MAP_CENTER_X}px ${MAP_CENTER_Y}px` }}
           >
             <rect width="800" height="600" fill="url(#atlas-map-vignette)" />
@@ -155,10 +171,16 @@ export function AtlasMap({ slide, locationLabel, loadPhase, parallaxOffset }: Pr
                 state={resolveNodeState(slide, node.id)}
                 isFocused={slide.focusNode === node.id}
                 loadPhase={loadPhase}
+                interactive={interactive}
                 revealIndex={
                   node.isCenter
                     ? DOMAIN_NODE_ORDER.length
                     : DOMAIN_NODE_ORDER.indexOf(node.id)
+                }
+                onSelect={
+                  interactive && onNodeSelect
+                    ? () => onNodeSelect(node.id)
+                    : undefined
                 }
               />
             ))}

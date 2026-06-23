@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ATLAS_SLIDES } from './atlas-data';
+import { ATLAS_SLIDES, getSlideIndexForNode } from './atlas-data';
 import { AtlasAmbientLayers } from './AtlasAmbientLayers';
 import { AtlasHUD } from './AtlasHUD';
 import { AtlasMap } from './AtlasMap';
@@ -13,15 +13,29 @@ import { useAtlasLoadSequence } from './useAtlasLoadSequence';
 import { useAtlasLocationLabel } from './useAtlasLocationLabel';
 import { useAtlasParallax } from './useAtlasParallax';
 
-export function AtlasSlider() {
+import type { AtlasNodeId } from './types';
+
+export function AtlasMemberSlider() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [loadEpoch, setLoadEpoch] = useState(0);
   const locationLabel = useAtlasLocationLabel();
-  const loadPhase = useAtlasLoadSequence();
+  const loadPhase = useAtlasLoadSequence(loadEpoch);
   const { offset } = useAtlasParallax();
   const activeSlide = ATLAS_SLIDES[activeIndex];
 
   const goTo = useCallback((index: number) => {
     setActiveIndex(Math.max(0, Math.min(ATLAS_SLIDES.length - 1, index)));
+  }, []);
+
+  const handleNodeSelect = useCallback(
+    (nodeId: AtlasNodeId) => {
+      goTo(getSlideIndexForNode(nodeId));
+    },
+    [goTo]
+  );
+
+  useEffect(() => {
+    setLoadEpoch((value) => value + 1);
   }, []);
 
   useEffect(() => {
@@ -41,7 +55,7 @@ export function AtlasSlider() {
   }, [activeIndex, goTo]);
 
   return (
-    <div className="atlas-slider" data-ui-surface="home-atlas">
+    <div className="atlas-slider atlas-slider--authenticated" data-ui-surface="home-atlas">
       <AtlasAmbientLayers
         loadPhase={loadPhase}
         starsOffset={offset('stars')}
@@ -60,7 +74,7 @@ export function AtlasSlider() {
           >
             <AnimatePresence mode="wait">
               <motion.div
-                key={activeSlide.id}
+                key={`${activeSlide.id}-${loadEpoch}`}
                 className="atlas-slider__map-wrap"
                 initial={{ opacity: 0.85, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -72,6 +86,8 @@ export function AtlasSlider() {
                   locationLabel={locationLabel}
                   loadPhase={loadPhase}
                   parallaxOffset={{ x: 0, y: 0 }}
+                  interactive
+                  onNodeSelect={handleNodeSelect}
                 />
               </motion.div>
             </AnimatePresence>
@@ -127,14 +143,6 @@ export function AtlasSlider() {
         </div>
 
         <JourneyTimeline activeStage={activeSlide.journeyStage} loadPhase={loadPhase} />
-
-        <div className="atlas-slider__progress" aria-hidden="true">
-          <motion.span
-            className="atlas-slider__progress-fill"
-            animate={{ width: `${((activeIndex + 1) / ATLAS_SLIDES.length) * 100}%` }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          />
-        </div>
       </main>
     </div>
   );

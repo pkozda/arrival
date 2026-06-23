@@ -1,6 +1,7 @@
 import type {
   AtlasConnectionDefinition,
   AtlasNodeDefinition,
+  AtlasNodeId,
   AtlasSlideDefinition,
   JourneyStageId,
 } from './types';
@@ -39,6 +40,7 @@ export const JOURNEY_STAGES: Array<{ id: JourneyStageId; label: string; subtitle
   { id: 'build', label: 'Build', subtitle: 'Long term' },
 ];
 
+/** Member experience slides 01–06 (shown only after login). */
 export const ATLAS_SLIDES: AtlasSlideDefinition[] = [
   {
     id: 'orientation',
@@ -207,3 +209,21 @@ export const ATLAS_SLIDES: AtlasSlideDefinition[] = [
     mapZoom: 1.12,
   },
 ];
+
+/** Slide index when the user selects a map node (member map navigation). */
+export function getSlideIndexForNode(nodeId: AtlasNodeId): number {
+  if (nodeId === 'center') {
+    return 0;
+  }
+
+  const focusedSlide = ATLAS_SLIDES.find((slide) => slide.focusNode === nodeId);
+  if (focusedSlide) {
+    return focusedSlide.index;
+  }
+
+  if (nodeId === 'community') {
+    return ATLAS_SLIDES.findIndex((slide) => slide.id === 'growth');
+  }
+
+  return 0;
+}

@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import type { AtlasLoadPhase } from './useAtlasLoadSequence';
 import type { AtlasSlideDefinition } from './types';
@@ -22,7 +21,7 @@ export function AtlasSlide({ slide, isActive, loadPhase }: Props) {
       animate={{
         opacity: isActive && uiVisible ? 1 : 0,
         y: isActive && uiVisible ? 0 : 16,
-        pointerEvents: isActive && uiVisible ? 'auto' : 'none',
+        pointerEvents: 'none',
       }}
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       aria-hidden={!isActive}

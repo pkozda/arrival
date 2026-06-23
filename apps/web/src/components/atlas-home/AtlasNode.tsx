@@ -15,6 +15,8 @@ type Props = {
   isFocused: boolean;
   loadPhase: AtlasLoadPhase;
   revealIndex: number;
+  interactive: boolean;
+  onSelect?: () => void;
 };
 
 const STATE_CLASS: Record<AtlasNodeState, string> = {
@@ -35,6 +37,8 @@ export function AtlasNode({
   isFocused,
   loadPhase,
   revealIndex,
+  interactive,
+  onSelect,
 }: Props) {
   const isRevealed = isCenter ? loadPhase >= 4 : loadPhase >= 3;
   const isLit = isCenter ? loadPhase >= 4 : loadPhase >= 3;
@@ -43,18 +47,24 @@ export function AtlasNode({
   const hoverScale = isCenter ? 1.08 : 1.15;
   const focusScale = isCenter ? 1.12 : 1.25;
   const baseScale = isFocused ? focusScale : 1;
+  const canInteract = interactive && isRevealed;
+  const isSelectable = canInteract && Boolean(onSelect);
+
+  const handleSelect = () => {
+    onSelect?.();
+  };
 
   return (
     <g transform={`translate(${x} ${y})`}>
       <motion.g
-        className={`atlas-node ${STATE_CLASS[state]}${isCenter ? ' atlas-node--center' : ''}${isFocused ? ' atlas-node--focused' : ''}${isLit ? ' atlas-node--lit' : ''}`}
+        className={`atlas-node ${STATE_CLASS[state]}${isCenter ? ' atlas-node--center' : ''}${isFocused ? ' atlas-node--focused' : ''}${isLit ? ' atlas-node--lit' : ''}${isSelectable ? ' atlas-node--selectable' : ''}`}
         data-node-id={id}
         initial={{ opacity: 0, scale: 0.4 }}
         animate={{
           opacity: isRevealed ? 1 : 0,
           scale: isRevealed ? baseScale : 0.4,
         }}
-        whileHover={{ scale: isRevealed ? hoverScale : 0.4 }}
+        whileHover={canInteract ? { scale: hoverScale } : undefined}
         transition={{
           opacity: { duration: 0.5, delay: staggerDelay, ease: [0.16, 1, 0.3, 1] },
           scale: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
@@ -88,6 +98,18 @@ export function AtlasNode({
               {label}
             </text>
           </>
+        )}
+        {isSelectable && (
+          <circle
+            className="atlas-node__hit"
+            r={isCenter ? 80 : 40}
+            fill="transparent"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={(event) => {
+              event.stopPropagation();
+              handleSelect();
+            }}
+          />
         )}
       </motion.g>
     </g>
