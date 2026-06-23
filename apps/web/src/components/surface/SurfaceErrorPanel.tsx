@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { AtlasSecondaryButton } from '@/components/atlas-runtime';
 
 type Props = {
   message: string;
@@ -35,15 +36,14 @@ export function SurfaceErrorPanel({
       <p className="surface-error-panel__title">{title}</p>
       <p className="surface-error-panel__message">{message}</p>
       {children}
-      <button
-        type="button"
-        className="btn btn-secondary surface-error-panel__retry"
+      <AtlasSecondaryButton
+        className="surface-error-panel__retry"
         onClick={() => void onRetry()}
         disabled={retrying}
         aria-busy={retrying}
       >
         {retryLabel}
-      </button>
+      </AtlasSecondaryButton>
     </div>
   );
 }

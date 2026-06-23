@@ -2,15 +2,16 @@
 
 import { Suspense } from 'react';
 import { useParams } from 'next/navigation';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { ProfileDomainDetail } from '@/components/profile/ProfileDomainDetail';
 import { useApp } from '@/components/AppProvider';
 import { isProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
 
 function LoadingState() {
   return (
-    <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
-      <p style={{ color: 'var(--color-text-muted)' }}>Loading...</p>
-    </div>
+    <AtlasSurface className="text-center" style={{ padding: '2rem' }}>
+      <p className="text-body text-body--muted">Loading...</p>
+    </AtlasSurface>
   );
 }
 

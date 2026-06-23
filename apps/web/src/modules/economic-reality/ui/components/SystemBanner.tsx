@@ -2,6 +2,7 @@
 
 import { ER_COPY_KEYS } from '@/lib/product-contract';
 import type { PresentationFocusV1 } from '@/lib/product-contract';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { useEconomicCopy } from '@/lib/economic-reality';
 
 type Props = {
@@ -16,15 +17,16 @@ export function SystemBanner({ highlights }: Props) {
   }
 
   return (
-    <aside
-      className="card"
+    <AtlasSurface
+      as="aside"
+      className="mb-md"
       data-ui-panel="SystemBanner"
-      style={{ marginBottom: '1rem', padding: '0.875rem 1rem', background: 'var(--color-surface-muted)' }}
+      style={{ padding: '0.875rem 1rem' }}
     >
-      <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-        {copy(ER_COPY_KEYS.UI_SYSTEM)}
+      <p className="text-eyebrow">{copy(ER_COPY_KEYS.UI_SYSTEM)}</p>
+      <p className="text-body" style={{ marginTop: '0.25rem' }}>
+        {copy(highlight.labelKey)}
       </p>
-      <p style={{ fontSize: '0.9375rem', marginTop: '0.25rem' }}>{copy(highlight.labelKey)}</p>
-    </aside>
+    </AtlasSurface>
   );
 }

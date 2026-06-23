@@ -123,7 +123,7 @@ export function LifeEventScenarioExplorer({
 
   return (
     <section
-      className={`le-explorer${embeddedInPanel ? ' le-explorer--embedded' : ' card'}`}
+      className={`le-explorer${embeddedInPanel ? ' le-explorer--embedded' : ''}`}
       aria-labelledby={embeddedInPanel ? undefined : 'le-explorer-title'}
     >
       {!embeddedInPanel && (

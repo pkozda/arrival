@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import type { MissingContextHint, ProfileInsightViewV1 } from '@/lib/product-contract';
 import { buildCompletenessSummary } from '@/lib/profile-insights/selectors';
 import { useApp } from '@/components/AppProvider';

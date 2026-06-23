@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { useMemo } from 'react';
+import { PageHeader } from '@/components/atlas-runtime';
 import { useApp } from '@/components/AppProvider';
 import { ProfileDomainSectionCard } from '@/components/profile/ProfileDomainSectionCard';
 import { buildProfileMirrorDomains, buildProfileMirrorHeadline } from '@/lib/profile-mirror-utils';
@@ -31,22 +32,12 @@ export function ProfileMirrorOverview() {
 
   return (
     <>
-      <header style={{ marginBottom: '1.5rem' }}>
-        <h1
-          style={{
-            fontSize: '1.75rem',
-            fontWeight: 700,
-            marginBottom: '0.375rem',
-            letterSpacing: '-0.02em',
-          }}
-        >
-          Your situation in Germany
-        </h1>
-        <p style={{ fontSize: '1rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-          A summary built from the tools you use
-        </p>
-        <p style={{ fontSize: '1.0625rem', fontWeight: 500, lineHeight: 1.5 }}>{headline}</p>
-      </header>
+      <PageHeader
+        eyebrow="Profile"
+        title="Your situation in Germany"
+        description="A summary built from the tools you use"
+      />
+      <p className="text-body text-body--emphasis mb-md">{headline}</p>
 
       <section>
         {domains.map((domain) => (
@@ -60,7 +51,7 @@ export function ProfileMirrorOverview() {
         ))}
       </section>
 
-      <p style={{ marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+      <p className="text-meta mt-lg">
         <Link href="/" style={{ color: 'var(--color-accent)' }}>
           ← Back to home
         </Link>

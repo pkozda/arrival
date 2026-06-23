@@ -2,6 +2,7 @@
 
 import type { ModuleUIProjection, PublicModuleContract } from '@/lib/product-contract';
 import { capabilityVisibilityFromContract } from '@/lib/module-catalog-utils';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { ExplainPanel } from '@/components/ExplainPanel';
 import { ModuleProjectionRenderer } from '@/components/ModuleProjectionRenderer';
 import { useModuleExplanation } from '@/lib/useModuleExplanation';
@@ -35,21 +36,13 @@ export function ModuleExecutionPanel({
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <div className="stack-md">
       <ModuleProjectionRenderer projection={projection} visibility={visibility} />
 
       {visibility.showExplanation && executionId && projection?.status === 'success' && (
         <>
-          {loading && (
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-              Loading explanation...
-            </p>
-          )}
-          {error && (
-            <div className="card" style={{ color: 'var(--color-danger)' }}>
-              {error}
-            </div>
-          )}
+          {loading && <p className="text-meta">Loading explanation...</p>}
+          {error && <AtlasSurface className="text-danger">{error}</AtlasSurface>}
           {explanation && <ExplainPanel explanation={explanation} />}
         </>
       )}

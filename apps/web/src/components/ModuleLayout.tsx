@@ -1,5 +1,7 @@
 'use client';
 
+import { PageHeader } from '@/components/atlas-runtime';
+
 interface ModuleLayoutProps {
   title: string;
   description: string;
@@ -10,12 +12,7 @@ export function ModuleLayout({ title, description, children }: ModuleLayoutProps
   return (
     <main className="celestial-page-main">
       <div className="container">
-        <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-            {title}
-          </h1>
-          <p style={{ color: 'var(--color-text-muted)' }}>{description}</p>
-        </div>
+        <PageHeader eyebrow="Module" title={title} description={description} />
         {children}
       </div>
     </main>

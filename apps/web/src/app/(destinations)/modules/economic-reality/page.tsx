@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AtlasSecondaryButton, PageHeader } from '@/components/atlas-runtime';
 import { useApp } from '@/components/AppProvider';
 import { ER_COPY_KEYS } from '@/lib/product-contract';
 import { useEconomicCopy, useEconomicRealityPlan } from '@/lib/economic-reality';
@@ -17,22 +18,17 @@ export default function EconomicRealityModulePage() {
   return (
     <main className="celestial-page-main">
       <div className="container">
-        <header style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 700 }}>{copy(ER_COPY_KEYS.MODULE_TITLE)}</h1>
-          <p style={{ color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
-            {copy(ER_COPY_KEYS.MODULE_DESCRIPTION)}
-          </p>
+        <PageHeader
+          eyebrow="Module"
+          title={copy(ER_COPY_KEYS.MODULE_TITLE)}
+          description={copy(ER_COPY_KEYS.MODULE_DESCRIPTION)}
+        >
           {devToolsEnabled && (
-            <button
-              type="button"
-              className="btn btn-secondary"
-              style={{ marginTop: '0.75rem' }}
-              onClick={() => setDebugOpen((open) => !open)}
-            >
+            <AtlasSecondaryButton onClick={() => setDebugOpen((open) => !open)}>
               {copy(debugOpen ? ER_COPY_KEYS.UI_HIDE_DEBUG : ER_COPY_KEYS.UI_SHOW_DEBUG)}
-            </button>
+            </AtlasSecondaryButton>
           )}
-        </header>
+        </PageHeader>
 
         <EconomicRealityPage
           sessionId={sessionId ?? undefined}

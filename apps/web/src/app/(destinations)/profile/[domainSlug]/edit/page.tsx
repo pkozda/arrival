@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { useCelestialNavigation } from '@/components/celestial/useCelestialNavigation';
 import { DomainMutationEditor } from '@/components/profile/DomainMutationEditor';
 import { isProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
@@ -14,9 +15,9 @@ export default function ProfileDomainEditPage() {
     return (
       <main className="celestial-page-main">
         <div className="container" style={{ maxWidth: '720px' }}>
-          <div className="card">
-            <p style={{ color: 'var(--color-text-muted)' }}>This section could not be found.</p>
-          </div>
+          <AtlasSurface>
+            <p className="text-body text-body--muted">This section could not be found.</p>
+          </AtlasSurface>
         </div>
       </main>
     );

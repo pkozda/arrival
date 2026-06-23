@@ -13,6 +13,15 @@ export type ArrivalIntensity = 'low' | 'medium' | 'high';
 
 export type ArrivalEntryAnimationState = 'pending' | 'entering' | 'arrived' | 'idle';
 
+export type SpatialNavigationOrigin =
+  | 'explicit'
+  | 'atlas-link'
+  | 'router-fallback'
+  | 'back-forward'
+  | 'unknown';
+
+export type SpatialNavigationMode = 'explicit-spatial' | 'fallback-spatial';
+
 export type ArrivalContext = {
   sourceNodeId: CelestialNodeId;
   destinationPath: string;
@@ -21,6 +30,8 @@ export type ArrivalContext = {
   entryAnimationState: ArrivalEntryAnimationState;
   departedFromPath: string;
   capturedAt: number;
+  navigationOrigin?: SpatialNavigationOrigin;
+  navigationMode?: SpatialNavigationMode;
 };
 
 export type ArrivalContextInput = Omit<ArrivalContext, 'capturedAt' | 'entryAnimationState'> & {

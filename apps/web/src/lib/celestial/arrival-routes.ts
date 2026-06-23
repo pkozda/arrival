@@ -3,6 +3,7 @@ import type {
   ArrivalIntensity,
   ArrivalTransitionType,
   CelestialNodeId,
+  SpatialNavigationOrigin,
 } from './types';
 import { isCelestialNodeId } from './node-labels';
 
@@ -99,5 +100,24 @@ export function buildArrivalContext(
     departedFromPath,
     transitionType: transitionForNavigation(departedFromPath, destinationPath, sourceNodeId),
     intensity: intensityForNavigation(departedFromPath, destinationPath, sourceNodeId),
+    navigationOrigin: 'explicit',
+    navigationMode: 'explicit-spatial',
+  };
+}
+
+/** Default drift transition when spatial origin cannot be resolved. */
+export function buildFallbackArrivalContext(
+  departedFromPath: string,
+  destinationPath: string,
+  navigationOrigin: SpatialNavigationOrigin = 'unknown'
+): ArrivalContextInput {
+  return {
+    sourceNodeId: 'center',
+    destinationPath,
+    departedFromPath,
+    transitionType: 'fade-through-space',
+    intensity: 'low',
+    navigationOrigin,
+    navigationMode: 'fallback-spatial',
   };
 }

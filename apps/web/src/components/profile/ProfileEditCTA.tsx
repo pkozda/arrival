@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import type { ProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
 
 type Props = {

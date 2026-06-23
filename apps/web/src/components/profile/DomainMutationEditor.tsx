@@ -1,7 +1,9 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { useMemo, useState } from 'react';
+import { AtlasSecondaryButton, PageHeader } from '@/components/atlas-runtime';
+import { LegacyFormNode } from '@/components/atlas-runtime/legacy';
 import { useApp } from '@/components/AppProvider';
 import { DomainFieldRenderer } from '@/components/profile/DomainFieldRenderer';
 import { updateSessionLanguage, updateSessionTheme } from '@/lib/api';
@@ -83,22 +85,14 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
 
   return (
     <>
-      <header style={{ marginBottom: '1.5rem' }}>
-        <p style={{ marginBottom: '0.75rem' }}>
-          <Link href={`/profile/${domainSlug}`} style={{ fontSize: '0.875rem', color: 'var(--color-accent)' }}>
-            ← Back to {section.title}
-          </Link>
-        </p>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 0.375rem' }}>
-          Correct information
-        </h1>
-        <p style={{ fontSize: '0.9375rem', color: 'var(--color-text-muted)', margin: 0 }}>
-          {section.summary}
-        </p>
-      </header>
+      <PageHeader
+        leading={<Link href={`/profile/${domainSlug}`}>{`← Back to ${section.title}`}</Link>}
+        title="Correct information"
+        description={section.summary}
+      />
 
-      <form onSubmit={handleSave} className="card">
-        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
+      <LegacyFormNode className="card" onSubmit={handleSave}>
+        <p className="text-meta mb-md">
           Update what we know about your situation. Changes are saved securely.
         </p>
 
@@ -113,7 +107,7 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
         ))}
 
         {error && (
-          <p role="alert" style={{ color: 'var(--color-danger, #b42318)', fontSize: '0.875rem' }}>
+          <p role="alert" className="text-meta text-danger">
             {error}
           </p>
         )}
@@ -122,11 +116,11 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
           <button type="submit" className="btn btn-primary" disabled={saving}>
             {saving ? 'Saving…' : 'Save'}
           </button>
-          <button type="button" className="btn btn-secondary" disabled={saving} onClick={onCancel}>
+          <AtlasSecondaryButton disabled={saving} onClick={onCancel}>
             Cancel
-          </button>
+          </AtlasSecondaryButton>
         </div>
-      </form>
+      </LegacyFormNode>
     </>
   );
 }

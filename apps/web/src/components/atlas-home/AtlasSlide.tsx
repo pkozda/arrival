@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { motion } from 'framer-motion';
 import type { AtlasLoadPhase } from './useAtlasLoadSequence';
 import type { AtlasSlideDefinition } from './types';

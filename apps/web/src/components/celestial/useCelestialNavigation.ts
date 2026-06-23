@@ -1,21 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
-import { useArrival } from './ArrivalProvider';
+import { useAtlasNavigation } from '@/components/atlas-runtime/useAtlasNavigation';
 
-/** Semantic navigation — route change as a celestial arrival event. */
+/** @deprecated Use useAtlasNavigation from @/components/atlas-runtime */
 export function useCelestialNavigation() {
-  const router = useRouter();
-  const { recordArrivalIntent } = useArrival();
-
-  const arriveAt = useCallback(
-    (href: string) => {
-      recordArrivalIntent(href);
-      router.push(href);
-    },
-    [recordArrivalIntent, router]
-  );
-
+  const { arriveAt, router } = useAtlasNavigation();
   return { arriveAt, router };
 }

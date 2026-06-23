@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { useMemo } from 'react';
 import type { UiSnapshot } from '@/lib/api';
 import type { ActionCard, PublicModuleContract } from '@/lib/product-contract';

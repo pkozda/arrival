@@ -2,9 +2,9 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 import type { ReactNode } from 'react';
-import { buildSpatialVariants } from '@/lib/celestial/spatial-motion';
+import { buildSpatialVariants } from '@/lib/atlas-runtime/spatial-motion';
 import { spatialTransitionConfig } from '@/lib/celestial/spatial-easing';
-import type { SpatialTransition } from '@/lib/celestial/spatial-types';
+import type { SpatialTransition } from '@/lib/atlas-runtime';
 import { useSpatialParallax } from './SpatialParallaxProvider';
 import { useSpatialLifecycle } from './useSpatialLifecycle';
 

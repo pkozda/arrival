@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useAtlasNavigation } from '@/components/atlas-runtime/useAtlasNavigation';
+import { AtlasSecondaryButton } from '@/components/atlas-runtime';
 import type { EconomicActionV1, PresentationCardV1 } from '@/lib/product-contract';
 import { ER_COPY_KEYS } from '@/lib/product-contract';
 import { executeEconomicAction, EconomicActionExecutionError } from '@/lib/economic-reality/action-executor';
@@ -18,19 +19,12 @@ type Props = {
   card: PresentationCardV1;
 };
 
-const cardStyle = {
-  padding: '1rem',
-  border: '1px solid var(--color-border)',
-  borderRadius: '0.5rem',
-  marginBottom: '0.75rem',
-} as const;
-
 function findAction(actionSet: { actions: EconomicActionV1[] } | undefined, actionId: string) {
   return actionSet?.actions.find((action) => action.id === actionId);
 }
 
 function EconomicActionButton({ actionId, labelKey }: { actionId: string; labelKey: string }) {
-  const router = useRouter();
+  const { navigate } = useAtlasNavigation();
   const copy = useEconomicCopy();
   const { actionSet } = useEconomicRealityPlan();
   const { trackActionExecuted } = useEconomicFeedbackTracker();
@@ -50,14 +44,14 @@ function EconomicActionButton({ actionId, labelKey }: { actionId: string; labelK
       case 'open_module': {
         const href = resolveOpenModuleHref(action);
         if (href) {
-          router.push(href);
+          navigate(href);
         }
         return;
       }
       case 'update_profile': {
         const href = resolveProfileEditHref(action);
         if (href) {
-          router.push(href);
+          navigate(href);
         }
         return;
       }
@@ -100,23 +94,17 @@ function EconomicActionButton({ actionId, labelKey }: { actionId: string; labelK
   return (
     <>
       {recorded && (
-        <p
-          className="er-action-recorded"
-          style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}
-          role="status"
-        >
+        <p className="text-meta er-action-recorded" style={{ marginTop: '0.75rem' }} role="status">
           {copy(ER_COPY_KEYS.UI_ACTION_RECORDED)}
         </p>
       )}
-      <button
-        type="button"
-        className="btn btn-secondary"
+      <AtlasSecondaryButton
         style={{ marginTop: recorded ? '0.5rem' : '0.75rem' }}
         disabled={pending || recorded}
         onClick={handleClick}
       >
         {pending ? copy(ER_COPY_KEYS.UI_LOADING) : copy(labelKey)}
-      </button>
+      </AtlasSecondaryButton>
     </>
   );
 }
@@ -125,8 +113,8 @@ export function ActionCardView({ card }: Props) {
   const copy = useEconomicCopy();
 
   return (
-    <article style={cardStyle} data-ui-card="ActionCard" data-card-id={card.cardId}>
-      <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{copy(card.titleKey)}</h3>
+    <article className="atlas-inline-surface" data-ui-card="ActionCard" data-card-id={card.cardId}>
+      <h3 className="text-section-title--sm">{copy(card.titleKey)}</h3>
       <EconomicActionButton actionId={card.actionRefIds[0]!} labelKey={ER_COPY_KEYS.UI_OPEN_ACTION} />
     </article>
   );
@@ -136,8 +124,8 @@ export function IntentCardView({ card }: Props) {
   const copy = useEconomicCopy();
 
   return (
-    <article style={cardStyle} data-ui-card="IntentCard" data-card-id={card.cardId}>
-      <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{copy(card.titleKey)}</h3>
+    <article className="atlas-inline-surface" data-ui-card="IntentCard" data-card-id={card.cardId}>
+      <h3 className="text-section-title--sm">{copy(card.titleKey)}</h3>
       <EconomicActionButton actionId={card.actionRefIds[0]!} labelKey={ER_COPY_KEYS.UI_START_INTENT} />
     </article>
   );
@@ -147,8 +135,8 @@ export function ResourceCardView({ card }: Props) {
   const copy = useEconomicCopy();
 
   return (
-    <article style={cardStyle} data-ui-card="ResourceCard" data-card-id={card.cardId}>
-      <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{copy(card.titleKey)}</h3>
+    <article className="atlas-inline-surface" data-ui-card="ResourceCard" data-card-id={card.cardId}>
+      <h3 className="text-section-title--sm">{copy(card.titleKey)}</h3>
       <EconomicActionButton actionId={card.actionRefIds[0]!} labelKey={ER_COPY_KEYS.UI_OPEN_RESOURCE} />
     </article>
   );
@@ -158,8 +146,8 @@ export function ProfileCardView({ card }: Props) {
   const copy = useEconomicCopy();
 
   return (
-    <article style={cardStyle} data-ui-card="ProfileCard" data-card-id={card.cardId}>
-      <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{copy(card.titleKey)}</h3>
+    <article className="atlas-inline-surface" data-ui-card="ProfileCard" data-card-id={card.cardId}>
+      <h3 className="text-section-title--sm">{copy(card.titleKey)}</h3>
       <EconomicActionButton actionId={card.actionRefIds[0]!} labelKey={ER_COPY_KEYS.UI_UPDATE_PROFILE} />
     </article>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { usePathname } from 'next/navigation';
 import { ECONOMIC_REALITY_MODULE_NAV } from '@/app-shell/navigation/modules';
 import { shouldShowEconomicRealitySurface } from '@/app-shell/navigation/visibility';

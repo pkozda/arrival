@@ -10,6 +10,7 @@ export type {
 export type {
   SpatialTransition,
   SpatialTransitionType,
+  SpatialMotionPrimitive,
   SpatialEasingProfile,
   SpatialPhase,
   SpatialParallaxOffset,
@@ -18,8 +19,8 @@ export type {
 } from './spatial-types';
 
 export { CELESTIAL_NODE_LABELS, isCelestialNodeId } from './node-labels';
-export { buildArrivalContext, resolveNodeForPath, readStarMapFocusedNodeId } from './arrival-routes';
-export { persistArrivalIntent, consumeArrivalIntent, CELESTIAL_ARRIVAL_STORAGE_KEY } from './arrival-storage';
+export { buildArrivalContext, buildFallbackArrivalContext, resolveNodeForPath, readStarMapFocusedNodeId } from './arrival-routes';
+export { persistArrivalIntent, consumeArrivalIntent, peekArrivalIntent, CELESTIAL_ARRIVAL_STORAGE_KEY } from './arrival-storage';
 export { captureArrivalIntentFromClick } from './capture-arrival-intent';
 export { CELESTIAL_EASE, arrivalDuration, transitionMotion } from './motion-tokens';
 export { NODE_ORIGIN_TRANSFORMS, getNodeOriginTransform } from './node-origin-transforms';
@@ -27,6 +28,7 @@ export {
   buildSpatialTransition,
   buildDefaultSpatialTransition,
   resolveSpatialTransitionType,
+  spatialTransitionEngine,
 } from './spatial-transition-engine';
 export { buildSpatialVariants } from './spatial-motion';
 export { spatialTransitionConfig } from './spatial-easing';

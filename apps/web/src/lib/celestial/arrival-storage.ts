@@ -16,6 +16,24 @@ export function persistArrivalIntent(input: ArrivalContextInput): void {
   sessionStorage.setItem(CELESTIAL_ARRIVAL_STORAGE_KEY, JSON.stringify(payload));
 }
 
+export function peekArrivalIntent(destinationPath: string): boolean {
+  if (typeof sessionStorage === 'undefined') {
+    return false;
+  }
+
+  const raw = sessionStorage.getItem(CELESTIAL_ARRIVAL_STORAGE_KEY);
+  if (!raw) {
+    return false;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as ArrivalContext;
+    return parsed.destinationPath === destinationPath;
+  } catch {
+    return false;
+  }
+}
+
 export function consumeArrivalIntent(destinationPath: string): ArrivalContext | null {
   if (typeof sessionStorage === 'undefined') {
     return null;

@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import type { LifeActionRef } from '@/lib/product-contract';
 import { useApp } from '@/components/AppProvider';
 import { lifeEventActionLabel } from '@/lib/life-event/content-labels';

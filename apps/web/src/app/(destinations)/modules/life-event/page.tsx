@@ -2,6 +2,8 @@
 
 import { Suspense, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { PageHeader } from '@/components/atlas-runtime';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { useApp } from '@/components/AppProvider';
 import { LifeEventPlanView } from '@/components/life-event/LifeEventPlanView';
 import { LifeEventPlanIntake } from '@/components/life-event/LifeEventPlanIntake';
@@ -18,9 +20,9 @@ import { useSurfaceRetry } from '@/components/surface/useSurfaceRetry';
 
 function LoadingState() {
   return (
-    <div className="card le-plan-card">
+    <AtlasSurface className="le-plan-card">
       <WireframeSkeleton />
-    </div>
+    </AtlasSurface>
   );
 }
 
@@ -80,33 +82,34 @@ function LifeEventModulePageContent() {
 
   if (modulesLoading) {
     return (
-      <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
+      <AtlasSurface className="text-center" style={{ padding: '2rem' }}>
         {t('life-event.empty.loadingModule')}
-      </div>
+      </AtlasSurface>
     );
   }
 
   if (modulesError || !contract || contract.status !== 'available') {
     return (
-      <div className="card" style={{ padding: '2rem' }}>
+      <AtlasSurface style={{ padding: '2rem' }}>
         {modulesError ?? t('life-event.empty.moduleNotFound')}
-      </div>
+      </AtlasSurface>
     );
   }
 
   return (
     <div className="le-module-page">
-      <header className="le-module-page__header">
-        <h1>{lifeEventModuleTitle(t, contract.title)}</h1>
-        {contract.description && (
-          <p>{lifeEventModuleDescription(t, contract.description)}</p>
-        )}
-      </header>
+      <PageHeader
+        eyebrow="Module"
+        title={lifeEventModuleTitle(t, contract.title)}
+        description={
+          contract.description ? lifeEventModuleDescription(t, contract.description) : undefined
+        }
+      />
 
       {(lifeEventPlanLoading || retrying) && <LoadingState />}
 
       {!lifeEventPlanLoading && !retrying && lifeEventPlanError && !isProfileNotReadyPlanError && (
-        <div className="card le-plan-card" data-ui-surface="life-event-module-body">
+        <AtlasSurface className="le-plan-card" data-ui-surface="life-event-module-body">
           <SurfaceErrorPanel
             message={lifeEventPlanError}
             onRetry={onRetry}
@@ -114,7 +117,7 @@ function LifeEventModulePageContent() {
             title={t('common.error')}
             retryLabel={t('common.retry')}
           />
-        </div>
+        </AtlasSurface>
       )}
 
       {!lifeEventPlanLoading && !retrying && lifeEventPlan && (

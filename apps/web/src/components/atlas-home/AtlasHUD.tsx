@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { usePathname } from 'next/navigation';
 import { useAtlasHomeAuth } from './AtlasHomeProvider';
 import { AtlasLogo } from './AtlasLogo';

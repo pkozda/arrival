@@ -41,7 +41,7 @@ function SectionHeading({ titleKey }: { titleKey: string }) {
 export function PrimarySection({ section }: Props) {
   return (
     <section data-ui-panel="MainActionPanel" aria-labelledby={`${section.section.sectionId}-title`}>
-      <h2 id={`${section.section.sectionId}-title`} style={{ fontSize: '1.125rem', fontWeight: 600 }}>
+      <h2 id={`${section.section.sectionId}-title`} className="text-section-title">
         <SectionHeading titleKey={section.section.titleKey} />
       </h2>
       <div style={{ marginTop: '0.75rem' }}>
@@ -54,7 +54,7 @@ export function PrimarySection({ section }: Props) {
 export function SecondarySection({ section }: Props) {
   return (
     <section data-ui-panel="SupportPanel" aria-labelledby={`${section.section.sectionId}-title`}>
-      <h2 id={`${section.section.sectionId}-title`} style={{ fontSize: '1.125rem', fontWeight: 600 }}>
+      <h2 id={`${section.section.sectionId}-title`} className="text-section-title">
         <SectionHeading titleKey={section.section.titleKey} />
       </h2>
       <div style={{ marginTop: '0.75rem' }}>
@@ -67,7 +67,7 @@ export function SecondarySection({ section }: Props) {
 export function SystemSection({ section }: Props) {
   return (
     <section data-ui-panel="SystemPanel" aria-labelledby={`${section.section.sectionId}-title`}>
-      <h2 id={`${section.section.sectionId}-title`} style={{ fontSize: '1.125rem', fontWeight: 600 }}>
+      <h2 id={`${section.section.sectionId}-title`} className="text-section-title">
         <SectionHeading titleKey={section.section.titleKey} />
       </h2>
       <div style={{ marginTop: '0.75rem' }}>

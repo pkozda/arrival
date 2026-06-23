@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import type { DomainInsight } from '@/lib/product-contract';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { ConfidenceBadge } from '@/components/profile/ConfidenceBadge';
 
 type Props = {
@@ -23,23 +24,19 @@ export function DomainInsightBlock({ insight }: Props) {
   }
 
   return (
-    <section className="card" style={{ marginTop: '1rem' }}>
-      <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem' }}>
-        What we know
-      </h2>
+    <AtlasSurface as="section" className="mt-md">
+      <h2 className="text-section-title--sm mb-sm">What we know</h2>
 
-      <div style={{ marginBottom: '0.75rem' }}>
+      <div className="mb-sm">
         <ConfidenceBadge level={insight.confidence.level} />
       </div>
 
       {insight.provenanceNarrative && (
-        <p style={{ fontSize: '0.9375rem', lineHeight: 1.5, marginBottom: '0.75rem' }}>
-          {insight.provenanceNarrative}
-        </p>
+        <p className="text-body mb-sm">{insight.provenanceNarrative}</p>
       )}
 
       {insight.confidence.reasons.length > 0 && (
-        <ul style={{ margin: '0 0 0.75rem', paddingLeft: '1.25rem', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+        <ul className="text-meta" style={{ margin: '0 0 0.75rem', paddingLeft: '1.25rem' }}>
           {insight.confidence.reasons.map((reason) => (
             <li key={reason}>{reason}</li>
           ))}
@@ -47,13 +44,13 @@ export function DomainInsightBlock({ insight }: Props) {
       )}
 
       {insight.suggestions.map((suggestion) => (
-        <p key={suggestion.href} style={{ fontSize: '0.875rem', marginBottom: '0.375rem' }}>
+        <p key={suggestion.href} className="text-meta" style={{ marginBottom: '0.375rem' }}>
           <Link href={suggestion.href} style={{ color: 'var(--color-accent)' }}>
             {suggestion.message}
           </Link>
         </p>
       ))}
-    </section>
+    </AtlasSurface>
   );
 }
 

@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { ContractModulePage } from '@/components/ContractModulePage';
+import { LegacyPanelSurface } from '@/components/atlas-runtime/legacy';
 import { useApp } from '@/components/AppProvider';
 
 export default function ModulePage() {
@@ -14,7 +15,7 @@ export default function ModulePage() {
     return (
       <main className="celestial-page-main">
         <div className="container">
-          <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>Loading module...</div>
+          <LegacyPanelSurface style={{ padding: '2rem', textAlign: 'center' }}>Loading module...</LegacyPanelSurface>
         </div>
       </main>
     );
@@ -24,7 +25,7 @@ export default function ModulePage() {
     return (
       <main className="celestial-page-main">
         <div className="container">
-          <div className="card" style={{ padding: '2rem', color: 'var(--color-danger)' }}>{modulesError}</div>
+          <LegacyPanelSurface style={{ padding: '2rem', color: 'var(--color-danger)' }}>{modulesError}</LegacyPanelSurface>
         </div>
       </main>
     );
@@ -34,7 +35,7 @@ export default function ModulePage() {
     return (
       <main className="celestial-page-main">
         <div className="container">
-          <div className="card" style={{ padding: '2rem' }}>Module not found.</div>
+          <LegacyPanelSurface style={{ padding: '2rem' }}>Module not found.</LegacyPanelSurface>
         </div>
       </main>
     );

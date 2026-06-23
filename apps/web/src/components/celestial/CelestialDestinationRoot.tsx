@@ -2,22 +2,21 @@
 
 import type { ReactNode } from 'react';
 import { AtlasHomeProvider } from '@/components/atlas-home/AtlasHomeProvider';
-import { ArrivalProvider } from './ArrivalProvider';
-import { SpatialCanvasLayer } from './SpatialCanvasLayer';
+import { LegacyGridField } from '@/components/atlas-runtime/legacy';
 import { SpatialPageShell } from './SpatialPageShell';
-import { SpatialParallaxProvider } from './SpatialParallaxProvider';
 
+/**
+ * Destination shell — spatial page chrome + legacy content field.
+ * Shared runtime providers (theme, motion, canvas) live in UnifiedAppShell.
+ */
 export function CelestialDestinationRoot({ children }: { children: ReactNode }) {
   return (
     <AtlasHomeProvider>
-      <ArrivalProvider>
-        <SpatialParallaxProvider>
-          <div className="celestial-destination-root">
-            <SpatialCanvasLayer />
-            <SpatialPageShell>{children}</SpatialPageShell>
-          </div>
-        </SpatialParallaxProvider>
-      </ArrivalProvider>
+      <div className="celestial-destination-root">
+        <SpatialPageShell>
+          <LegacyGridField>{children}</LegacyGridField>
+        </SpatialPageShell>
+      </div>
     </AtlasHomeProvider>
   );
 }

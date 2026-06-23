@@ -1,5 +1,7 @@
 'use client';
 
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
+
 interface ResultPanelProps {
   loading: boolean;
   error?: string;
@@ -9,17 +11,17 @@ interface ResultPanelProps {
 export function ResultPanel({ loading, error, children }: ResultPanelProps) {
   if (loading) {
     return (
-      <div className="card animate-in" style={{ textAlign: 'center', padding: '3rem' }}>
-        <p style={{ color: 'var(--color-text-muted)' }}>Analyzing...</p>
-      </div>
+      <AtlasSurface className="animate-in text-center" style={{ padding: '3rem' }}>
+        <p className="text-body text-body--muted">Analyzing...</p>
+      </AtlasSurface>
     );
   }
 
   if (error) {
     return (
-      <div className="card animate-in" style={{ borderColor: 'var(--color-danger)' }}>
-        <p style={{ color: 'var(--color-danger)' }}>{error}</p>
-      </div>
+      <AtlasSurface className="animate-in text-danger" style={{ borderColor: 'var(--color-danger)' }}>
+        <p className="text-danger">{error}</p>
+      </AtlasSurface>
     );
   }
 
