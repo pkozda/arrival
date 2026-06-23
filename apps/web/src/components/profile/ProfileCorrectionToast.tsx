@@ -1,5 +1,7 @@
 'use client';
 
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
+
 type Props = {
   title?: string;
   subtitle?: string;
@@ -12,23 +14,17 @@ export function ProfileCorrectionToast({
   onDismiss,
 }: Props) {
   return (
-    <div
-      className="card"
+    <AtlasSurface
       role="status"
+      className="mb-md"
       style={{
-        marginBottom: '1rem',
         borderColor: 'var(--color-accent)',
-        background: 'color-mix(in srgb, var(--color-accent) 8%, var(--color-surface))',
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
         <div>
-          <p style={{ fontWeight: 600, margin: 0 }}>{title}</p>
-          {subtitle && (
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: '0.25rem 0 0' }}>
-              {subtitle}
-            </p>
-          )}
+          <p className="text-section-title--sm">{title}</p>
+          {subtitle && <p className="text-meta" style={{ marginTop: '0.25rem' }}>{subtitle}</p>}
         </div>
         {onDismiss && (
           <button
@@ -48,6 +44,6 @@ export function ProfileCorrectionToast({
           </button>
         )}
       </div>
-    </div>
+    </AtlasSurface>
   );
 }

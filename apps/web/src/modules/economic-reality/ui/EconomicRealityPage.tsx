@@ -5,6 +5,7 @@ import { ER_COPY_KEYS } from '@/lib/product-contract';
 import type { EconomicRealityClientStateV1 } from '@/lib/economic-reality';
 import { adaptPresentationToUi, useEconomicCopy } from '@/lib/economic-reality';
 import { useApp } from '@/components/AppProvider';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { useEconomicFeedbackTracker } from '@/lib/economic-reality/useEconomicFeedbackTracker';
 import { SurfaceErrorPanel } from '@/components/surface/SurfaceErrorPanel';
 import { SurfaceLoadingSkeleton } from '@/components/surface/SurfaceLoadingSkeleton';
@@ -47,15 +48,15 @@ export function EconomicRealityPage({ mode, state, showDebug = false, onRetry }:
 
   if (state.loading || retrying) {
     return (
-      <div className="card" data-ui-surface="economic-reality-module-body" style={{ padding: '1.5rem' }}>
+      <AtlasSurface data-ui-surface="economic-reality-module-body">
         <SurfaceLoadingSkeleton />
-      </div>
+      </AtlasSurface>
     );
   }
 
   if (state.error) {
     return (
-      <div className="card" data-ui-surface="economic-reality-module-body" style={{ padding: '1.5rem' }}>
+      <AtlasSurface data-ui-surface="economic-reality-module-body">
         <SurfaceErrorPanel
           message={copy(state.error)}
           onRetry={handleRetry}
@@ -63,15 +64,15 @@ export function EconomicRealityPage({ mode, state, showDebug = false, onRetry }:
           title={copy(ER_COPY_KEYS.UI_ERROR)}
           retryLabel={t('common.retry')}
         />
-      </div>
+      </AtlasSurface>
     );
   }
 
   if (!state.presentation) {
     return (
-      <div className="card" style={{ padding: '1.5rem', color: 'var(--color-text-muted)' }}>
+      <AtlasSurface className="text-body text-body--muted">
         {copy(ER_COPY_KEYS.UI_NOT_AVAILABLE)}
-      </div>
+      </AtlasSurface>
     );
   }
 
@@ -94,11 +95,11 @@ export function EconomicRealityPage({ mode, state, showDebug = false, onRetry }:
       <SystemBanner highlights={state.presentation.systemHighlights} />
 
       {showDebug && state.plan && (
-        <details className="card" style={{ marginTop: '1rem', padding: '1rem' }}>
-          <summary style={{ cursor: 'pointer', fontWeight: 600 }}>
+        <AtlasSurface as="details" className="mt-md" style={{ padding: '1rem' }}>
+          <summary className="text-section-title--sm" style={{ cursor: 'pointer' }}>
             {copy(ER_COPY_KEYS.UI_DEBUG_PLAN)}
           </summary>
-          <pre style={{ marginTop: '0.75rem', fontSize: '0.75rem', overflowX: 'auto' }}>
+          <pre className="text-caption" style={{ marginTop: '0.75rem', overflowX: 'auto' }}>
             {JSON.stringify(
               {
                 planId: state.plan.planId,
@@ -109,7 +110,7 @@ export function EconomicRealityPage({ mode, state, showDebug = false, onRetry }:
               2
             )}
           </pre>
-        </details>
+        </AtlasSurface>
       )}
     </div>
   );

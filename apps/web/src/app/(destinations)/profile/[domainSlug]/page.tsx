@@ -2,16 +2,16 @@
 
 import { Suspense } from 'react';
 import { useParams } from 'next/navigation';
-import { Header } from '@/components/Header';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { ProfileDomainDetail } from '@/components/profile/ProfileDomainDetail';
 import { useApp } from '@/components/AppProvider';
 import { isProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
 
 function LoadingState() {
   return (
-    <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
-      <p style={{ color: 'var(--color-text-muted)' }}>Loading...</p>
-    </div>
+    <AtlasSurface className="text-center" style={{ padding: '2rem' }}>
+      <p className="text-body text-body--muted">Loading...</p>
+    </AtlasSurface>
   );
 }
 
@@ -32,15 +32,12 @@ function ProfileDomainDetailPageContent() {
 
 export default function ProfileDomainPage() {
   return (
-    <>
-      <Header />
-      <main style={{ padding: '2rem 0 4rem' }}>
-        <div className="container" style={{ maxWidth: '720px' }}>
-          <Suspense fallback={<LoadingState />}>
-            <ProfileDomainDetailPageContent />
-          </Suspense>
-        </div>
-      </main>
-    </>
+    <main className="celestial-page-main">
+      <div className="container" style={{ maxWidth: '720px' }}>
+        <Suspense fallback={<LoadingState />}>
+          <ProfileDomainDetailPageContent />
+        </Suspense>
+      </div>
+    </main>
   );
 }

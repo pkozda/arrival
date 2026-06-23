@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { AtlasSecondaryButton } from '@/components/atlas-runtime';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { ExplainPanel } from '@/components/ExplainPanel';
 import { useModuleExplanation } from '@/lib/useModuleExplanation';
 
@@ -21,27 +23,14 @@ export function ExecutionExplainToggle({ moduleId, executionId, sessionId }: Pro
 
   return (
     <div style={{ marginTop: '0.75rem' }}>
-      <button
-        type="button"
-        className="btn btn-secondary"
-        onClick={() => setOpen((current) => !current)}
-        aria-expanded={open}
-      >
+      <AtlasSecondaryButton onClick={() => setOpen((current) => !current)} aria-expanded={open}>
         {open ? 'Hide explanation' : 'Why these results?'}
-      </button>
+      </AtlasSecondaryButton>
 
       {open && (
         <div style={{ marginTop: '0.75rem' }}>
-          {loading && (
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-              Loading explanation...
-            </p>
-          )}
-          {error && (
-            <div className="card" style={{ color: 'var(--color-danger)' }}>
-              {error}
-            </div>
-          )}
+          {loading && <p className="text-meta">Loading explanation...</p>}
+          {error && <AtlasSurface className="text-danger">{error}</AtlasSurface>}
           {explanation && <ExplainPanel explanation={explanation} />}
         </div>
       )}

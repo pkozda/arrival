@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { AtlasNodeIcon } from './atlas-node-icons';
 import type { AtlasLoadPhase } from './useAtlasLoadSequence';
 import type { AtlasNodeId, AtlasNodeState } from './types';
 
@@ -49,6 +50,9 @@ export function AtlasNode({
   const baseScale = isFocused ? focusScale : 1;
   const canInteract = interactive && isRevealed;
   const isSelectable = canInteract && Boolean(onSelect);
+  const coreRadius = isCenter ? 24 : isFocused ? 16 : 13;
+  const glowRadius = isCenter ? 52 : isFocused ? 44 : 36;
+  const pulseRadius = isCenter ? 38 : isFocused ? 28 : 22;
 
   const handleSelect = () => {
     onSelect?.();
@@ -77,9 +81,11 @@ export function AtlasNode({
             <circle className="atlas-node__halo" r={88} />
             <circle className="atlas-node__ring atlas-node__ring--outer" r={68} />
             <circle className="atlas-node__ring atlas-node__ring--inner" r={46} />
-            <circle className="atlas-node__glow atlas-node__glow--center" r={52} />
-            <circle className="atlas-node__pulse" r={38} />
-            <circle className="atlas-node__core atlas-node__core--center" r={24} />
+            <circle className="atlas-node__radiance atlas-node__radiance--center" r={62} />
+            <circle className="atlas-node__glow atlas-node__glow--center" r={glowRadius} />
+            <circle className="atlas-node__pulse" r={pulseRadius} />
+            <circle className="atlas-node__core atlas-node__core--center" r={coreRadius} />
+            <AtlasNodeIcon nodeId={id} coreRadius={coreRadius} />
             <text className="atlas-node__label atlas-node__label--center" y={-78} textAnchor="middle">
               {label}
             </text>
@@ -91,9 +97,11 @@ export function AtlasNode({
           </>
         ) : (
           <>
-            <circle className="atlas-node__glow" r={isFocused ? 44 : 36} />
-            <circle className="atlas-node__pulse" r={isFocused ? 28 : 22} />
-            <circle className="atlas-node__core" r={isFocused ? 16 : 13} />
+            <circle className="atlas-node__radiance" r={glowRadius + 6} />
+            <circle className="atlas-node__glow" r={glowRadius} />
+            <circle className="atlas-node__pulse" r={pulseRadius} />
+            <circle className="atlas-node__core" r={coreRadius} />
+            <AtlasNodeIcon nodeId={id} coreRadius={coreRadius} />
             <text className="atlas-node__label" y={isFocused ? -38 : -34} textAnchor="middle">
               {label}
             </text>

@@ -8,7 +8,6 @@ import {
   useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
   type ReactNode,
 } from 'react';
 import {
@@ -57,7 +56,6 @@ import { getTranslations } from '@arrival-atlas/core';
 import {
   getSessionLanguage,
   getThemePreference,
-  resolveTheme,
   type ResolvedTheme,
 } from '@/lib/snapshot';
 
@@ -100,24 +98,6 @@ interface AppState {
   t: (key: string) => string;
 }
 
-function subscribeSystemColorScheme(onStoreChange: () => void): () => void {
-  const media = window.matchMedia('(prefers-color-scheme: light)');
-  media.addEventListener('change', onStoreChange);
-  return () => media.removeEventListener('change', onStoreChange);
-}
-
-function getSystemColorSchemeSnapshot(): ResolvedTheme {
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-}
-
-function useSystemColorScheme(): ResolvedTheme {
-  return useSyncExternalStore(
-    subscribeSystemColorScheme,
-    getSystemColorSchemeSnapshot,
-    () => 'light'
-  );
-}
-
 const AppContext = createContext<AppState | null>(null);
 
 type ShellState = {
@@ -151,7 +131,6 @@ function AppProviderSessionLayer({ children }: { children: ReactNode }) {
     () => getThemePreference(consistency.uiSnapshot),
     [consistency.uiSnapshot]
   );
-  const systemTheme = useSystemColorScheme();
   const sessionLanguage = useMemo(
     () => getSessionLanguage(consistency.uiSnapshot),
     [consistency.uiSnapshot]
@@ -191,14 +170,11 @@ function AppProviderSessionLayer({ children }: { children: ReactNode }) {
     }
     setClientLocaleReady(true);
   }, []);
-  const theme = useMemo(
-    () => (themePreference === 'system' ? systemTheme : resolveTheme(themePreference)),
-    [themePreference, systemTheme]
-  );
+  const theme: ResolvedTheme = 'dark';
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
+    document.documentElement.dataset.theme = 'dark';
+  }, []);
 
   useEffect(() => {
     const bundled = getTranslations(language);
@@ -281,9 +257,8 @@ function AppProviderSessionLayer({ children }: { children: ReactNode }) {
   );
 
   const toggleTheme = useCallback(async () => {
-    const next: ThemePreference = theme === 'dark' ? 'light' : 'dark';
-    await changeTheme(next);
-  }, [theme, changeTheme]);
+    /* Platform uses a single atlas dark theme. */
+  }, []);
 
   const t = useCallback(
     (key: string) => shell.translations[key] ?? getTranslations(language)[key] ?? key,
@@ -353,7 +328,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const id = await ensureSession({
         userProfile: {
           language: readStoredDisplayLanguage() ?? 'en',
-          uiPreferences: { theme: 'light' },
+          uiPreferences: { theme: 'dark' },
         },
       });
       setSessionId(id);

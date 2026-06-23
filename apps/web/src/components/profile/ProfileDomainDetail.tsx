@@ -1,8 +1,10 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { PageHeader } from '@/components/atlas-runtime';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { useApp } from '@/components/AppProvider';
 import { DomainStatusBadge } from '@/components/profile/DomainStatusBadge';
 import { ProfileCorrectionToast } from '@/components/profile/ProfileCorrectionToast';
@@ -32,12 +34,12 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
 
   if (!domain) {
     return (
-      <div className="card">
-        <p style={{ color: 'var(--color-text-muted)' }}>This section could not be found.</p>
+      <AtlasSurface>
+        <p className="text-body text-body--muted">This section could not be found.</p>
         <Link href="/profile" style={{ color: 'var(--color-accent)' }}>
           ← Back to your situation
         </Link>
-      </div>
+      </AtlasSurface>
     );
   }
 
@@ -52,61 +54,34 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
     <>
       {showUpdatedToast && <ProfileCorrectionToast />}
 
-      <header style={{ marginBottom: '1.5rem' }}>
-        <p style={{ marginBottom: '0.75rem' }}>
-          <Link href="/profile" style={{ fontSize: '0.875rem', color: 'var(--color-accent)' }}>
-            ← Your situation in Germany
-          </Link>
-        </p>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: '0.75rem',
-          }}
-        >
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>{domain.title}</h1>
-          <DomainStatusBadge status={domain.status} />
-        </div>
-      </header>
+      <PageHeader
+        leading={
+          <Link href="/profile">← Your situation in Germany</Link>
+        }
+        title={domain.title}
+        trailing={<DomainStatusBadge status={domain.status} />}
+      />
 
-      <div className="card" style={{ marginBottom: '1rem' }}>
+      <AtlasSurface className="mb-md">
         {hasData ? (
           <>
-            <dl style={{ display: 'grid', gap: '0.875rem', margin: 0 }}>
+            <dl className="profile-field-list">
               {domain.fields.map((field) => (
                 <div key={field.label}>
-                  <dt
-                    style={{
-                      fontSize: '0.8125rem',
-                      color: 'var(--color-text-muted)',
-                      marginBottom: '0.125rem',
-                    }}
-                  >
-                    {field.label}
-                  </dt>
-                  <dd style={{ fontSize: '0.9375rem', margin: 0 }}>{field.value}</dd>
+                  <dt className="text-label">{field.label}</dt>
+                  <dd className="text-body">{field.value}</dd>
                 </div>
               ))}
             </dl>
             {domain.provenanceModuleTitle && (
-              <p
-                style={{
-                  marginTop: '1rem',
-                  fontSize: '0.8125rem',
-                  color: 'var(--color-text-muted)',
-                }}
-              >
-                Last updated when you used {domain.provenanceModuleTitle}
+              <p className="text-caption mt-md">
+                {`Last updated when you used ${domain.provenanceModuleTitle}`}
               </p>
             )}
           </>
         ) : (
           <>
-            <p style={{ fontSize: '0.9375rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-              {domain.emptyExplanation}
-            </p>
+            <p className="text-body text-body--muted">{domain.emptyExplanation}</p>
             {domain.ctaModuleId && ctaTitle && (
               <Link
                 href={`/modules/${domain.ctaModuleId}`}
@@ -118,27 +93,23 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
                   textDecoration: 'none',
                 }}
               >
-                Open {ctaTitle}
+                {`Open ${ctaTitle}`}
               </Link>
             )}
           </>
         )}
 
-        <div style={{ marginTop: '1rem' }}>
+        <div className="mt-md">
           <ProfileEditCTA domainSlug={editSlug} />
         </div>
-      </div>
+      </AtlasSurface>
 
       <DomainInsightBlock insight={domainInsight} />
 
-      <section className="card">
-        <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-          Why this matters
-        </h2>
-        <p style={{ fontSize: '0.9375rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-          {domain.whyItMatters}
-        </p>
-      </section>
+      <AtlasSurface as="section" className="mt-md">
+        <h2 className="text-section-title--sm mb-sm">Why this matters</h2>
+        <p className="text-body text-body--muted">{domain.whyItMatters}</p>
+      </AtlasSurface>
     </>
   );
 }

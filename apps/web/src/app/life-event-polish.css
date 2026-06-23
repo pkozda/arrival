@@ -5,18 +5,6 @@
   color: var(--color-danger);
 }
 
-.btn-secondary {
-  background: transparent;
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-}
-
-.btn-secondary:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  text-decoration: none;
-}
-
 .btn:focus-visible,
 a.btn:focus-visible,
 .le-contextual-panel > summary:focus-visible {
@@ -80,23 +68,8 @@ a.btn:focus-visible,
   gap: 2rem;
 }
 
-.le-module-page__header h1 {
-  font-size: clamp(1.5rem, 4vw, 1.75rem);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
-}
-
-.le-module-page__header p {
-  color: var(--color-text-muted);
-  max-width: 48rem;
-  line-height: 1.65;
-  font-size: 0.9375rem;
-}
-
 .le-plan-card {
   padding: clamp(1rem, 3vw, 1.75rem);
-  box-shadow: var(--shadow);
 }
 
 .le-home-card__header {
@@ -390,11 +363,20 @@ a.btn:focus-visible,
 
 /* —— Node cards —— */
 .le-node-card {
-  border-radius: var(--radius-sm);
-  padding: 0.875rem;
+  border-radius: var(--radius);
+  padding: 0.875rem 1rem;
   margin-bottom: 0.625rem;
-  border-left: 3px solid var(--le-accent, var(--color-border));
-  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+  background: linear-gradient(
+    145deg,
+    rgba(10, 22, 40, 0.9) 0%,
+    rgba(7, 17, 31, 0.85) 100%
+  );
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-left: 3px solid var(--le-accent, rgba(56, 189, 248, 0.5));
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.04) inset,
+    0 6px 24px rgba(0, 0, 0, 0.24);
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .le-node-card:last-child {
@@ -402,32 +384,40 @@ a.btn:focus-visible,
 }
 
 .le-node-card--focus {
-  border: 2px solid var(--le-accent, var(--color-accent));
-  background: var(--color-surface);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-left: 3px solid var(--le-accent, var(--color-accent));
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.08) inset,
+    0 0 24px rgba(56, 189, 248, 0.12);
 }
 
 .le-node-card--action {
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(148, 163, 184, 0.14);
   border-left: 3px solid var(--le-accent, var(--color-primary));
-  background: var(--color-surface);
 }
 
 .le-node-card--action:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
-  background: var(--color-surface-hover);
+  border-color: rgba(56, 189, 248, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.06) inset,
+    0 8px 28px rgba(0, 0, 0, 0.28);
 }
 
 .le-node-card--blocker {
-  border: 1px solid color-mix(in srgb, var(--color-warning) 40%, var(--color-border));
+  border: 1px solid rgba(251, 191, 36, 0.28);
   border-left: 3px solid var(--color-warning);
-  background: rgba(245, 158, 11, 0.06);
-  opacity: 0.92;
+  background: linear-gradient(
+    145deg,
+    rgba(251, 191, 36, 0.08) 0%,
+    rgba(7, 17, 31, 0.88) 100%
+  );
 }
 
 .le-node-card--timeline {
-  border: 1px dashed var(--color-border);
-  border-left: 3px solid var(--color-border);
-  background: transparent;
+  border: 1px dashed rgba(148, 163, 184, 0.2);
+  border-left: 3px solid rgba(148, 163, 184, 0.35);
+  background: rgba(7, 17, 31, 0.45);
+  box-shadow: none;
 }
 
 .le-node-card__header {
@@ -595,9 +585,17 @@ a.btn:focus-visible,
 
 /* —— Scenario explorer —— */
 .le-explorer {
-  border-style: dashed;
-  border-width: 1px;
-  background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-surface) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--radius);
+  background: linear-gradient(
+    145deg,
+    rgba(10, 22, 40, 0.92) 0%,
+    rgba(7, 17, 31, 0.88) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.04) inset,
+    0 8px 32px rgba(0, 0, 0, 0.28);
+  padding: 1.25rem;
 }
 
 .le-explorer__header {
@@ -679,7 +677,7 @@ a.btn:focus-visible,
 .le-explorer-panel {
   margin-top: 3rem;
   padding-top: 2.5rem;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 .le-explorer-panel--demoted {

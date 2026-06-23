@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { usePathname } from 'next/navigation';
 import { useApp } from './AppProvider';
 import {

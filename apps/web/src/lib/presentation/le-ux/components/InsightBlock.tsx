@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { useApp } from '@/components/AppProvider';
 import type { InsightWireframeContent } from '@/lib/presentation/le-ux/types';
 

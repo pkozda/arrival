@@ -2,9 +2,12 @@ import type { Metadata } from 'next';
 import { PRODUCT_NAME, PRODUCT_TAGLINE } from '@/lib/product-contract';
 import { AppProvider } from '@/components/AppProvider';
 import { AppErrorBoundary } from '@/components/AppErrorBoundary';
+import { AtlasRuntimeRoot } from '@/components/atlas-runtime';
 import { ThemeScript } from '@/components/ThemeScript';
 import './globals.css';
 import './atlas-home.css';
+import './atlas-runtime.css';
+import './ui-cohesion.css';
 import './life-event-polish.css';
 
 export const metadata: Metadata = {
@@ -14,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="light" suppressHydrationWarning>
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
         <ThemeScript />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,7 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <AppErrorBoundary>
-          <AppProvider>{children}</AppProvider>
+          <AppProvider>
+            <AtlasRuntimeRoot>{children}</AtlasRuntimeRoot>
+          </AppProvider>
         </AppErrorBoundary>
       </body>
     </html>

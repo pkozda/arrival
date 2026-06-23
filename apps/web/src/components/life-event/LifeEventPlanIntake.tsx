@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { useMemo, useState } from 'react';
 import { useApp } from '@/components/AppProvider';
 import { DomainFieldRenderer } from '@/components/profile/DomainFieldRenderer';

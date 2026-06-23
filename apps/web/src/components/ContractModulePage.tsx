@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { ProfilePrefillBanner } from '@/components/ProfilePrefillBanner';
 import { ModuleLayout } from '@/components/ModuleLayout';
 import { ModuleExecutionPanel } from '@/components/ModuleExecutionPanel';
@@ -112,7 +113,7 @@ export function ContractModulePage({ moduleId, contract }: Props) {
     <ModuleLayout title={contract.title} description={contract.description}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.5rem' }}>
         {schemaError ? (
-          <div className="card" style={{ color: 'var(--color-danger)' }}>{schemaError}</div>
+          <AtlasSurface className="text-danger">{schemaError}</AtlasSurface>
         ) : (
           <>
             <ProfilePrefillBanner visible={showProfilePrefillBanner} message={prefillMessage} />

@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import type { HomeLifeEventWireframeProps } from '@/lib/presentation/le-ux/types';
 import {
   buildExecutionStateLookup,

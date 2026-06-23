@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { AtlasLink as Link } from '@/components/atlas-runtime';
 import type { EconomicRealityClientStateV1 } from '@/lib/economic-reality';
 import { ER_COPY_KEYS, ECONOMIC_REALITY_MODULE_CATALOG_ENTRY, buildModuleCatalogRoute } from '@/lib/product-contract';
 import { useEconomicCopy } from '@/lib/economic-reality';

@@ -1,6 +1,7 @@
 'use client';
 
 import type { SchemaField } from '@/lib/product-contract';
+import { LegacyFormNode } from '@/components/atlas-runtime/legacy';
 import { getNestedValue, schemaEnumLabel, schemaFieldLabel } from '@/lib/schema-form-utils';
 
 export type SchemaLabelResolver = {
@@ -129,7 +130,7 @@ export function SchemaForm({
   labelResolver,
 }: Props) {
   return (
-    <form className="card" onSubmit={onSubmit}>
+    <LegacyFormNode className="card" onSubmit={onSubmit}>
       {fields.map((field) => (
         <SchemaFieldInput
           key={prefix ? `${prefix}.${field.name}` : field.name}
@@ -143,6 +144,6 @@ export function SchemaForm({
       <button type="submit" className="btn btn-primary" disabled={disabled} style={{ width: '100%' }}>
         {submitLabel}
       </button>
-    </form>
+    </LegacyFormNode>
   );
 }

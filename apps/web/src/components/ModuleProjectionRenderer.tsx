@@ -2,6 +2,7 @@
 
 import type { ModuleUIProjection, SanitizedRecommendation } from '@/lib/product-contract';
 import type { ModuleCapabilityVisibility } from '@/lib/module-catalog-utils';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { humanizeActionKind, humanizePriority } from '@/lib/ux-labels';
 
 type Props = {
@@ -37,14 +38,20 @@ function RecommendationList({
             <span className={`badge badge-${recommendation.priority}`}>
               {humanizePriority(recommendation.priority)}
             </span>
-            <strong style={{ fontSize: '0.9375rem' }}>{recommendation.title}</strong>
+            <strong className="text-body">{recommendation.title}</strong>
           </div>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-            {recommendation.description}
-          </p>
+          <p className="text-meta">{recommendation.description}</p>
         </div>
       ))}
     </>
+  );
+}
+
+function PanelSectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-eyebrow mb-sm" style={{ marginBottom: '0.75rem' }}>
+      {children}
+    </h3>
   );
 }
 
@@ -55,9 +62,9 @@ export function ModuleProjectionRenderer({ projection, visibility }: Props) {
 
   if (projection.status === 'error') {
     return (
-      <div className="card" style={{ color: 'var(--color-danger)' }}>
+      <AtlasSurface className="text-danger">
         {projection.error?.message ?? 'Something went wrong while running this tool'}
-      </div>
+      </AtlasSurface>
     );
   }
 
@@ -76,63 +83,31 @@ export function ModuleProjectionRenderer({ projection, visibility }: Props) {
     : [];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <div className="stack-md">
       {projection.summary && (
-        <div className="card">
-          <h3
-            style={{
-              fontSize: '0.875rem',
-              color: 'var(--color-text-muted)',
-              marginBottom: '0.5rem',
-            }}
-          >
-            Summary
-          </h3>
-          <p>{projection.summary}</p>
-        </div>
+        <AtlasSurface>
+          <PanelSectionTitle>Summary</PanelSectionTitle>
+          <p className="text-body">{projection.summary}</p>
+        </AtlasSurface>
       )}
 
       {showRiskModel && riskRecommendations.length > 0 && (
-        <div className="card">
-          <h3
-            style={{
-              fontSize: '0.875rem',
-              color: 'var(--color-text-muted)',
-              marginBottom: '0.75rem',
-            }}
-          >
-            Risk warnings
-          </h3>
+        <AtlasSurface>
+          <PanelSectionTitle>Risk warnings</PanelSectionTitle>
           <RecommendationList recommendations={riskRecommendations} />
-        </div>
+        </AtlasSurface>
       )}
 
       {standardRecommendations.length > 0 && (
-        <div className="card">
-          <h3
-            style={{
-              fontSize: '0.875rem',
-              color: 'var(--color-text-muted)',
-              marginBottom: '0.75rem',
-            }}
-          >
-            Recommendations
-          </h3>
+        <AtlasSurface>
+          <PanelSectionTitle>Recommendations</PanelSectionTitle>
           <RecommendationList recommendations={standardRecommendations} />
-        </div>
+        </AtlasSurface>
       )}
 
       {showActions && projection.actions.length > 0 && (
-        <div className="card">
-          <h3
-            style={{
-              fontSize: '0.875rem',
-              color: 'var(--color-text-muted)',
-              marginBottom: '0.75rem',
-            }}
-          >
-            Actions
-          </h3>
+        <AtlasSurface>
+          <PanelSectionTitle>Actions</PanelSectionTitle>
           {projection.actions.map((action, index) => (
             <div
               key={`${action.label}-${index}`}
@@ -154,14 +129,12 @@ export function ModuleProjectionRenderer({ projection, visibility }: Props) {
                 <span className={`badge badge-${action.priority}`}>
                   {humanizeActionKind(action.kind)}
                 </span>
-                <strong style={{ fontSize: '0.9375rem' }}>{action.label}</strong>
+                <strong className="text-body">{action.label}</strong>
               </div>
-              <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-                {action.description}
-              </p>
+              <p className="text-meta">{action.description}</p>
             </div>
           ))}
-        </div>
+        </AtlasSurface>
       )}
     </div>
   );

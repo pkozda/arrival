@@ -1,0 +1,267 @@
+/* UI Cohesion Sprint — typography, headers, unified secondary buttons */
+
+/* —— Typography scale —— */
+.text-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(139, 156, 184, 0.85);
+  line-height: 1.3;
+}
+
+.text-page-title {
+  font-size: clamp(1.5rem, 2.5vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.text-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.text-section-title--sm {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.text-body {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.text-body--muted {
+  color: var(--color-text-muted);
+}
+
+.text-body--emphasis {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.text-caption {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+.text-label {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.text-meta {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.text-danger {
+  color: var(--color-danger);
+}
+
+/* —— Page header —— */
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header__eyebrow {
+  margin: 0 0 0.5rem;
+}
+
+.page-header__title {
+  margin-bottom: 0.375rem;
+}
+
+.page-header__description {
+  margin: 0;
+  max-width: 48rem;
+}
+
+.page-header__actions {
+  margin-top: 0.75rem;
+}
+
+.page-header__leading {
+  margin: 0 0 0.75rem;
+}
+
+.page-header__leading a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.page-header__leading a:hover {
+  text-decoration: underline;
+}
+
+.page-header__title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+/* —— Layout utilities —— */
+.stack-sm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stack-md {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.surface-stack > * + * {
+  margin-top: 0.75rem;
+}
+
+.surface-stack--md > * + * {
+  margin-top: 1rem;
+}
+
+.mb-sm {
+  margin-bottom: 0.75rem;
+}
+
+.mb-md {
+  margin-bottom: 1rem;
+}
+
+.mt-md {
+  margin-top: 1rem;
+}
+
+.mt-lg {
+  margin-top: 1.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* —— Unified secondary button —— */
+.btn-secondary,
+.atlas-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  background: rgba(13, 26, 48, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  color: var(--atlas-text, var(--color-text));
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.04) inset,
+    0 4px 16px rgba(0, 0, 0, 0.2);
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover:not(:disabled),
+.atlas-secondary-button:hover:not(:disabled) {
+  border-color: rgba(56, 189, 248, 0.35);
+  color: var(--color-primary-hover);
+  text-decoration: none;
+}
+
+.btn-secondary:disabled,
+.atlas-secondary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary:focus-visible,
+.atlas-secondary-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Inline ER action cards — glass surface without .card */
+.atlas-inline-surface {
+  background: linear-gradient(
+    145deg,
+    rgba(10, 22, 40, 0.92) 0%,
+    rgba(7, 17, 31, 0.88) 100%
+  );
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.04) inset,
+    0 8px 32px rgba(0, 0, 0, 0.28);
+}
+
+/* Profile domain field list */
+.profile-field-list {
+  display: grid;
+  gap: 0.875rem;
+  margin: 0;
+}
+
+.profile-domain-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.profile-domain-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.profile-domain-card__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.explain-panel__block {
+  margin-bottom: 1rem;
+}
+
+.explain-panel__block-title {
+  margin-bottom: 0.5rem;
+}
+
+.explain-panel__entry {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.explain-factors-list {
+  padding-left: 1.25rem;
+  margin: 0;
+  display: grid;
+  gap: 0.375rem;
+}

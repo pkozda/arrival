@@ -1,5 +1,7 @@
 'use client';
 
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
+
 type Props = {
   visible: boolean;
   message?: string;
@@ -11,16 +13,14 @@ export function ProfilePrefillBanner({ visible, message = 'Using information fro
   }
 
   return (
-    <div
-      className="card"
+    <AtlasSurface
       style={{
         marginBottom: '1rem',
         padding: '0.875rem 1rem',
-        background: 'var(--color-hero-gradient, var(--color-surface))',
         borderColor: 'var(--color-accent)',
       }}
     >
-      <p style={{ fontSize: '0.875rem', margin: 0, lineHeight: 1.5 }}>{message}</p>
-    </div>
+      <p className="text-meta">{message}</p>
+    </AtlasSurface>
   );
 }
