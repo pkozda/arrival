@@ -15,6 +15,7 @@ import {
   useGalaxyGraphModel,
   useGalaxyProgressReporter,
 } from '@/lib/presentation/spatial-core';
+import { useJourneyGuideReporter } from '@/lib/journey-guide';
 import {
   GalaxyInspectorContext,
   GalaxyInspectorEmpty,
@@ -84,6 +85,29 @@ export function EconomicRealityGalaxyBridge({ presentation, sections }: Props) {
   useGalaxyProgressReporter({
     graphNodes: model.graphNodes,
     selectedNodeId: model.selectedNodeId,
+  });
+
+  const nodeTitles = useMemo(() => {
+    const titles: Record<string, string> = {};
+    model.graphNodes.forEach((node) => {
+      if (node.id === '__journey__') {
+        titles[node.id] = copy(journeyLabelKey);
+        return;
+      }
+      const payload = cardsById.get(node.id);
+      titles[node.id] = payload ? copy(payload.card.titleKey) : node.id;
+    });
+    return titles;
+  }, [cardsById, copy, journeyLabelKey, model.graphNodes]);
+
+  useJourneyGuideReporter({
+    surfaceId: 'economic-reality-galaxy',
+    graphNodes: model.graphNodes,
+    graphEdges: model.graphEdges,
+    lockedNodeIds: model.lockedNodeIds,
+    selectedNodeId: model.selectedNodeId,
+    nodeTitles,
+    onSelectNode: model.setSelectedNodeId,
   });
 
   useEffect(() => {

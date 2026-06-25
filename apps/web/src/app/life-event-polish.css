@@ -2013,7 +2013,505 @@ a.btn:focus-visible,
   }
 }
 
+/* —— Journey Guide (navigation probe) —— */
+.journey-guide-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+}
+
+.journey-guide-layer--welcome {
+  display: grid;
+  place-items: center;
+  background: rgba(4, 9, 18, 0.5);
+  backdrop-filter: blur(5px) saturate(0.88);
+  pointer-events: auto;
+}
+
+.journey-guide-ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 38;
+  pointer-events: none;
+  background: rgba(4, 9, 18, 0.2);
+  backdrop-filter: blur(2px) saturate(0.82);
+  -webkit-backdrop-filter: blur(2px) saturate(0.82);
+  transition: opacity 0.45s ease;
+}
+
+/* Route preview: dim via node/edge opacity only — no backdrop blur over the galaxy */
+.journey-guide-ambient--route-preview {
+  display: none;
+}
+
+.le-galaxy-viewport.is-route-preview-active.is-guide-focus-active .le-galaxy-hud {
+  opacity: 0.92;
+  filter: none;
+}
+
+.le-galaxy-viewport__stage.is-guide-route-preview::before {
+  filter: saturate(0.7);
+  opacity: 0.3;
+}
+
+.le-galaxy-viewport__stage.is-guide-route-preview::after {
+  opacity: 0.25;
+}
+
+.journey-guide-stage-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 90% 80% at 48% 42%,
+    rgba(4, 9, 18, 0.08) 0%,
+    rgba(4, 9, 18, 0.28) 72%,
+    rgba(4, 9, 18, 0.38) 100%
+  );
+  transition: opacity 0.45s ease;
+}
+
+.le-galaxy-viewport__stage.is-guide-focus::before {
+  opacity: 0.42;
+  filter: blur(2px) saturate(0.75);
+  transition: opacity 0.45s ease, filter 0.45s ease;
+}
+
+.le-galaxy-viewport__stage.is-guide-focus::after {
+  opacity: 0.35;
+  transition: opacity 0.45s ease;
+}
+
+.le-galaxy-viewport__stage.is-guide-focus .le-galaxy-viewport__orbits {
+  opacity: 0.34;
+  transition: opacity 0.45s ease;
+}
+
+.le-galaxy-viewport__stage.is-guide-focus .le-consequence-map__edges {
+  opacity: 0.72;
+  transition: opacity 0.45s ease;
+}
+
+.le-galaxy-viewport__stage.is-guide-focus .le-consequence-node.is-guide-highlighted,
+.le-galaxy-viewport__stage.is-guide-focus .le-consequence-node.is-route-preview,
+.le-galaxy-viewport__stage.is-guide-focus .le-consequence-node.is-discovery-unlock,
+.le-galaxy-viewport__stage.is-guide-focus .le-consequence-node.is-selected {
+  opacity: 1;
+  filter: none;
+}
+
+.le-galaxy-viewport.is-guide-focus-active .le-galaxy-hud {
+  opacity: 0.82;
+  filter: saturate(0.88);
+  transition: opacity 0.45s ease, filter 0.45s ease;
+}
+
+.journey-guide-layer--anchored .journey-guide-anchor {
+  position: absolute;
+  left: var(--guide-x, 50%);
+  top: var(--guide-y, 40%);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  max-width: min(22rem, 72vw);
+  transform: translate(0.35rem, -50%);
+  pointer-events: auto;
+}
+
+.journey-guide-welcome {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.25rem 1.35rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(8, 12, 28, 0.82);
+  box-shadow: 0 18px 48px rgba(2, 6, 23, 0.45);
+}
+
+.journey-guide-welcome__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  color: rgba(226, 232, 240, 0.96);
+}
+
+.journey-guide-welcome__lead {
+  margin: 0 0 1rem;
+  color: rgba(186, 210, 255, 0.82);
+  font-size: 0.92rem;
+}
+
+.journey-guide-welcome__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.journey-guide-btn {
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.journey-guide-btn--primary {
+  background: rgba(99, 132, 255, 0.22);
+  border-color: rgba(148, 176, 255, 0.45);
+  color: rgba(226, 232, 240, 0.95);
+}
+
+.journey-guide-btn--ghost {
+  background: transparent;
+  border-color: rgba(148, 163, 184, 0.22);
+  color: rgba(186, 210, 255, 0.82);
+}
+
+.journey-guide-probe {
+  position: relative;
+  display: inline-flex;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+
+.journey-guide-probe__core {
+  position: absolute;
+  inset: 0.28rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #dbeafe, #60a5fa 58%, #1d4ed8 100%);
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.55);
+}
+
+.journey-guide-probe__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(147, 197, 253, 0.45);
+}
+
+.journey-guide-probe__glow {
+  position: absolute;
+  inset: -0.35rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.18), transparent 68%);
+  opacity: 0.7;
+}
+
+.journey-guide-probe--speaking .journey-guide-probe__glow,
+.journey-guide-probe--highlighting .journey-guide-probe__glow {
+  animation: journey-guide-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes journey-guide-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+}
+
+.journey-guide-speech {
+  position: relative;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(6, 10, 24, 0.88);
+  backdrop-filter: blur(10px);
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.journey-guide-speech__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(148, 176, 255, 0.82);
+}
+
+.journey-guide-speech__mission {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  color: rgba(226, 232, 240, 0.96);
+}
+
+.journey-guide-speech__label {
+  margin: 0.65rem 0 0.25rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.78);
+}
+
+.journey-guide-speech__list {
+  margin: 0.2rem 0 0.65rem;
+  padding-left: 1rem;
+}
+
+.journey-guide-speech__close {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.45rem;
+  border: none;
+  background: transparent;
+  color: rgba(148, 163, 184, 0.75);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.journey-guide-fab {
+  position: fixed;
+  right: 1rem;
+  bottom: 1.25rem;
+  z-index: 46;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 176, 255, 0.28);
+  background: rgba(6, 10, 24, 0.78);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.journey-guide-discovery {
+  position: fixed;
+  left: 50%;
+  top: calc(var(--atlas-hud-height, 80px) + 1rem);
+  transform: translateX(-50%);
+  z-index: 46;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 176, 255, 0.22);
+  background: rgba(6, 10, 24, 0.82);
+  color: rgba(186, 210, 255, 0.9);
+  font-size: 0.78rem;
+  pointer-events: none;
+  animation: journey-guide-discovery-fade 3.2s ease forwards;
+}
+
+@keyframes journey-guide-discovery-fade {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px);
+  }
+  12%,
+  78% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.le-galaxy-viewport__stage.is-guide-welcome .le-consequence-node:not(.is-guide-highlighted):not(.is-selected) {
+  opacity: 0.55;
+  filter: saturate(0.75);
+}
+
+.le-galaxy-viewport__stage.is-guide-guided .le-consequence-node.is-guide-dimmed {
+  opacity: 0.5;
+  filter: saturate(0.7);
+}
+
+.le-galaxy-viewport__stage.is-guide-route-preview .le-consequence-map__edges {
+  opacity: 1;
+}
+
+.le-galaxy-viewport__stage.is-guide-route-preview .le-consequence-node.is-guide-dimmed {
+  opacity: 0.28;
+  filter: saturate(0.5);
+  transition: opacity 0.35s ease, filter 0.35s ease;
+}
+
+.le-galaxy-viewport__stage.is-guide-route-preview .le-consequence-map__edge.is-guide-dimmed {
+  opacity: 0.18 !important;
+}
+
+.le-galaxy-viewport__stage.is-guide-route-preview .journey-guide-stage-veil {
+  background: radial-gradient(
+    ellipse 90% 80% at 48% 42%,
+    rgba(4, 9, 18, 0.1) 0%,
+    rgba(4, 9, 18, 0.3) 72%,
+    rgba(4, 9, 18, 0.4) 100%
+  );
+}
+
+.le-galaxy-viewport__stage.is-guide-route-preview .le-galaxy-viewport__orbits {
+  opacity: 0.22;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-route-preview {
+  z-index: 6;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-route-preview .le-consequence-node__beacon {
+  transform: scale(1.14);
+  transition: transform 0.35s ease;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-route-preview .le-consequence-node__orb {
+  box-shadow:
+    0 0 14px rgba(191, 219, 254, 0.95),
+    0 0 32px rgba(96, 165, 250, 0.72),
+    0 0 56px rgba(59, 130, 246, 0.38);
+  animation: journey-guide-route-node-pulse 1.5s ease-in-out infinite;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-route-preview .le-consequence-node__halo {
+  opacity: 1;
+  inset: -0.55rem;
+  border: 1.5px solid rgba(147, 197, 253, 0.72);
+  box-shadow:
+    0 0 16px rgba(147, 197, 253, 0.55),
+    0 0 32px rgba(96, 165, 250, 0.28);
+  animation: journey-guide-route-halo-pulse 1.5s ease-in-out infinite;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-route-preview .le-consequence-node__label {
+  opacity: 1;
+  background: rgba(6, 12, 28, 0.82);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 0 0 16px rgba(96, 165, 250, 0.22);
+}
+
+.le-galaxy-viewport .le-consequence-node.is-route-preview .le-consequence-node__title {
+  color: rgba(248, 250, 252, 0.98);
+  text-shadow:
+    0 0 10px rgba(147, 197, 253, 0.65),
+    0 1px 8px rgba(0, 0, 0, 0.65);
+}
+
+@keyframes journey-guide-route-node-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 12px rgba(191, 219, 254, 0.82),
+      0 0 28px rgba(96, 165, 250, 0.58),
+      0 0 48px rgba(59, 130, 246, 0.28);
+  }
+  50% {
+    box-shadow:
+      0 0 18px rgba(219, 234, 254, 1),
+      0 0 40px rgba(96, 165, 250, 0.88),
+      0 0 68px rgba(59, 130, 246, 0.48);
+  }
+}
+
+@keyframes journey-guide-route-halo-pulse {
+  0%,
+  100% {
+    opacity: 0.82;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.le-galaxy-viewport .le-consequence-node.is-guide-highlighted .le-consequence-node__orb {
+  box-shadow: 0 0 18px rgba(129, 164, 255, 0.55);
+}
+
+.le-galaxy-viewport .le-consequence-node.is-discovery-unlock .le-consequence-node__orb {
+  animation: journey-guide-discovery-node 3s ease forwards;
+}
+
+@keyframes journey-guide-discovery-node {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(147, 197, 253, 0.35);
+  }
+  40%,
+  60% {
+    box-shadow: 0 0 20px rgba(147, 197, 253, 0.72);
+  }
+}
+
+.le-galaxy-viewport .le-consequence-map__edge.is-route-preview {
+  stroke: rgba(219, 234, 254, 0.98) !important;
+  stroke-width: 2.25px !important;
+  opacity: 1 !important;
+  filter:
+    drop-shadow(0 0 2px rgba(191, 219, 254, 0.95))
+    drop-shadow(0 0 6px rgba(96, 165, 250, 0.65))
+    drop-shadow(0 0 14px rgba(59, 130, 246, 0.35));
+  animation: journey-guide-route-edge-pulse 1.5s ease-in-out infinite;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--unlock.is-route-preview {
+  stroke: rgba(186, 230, 253, 0.98) !important;
+  stroke-dasharray: 5 4 !important;
+  stroke-width: 2.25px !important;
+  opacity: 1 !important;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-route-preview {
+  stroke: rgba(199, 210, 254, 0.98) !important;
+  stroke-width: 2.25px !important;
+  opacity: 1 !important;
+}
+
+@keyframes journey-guide-route-edge-pulse {
+  0%,
+  100% {
+    stroke-width: 2.1px;
+    filter:
+      drop-shadow(0 0 2px rgba(191, 219, 254, 0.85))
+      drop-shadow(0 0 5px rgba(96, 165, 250, 0.5));
+  }
+  50% {
+    stroke-width: 2.4px;
+    filter:
+      drop-shadow(0 0 3px rgba(219, 234, 254, 1))
+      drop-shadow(0 0 8px rgba(96, 165, 250, 0.78))
+      drop-shadow(0 0 16px rgba(59, 130, 246, 0.4));
+  }
+}
+
+.le-galaxy-viewport .le-consequence-map__edge.is-guide-dimmed {
+  opacity: 0.42 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .journey-guide-ambient,
+  .journey-guide-stage-veil,
+  .le-galaxy-viewport__stage.is-guide-focus::before,
+  .le-galaxy-viewport__stage.is-guide-focus::after,
+  .le-galaxy-viewport__stage.is-guide-focus .le-galaxy-viewport__orbits,
+  .le-galaxy-viewport__stage.is-guide-focus .le-consequence-map__edges,
+  .le-galaxy-viewport.is-guide-focus-active .le-galaxy-hud {
+    transition: none !important;
+  }
+
+  .journey-guide-probe--speaking .journey-guide-probe__glow,
+  .journey-guide-probe--highlighting .journey-guide-probe__glow,
+  .journey-guide-discovery,
+  .le-galaxy-viewport .le-consequence-node.is-discovery-unlock .le-consequence-node__orb,
+  .le-galaxy-viewport .le-consequence-node.is-route-preview .le-consequence-node__orb,
+  .le-galaxy-viewport .le-consequence-node.is-route-preview .le-consequence-node__halo,
+  .le-galaxy-viewport .le-consequence-map__edge.is-route-preview {
+    animation: none !important;
+  }
+
   .le-galaxy-orbit,
   .le-galaxy-viewport__stage::before,
   .le-galaxy-viewport .le-consequence-node--core .le-consequence-node__orb,

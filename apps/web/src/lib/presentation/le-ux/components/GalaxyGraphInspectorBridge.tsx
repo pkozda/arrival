@@ -7,6 +7,7 @@ import { useApp } from '@/components/AppProvider';
 import type { ActionBreakdownSectionProps } from '@/lib/presentation/le-ux/types';
 import { buildLifeEventGalaxyGraph } from '@/lib/presentation/le-ux/build-galaxy-graph';
 import { GalaxyGraphStage, GalaxyInspectorShell, useGalaxyGraphModel, useGalaxyProgressReporter } from '@/lib/presentation/spatial-core';
+import { useJourneyGuideReporter } from '@/lib/journey-guide';
 import { lifeEventNodeDescription, lifeEventNodeTitle } from '@/lib/life-event/content-labels';
 
 type GraphStatus = 'completed' | 'recommended' | 'blocked' | 'future' | 'core';
@@ -122,6 +123,29 @@ export function GalaxyGraphInspectorBridge({
   useGalaxyProgressReporter({
     graphNodes: model.graphNodes,
     selectedNodeId: model.selectedNodeId,
+  });
+
+  const nodeTitles = useMemo(() => {
+    const titles: Record<string, string> = {};
+    model.graphNodes.forEach((graphNode) => {
+      if (graphNode.id === '__journey__') {
+        titles[graphNode.id] = 'Your Journey';
+        return;
+      }
+      const node = graphNode.payload;
+      titles[graphNode.id] = node ? lifeEventNodeTitle(t, node) : graphNode.id;
+    });
+    return titles;
+  }, [model.graphNodes, t]);
+
+  useJourneyGuideReporter({
+    surfaceId: 'life-event-galaxy',
+    graphNodes: model.graphNodes,
+    graphEdges: model.graphEdges,
+    lockedNodeIds: model.lockedNodeIds,
+    selectedNodeId: model.selectedNodeId,
+    nodeTitles,
+    onSelectNode: model.setSelectedNodeId,
   });
 
   return (

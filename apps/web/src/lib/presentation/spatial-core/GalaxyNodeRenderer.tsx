@@ -17,6 +17,7 @@ export type GalaxyNodeRendererProps = {
   lockHint?: string;
   onHover: (nodeId: string | null) => void;
   onSelect: (nodeId: string) => void;
+  onLockedSelect?: (nodeId: string) => void;
 };
 
 function GalaxyNodeRendererComponent({
@@ -32,6 +33,7 @@ function GalaxyNodeRendererComponent({
   lockHint,
   onHover,
   onSelect,
+  onLockedSelect,
 }: GalaxyNodeRendererProps) {
   const showDescriptor = Boolean(descriptor) && (visual.isSelected || visual.isHovered || visual.isJourneyNode);
 
@@ -48,7 +50,12 @@ function GalaxyNodeRendererComponent({
         visual.isDependencySourceHighlight ? ' is-dependency-source-highlight' : ''
       }${visual.isGravitySourceActive ? ' is-gravity-source-active' : ''}${
         visual.isGravityTargetPulled ? ' is-gravity-target-pulled' : ''
-      } le-consequence-node--scale-${visual.scaleTier}`}
+      } le-consequence-node--scale-${visual.scaleTier}${
+        visual.isGuideHighlighted ? ' is-guide-highlighted' : ''
+      }${visual.isGuideDimmed ? ' is-guide-dimmed' : ''}${
+        visual.isRoutePreview ? ' is-route-preview' : ''
+      }${visual.isDiscoveryUnlock ? ' is-discovery-unlock' : ''}`}
+      data-galaxy-node-id={id}
       style={
         {
           '--node-x': `${x}%`,
@@ -65,9 +72,14 @@ function GalaxyNodeRendererComponent({
       onFocus={() => onHover(id)}
       onBlur={() => onHover(null)}
       onClick={() => {
-        if (!visual.isJourneyNode && !visual.isLocked) {
-          onSelect(id);
+        if (visual.isJourneyNode) {
+          return;
         }
+        if (visual.isLocked) {
+          onLockedSelect?.(id);
+          return;
+        }
+        onSelect(id);
       }}
       aria-selected={visual.isSelected}
       disabled={disabled}
