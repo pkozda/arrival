@@ -13,11 +13,9 @@ export function HighlightPanel({ highlight }: Props) {
   const copy = useEconomicCopy();
 
   return (
-    <AtlasSurface as="section" className="mb-md" data-ui-panel="HighlightPanel" style={{ padding: '1rem' }}>
+    <AtlasSurface as="section" className="mb-md er-highlight-panel" data-ui-panel="HighlightPanel">
       <p className="text-eyebrow">{copy(ER_COPY_KEYS.UI_PRIMARY_FOCUS)}</p>
-      <h2 className="text-section-title" style={{ marginTop: '0.25rem' }}>
-        {copy(highlight.labelKey)}
-      </h2>
+      <h2 className="text-section-title mt-sm">{copy(highlight.labelKey)}</h2>
     </AtlasSurface>
   );
 }

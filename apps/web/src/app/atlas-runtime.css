@@ -109,11 +109,19 @@
 }
 
 .legacy-form-node {
-  background: rgba(7, 17, 31, 0.6);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: linear-gradient(
+    145deg,
+    rgba(10, 22, 40, 0.88) 0%,
+    rgba(7, 17, 31, 0.84) 100%
+  );
+  border: 1px solid rgba(148, 163, 184, 0.14);
   border-radius: var(--radius);
   padding: 1.25rem 1.5rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.04) inset,
+    0 6px 28px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .legacy-data-plane {

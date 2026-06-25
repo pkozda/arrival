@@ -7,24 +7,23 @@ import type { AtlasSlideDefinition } from './types';
 
 type Props = {
   slide: AtlasSlideDefinition;
-  isActive: boolean;
   loadPhase: AtlasLoadPhase;
 };
 
-export function AtlasSlide({ slide, isActive, loadPhase }: Props) {
+export function AtlasSlide({ slide, loadPhase }: Props) {
   const uiVisible = loadPhase >= 5;
 
   return (
     <motion.div
       className="atlas-slide"
-      initial={false}
+      initial={{ opacity: 0, y: 16 }}
       animate={{
-        opacity: isActive && uiVisible ? 1 : 0,
-        y: isActive && uiVisible ? 0 : 16,
-        pointerEvents: 'none',
+        opacity: uiVisible ? 1 : 0,
+        y: uiVisible ? 0 : 16,
+        pointerEvents: uiVisible ? 'auto' : 'none',
       }}
+      exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      aria-hidden={!isActive}
     >
       <p className="atlas-slide__eyebrow">Personal Life Navigation</p>
       <p className="atlas-slide__index">{slide.label}</p>

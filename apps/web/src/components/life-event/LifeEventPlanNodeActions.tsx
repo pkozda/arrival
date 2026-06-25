@@ -1,6 +1,6 @@
 'use client';
 
-import { AtlasLink as Link } from '@/components/atlas-runtime';
+import { AtlasSecondaryLink } from '@/components/atlas-runtime';
 import type { LifeActionRef } from '@/lib/product-contract';
 import { useApp } from '@/components/AppProvider';
 import { lifeEventActionLabel } from '@/lib/life-event/content-labels';
@@ -18,33 +18,25 @@ export function LifeEventPlanNodeActions({ actions, disabled = false }: Props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+    <div className="le-node-actions">
       {actions.map((action) => {
         const label = lifeEventActionLabel(t, action);
         return disabled ? (
           <span
             key={`${action.kind}-${action.href}-${label}`}
-            className="btn btn-secondary"
-            style={{
-              fontSize: '0.8125rem',
-              padding: '0.375rem 0.75rem',
-              opacity: 0.55,
-              cursor: 'not-allowed',
-              pointerEvents: 'none',
-            }}
+            className="btn atlas-secondary-button atlas-secondary-button--compact"
             aria-disabled="true"
           >
             {label}
           </span>
         ) : (
-          <Link
+          <AtlasSecondaryLink
             key={`${action.kind}-${action.href}-${label}`}
             href={action.href}
-            className="btn btn-secondary"
-            style={{ fontSize: '0.8125rem', padding: '0.375rem 0.75rem' }}
+            compact
           >
             {label}
-          </Link>
+          </AtlasSecondaryLink>
         );
       })}
     </div>

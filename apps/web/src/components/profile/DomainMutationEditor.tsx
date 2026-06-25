@@ -86,12 +86,13 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
   return (
     <>
       <PageHeader
+        eyebrow="Profile"
         leading={<Link href={`/profile/${domainSlug}`}>{`← Back to ${section.title}`}</Link>}
         title="Correct information"
         description={section.summary}
       />
 
-      <LegacyFormNode className="card" onSubmit={handleSave}>
+      <LegacyFormNode onSubmit={handleSave}>
         <p className="text-meta mb-md">
           Update what we know about your situation. Changes are saved securely.
         </p>

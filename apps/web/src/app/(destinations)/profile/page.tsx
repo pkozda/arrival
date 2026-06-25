@@ -6,18 +6,16 @@ import { useApp } from '@/components/AppProvider';
 
 function LoadingState() {
   return (
-    <LegacyPanelSurface style={{ padding: '2rem', textAlign: 'center' }}>
-      <p style={{ color: 'var(--color-text-muted)' }}>Loading...</p>
+    <LegacyPanelSurface className="text-center">
+      <p className="text-body text-body--muted">Loading...</p>
     </LegacyPanelSurface>
   );
 }
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <LegacyPanelSurface style={{ padding: '2rem', textAlign: 'center' }}>
-      <p style={{ color: 'var(--color-danger)', marginBottom: '0.5rem' }}>
-        Unable to load your situation
-      </p>
+    <LegacyPanelSurface className="text-center">
+      <p className="text-body text-danger mb-sm">Unable to load your situation</p>
       <p className="text-meta">{message}</p>
     </LegacyPanelSurface>
   );

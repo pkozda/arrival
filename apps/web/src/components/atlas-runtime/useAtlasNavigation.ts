@@ -4,6 +4,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import { buildArrivalContext } from '@/lib/celestial/arrival-routes';
 import { spatialNavigationInterceptor } from '@/lib/atlas-runtime/spatial-navigation-interceptor';
+import { spatialMemoryStore } from '@/lib/atlas-runtime/spatial-memory-store';
+import { getSpatialTransitionContext } from '@/lib/atlas-runtime/spatial-transition-context';
 import { normalizeNavigationPath } from '@/lib/atlas-runtime/spatial-navigation';
 import { useArrival } from '@/components/celestial/ArrivalProvider';
 import { useAtlasRuntime } from './AtlasRuntimeProvider';
@@ -36,7 +38,16 @@ export function useAtlasNavigation() {
       }
 
       const arrival = buildArrivalContext(departedFromPath, destinationPath);
-      motionEngine.buildSpatialTransition(arrival);
+      const spatialTransitionContext = getSpatialTransitionContext(
+        departedFromPath,
+        destinationPath,
+        spatialMemoryStore,
+        'explicit'
+      );
+      motionEngine.buildSpatialTransition(
+        { ...arrival, spatialTransitionContext },
+        spatialTransitionContext
+      );
       recordArrivalIntent(destinationPath);
 
       if (options?.replace) {

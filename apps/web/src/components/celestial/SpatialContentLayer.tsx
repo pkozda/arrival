@@ -26,7 +26,11 @@ export function SpatialContentLayer({
   const reduceMotion = useReducedMotion();
   const { offset } = useSpatialParallax();
   const baseVariants = buildSpatialVariants(transition, Boolean(reduceMotion));
-  const enterTransition = spatialTransitionConfig(transition.easingProfile, 'enter');
+  const enterTransition = spatialTransitionConfig(
+    transition.easingProfile,
+    'enter',
+    transition.durationScale ?? 1
+  );
 
   const variants = {
     ...baseVariants,

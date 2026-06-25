@@ -8,7 +8,6 @@ import './globals.css';
 import './atlas-home.css';
 import './atlas-runtime.css';
 import './ui-cohesion.css';
-import './life-event-polish.css';
 
 export const metadata: Metadata = {
   title: `${PRODUCT_NAME} — Decision Support for Migrants in Germany`,

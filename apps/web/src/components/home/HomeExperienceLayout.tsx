@@ -1,5 +1,6 @@
 'use client';
 
+import '@/app/home-landing.css';
 import { useRef, type ReactNode } from 'react';
 import type { HomePresenceModel, HomePresencePhase } from '@/lib/presentation/home-presence';
 import { HomePresenceHero } from '@/components/home/HomePresenceHero';

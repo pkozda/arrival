@@ -5,6 +5,11 @@ import {
 } from '@/lib/celestial/arrival-routes';
 import { peekArrivalIntent, persistArrivalIntent } from '@/lib/celestial/arrival-storage';
 import type { CelestialNodeId, SpatialNavigationOrigin } from '@/lib/celestial/types';
+import { spatialMemoryStore } from './spatial-memory-store';
+import {
+  getSpatialTransitionContext,
+  resolveSourceNodeForTransition,
+} from './spatial-transition-context';
 import { isInternalAppPath, normalizeNavigationPath } from './spatial-navigation';
 
 const ATLAS_NAV_BYPASS_WARN =
@@ -117,15 +122,36 @@ export const spatialNavigationInterceptor = {
       options.focusedNodeId ??
       (departedFromPath === '/' ? readStarMapFocusedNodeId() : null);
 
+    const spatialTransitionContext = getSpatialTransitionContext(
+      departedFromPath,
+      destinationPath,
+      spatialMemoryStore,
+      origin
+    );
+
     const input = shouldUseFallback(origin)
-      ? buildFallbackArrivalContext(departedFromPath, destinationPath, origin)
+      ? {
+          ...buildFallbackArrivalContext(departedFromPath, destinationPath, origin),
+          spatialTransitionContext,
+        }
       : {
           ...buildArrivalContext(departedFromPath, destinationPath, focusedNodeId),
           navigationOrigin: origin,
           navigationMode: 'explicit-spatial' as const,
+          spatialTransitionContext,
         };
 
     persistArrivalIntent(input);
+
+    spatialMemoryStore.recordNavigation(
+      departedFromPath,
+      destinationPath,
+      focusedNodeId && departedFromPath === '/'
+        ? focusedNodeId
+        : resolveSourceNodeForTransition(departedFromPath, destinationPath),
+      spatialTransitionContext.direction
+    );
+
     runtimeNavigationMarked = false;
     return true;
   },

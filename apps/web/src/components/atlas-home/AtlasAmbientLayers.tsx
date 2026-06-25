@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { AtlasLoadPhase } from './useAtlasLoadSequence';
-import type { ParallaxOffset } from './useAtlasParallax';
 
 type Star = {
   x: number;
@@ -72,14 +71,12 @@ const CONSTELLATION_LINES: Array<[number, number, number, number]> = [
 
 type Props = {
   loadPhase: AtlasLoadPhase;
-  starsOffset: ParallaxOffset;
-  constellationOffset: ParallaxOffset;
 };
 
-export function AtlasAmbientLayers({ loadPhase, starsOffset, constellationOffset }: Props) {
+export function AtlasAmbientLayers({ loadPhase }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stars = useMemo(() => buildStars(320), []);
-  const particles = useMemo(() => buildParticles(28), []);
+  const stars = useMemo(() => buildStars(220), []);
+  const particles = useMemo(() => buildParticles(18), []);
   const starsVisible = loadPhase >= 1;
 
   useEffect(() => {
@@ -141,9 +138,6 @@ export function AtlasAmbientLayers({ loadPhase, starsOffset, constellationOffset
     <div className="atlas-ambient" aria-hidden="true">
       <motion.div
         className="atlas-ambient__layer atlas-ambient__layer--stars"
-        style={{
-          transform: `translate(${starsOffset.x}px, ${starsOffset.y}px)`,
-        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: starsVisible ? 1 : 0 }}
         transition={{ duration: 0.9, ease: 'easeOut' }}
@@ -153,9 +147,6 @@ export function AtlasAmbientLayers({ loadPhase, starsOffset, constellationOffset
 
       <motion.div
         className="atlas-ambient__layer atlas-ambient__layer--particles"
-        style={{
-          transform: `translate(${starsOffset.x * 0.6}px, ${starsOffset.y * 0.5}px)`,
-        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: loadPhase >= 1 ? 1 : 0 }}
         transition={{ duration: 1.2, ease: 'easeOut' }}
@@ -181,9 +172,6 @@ export function AtlasAmbientLayers({ loadPhase, starsOffset, constellationOffset
         className="atlas-ambient__layer atlas-ambient__layer--constellation"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        style={{
-          transform: `translate(${constellationOffset.x}px, ${constellationOffset.y}px)`,
-        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: loadPhase >= 2 ? 0.35 : 0 }}
         transition={{ duration: 1, ease: 'easeOut' }}

@@ -1,6 +1,7 @@
 'use client';
 
-import { AtlasLink as Link } from '@/components/atlas-runtime';
+import { AtlasSecondaryLink } from '@/components/atlas-runtime';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { useMemo, useState } from 'react';
 import { useApp } from '@/components/AppProvider';
 import { DomainFieldRenderer } from '@/components/profile/DomainFieldRenderer';
@@ -82,13 +83,15 @@ export function LifeEventPlanIntake() {
   };
 
   return (
-    <section className="card le-plan-intake" aria-labelledby="le-plan-intake-title">
+    <AtlasSurface as="section" className="le-plan-card le-plan-intake" aria-labelledby="le-plan-intake-title">
       <header className="le-plan-intake__header">
-        <h2 id="le-plan-intake-title" className="le-plan-intake__title">
+        <h2 id="le-plan-intake-title" className="le-plan-intake__title text-section-title">
           {t('life-event.intake.title')}
         </h2>
-        <p className="le-plan-intake__description">{t('life-event.intake.description')}</p>
-        <p className="le-plan-intake__meta">{t('life-event.home.coldStart.duration')}</p>
+        <p className="le-plan-intake__description text-body text-body--muted">
+          {t('life-event.intake.description')}
+        </p>
+        <p className="le-plan-intake__meta text-caption">{t('life-event.home.coldStart.duration')}</p>
       </header>
 
       <form onSubmit={handleSubmit} className="le-plan-intake__form">
@@ -112,11 +115,11 @@ export function LifeEventPlanIntake() {
           <button type="submit" className="btn btn-primary" disabled={saving}>
             {saving ? t('common.loading') : t('life-event.intake.submit')}
           </button>
-          <Link href="/modules/life-event?mode=scenarios" className="btn btn-secondary">
+          <AtlasSecondaryLink href="/modules/life-event?mode=scenarios">
             {t('life-event.home.coldStart.exploreScenarios')}
-          </Link>
+          </AtlasSecondaryLink>
         </div>
       </form>
-    </section>
+    </AtlasSurface>
   );
 }

@@ -130,7 +130,7 @@ export function SchemaForm({
   labelResolver,
 }: Props) {
   return (
-    <LegacyFormNode className="card" onSubmit={onSubmit}>
+    <LegacyFormNode onSubmit={onSubmit}>
       {fields.map((field) => (
         <SchemaFieldInput
           key={prefix ? `${prefix}.${field.name}` : field.name}

@@ -43,6 +43,12 @@ export type SpatialTransition = {
   originNodeTransform: OriginNodeTransform;
   cameraMotion: CameraMotion;
   easingProfile: SpatialEasingProfile;
+  /** Multiplier for enter/exit duration — lower feels faster/familiar. */
+  durationScale?: number;
+  /** Scales camera motion intensity. */
+  motionScale?: number;
+  /** A → B → A return path — reversed collapse easing. */
+  isReturnPath?: boolean;
 };
 
 /**
