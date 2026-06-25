@@ -224,3 +224,33 @@ export function galaxyEdgePath(
   const controlY = midY + (dx / distance) * bend;
   return `M ${from.x} ${from.y} Q ${controlX} ${controlY} ${to.x} ${to.y}`;
 }
+
+export function galaxyEdgeControlPoint(
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+  curvatureOffset = 0
+): { controlX: number; controlY: number } {
+  const midX = (from.x + to.x) / 2;
+  const midY = (from.y + to.y) / 2;
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const distance = Math.hypot(dx, dy) || 1;
+  const bend = Math.min(distance * 0.22, 9) + curvatureOffset;
+  return {
+    controlX: midX + (-dy / distance) * bend,
+    controlY: midY + (dx / distance) * bend,
+  };
+}
+
+export function sampleQuadraticBezier(
+  from: { x: number; y: number },
+  control: { x: number; y: number },
+  to: { x: number; y: number },
+  t: number
+): { x: number; y: number } {
+  const u = 1 - t;
+  return {
+    x: u * u * from.x + 2 * u * t * control.x + t * t * to.x,
+    y: u * u * from.y + 2 * u * t * control.y + t * t * to.y,
+  };
+}

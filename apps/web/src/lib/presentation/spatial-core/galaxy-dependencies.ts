@@ -1,4 +1,4 @@
-import type { SpatialGraphEdge, SpatialGraphNode } from './types';
+import type { GalaxyNodeState, SpatialGraphEdge, SpatialGraphNode } from './types';
 
 export const JOURNEY_NODE_ID = '__journey__';
 
@@ -98,4 +98,45 @@ export function assignDependencyEdgeCurvatureOffsets(edges: SpatialGraphEdge[]):
   });
 
   return offsets;
+}
+
+export type PlanetScaleTier = 'primary' | 'secondary' | 'locked';
+
+export function resolvePlanetScaleTier(input: {
+  nodeId: string;
+  status: GalaxyNodeState;
+  isJourneyNode: boolean;
+  isLocked: boolean;
+  primaryNodeId: string | null;
+  isSelected: boolean;
+  isHovered: boolean;
+  isNeighbor: boolean;
+}): PlanetScaleTier {
+  if (input.isLocked) {
+    return 'locked';
+  }
+  if (
+    input.isJourneyNode ||
+    input.nodeId === input.primaryNodeId ||
+    input.isSelected ||
+    input.isHovered
+  ) {
+    return 'primary';
+  }
+  if (input.isNeighbor || input.status === 'recommended' || input.status === 'completed') {
+    return 'primary';
+  }
+  return 'secondary';
+}
+
+export function computeVisibleDependencyEdgeIds(graphEdges: SpatialGraphEdge[]): Set<string> {
+  const visible = new Set<string>();
+
+  for (const edge of graphEdges) {
+    if (edge.type === 'dependency') {
+      visible.add(edge.id);
+    }
+  }
+
+  return visible;
 }

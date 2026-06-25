@@ -46,11 +46,16 @@ function GalaxyNodeRendererComponent({
         visual.isPrimaryRecommended ? ' is-primary-recommended' : ''
       }${visual.isHovered ? ' is-hovered' : ''}${visual.isLocked ? ' is-locked' : ''}${
         visual.isDependencySourceHighlight ? ' is-dependency-source-highlight' : ''
-      }`}
+      }${visual.isGravitySourceActive ? ' is-gravity-source-active' : ''}${
+        visual.isGravityTargetPulled ? ' is-gravity-target-pulled' : ''
+      } le-consequence-node--scale-${visual.scaleTier}`}
       style={
         {
           '--node-x': `${x}%`,
           '--node-y': `${y}%`,
+          '--gravity-x': `${visual.gravityOffsetX}px`,
+          '--gravity-y': `${visual.gravityOffsetY}px`,
+          '--gravity-pull': visual.gravityPullIntensity,
         } as CSSProperties
       }
       title={visual.isLocked ? lockHint : undefined}

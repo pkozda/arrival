@@ -645,7 +645,8 @@ a.btn:focus-visible,
 .le-galaxy-viewport .le-consequence-node {
   left: var(--node-x);
   top: var(--node-y);
-  transform: translate3d(-50%, -50%, 0);
+  transform: translate3d(calc(-50% + var(--gravity-x, 0px)), calc(-50% + var(--gravity-y, 0px)), 0);
+  transition: transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .le-galaxy-viewport .le-consequence-node__beacon {
@@ -791,7 +792,8 @@ a.btn:focus-visible,
 
 .le-galaxy-viewport .le-consequence-node.is-hovered:not(:disabled),
 .le-galaxy-viewport .le-consequence-node.is-selected {
-  transform: translate3d(-50%, -50%, 0) scale(1.03);
+  transform: translate3d(calc(-50% + var(--gravity-x, 0px)), calc(-50% + var(--gravity-y, 0px)), 0)
+    scale(1.03);
 }
 
 .le-galaxy-viewport .le-consequence-node.is-hovered:not(:disabled) .le-consequence-node__orb,
@@ -812,103 +814,176 @@ a.btn:focus-visible,
 }
 
 .le-galaxy-viewport .le-consequence-node.is-dimmed {
-  opacity: 0.38;
-}
-
-.le-galaxy-viewport .le-consequence-node.is-constrained {
-  opacity: 0.28;
+  opacity: 0.5;
 }
 
 .le-galaxy-viewport .le-consequence-node.is-twohop-dim {
-  opacity: 0.2;
+  opacity: 0.45;
 }
 
-.le-galaxy-viewport .le-consequence-node.is-primary-recommended .le-consequence-node__orb {
+/* Planet scale hierarchy */
+.le-galaxy-viewport .le-consequence-node--scale-primary .le-consequence-node__beacon {
+  transform: scale(1);
+}
+
+.le-galaxy-viewport .le-consequence-node--scale-secondary .le-consequence-node__beacon {
+  transform: scale(0.76);
+}
+
+.le-galaxy-viewport .le-consequence-node--scale-secondary .le-consequence-node__orb {
+  box-shadow:
+    0 0 8px rgba(56, 189, 248, 0.28),
+    0 0 16px rgba(56, 189, 248, 0.1);
+  filter: saturate(0.75);
+}
+
+.le-galaxy-viewport .le-consequence-node--scale-secondary .le-consequence-node__label {
+  opacity: 0.62;
+}
+
+.le-galaxy-viewport .le-consequence-node--scale-locked .le-consequence-node__beacon {
+  transform: scale(0.52);
+}
+
+.le-galaxy-viewport .le-consequence-node.is-primary-recommended.is-selected .le-consequence-node__orb,
+.le-galaxy-viewport .le-consequence-node.is-primary-recommended.is-hovered .le-consequence-node__orb {
   animation: le-star-breathe 2.8s ease-in-out infinite;
 }
 
-/* Galaxy edges — faint filaments, not progress bars */
+/* Galaxy edges — screen-pixel strokes (non-scaling-stroke uses CSS px) */
 .le-galaxy-viewport .le-consequence-map__edges {
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .le-galaxy-viewport .le-consequence-map__edge {
-  stroke-width: 0.22;
-  opacity: 0.14;
+  stroke-width: 1px;
+  opacity: 1;
   vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
 }
 
 .le-galaxy-viewport .le-consequence-map__edge--unlock {
-  stroke: rgba(125, 211, 252, 0.55);
-  stroke-dasharray: 0.8 2.2;
-  animation: le-causal-flow 8s linear infinite;
-}
-
-.le-galaxy-viewport .le-consequence-map__edge--unlock.is-highlighted {
-  opacity: 0.55;
-}
-
-.le-galaxy-viewport .le-consequence-map__edge--unlock.is-causal-unlock {
-  stroke: rgba(125, 211, 252, 0.85);
-  stroke-width: 0.38;
-  opacity: 0.78;
-  filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.45));
-}
-
-.le-galaxy-viewport .le-consequence-map__edge--dependency {
-  stroke: rgba(120, 140, 255, 0.6);
-  stroke-dasharray: 1.2 1.2;
-  stroke-width: 0.28;
-  opacity: 0.42;
-  animation: galaxy-dep-flow 7s linear infinite;
-}
-
-.le-galaxy-viewport .le-consequence-map__edge--dependency.is-locked {
-  stroke: rgba(120, 120, 120, 0.25);
-  opacity: 0.22;
+  stroke: rgba(125, 211, 252, 0.78);
+  stroke-dasharray: 3 5;
+  stroke-width: 0.85px;
+  opacity: 0.62;
   animation: none;
 }
 
-.le-galaxy-viewport .le-consequence-map__edge--dependency.is-satisfied:not(.is-locked) {
-  stroke: rgba(120, 140, 255, 0.6);
+.le-galaxy-viewport .le-consequence-map__edge--unlock.is-highlighted,
+.le-galaxy-viewport .le-consequence-map__edge--unlock.is-causal-unlock {
+  stroke: rgba(125, 211, 252, 0.95);
+  stroke-width: 1.05px;
+  opacity: 0.8;
+  animation: none;
 }
 
-.le-galaxy-viewport .le-consequence-map__edge--dependency.is-flow-highlighted {
-  stroke: rgba(150, 170, 255, 0.92);
-  stroke-width: 0.42;
-  opacity: 0.88;
-  animation: galaxy-dep-flow 2.4s linear infinite;
+.le-galaxy-viewport .le-consequence-map__edge--dependency {
+  stroke: rgba(150, 172, 255, 0.95);
+  stroke-dasharray: 3.5 3.5;
+  stroke-width: 1px;
+  opacity: 0.72;
+  animation: none;
+  filter: drop-shadow(0 0 0.5px rgba(120, 150, 255, 0.22));
 }
 
-.le-galaxy-viewport .le-consequence-map__edge--dependency.is-dimmed {
-  opacity: 0.1;
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-locked {
+  stroke: rgba(182, 188, 210, 0.88);
+  stroke-width: 0.9px;
+  opacity: 0.58;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-satisfied {
+  stroke: rgba(135, 162, 255, 0.68);
+  stroke-width: 0.8px;
+  opacity: 0.4;
+  filter: none;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-flow-highlighted,
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-gravity-active {
+  stroke: rgba(168, 188, 255, 0.98);
+  stroke-width: 1.2px;
+  opacity: 0.86;
+  filter: drop-shadow(0 0 1px rgba(140, 165, 255, 0.38));
+  animation: galaxy-dep-hover-pulse 2.4s ease-in-out infinite;
 }
 
 .le-galaxy-viewport .le-consequence-map__edge--dependency.is-causal-dependency {
-  stroke-width: 0.36;
-  opacity: 0.72;
+  stroke-width: 1.05px;
+  opacity: 0.76;
 }
 
-@keyframes galaxy-dep-flow {
-  to {
-    stroke-dashoffset: -12;
+/* Thinner lines for edges not tied to the selected planet */
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-selection-inactive {
+  stroke-width: 0.75px;
+  opacity: 0.58;
+  filter: none;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-selection-inactive.is-locked {
+  stroke-width: 0.7px;
+  opacity: 0.48;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-selection-inactive.is-satisfied {
+  stroke-width: 0.65px;
+  opacity: 0.34;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--unlock.is-selection-inactive {
+  stroke-width: 0.7px;
+  opacity: 0.52;
+}
+
+/* Thicker lines for the selected planet's connections */
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-selection-active {
+  stroke-width: 1.5px;
+  opacity: 0.82;
+  filter: drop-shadow(0 0 0.75px rgba(130, 160, 255, 0.3));
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-selection-active.is-locked {
+  stroke-width: 1.38px;
+  opacity: 0.68;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--unlock.is-selection-active {
+  stroke-width: 1.25px;
+  opacity: 0.76;
+}
+
+@keyframes galaxy-dep-hover-pulse {
+  0%,
+  100% {
+    opacity: 0.76;
   }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.le-galaxy-viewport .le-consequence-node.is-gravity-target-pulled {
+  transition-duration: 520ms;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-gravity-source-active .le-consequence-node__orb {
+  transform: scale(1.03);
+  box-shadow:
+    0 0 14px rgba(150, 170, 255, 0.45),
+    0 0 24px rgba(120, 140, 255, 0.2);
 }
 
 .le-galaxy-viewport .le-consequence-node.is-locked {
   cursor: not-allowed;
   filter: grayscale(1);
-  opacity: 0.42;
+  opacity: 0.35;
 }
 
 .le-galaxy-viewport .le-consequence-node.is-locked .le-consequence-node__orb {
-  filter: blur(0.5px);
+  filter: blur(0.3px);
   box-shadow: none;
-  animation: none;
-}
-
-.le-galaxy-viewport .le-consequence-node.is-locked.is-hovered {
-  transform: translate3d(-50%, -50%, 0);
+  animation: none !important;
 }
 
 .le-galaxy-viewport .le-consequence-node.is-locked.is-hovered .le-consequence-node__orb {
@@ -917,6 +992,10 @@ a.btn:focus-visible,
 
 .le-galaxy-viewport .le-consequence-node.is-locked .le-consequence-node__halo {
   opacity: 0;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-locked.is-gravity-target-pulled {
+  transition-duration: 680ms;
 }
 
 .le-galaxy-viewport .le-consequence-node__lock {
@@ -942,10 +1021,10 @@ a.btn:focus-visible,
 }
 
 .le-galaxy-viewport .le-consequence-node.is-dependency-source-highlight .le-consequence-node__orb {
-  transform: scale(1.14);
+  transform: scale(1.04);
   box-shadow:
-    0 0 18px rgba(150, 170, 255, 0.55),
-    0 0 32px rgba(120, 140, 255, 0.28);
+    0 0 14px rgba(150, 170, 255, 0.42),
+    0 0 24px rgba(120, 140, 255, 0.18);
 }
 
 .le-galaxy-viewport .le-consequence-inspector__section h4 {
@@ -1942,6 +2021,7 @@ a.btn:focus-visible,
     animation: none !important;
   }
 
+  .le-galaxy-viewport .le-consequence-node.is-gravity-source-active .le-consequence-node__orb,
   .le-galaxy-viewport .le-consequence-node__star.is-pulse {
     animation: none !important;
     transition: none !important;
