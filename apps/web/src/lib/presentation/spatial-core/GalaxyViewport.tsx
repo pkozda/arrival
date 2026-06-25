@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, type ReactNode } from 'react';
+import { GalaxyProgressProvider } from './GalaxyProgressProvider';
 
 type Props = {
   children: ReactNode;
@@ -11,7 +12,11 @@ type Props = {
 /**
  * Fullscreen spatial stage — single owner of viewport scroll lock.
  */
-export function GalaxyViewport({ children, label = 'Life Events', surfaceId = 'life-event-galaxy' }: Props) {
+export function GalaxyViewport({
+  children,
+  label = 'Life Events',
+  surfaceId = 'life-event-galaxy',
+}: Props) {
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
@@ -28,11 +33,13 @@ export function GalaxyViewport({ children, label = 'Life Events', surfaceId = 'l
   }, []);
 
   return (
-    <div className="le-galaxy-viewport" data-ui-surface={surfaceId}>
-      <div className="le-galaxy-viewport__chrome" aria-hidden="true">
-        <span className="le-galaxy-viewport__label">{label}</span>
+    <GalaxyProgressProvider>
+      <div className="le-galaxy-viewport" data-ui-surface={surfaceId}>
+        <div className="le-galaxy-viewport__chrome" aria-hidden="true">
+          <span className="le-galaxy-viewport__label">{label}</span>
+        </div>
+        <div className="le-galaxy-viewport__world">{children}</div>
       </div>
-      <div className="le-galaxy-viewport__world">{children}</div>
-    </div>
+    </GalaxyProgressProvider>
   );
 }

@@ -443,6 +443,29 @@ a.btn:focus-visible,
   color: rgba(186, 210, 255, 0.82);
 }
 
+.le-galaxy-viewport__devtools {
+  position: fixed;
+  top: calc(var(--atlas-hud-height, 72px) + 0.65rem);
+  right: 1rem;
+  z-index: 36;
+  pointer-events: auto;
+}
+
+.le-galaxy-viewport .le-consequence-inspector__fields {
+  margin-top: 0.75rem;
+}
+
+.le-galaxy-viewport .le-consequence-inspector__fields .text-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.8);
+}
+
+.le-galaxy-viewport .le-consequence-inspector__fields .text-body {
+  margin-bottom: 0.5rem;
+}
+
 .le-galaxy-viewport__overlay {
   position: absolute;
   inset: 0;
@@ -682,6 +705,31 @@ a.btn:focus-visible,
   letter-spacing: 0.04em;
 }
 
+.le-galaxy-viewport .le-consequence-node__stars {
+  display: flex;
+  justify-content: center;
+  gap: 0.12rem;
+  margin-top: 0.28rem;
+  line-height: 1;
+}
+
+.le-galaxy-viewport .le-consequence-node__star {
+  font-size: 0.52rem;
+  color: rgba(148, 163, 184, 0.28);
+  text-shadow: none;
+  transition: color 240ms ease, text-shadow 240ms ease, transform 240ms ease;
+}
+
+.le-galaxy-viewport .le-consequence-node__star.is-filled {
+  color: rgba(251, 191, 36, 0.9);
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+}
+
+.le-galaxy-viewport .le-consequence-node__star.is-pulse {
+  transform: scale(1.15);
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.65);
+}
+
 .le-galaxy-viewport .le-consequence-node--core .le-consequence-node__beacon {
   width: 3.8rem;
   height: 3.8rem;
@@ -808,14 +856,96 @@ a.btn:focus-visible,
 }
 
 .le-galaxy-viewport .le-consequence-map__edge--dependency {
-  stroke: rgba(248, 113, 113, 0.45);
-  stroke-dasharray: 0.5 1.8;
-  animation: le-dependency-shimmer 10s linear infinite;
+  stroke: rgba(120, 140, 255, 0.6);
+  stroke-dasharray: 1.2 1.2;
+  stroke-width: 0.28;
+  opacity: 0.42;
+  animation: galaxy-dep-flow 7s linear infinite;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-locked {
+  stroke: rgba(120, 120, 120, 0.25);
+  opacity: 0.22;
+  animation: none;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-satisfied:not(.is-locked) {
+  stroke: rgba(120, 140, 255, 0.6);
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-flow-highlighted {
+  stroke: rgba(150, 170, 255, 0.92);
+  stroke-width: 0.42;
+  opacity: 0.88;
+  animation: galaxy-dep-flow 2.4s linear infinite;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-dimmed {
+  opacity: 0.1;
 }
 
 .le-galaxy-viewport .le-consequence-map__edge--dependency.is-causal-dependency {
-  stroke-width: 0.32;
-  opacity: 0.62;
+  stroke-width: 0.36;
+  opacity: 0.72;
+}
+
+@keyframes galaxy-dep-flow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+.le-galaxy-viewport .le-consequence-node.is-locked {
+  cursor: not-allowed;
+  filter: grayscale(1);
+  opacity: 0.42;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-locked .le-consequence-node__orb {
+  filter: blur(0.5px);
+  box-shadow: none;
+  animation: none;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-locked.is-hovered {
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.le-galaxy-viewport .le-consequence-node.is-locked.is-hovered .le-consequence-node__orb {
+  transform: none;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-locked .le-consequence-node__halo {
+  opacity: 0;
+}
+
+.le-galaxy-viewport .le-consequence-node__lock {
+  position: absolute;
+  top: -0.15rem;
+  right: -0.35rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.le-galaxy-viewport .le-consequence-node__lock-hint {
+  font-size: 0.56rem;
+  line-height: 1.25;
+  color: rgba(203, 213, 225, 0.88);
+  margin-top: 0.12rem;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-dependency-source-highlight {
+  opacity: 1;
+  filter: none;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-dependency-source-highlight .le-consequence-node__orb {
+  transform: scale(1.14);
+  box-shadow:
+    0 0 18px rgba(150, 170, 255, 0.55),
+    0 0 32px rgba(120, 140, 255, 0.28);
 }
 
 .le-galaxy-viewport .le-consequence-inspector__section h4 {
@@ -1810,6 +1940,11 @@ a.btn:focus-visible,
   .le-galaxy-viewport .le-consequence-node--core .le-consequence-node__orb,
   .le-galaxy-viewport .le-consequence-node.is-primary-recommended .le-consequence-node__orb {
     animation: none !important;
+  }
+
+  .le-galaxy-viewport .le-consequence-node__star.is-pulse {
+    animation: none !important;
+    transition: none !important;
   }
 
   .le-consequence-map__edge,

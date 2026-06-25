@@ -6,7 +6,7 @@ import { LifeEventPlanNodeActions } from '@/components/life-event/LifeEventPlanN
 import { useApp } from '@/components/AppProvider';
 import type { ActionBreakdownSectionProps } from '@/lib/presentation/le-ux/types';
 import { buildLifeEventGalaxyGraph } from '@/lib/presentation/le-ux/build-galaxy-graph';
-import { GalaxyGraphStage, GalaxyInspectorShell, useGalaxyGraphModel } from '@/lib/presentation/spatial-core';
+import { GalaxyGraphStage, GalaxyInspectorShell, useGalaxyGraphModel, useGalaxyProgressReporter } from '@/lib/presentation/spatial-core';
 import { lifeEventNodeDescription, lifeEventNodeTitle } from '@/lib/life-event/content-labels';
 
 type GraphStatus = 'completed' | 'recommended' | 'blocked' | 'future' | 'core';
@@ -118,6 +118,11 @@ export function GalaxyGraphInspectorBridge({
   const recommendedHints = secondaryActions
     .filter((node) => node.id !== selectedNodeRef?.id)
     .slice(0, 3);
+
+  useGalaxyProgressReporter({
+    graphNodes: model.graphNodes,
+    selectedNodeId: model.selectedNodeId,
+  });
 
   return (
     <>

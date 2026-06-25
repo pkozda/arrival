@@ -1,43 +1,59 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useParams } from 'next/navigation';
-import { AtlasSurface } from '@/components/atlas-runtime/legacy';
-import { ProfileDomainDetail } from '@/components/profile/ProfileDomainDetail';
+import { useParams, useSearchParams } from 'next/navigation';
+import { ProfileGalaxyBridge } from '@/components/profile/ProfileGalaxyBridge';
+import { LegacyPanelSurface } from '@/components/atlas-runtime/legacy';
+import { GalaxyViewport } from '@/lib/presentation/spatial-core';
 import { useApp } from '@/components/AppProvider';
 import { isProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
 
-function LoadingState() {
+function LoadingOverlay() {
   return (
-    <AtlasSurface className="text-center">
-      <p className="text-body text-body--muted">Loading...</p>
-    </AtlasSurface>
+    <div className="le-galaxy-viewport__overlay le-galaxy-viewport__overlay--message">
+      Loading...
+    </div>
   );
 }
 
-function ProfileDomainDetailPageContent() {
+function ProfileDomainGalaxyContent() {
   const params = useParams<{ domainSlug: string }>();
+  const searchParams = useSearchParams();
   const domainSlug = params.domainSlug;
-  const { uiSnapshotLoading } = useApp();
+  const { uiSnapshot, uiSnapshotLoading } = useApp();
+  const showUpdatedToast = searchParams.get('updated') === '1';
 
-  const validSlug = isProfileMirrorDomainSlug(domainSlug) ? domainSlug : '';
+  const validSlug = isProfileMirrorDomainSlug(domainSlug) ? domainSlug : null;
+
+  if (uiSnapshotLoading) {
+    return <LoadingOverlay />;
+  }
+
+  if (!uiSnapshot || !validSlug) {
+    return (
+      <div className="le-galaxy-viewport__overlay">
+        <LegacyPanelSurface>
+          <p className="text-body text-body--muted">This section could not be found.</p>
+        </LegacyPanelSurface>
+      </div>
+    );
+  }
 
   return (
-    <>
-      {uiSnapshotLoading && <LoadingState />}
-      {!uiSnapshotLoading && <ProfileDomainDetail domainSlug={validSlug || domainSlug} />}
-    </>
+    <ProfileGalaxyBridge
+      initialSelectedSlug={validSlug}
+      inspectorDepth="detail"
+      showUpdatedToast={showUpdatedToast}
+    />
   );
 }
 
 export default function ProfileDomainPage() {
   return (
-    <main className="celestial-page-main">
-      <div className="container" style={{ maxWidth: '720px' }}>
-        <Suspense fallback={<LoadingState />}>
-          <ProfileDomainDetailPageContent />
-        </Suspense>
-      </div>
-    </main>
+    <GalaxyViewport label="Profile" surfaceId="profile-galaxy">
+      <Suspense fallback={<LoadingOverlay />}>
+        <ProfileDomainGalaxyContent />
+      </Suspense>
+    </GalaxyViewport>
   );
 }
