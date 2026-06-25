@@ -44,7 +44,7 @@ export function PrimarySection({ section }: Props) {
       <h2 id={`${section.section.sectionId}-title`} className="text-section-title">
         <SectionHeading titleKey={section.section.titleKey} />
       </h2>
-      <div style={{ marginTop: '0.75rem' }}>
+      <div className="stack-sm mt-sm">
         {section.cards.map((_, index) => renderCard(section, index))}
       </div>
     </section>
@@ -57,7 +57,7 @@ export function SecondarySection({ section }: Props) {
       <h2 id={`${section.section.sectionId}-title`} className="text-section-title">
         <SectionHeading titleKey={section.section.titleKey} />
       </h2>
-      <div style={{ marginTop: '0.75rem' }}>
+      <div className="stack-sm mt-sm">
         {section.cards.map((_, index) => renderCard(section, index))}
       </div>
     </section>
@@ -70,7 +70,7 @@ export function SystemSection({ section }: Props) {
       <h2 id={`${section.section.sectionId}-title`} className="text-section-title">
         <SectionHeading titleKey={section.section.titleKey} />
       </h2>
-      <div style={{ marginTop: '0.75rem' }}>
+      <div className="stack-sm mt-sm">
         {section.cards.map((_, index) => renderCard(section, index))}
       </div>
     </section>

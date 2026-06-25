@@ -20,7 +20,7 @@ export function AtlasMemberSlider() {
   const [loadEpoch, setLoadEpoch] = useState(0);
   const locationLabel = useAtlasLocationLabel();
   const loadPhase = useAtlasLoadSequence(loadEpoch);
-  const { offset } = useAtlasParallax();
+  const { parallaxRef } = useAtlasParallax();
   const activeSlide = ATLAS_SLIDES[activeIndex];
 
   const goTo = useCallback((index: number) => {
@@ -55,23 +55,18 @@ export function AtlasMemberSlider() {
   }, [activeIndex, goTo]);
 
   return (
-    <div className="atlas-slider atlas-slider--authenticated" data-ui-surface="home-atlas">
-      <AtlasAmbientLayers
-        loadPhase={loadPhase}
-        starsOffset={offset('stars')}
-        constellationOffset={offset('constellation')}
-      />
+    <div
+      ref={parallaxRef}
+      className="atlas-parallax-root atlas-slider atlas-slider--authenticated"
+      data-ui-surface="home-atlas"
+    >
+      <AtlasAmbientLayers loadPhase={loadPhase} />
 
       <AtlasHUD />
 
       <main className="atlas-slider__main">
         <div className="atlas-slider__stage">
-          <motion.div
-            className="atlas-slider__map-hero"
-            style={{
-              transform: `translate(${offset('map').x}px, ${offset('map').y}px)`,
-            }}
-          >
+          <motion.div className="atlas-slider__map-hero">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`${activeSlide.id}-${loadEpoch}`}
@@ -93,12 +88,7 @@ export function AtlasMemberSlider() {
             </AnimatePresence>
           </motion.div>
 
-          <motion.div
-            className="atlas-slider__ui-left"
-            style={{
-              transform: `translate(${offset('ui').x}px, ${offset('ui').y}px)`,
-            }}
-          >
+          <motion.div className="atlas-slider__ui-left">
             <nav className="atlas-slider__rail" aria-label="Journey slides">
               {ATLAS_SLIDES.map((slide, index) => {
                 const isActive = index === activeIndex;
@@ -119,23 +109,13 @@ export function AtlasMemberSlider() {
             </nav>
 
             <div className="atlas-slider__copy">
-              {ATLAS_SLIDES.map((slide, index) => (
-                <AtlasSlide
-                  key={slide.id}
-                  slide={slide}
-                  isActive={index === activeIndex}
-                  loadPhase={loadPhase}
-                />
-              ))}
+              <AnimatePresence mode="wait">
+                <AtlasSlide key={activeSlide.id} slide={activeSlide} loadPhase={loadPhase} />
+              </AnimatePresence>
             </div>
           </motion.div>
 
-          <motion.div
-            className="atlas-slider__ui-right"
-            style={{
-              transform: `translate(${offset('ui').x}px, ${offset('ui').y}px)`,
-            }}
-          >
+          <motion.div className="atlas-slider__ui-right">
             <AnimatePresence mode="wait">
               <AtlasSidePanel key={activeSlide.id} slide={activeSlide} loadPhase={loadPhase} />
             </AnimatePresence>

@@ -26,8 +26,16 @@ export function buildSpatialVariants(
     };
   }
 
-  const enterTransition = spatialTransitionConfig(transition.easingProfile, 'enter');
-  const exitTransition = spatialTransitionConfig(transition.easingProfile, 'exit');
+  const enterTransition = spatialTransitionConfig(
+    transition.easingProfile,
+    'enter',
+    transition.durationScale ?? 1
+  );
+  const exitTransition = spatialTransitionConfig(
+    transition.easingProfile,
+    'exit',
+    transition.durationScale ?? 1
+  );
 
   const { motionPrimitive } = transition;
 
@@ -60,13 +68,22 @@ export function buildSpatialVariants(
   switch (motionPrimitive) {
     case 'collapse-to-node':
       return {
-        initial,
+        initial: transition.isReturnPath
+          ? {
+              opacity: 0,
+              scale: origin.scale * 0.9,
+              x: originX * 0.45,
+              y: originY * 0.45,
+              rotateZ: -cam.rotationZ * 0.4,
+              filter: `blur(${enterBlur * 0.65}px)`,
+            }
+          : initial,
         animate,
         exit: {
           ...exitBase,
-          scale: origin.scale * 0.88,
-          x: -originX * 0.72,
-          y: -originY * 0.72,
+          scale: origin.scale * (transition.isReturnPath ? 0.94 : 0.88),
+          x: transition.isReturnPath ? originX * 0.38 : -originX * 0.72,
+          y: transition.isReturnPath ? originY * 0.38 : -originY * 0.72,
         },
       };
     case 'expand-from-node':

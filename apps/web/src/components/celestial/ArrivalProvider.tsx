@@ -20,6 +20,8 @@ import {
 } from '@/lib/celestial';
 import type { SpatialPhase, SpatialTransition } from '@/lib/atlas-runtime';
 import { spatialNavigationInterceptor } from '@/lib/atlas-runtime/spatial-navigation-interceptor';
+import { spatialMemoryStore } from '@/lib/atlas-runtime/spatial-memory-store';
+import { getSpatialTransitionContext } from '@/lib/atlas-runtime/spatial-transition-context';
 import { captureArrivalIntentFromClick } from '@/lib/celestial/capture-arrival-intent';
 
 type ArrivalContextValue = {
@@ -59,11 +61,11 @@ export function ArrivalProvider({ children }: { children: ReactNode }) {
       return motionEngine.fallback();
     }
 
-    if (arrival.navigationMode === 'fallback-spatial') {
+    if (arrival.navigationMode === 'fallback-spatial' && !arrival.spatialTransitionContext) {
       return motionEngine.fallback(arrival.sourceNodeId);
     }
 
-    return motionEngine.buildSpatialTransition(arrival);
+    return motionEngine.buildSpatialTransition(arrival, arrival.spatialTransitionContext);
   }, [arrival, motionEngine]);
 
   const recordArrivalIntent = useCallback(
@@ -134,14 +136,26 @@ export function ArrivalProvider({ children }: { children: ReactNode }) {
     }
 
     const previousPath = previousPathRef.current;
-    const fallback = buildFallbackArrivalContext(
-      previousPath && previousPath !== pathname ? previousPath : '/',
+    const departedFromPath = previousPath && previousPath !== pathname ? previousPath : '/';
+    const spatialTransitionContext = getSpatialTransitionContext(
+      departedFromPath,
       pathname,
+      spatialMemoryStore,
       'router-fallback'
+    );
+
+    const fallback = buildFallbackArrivalContext(departedFromPath, pathname, 'router-fallback');
+
+    spatialMemoryStore.recordNavigation(
+      departedFromPath,
+      pathname,
+      fallback.sourceNodeId,
+      spatialTransitionContext.direction
     );
 
     setArrival({
       ...fallback,
+      spatialTransitionContext,
       entryAnimationState: 'entering',
       capturedAt: Date.now(),
     });

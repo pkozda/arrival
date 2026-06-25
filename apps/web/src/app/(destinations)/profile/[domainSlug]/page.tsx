@@ -9,7 +9,7 @@ import { isProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
 
 function LoadingState() {
   return (
-    <AtlasSurface className="text-center" style={{ padding: '2rem' }}>
+    <AtlasSurface className="text-center">
       <p className="text-body text-body--muted">Loading...</p>
     </AtlasSurface>
   );

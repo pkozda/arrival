@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { AtlasNodeIcon } from './atlas-node-icons';
 import type { AtlasLoadPhase } from './useAtlasLoadSequence';
@@ -27,7 +28,7 @@ const STATE_CLASS: Record<AtlasNodeState, string> = {
   blocked: 'atlas-node--blocked',
 };
 
-export function AtlasNode({
+export const AtlasNode = memo(function AtlasNode({
   id,
   label,
   x,
@@ -122,4 +123,4 @@ export function AtlasNode({
       </motion.g>
     </g>
   );
-}
+});

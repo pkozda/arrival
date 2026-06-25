@@ -14,6 +14,10 @@ type Props = {
 export function PersistentSpatialCanvas(_props: Props) {
   const { shellMode } = useAtlasRuntime();
 
+  if (shellMode === 'star-map') {
+    return null;
+  }
+
   return (
     <div
       className="persistent-spatial-canvas"

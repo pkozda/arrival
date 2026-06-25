@@ -52,7 +52,7 @@ export function ProfileMirrorOverview() {
       </section>
 
       <p className="text-meta mt-lg">
-        <Link href="/" style={{ color: 'var(--color-accent)' }}>
+        <Link href="/" className="text-link-accent">
           ← Back to home
         </Link>
       </p>

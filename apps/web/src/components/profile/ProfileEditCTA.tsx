@@ -1,4 +1,4 @@
-import { AtlasLink as Link } from '@/components/atlas-runtime';
+import { AtlasLink as Link, AtlasSecondaryLink } from '@/components/atlas-runtime';
 import type { ProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
 
 type Props = {
@@ -12,20 +12,17 @@ export function ProfileEditCTA({
   label = 'Correct information',
   variant = 'button',
 }: Props) {
-  const className = variant === 'button' ? 'btn btn-secondary' : undefined;
+  if (variant === 'link') {
+    return (
+      <Link href={`/profile/${domainSlug}/edit`} className="text-link-accent">
+        {label}
+      </Link>
+    );
+  }
 
   return (
-    <Link
-      href={`/profile/${domainSlug}/edit`}
-      className={className}
-      style={{
-        display: 'inline-block',
-        fontSize: '0.875rem',
-        textDecoration: 'none',
-        ...(variant === 'link' ? { color: 'var(--color-accent)' } : {}),
-      }}
-    >
+    <AtlasSecondaryLink href={`/profile/${domainSlug}/edit`}>
       {label}
-    </Link>
+    </AtlasSecondaryLink>
   );
 }

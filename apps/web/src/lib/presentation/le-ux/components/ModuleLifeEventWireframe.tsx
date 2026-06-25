@@ -1,6 +1,7 @@
 'use client';
 
 import type { ModuleLifeEventWireframeProps } from '@/lib/presentation/le-ux/types';
+import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { useApp } from '@/components/AppProvider';
 import { LifeEventWireframeLayout } from '@/lib/presentation/le-ux/components/LifeEventWireframeLayout';
 import { WireframeSkeleton } from '@/lib/presentation/le-ux/components/WireframeSkeleton';
@@ -20,9 +21,9 @@ export function ModuleLifeEventWireframe({
 
   if (loading) {
     return (
-      <div className="card le-plan-card">
+      <AtlasSurface className="le-plan-card">
         <WireframeSkeleton />
-      </div>
+      </AtlasSurface>
     );
   }
 
@@ -31,7 +32,7 @@ export function ModuleLifeEventWireframe({
   const insight = buildModuleInsightContent(plan, t);
 
   return (
-    <div className="card le-plan-card">
+    <AtlasSurface className="le-plan-card">
       <LifeEventWireframeLayout
         plan={plan}
         surface={surface}
@@ -42,6 +43,6 @@ export function ModuleLifeEventWireframe({
         showRuntimeFeedback={false}
         variant="module"
       />
-    </div>
+    </AtlasSurface>
   );
 }

@@ -43,3 +43,16 @@ export {
 
 export { spatialNavigationInterceptor } from './spatial-navigation-interceptor';
 export type { SpatialNavigationInterceptOptions } from './spatial-navigation-interceptor';
+
+export { spatialMemoryStore, SpatialMemoryStore } from './spatial-memory-store';
+export type { SpatialMemorySnapshot, SpatialTransitionRecord } from './spatial-memory-store';
+
+export {
+  getSpatialTransitionContext,
+  resolveSourceNodeForTransition,
+} from './spatial-transition-context';
+export type {
+  SpatialTransitionContext,
+  SpatialTransitionDirection,
+  SpatialTransitionRelation,
+} from './spatial-transition-context';

@@ -22,6 +22,8 @@ export type SpatialNavigationOrigin =
 
 export type SpatialNavigationMode = 'explicit-spatial' | 'fallback-spatial';
 
+export type SpatialTransitionContext = import('@/lib/atlas-runtime/spatial-transition-context').SpatialTransitionContext;
+
 export type ArrivalContext = {
   sourceNodeId: CelestialNodeId;
   destinationPath: string;
@@ -32,6 +34,7 @@ export type ArrivalContext = {
   capturedAt: number;
   navigationOrigin?: SpatialNavigationOrigin;
   navigationMode?: SpatialNavigationMode;
+  spatialTransitionContext?: SpatialTransitionContext;
 };
 
 export type ArrivalContextInput = Omit<ArrivalContext, 'capturedAt' | 'entryAnimationState'> & {

@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { ATLAS_NODES } from './atlas-data';
 import type { AtlasLoadPhase } from './useAtlasLoadSequence';
@@ -20,7 +21,7 @@ function nodePosition(id: AtlasNodeId) {
   return { x: node.x, y: node.y };
 }
 
-export function AtlasConnection({ from, to, emphasized, loadPhase }: Props) {
+export const AtlasConnection = memo(function AtlasConnection({ from, to, emphasized, loadPhase }: Props) {
   const start = nodePosition(from);
   const end = nodePosition(to);
   const visible = loadPhase >= 3;
@@ -40,4 +41,4 @@ export function AtlasConnection({ from, to, emphasized, loadPhase }: Props) {
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     />
   );
-}
+});

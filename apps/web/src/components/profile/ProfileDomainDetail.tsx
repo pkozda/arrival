@@ -36,7 +36,7 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
     return (
       <AtlasSurface>
         <p className="text-body text-body--muted">This section could not be found.</p>
-        <Link href="/profile" style={{ color: 'var(--color-accent)' }}>
+        <Link href="/profile" className="text-link-accent">
           ← Back to your situation
         </Link>
       </AtlasSurface>
@@ -55,6 +55,7 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
       {showUpdatedToast && <ProfileCorrectionToast />}
 
       <PageHeader
+        eyebrow="Profile"
         leading={
           <Link href="/profile">← Your situation in Germany</Link>
         }
@@ -83,16 +84,7 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
           <>
             <p className="text-body text-body--muted">{domain.emptyExplanation}</p>
             {domain.ctaModuleId && ctaTitle && (
-              <Link
-                href={`/modules/${domain.ctaModuleId}`}
-                className="btn btn-primary"
-                style={{
-                  display: 'inline-block',
-                  marginTop: '0.75rem',
-                  fontSize: '0.875rem',
-                  textDecoration: 'none',
-                }}
-              >
+              <Link href={`/modules/${domain.ctaModuleId}`} className="btn-primary-link">
                 {`Open ${ctaTitle}`}
               </Link>
             )}

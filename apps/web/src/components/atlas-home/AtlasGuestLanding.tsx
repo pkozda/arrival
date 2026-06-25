@@ -12,27 +12,24 @@ import { useAtlasParallax } from './useAtlasParallax';
 export function AtlasGuestLanding() {
   const { login } = useAtlasHomeAuth();
   const loadPhase = useAtlasLoadSequence(0);
-  const { offset } = useAtlasParallax();
+  const { parallaxRef } = useAtlasParallax();
   const uiVisible = loadPhase >= 5;
 
   return (
-    <div className="atlas-guest-landing" data-ui-surface="home-atlas">
-      <AtlasAmbientLayers
-        loadPhase={loadPhase}
-        starsOffset={offset('stars')}
-        constellationOffset={offset('constellation')}
-      />
+    <div ref={parallaxRef} className="atlas-parallax-root atlas-guest-landing" data-ui-surface="home-atlas">
+      <AtlasAmbientLayers loadPhase={loadPhase} />
 
       <AtlasHUD />
 
       <main className="atlas-guest-landing__main">
         <div className="atlas-guest-landing__stage">
-          <motion.div
-            className="atlas-guest-landing__copy"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: uiVisible ? 1 : 0, y: uiVisible ? 0 : 20 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          >
+          <div className="atlas-guest-landing__copy-shell">
+            <motion.div
+              className="atlas-guest-landing__copy"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: uiVisible ? 1 : 0, y: uiVisible ? 0 : 20 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            >
             <p className="atlas-slide__eyebrow">{GUEST_LANDING_COPY.eyebrow}</p>
             <h1 className="atlas-slide__headline">
               {GUEST_LANDING_COPY.headline}
@@ -55,14 +52,10 @@ export function AtlasGuestLanding() {
                 <span aria-hidden="true">→</span>
               </button>
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
 
-          <motion.div
-            className="atlas-guest-landing__map-hero"
-            style={{
-              transform: `translate(${offset('map').x}px, ${offset('map').y}px)`,
-            }}
-          >
+          <motion.div className="atlas-guest-landing__map-hero">
             <div className="atlas-guest-landing__map-wrap">
               <AtlasMap
                 slide={GUEST_LANDING_MAP}

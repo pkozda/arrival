@@ -15,7 +15,7 @@ export default function ModulePage() {
     return (
       <main className="celestial-page-main">
         <div className="container">
-          <LegacyPanelSurface style={{ padding: '2rem', textAlign: 'center' }}>Loading module...</LegacyPanelSurface>
+          <LegacyPanelSurface className="text-center text-body text-body--muted">Loading module...</LegacyPanelSurface>
         </div>
       </main>
     );
@@ -25,7 +25,7 @@ export default function ModulePage() {
     return (
       <main className="celestial-page-main">
         <div className="container">
-          <LegacyPanelSurface style={{ padding: '2rem', color: 'var(--color-danger)' }}>{modulesError}</LegacyPanelSurface>
+          <LegacyPanelSurface className="text-center text-danger">{modulesError}</LegacyPanelSurface>
         </div>
       </main>
     );
@@ -35,7 +35,7 @@ export default function ModulePage() {
     return (
       <main className="celestial-page-main">
         <div className="container">
-          <LegacyPanelSurface style={{ padding: '2rem' }}>Module not found.</LegacyPanelSurface>
+          <LegacyPanelSurface className="text-center text-body">Module not found.</LegacyPanelSurface>
         </div>
       </main>
     );

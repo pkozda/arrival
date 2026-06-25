@@ -47,7 +47,7 @@ export function ProfileDomainSectionCard({ domain, modules, detailHref, domainIn
           )}
           {detailHref && (
             <div className="profile-domain-card__actions">
-              <Link href={detailHref} className="text-meta" style={{ color: 'var(--color-accent)' }}>
+              <Link href={detailHref} className="text-link-accent">
                 View details →
               </Link>
               <ProfileEditCTA domainSlug={domain.slug} variant="link" label="Correct information →" />
@@ -59,16 +59,7 @@ export function ProfileDomainSectionCard({ domain, modules, detailHref, domainIn
           <p className="text-body text-body--muted">{domain.emptyExplanation}</p>
           <p className="text-meta">{domain.whyItMatters}</p>
           {domain.ctaModuleId && ctaTitle && (
-            <Link
-              href={`/modules/${domain.ctaModuleId}`}
-              className="btn btn-primary"
-              style={{
-                display: 'inline-block',
-                marginTop: '0.75rem',
-                fontSize: '0.875rem',
-                textDecoration: 'none',
-              }}
-            >
+            <Link href={`/modules/${domain.ctaModuleId}`} className="btn-primary-link">
               {`Open ${ctaTitle}`}
             </Link>
           )}
