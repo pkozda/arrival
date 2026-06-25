@@ -18,9 +18,3 @@ export const LE_UX_BREAKDOWN_GRID = {
   gap: LE_UX_SPACE.columnGap,
   alignItems: 'start',
 } as const;
-
-export const LE_UX_BREAKDOWN_GRID_STACKED = {
-  display: 'flex',
-  flexDirection: 'column' as const,
-  gap: LE_UX_SPACE.section,
-} as const;

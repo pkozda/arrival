@@ -5,7 +5,6 @@ import type { LifeEventPlanV1 } from '@/lib/product-contract';
 import type { ExecutionSurfaceV1 } from '@/lib/life-event-plan';
 import type { ScenarioMatchV1 } from '@/lib/life-event/scenarios';
 import { ModuleLifeEventWireframe } from '@/lib/presentation/le-ux';
-import { ScenarioExplorerPanel } from '@/components/life-event/ScenarioExplorerPanel';
 
 type Props = {
   plan: LifeEventPlanV1;
@@ -27,9 +26,10 @@ export function LifeEventPlanView({
       <ModuleLifeEventWireframe plan={plan} executionSurface={executionSurface} scenario={scenario} />
 
       {scenarioExplorer && (
-        <ScenarioExplorerPanel defaultOpen={scenarioExplorerDefaultOpen}>
-          {scenarioExplorer}
-        </ScenarioExplorerPanel>
+        <details className="le-galaxy-hud le-galaxy-hud--explorer" open={scenarioExplorerDefaultOpen}>
+          <summary className="le-galaxy-hud__explorer-toggle">Scenarios</summary>
+          <div className="le-galaxy-hud__explorer-body">{scenarioExplorer}</div>
+        </details>
       )}
     </>
   );

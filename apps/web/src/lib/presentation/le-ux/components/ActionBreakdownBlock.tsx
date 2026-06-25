@@ -5,6 +5,7 @@ import { LifeEventPlanNodeCard } from '@/components/life-event/LifeEventPlanNode
 import { useApp } from '@/components/AppProvider';
 import type { ActionBreakdownSectionProps } from '@/lib/presentation/le-ux/types';
 import { LeEmptyState } from '@/lib/presentation/le-ux/components/LeEmptyState';
+import { GalaxyGraphInspectorBridge } from '@/lib/presentation/le-ux/components/GalaxyGraphInspectorBridge';
 
 function SecondaryColumn({
   nodes,
@@ -104,35 +105,51 @@ function ContextualColumn({
 }
 
 export function ActionBreakdownBlock({
+  plan,
+  primaryAction,
   secondaryActions,
   blockedActions,
   contextualActions,
   isNodeDisabled,
   contextualDefaultOpen,
+  variant,
 }: ActionBreakdownSectionProps) {
   const { t } = useApp();
 
+  if (variant === 'home') {
+    return (
+      <section className="le-breakdown" aria-label={t('life-event.plan.nextActions')}>
+        <SecondaryColumn
+          nodes={secondaryActions}
+          isNodeDisabled={isNodeDisabled}
+          emptyMessage={t('life-event.empty.noUpcomingActions')}
+          emptyHint={t('life-event.empty.noUpcomingActions.hint')}
+        />
+        <BlockedColumn
+          nodes={blockedActions}
+          isNodeDisabled={isNodeDisabled}
+          emptyMessage={t('life-event.empty.noBlockers')}
+          emptyHint={t('life-event.empty.noBlockers.hint')}
+        />
+        <ContextualColumn
+          nodes={contextualActions}
+          isNodeDisabled={isNodeDisabled}
+          defaultOpen={contextualDefaultOpen}
+          emptyMessage={t('life-event.empty.noTimelineItems')}
+          emptyHint={t('life-event.empty.noTimelineItems.hint')}
+        />
+      </section>
+    );
+  }
+
   return (
-    <section className="le-breakdown" aria-label={t('life-event.plan.nextActions')}>
-      <SecondaryColumn
-        nodes={secondaryActions}
-        isNodeDisabled={isNodeDisabled}
-        emptyMessage={t('life-event.empty.noUpcomingActions')}
-        emptyHint={t('life-event.empty.noUpcomingActions.hint')}
-      />
-      <BlockedColumn
-        nodes={blockedActions}
-        isNodeDisabled={isNodeDisabled}
-        emptyMessage={t('life-event.empty.noBlockers')}
-        emptyHint={t('life-event.empty.noBlockers.hint')}
-      />
-      <ContextualColumn
-        nodes={contextualActions}
-        isNodeDisabled={isNodeDisabled}
-        defaultOpen={contextualDefaultOpen}
-        emptyMessage={t('life-event.empty.noTimelineItems')}
-        emptyHint={t('life-event.empty.noTimelineItems.hint')}
-      />
-    </section>
+    <GalaxyGraphInspectorBridge
+      plan={plan}
+      primaryAction={primaryAction}
+      secondaryActions={secondaryActions}
+      blockedActions={blockedActions}
+      contextualActions={contextualActions}
+      isNodeDisabled={isNodeDisabled}
+    />
   );
 }

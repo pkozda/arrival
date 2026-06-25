@@ -46,9 +46,12 @@ export type ModuleLifeEventWireframeProps = {
 };
 
 export type ActionBreakdownSectionProps = {
+  plan: LifeEventPlanV1;
+  primaryAction: LifeEventPlanNode | null;
   secondaryActions: LifeEventPlanNode[];
   blockedActions: LifeEventPlanNode[];
   contextualActions: LifeEventPlanNode[];
   isNodeDisabled: NodeDisabledFn;
   contextualDefaultOpen: boolean;
+  variant: 'home' | 'module';
 };

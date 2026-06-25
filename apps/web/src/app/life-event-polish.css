@@ -400,6 +400,903 @@ a.btn:focus-visible,
   opacity: 0.85;
 }
 
+/* —— Galaxy viewport (module spatial shell) —— */
+.le-galaxy-viewport {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: transparent;
+  pointer-events: none;
+}
+
+.le-galaxy-viewport__world {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.le-galaxy-viewport__chrome {
+  position: fixed;
+  top: calc(var(--atlas-hud-height, 72px) + 0.65rem);
+  left: 1rem;
+  z-index: 35;
+  pointer-events: none;
+}
+
+.le-galaxy-viewport__label {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(5, 8, 22, 0.38);
+  backdrop-filter: blur(10px);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(186, 210, 255, 0.82);
+}
+
+.le-galaxy-viewport__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(4, 9, 18, 0.55);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.le-galaxy-viewport__overlay--message {
+  font-size: 0.95rem;
+  color: rgba(226, 232, 240, 0.9);
+}
+
+.le-galaxy-viewport__overlay--intake {
+  overflow-y: auto;
+  align-content: start;
+  padding-top: calc(var(--atlas-hud-height, 72px) + 1.5rem);
+}
+
+.le-galaxy-viewport__stage {
+  position: absolute;
+  top: var(--atlas-hud-height, 80px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.le-galaxy-viewport .le-consequence-map__canvas {
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.le-galaxy-viewport__stage::before {
+  content: '';
+  position: absolute;
+  left: 42%;
+  top: 40%;
+  width: min(30vw, 300px);
+  height: min(42%, 420px);
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    rgba(251, 191, 36, 0.2) 0%,
+    rgba(245, 158, 11, 0.08) 28%,
+    rgba(146, 64, 14, 0.03) 52%,
+    transparent 72%
+  );
+  filter: blur(2px);
+  pointer-events: none;
+  animation: le-sun-core-pulse 5.5s ease-in-out infinite;
+}
+
+.le-galaxy-viewport__stage::after {
+  content: '';
+  position: absolute;
+  left: 42%;
+  top: 40%;
+  width: min(40vw, 400px);
+  height: min(58%, 560px);
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: radial-gradient(circle, transparent 42%, rgba(56, 189, 248, 0.04) 58%, transparent 74%);
+  pointer-events: none;
+}
+
+.le-galaxy-viewport__orbits {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.le-galaxy-orbit {
+  fill: none;
+  stroke: rgba(148, 163, 184, 0.1);
+  stroke-width: 0.18;
+  stroke-dasharray: 1.2 2.4;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+  animation: le-orbit-spin 120s linear infinite;
+}
+
+.le-galaxy-orbit--outer {
+  stroke: rgba(56, 189, 248, 0.08);
+  animation-duration: 180s;
+  animation-direction: reverse;
+}
+
+.le-galaxy-hud {
+  position: fixed;
+  right: 1rem;
+  top: calc(var(--atlas-hud-height, 72px) + 1rem);
+  bottom: 1rem;
+  z-index: 30;
+  width: min(340px, calc(100vw - 2rem));
+  max-height: calc(100dvh - var(--atlas-hud-height, 72px) - 2rem);
+  overflow-y: auto;
+  pointer-events: auto;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 1rem;
+  background: rgba(5, 10, 24, 0.52);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.06) inset,
+    0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.le-galaxy-hud.le-consequence-inspector {
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+}
+
+.le-galaxy-hud--explorer {
+  right: auto;
+  left: 1rem;
+  bottom: 1rem;
+  top: auto;
+  width: min(400px, calc(100vw - 2rem));
+  max-height: min(48vh, 440px);
+}
+
+.le-galaxy-hud__explorer-toggle {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(139, 156, 184, 0.92);
+  margin-bottom: 0.65rem;
+}
+
+.le-galaxy-hud__explorer-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.le-galaxy-hud__explorer-body {
+  max-height: min(40vh, 380px);
+  overflow-y: auto;
+}
+
+/* Galaxy nodes — celestial bodies, not cards */
+.le-galaxy-viewport .le-consequence-node--galaxy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  max-width: 9.5rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--atlas-text, #e8edf8);
+  text-align: center;
+  cursor: pointer;
+}
+
+.le-galaxy-viewport .le-consequence-node--galaxy:disabled {
+  cursor: default;
+}
+
+.le-galaxy-viewport .le-consequence-node {
+  left: var(--node-x);
+  top: var(--node-y);
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.le-galaxy-viewport .le-consequence-node__beacon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+}
+
+.le-galaxy-viewport .le-consequence-node__orb {
+  position: relative;
+  display: block;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, rgba(240, 249, 255, 0.95) 0%, rgba(125, 211, 252, 0.75) 28%, rgba(56, 189, 248, 0.35) 58%, transparent 78%);
+  box-shadow:
+    0 0 12px rgba(56, 189, 248, 0.55),
+    0 0 28px rgba(56, 189, 248, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.le-galaxy-viewport .le-consequence-node__halo {
+  position: absolute;
+  inset: -0.35rem;
+  border-radius: 50%;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.le-galaxy-viewport .le-consequence-node__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  max-width: 9.5rem;
+  padding: 0.2rem 0.35rem;
+  border-radius: 0.45rem;
+  background: rgba(4, 9, 18, 0.42);
+  backdrop-filter: blur(6px);
+  opacity: 0.72;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.le-galaxy-viewport .le-consequence-node__title {
+  font-size: 0.68rem;
+  line-height: 1.3;
+  font-weight: 500;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65);
+}
+
+.le-galaxy-viewport .le-consequence-node__descriptor {
+  font-size: 0.58rem;
+  color: rgba(186, 210, 255, 0.72);
+  letter-spacing: 0.04em;
+}
+
+.le-galaxy-viewport .le-consequence-node--core .le-consequence-node__beacon {
+  width: 3.8rem;
+  height: 3.8rem;
+}
+
+.le-galaxy-viewport .le-consequence-node--core .le-consequence-node__orb {
+  width: 3.4rem;
+  height: 3.4rem;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 244, 214, 0.92) 0%,
+    rgba(251, 191, 36, 0.58) 22%,
+    rgba(217, 119, 6, 0.34) 46%,
+    rgba(120, 53, 15, 0.16) 68%,
+    transparent 82%
+  );
+  box-shadow:
+    0 0 22px rgba(251, 191, 36, 0.45),
+    0 0 52px rgba(217, 119, 6, 0.26),
+    0 0 90px rgba(120, 53, 15, 0.12);
+  animation: le-sun-node-pulse 4.8s ease-in-out infinite;
+}
+
+.le-galaxy-viewport .le-consequence-node--core .le-consequence-node__label {
+  opacity: 1;
+  background: rgba(4, 9, 18, 0.55);
+}
+
+.le-galaxy-viewport .le-consequence-node--core,
+.le-galaxy-viewport .le-consequence-node--core.is-dimmed,
+.le-galaxy-viewport .le-consequence-node--core.is-constrained,
+.le-galaxy-viewport .le-consequence-node--core.is-twohop-dim {
+  opacity: 1;
+}
+
+.le-galaxy-viewport .le-consequence-node--recommended .le-consequence-node__orb {
+  width: 1.65rem;
+  height: 1.65rem;
+  box-shadow:
+    0 0 16px rgba(56, 189, 248, 0.7),
+    0 0 36px rgba(56, 189, 248, 0.25);
+}
+
+.le-galaxy-viewport .le-consequence-node--blocked .le-consequence-node__orb {
+  background: radial-gradient(circle at 32% 28%, rgba(254, 202, 202, 0.9) 0%, rgba(239, 68, 68, 0.55) 40%, transparent 78%);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
+}
+
+.le-galaxy-viewport .le-consequence-node--future .le-consequence-node__orb {
+  width: 1rem;
+  height: 1rem;
+  opacity: 0.65;
+  box-shadow: 0 0 8px rgba(148, 163, 184, 0.35);
+}
+
+.le-galaxy-viewport .le-consequence-node--completed .le-consequence-node__orb {
+  background: radial-gradient(circle at 32% 28%, rgba(224, 242, 254, 0.9) 0%, rgba(34, 211, 238, 0.5) 45%, transparent 78%);
+}
+
+.le-galaxy-viewport .le-consequence-node.is-hovered:not(:disabled),
+.le-galaxy-viewport .le-consequence-node.is-selected {
+  transform: translate3d(-50%, -50%, 0) scale(1.03);
+}
+
+.le-galaxy-viewport .le-consequence-node.is-hovered:not(:disabled) .le-consequence-node__orb,
+.le-galaxy-viewport .le-consequence-node.is-selected .le-consequence-node__orb {
+  transform: scale(1.12);
+}
+
+.le-galaxy-viewport .le-consequence-node.is-hovered:not(:disabled) .le-consequence-node__halo,
+.le-galaxy-viewport .le-consequence-node.is-selected .le-consequence-node__halo,
+.le-galaxy-viewport .le-consequence-node.is-orbit-active .le-consequence-node__halo {
+  opacity: 1;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-hovered:not(:disabled) .le-consequence-node__label,
+.le-galaxy-viewport .le-consequence-node.is-selected .le-consequence-node__label {
+  opacity: 1;
+  background: rgba(4, 9, 18, 0.68);
+}
+
+.le-galaxy-viewport .le-consequence-node.is-dimmed {
+  opacity: 0.38;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-constrained {
+  opacity: 0.28;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-twohop-dim {
+  opacity: 0.2;
+}
+
+.le-galaxy-viewport .le-consequence-node.is-primary-recommended .le-consequence-node__orb {
+  animation: le-star-breathe 2.8s ease-in-out infinite;
+}
+
+/* Galaxy edges — faint filaments, not progress bars */
+.le-galaxy-viewport .le-consequence-map__edges {
+  opacity: 0.85;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge {
+  stroke-width: 0.22;
+  opacity: 0.14;
+  vector-effect: non-scaling-stroke;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--unlock {
+  stroke: rgba(125, 211, 252, 0.55);
+  stroke-dasharray: 0.8 2.2;
+  animation: le-causal-flow 8s linear infinite;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--unlock.is-highlighted {
+  opacity: 0.55;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--unlock.is-causal-unlock {
+  stroke: rgba(125, 211, 252, 0.85);
+  stroke-width: 0.38;
+  opacity: 0.78;
+  filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.45));
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency {
+  stroke: rgba(248, 113, 113, 0.45);
+  stroke-dasharray: 0.5 1.8;
+  animation: le-dependency-shimmer 10s linear infinite;
+}
+
+.le-galaxy-viewport .le-consequence-map__edge--dependency.is-causal-dependency {
+  stroke-width: 0.32;
+  opacity: 0.62;
+}
+
+.le-galaxy-viewport .le-consequence-inspector__section h4 {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.75);
+  font-weight: 500;
+}
+
+.le-galaxy-viewport:has(.le-consequence-node.is-hovered) .le-consequence-inspector,
+.le-galaxy-viewport:has(.le-consequence-node.is-selected) .le-consequence-inspector {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.le-galaxy-viewport:not(:has(.le-consequence-node.is-hovered)):not(:has(.le-consequence-node.is-selected))
+  .le-consequence-inspector {
+  transform: translateX(4px);
+  opacity: 0.88;
+}
+
+@keyframes le-sun-core-pulse {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+}
+
+@keyframes le-sun-node-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes le-star-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 16px rgba(56, 189, 248, 0.7),
+      0 0 36px rgba(56, 189, 248, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(56, 189, 248, 0.9),
+      0 0 48px rgba(56, 189, 248, 0.38);
+  }
+}
+
+@keyframes le-orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* —— Consequence map (module MVP) —— */
+.le-consequence-map {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.le-consequence-map__canvas {
+  position: relative;
+  min-height: 420px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: linear-gradient(145deg, rgba(10, 22, 40, 0.9) 0%, rgba(7, 17, 31, 0.86) 100%);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.05) inset,
+    0 8px 32px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+  outline: none;
+}
+
+.le-consequence-map__canvas::before {
+  content: '';
+  position: absolute;
+  left: 8%;
+  top: 50%;
+  width: 240px;
+  height: 240px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(56, 189, 248, 0.02) 48%, transparent 72%);
+  pointer-events: none;
+}
+
+.le-consequence-map__canvas.is-rebalancing {
+  filter: saturate(1.03);
+}
+
+.le-consequence-map__canvas:focus-visible {
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.le-consequence-map__edges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.le-consequence-map__edge {
+  stroke-width: 1.3;
+  opacity: 0.32;
+  transition: opacity 0.2s ease;
+}
+
+.le-consequence-map__edge--unlock {
+  stroke: rgba(56, 189, 248, 0.62);
+  stroke-dasharray: 8 7;
+  animation: le-causal-flow 3.6s linear infinite;
+}
+
+.le-consequence-map__edge--unlock.is-highlighted {
+  opacity: 0.95;
+}
+
+.le-consequence-map__edge--unlock.is-causal-unlock {
+  stroke: rgba(56, 189, 248, 0.9);
+  stroke-width: 1.9;
+  opacity: 1;
+}
+
+.le-consequence-map__edge.is-selection-context {
+  animation: le-causal-pulse 260ms ease-out 1;
+}
+
+.le-consequence-map__edge.is-primary-pulse {
+  animation: le-causal-flow 2.1s linear infinite, le-causal-heartbeat 2.4s ease-in-out infinite;
+}
+
+.le-consequence-map__edge--dependency {
+  stroke: rgba(239, 68, 68, 0.52);
+  stroke-dasharray: 4 3;
+  animation: le-dependency-shimmer 4.8s linear infinite;
+}
+
+.le-consequence-map__edge--dependency.is-highlighted {
+  opacity: 0.88;
+}
+
+.le-consequence-map__edge--dependency.is-causal-dependency {
+  stroke: rgba(239, 68, 68, 0.68);
+  stroke-width: 1.5;
+  opacity: 0.95;
+  animation: le-dependency-shimmer 3.6s linear infinite, le-dependency-flicker 5.4s ease-in-out infinite;
+}
+
+.le-consequence-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  min-width: 130px;
+  max-width: 180px;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(5, 8, 22, 0.85);
+  color: var(--atlas-text, #e8edf8);
+  text-align: left;
+  transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.le-consequence-node:disabled {
+  cursor: default;
+}
+
+.le-consequence-node.is-hovered:not(:disabled) {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.le-consequence-node__title {
+  display: block;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.le-consequence-node--core .le-consequence-node__title {
+  font-weight: 700;
+}
+
+.le-consequence-node--recommended .le-consequence-node__title {
+  font-weight: 600;
+}
+
+.le-consequence-node--blocked .le-consequence-node__title {
+  font-weight: 500;
+}
+
+.le-consequence-node--future .le-consequence-node__title {
+  font-weight: 500;
+}
+
+.le-consequence-node__descriptor {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.67rem;
+  color: rgba(139, 156, 184, 0.86);
+}
+
+.le-consequence-node__meta {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(139, 156, 184, 0.82);
+}
+
+.le-consequence-node--core {
+  min-width: 120px;
+  text-align: center;
+  border-color: rgba(56, 189, 248, 0.28);
+  background: rgba(7, 17, 31, 0.92);
+}
+
+.le-consequence-node--completed {
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.le-consequence-node--recommended {
+  border-color: rgba(56, 189, 248, 0.34);
+}
+
+.le-consequence-node--blocked {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.le-consequence-node--future {
+  border-color: rgba(148, 163, 184, 0.18);
+  opacity: 0.75;
+  animation: le-future-drift 8s ease-in-out infinite;
+}
+
+.le-consequence-node.is-selected {
+  transform: translate(-50%, -50%) scale(1.04);
+  border-color: rgba(56, 189, 248, 0.75);
+}
+
+.le-consequence-node.is-neighbor {
+  opacity: 0.96;
+}
+
+.le-consequence-node.is-orbit-active {
+  opacity: 1;
+  border-color: rgba(56, 189, 248, 0.56);
+}
+
+.le-consequence-node.is-dimmed {
+  opacity: 0.45;
+}
+
+.le-consequence-node.is-constrained {
+  opacity: 0.32;
+}
+
+.le-consequence-node.is-twohop-dim {
+  opacity: 0.26;
+}
+
+.le-consequence-node.is-primary-recommended {
+  animation: le-primary-node-breathe 2.4s ease-in-out infinite;
+}
+
+.le-consequence-node__impact {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(56, 189, 248, 0.88);
+}
+
+.le-consequence-node--blocked {
+  filter: saturate(0.8);
+  box-shadow: 0 6px 0 rgba(2, 6, 23, 0.28);
+}
+
+.le-consequence-node--completed {
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.1) inset;
+}
+
+.le-consequence-inspector {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, rgba(10, 22, 40, 0.9) 0%, rgba(7, 17, 31, 0.86) 100%);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.05) inset,
+    0 8px 32px rgba(0, 0, 0, 0.28);
+  padding: 1rem;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+  transition-delay: 90ms;
+}
+
+.le-galaxy-viewport .le-galaxy-hud.le-consequence-inspector {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 1rem;
+  background: rgba(5, 10, 24, 0.52);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.06) inset,
+    0 12px 40px rgba(0, 0, 0, 0.35);
+  padding: 0.9rem 1rem;
+}
+
+.le-consequence-map:has(.le-consequence-node.is-hovered) .le-consequence-inspector,
+.le-consequence-map:has(.le-consequence-node.is-selected) .le-consequence-inspector {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.le-consequence-map:not(:has(.le-consequence-node.is-hovered)):not(:has(.le-consequence-node.is-selected))
+  .le-consequence-inspector {
+  transform: translateX(4px);
+  opacity: 0.94;
+}
+
+.le-consequence-inspector__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.le-consequence-inspector__status {
+  margin: 0.4rem 0 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(139, 156, 184, 0.85);
+}
+
+.le-consequence-inspector__requires {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: rgba(239, 68, 68, 0.85);
+}
+
+.le-consequence-inspector__why {
+  margin: 0.8rem 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.le-consequence-inspector__section + .le-consequence-inspector__section {
+  margin-top: 0.9rem;
+}
+
+.le-consequence-inspector__section h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.le-consequence-inspector__section ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.le-consequence-inspector__section li {
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.le-consequence-inspector__items {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.le-consequence-inspector__item {
+  border-left: 1px solid rgba(148, 163, 184, 0.2);
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  padding: 0.2rem 0.1rem 0.2rem 0.65rem;
+}
+
+.le-consequence-inspector__item-title {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.le-consequence-inspector__outcome {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+@keyframes le-causal-flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -30;
+  }
+}
+
+@keyframes le-causal-pulse {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes le-causal-heartbeat {
+  0%,
+  100% {
+    stroke-width: 1.7;
+  }
+  50% {
+    stroke-width: 2.2;
+  }
+}
+
+@keyframes le-dependency-shimmer {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 22;
+  }
+}
+
+@keyframes le-dependency-flicker {
+  0%,
+  100% {
+    opacity: 0.86;
+  }
+  45% {
+    opacity: 0.58;
+  }
+  55% {
+    opacity: 0.94;
+  }
+}
+
+@keyframes le-primary-node-breathe {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+}
+
+@keyframes le-future-drift {
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% + 2px));
+  }
+}
+
 /* —— Node cards —— */
 .le-node-card {
   border-radius: var(--radius);
@@ -838,6 +1735,37 @@ a.btn:focus-visible,
 
 /* —— Mobile —— */
 @media (max-width: 768px) {
+  .le-galaxy-hud {
+    right: 0.65rem;
+    left: 0.65rem;
+    width: auto;
+    max-height: min(46vh, 360px);
+    bottom: 0.65rem;
+    top: auto;
+  }
+
+  .le-galaxy-hud--explorer {
+    left: 0.65rem;
+    right: 0.65rem;
+    bottom: auto;
+    top: calc(var(--atlas-hud-height, 72px) + 0.65rem);
+    max-height: min(38vh, 320px);
+  }
+
+  .le-consequence-map {
+    grid-template-columns: 1fr;
+  }
+
+  .le-consequence-map__canvas {
+    min-height: 360px;
+  }
+
+  .le-consequence-node {
+    min-width: 110px;
+    max-width: 150px;
+    padding: 0.45rem 0.55rem;
+  }
+
   .le-breakdown {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -877,6 +1805,22 @@ a.btn:focus-visible,
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .le-galaxy-orbit,
+  .le-galaxy-viewport__stage::before,
+  .le-galaxy-viewport .le-consequence-node--core .le-consequence-node__orb,
+  .le-galaxy-viewport .le-consequence-node.is-primary-recommended .le-consequence-node__orb {
+    animation: none !important;
+  }
+
+  .le-consequence-map__edge,
+  .le-consequence-node,
+  .le-consequence-node.is-primary-recommended,
+  .le-consequence-node--future {
+    animation: none !important;
+  }
+
+  .le-consequence-map__edge,
+  .le-consequence-node,
   .le-hero__cta,
   .le-node-card--action,
   .le-contextual-panel,

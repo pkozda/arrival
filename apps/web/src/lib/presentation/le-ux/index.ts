@@ -10,7 +10,6 @@ export type {
 export {
   assertNoDuplicateWireframeNodes,
   buildHomeInsightContent,
-  buildModuleInsightContent,
   collectWireframeNodeIds,
   hasHomeInsightContent,
 } from './home-wireframe';
@@ -23,6 +22,8 @@ export { leBadgeClass, leConfidenceClass, leSeverityClass } from './severity';
 export { LE_UX_BREAKDOWN_GRID, LE_UX_SECTION_STYLE, LE_UX_SPACE } from './wireframe-tokens';
 
 export { ActionBreakdownBlock } from './components/ActionBreakdownBlock';
+export { GalaxyGraphInspectorBridge } from './components/GalaxyGraphInspectorBridge';
+export { GalaxyViewport } from './components/GalaxyViewport';
 export { HeaderContextBlock } from './components/HeaderContextBlock';
 export { HeroActionBlock } from './components/HeroActionBlock';
 export { HomeLifeEventWireframe } from './components/HomeLifeEventWireframe';
