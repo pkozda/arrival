@@ -51,6 +51,27 @@ describe('buildProfileGalaxyGraph', () => {
     ).toBe(true);
   });
 
+  it('marks a complete primary focus domain as completed instead of recommended', () => {
+    const fixture = CLASSIFIER_FIXTURES[0]!;
+    const profile = fixture.userContext.profile;
+
+    const { graphNodes } = buildProfileGalaxyGraph({
+      uiSnapshot: TEST_SNAPSHOT,
+      modules: [],
+      profile,
+      profileInsights: null,
+    });
+
+    graphNodes
+      .filter((node) => node.id !== '__journey__')
+      .forEach((node) => {
+        const payload = node.payload as { domain: { status: string } } | null;
+        if (payload?.domain.status === 'complete') {
+          expect(node.status).toBe('completed');
+        }
+      });
+  });
+
   it('does not emit duplicate dependency edge ids', () => {
     const fixture = ECONOMIC_FIXTURES.find((entry) => entry.id === 'EF03')!;
     const profile = fixture.userContext.profile;

@@ -45,8 +45,13 @@ function pickPrimaryFocus(
   domains: ProfileMirrorDomain[],
   profileInsights?: ProfileInsightViewV1 | null
 ): ProfileMirrorDomainSlug | null {
+  const isActionable = (slug: ProfileMirrorDomainSlug) => {
+    const domain = domains.find((entry) => entry.slug === slug);
+    return Boolean(domain && domain.status !== 'complete');
+  };
+
   const hintSlug = profileInsights?.missingContext[0]?.mirrorSlug;
-  if (hintSlug && isProfileMirrorDomainSlug(hintSlug)) {
+  if (hintSlug && isProfileMirrorDomainSlug(hintSlug) && isActionable(hintSlug)) {
     return hintSlug;
   }
 
@@ -60,7 +65,7 @@ function pickPrimaryFocus(
     return notAdded.slug;
   }
 
-  return domains[0]?.slug ?? null;
+  return domains.find((domain) => domain.status !== 'complete')?.slug ?? null;
 }
 
 function isUpstreamIncomplete(
@@ -75,11 +80,11 @@ function domainGalaxyStatus(
   domain: ProfileMirrorDomain,
   isPrimaryFocus: boolean
 ): GalaxyNodeState {
-  if (isPrimaryFocus) {
-    return 'recommended';
-  }
   if (domain.status === 'complete') {
     return 'completed';
+  }
+  if (isPrimaryFocus) {
+    return 'recommended';
   }
   if (domain.status === 'needs_attention') {
     return 'blocked';

@@ -30,12 +30,22 @@ export {
   assignDependencyEdgeCurvatureOffsets,
   buildIncomingDependencyMap,
   computeLockedNodeIds,
+  computeVisibleDependencyEdgeIds,
   getUnsatisfiedDependencySources,
   isDependencyEdgeSatisfied,
   isNodeLockedByDependencies,
   isPrerequisiteSatisfied,
   JOURNEY_NODE_ID,
+  resolvePlanetScaleTier,
+  type PlanetScaleTier,
 } from './galaxy-dependencies';
+export {
+  computeGravityField,
+  GRAVITY_MAX_OFFSET_PX,
+  resolveDependencyWeight,
+  type EdgeGravityState,
+  type NodeGravityState,
+} from './galaxy-gravity';
 export {
   GalaxyInspectorContext,
   GalaxyInspectorEmpty,

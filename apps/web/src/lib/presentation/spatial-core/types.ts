@@ -1,3 +1,5 @@
+import type { PlanetScaleTier } from './galaxy-dependencies';
+
 export type GalaxyNodeState = 'completed' | 'recommended' | 'blocked' | 'future' | 'core';
 
 export type GalaxyEdgeType = 'unlock' | 'dependency';
@@ -15,6 +17,8 @@ export type SpatialGraphEdge = {
   from: string;
   to: string;
   type: GalaxyEdgeType;
+  /** Dependency pull strength (0.1–1.0). Defaults to 0.5 */
+  weight?: number;
 };
 
 export type GalaxyOrbitRing = {
@@ -34,7 +38,19 @@ export type GalaxyNodeVisualState = {
   isPrimaryRecommended: boolean;
   isLocked: boolean;
   isDependencySourceHighlight: boolean;
+  scaleTier: PlanetScaleTier;
+  isGravitySourceActive: boolean;
+  isGravityTargetPulled: boolean;
+  gravityOffsetX: number;
+  gravityOffsetY: number;
+  gravityPullIntensity: number;
+  isGuideHighlighted: boolean;
+  isGuideDimmed: boolean;
+  isRoutePreview: boolean;
+  isDiscoveryUnlock: boolean;
 };
+
+export type { PlanetScaleTier };
 
 export type GalaxyEdgeVisualState = {
   isHighlighted: boolean;
@@ -46,6 +62,14 @@ export type GalaxyEdgeVisualState = {
   isLocked: boolean;
   isFlowHighlighted: boolean;
   isDimmed: boolean;
+  isVisible: boolean;
+  isSelectionActive: boolean;
+  isSelectionInactive: boolean;
+  isGravityActive: boolean;
+  gravityIntensity: number;
+  gravityWeight: number;
+  isRoutePreview: boolean;
+  isGuideDimmed: boolean;
 };
 
 export type GalaxyInspectorSelection<TPayload> = {

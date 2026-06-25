@@ -19,6 +19,7 @@ import {
   useGalaxyGraphModel,
   useGalaxyProgressReporter,
 } from '@/lib/presentation/spatial-core';
+import { useJourneyGuideReporter } from '@/lib/journey-guide';
 import {
   GalaxyInspectorContext,
   GalaxyInspectorEmpty,
@@ -76,6 +77,28 @@ export function ProfileGalaxyBridge({
   useGalaxyProgressReporter({
     graphNodes: model.graphNodes,
     selectedNodeId: model.selectedNodeId,
+  });
+
+  const nodeTitles = useMemo(() => {
+    const titles: Record<string, string> = {};
+    model.graphNodes.forEach((node) => {
+      if (node.id === '__journey__') {
+        titles[node.id] = 'Your situation';
+        return;
+      }
+      titles[node.id] = node.payload?.domain.title ?? node.id;
+    });
+    return titles;
+  }, [model.graphNodes]);
+
+  useJourneyGuideReporter({
+    surfaceId: 'profile-galaxy',
+    graphNodes: model.graphNodes,
+    graphEdges: model.graphEdges,
+    lockedNodeIds: model.lockedNodeIds,
+    selectedNodeId: model.selectedNodeId,
+    nodeTitles,
+    onSelectNode: model.setSelectedNodeId,
   });
 
   useEffect(() => {

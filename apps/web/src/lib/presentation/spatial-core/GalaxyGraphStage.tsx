@@ -1,13 +1,17 @@
 'use client';
 
 import { memo, useCallback, useContext, useMemo, useState } from 'react';
+import { useOptionalJourneyGuideContext } from '@/lib/journey-guide/JourneyGuideProvider';
 import {
   assignDependencyEdgeCurvatureOffsets,
   buildIncomingDependencyMap,
+  computeVisibleDependencyEdgeIds,
   getUnsatisfiedDependencySources,
   isDependencyEdgeSatisfied,
   JOURNEY_NODE_ID,
+  resolvePlanetScaleTier,
 } from './galaxy-dependencies';
+import { computeGravityField } from './galaxy-gravity';
 import { GALAXY_CENTER, GALAXY_ORBIT_RADII, galaxyEdgePath } from './galaxy-layout';
 import { GalaxyNodeRenderer } from './GalaxyNodeRenderer';
 import { GalaxyProgressContext } from './GalaxyProgressProvider';
@@ -43,11 +47,29 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
 
   const progressState = useContext(GalaxyProgressContext)?.progress;
   const nodeStarsById = progressState?.nodeStarsById ?? {};
+  const journeyGuide = useOptionalJourneyGuideContext();
 
   const incomingDependencyMap = useMemo(() => buildIncomingDependencyMap(graphEdges), [graphEdges]);
   const dependencyCurvatureOffsets = useMemo(
     () => assignDependencyEdgeCurvatureOffsets(graphEdges),
     [graphEdges]
+  );
+
+  const visibleDependencyEdgeIds = useMemo(
+    () => computeVisibleDependencyEdgeIds(graphEdges),
+    [graphEdges]
+  );
+
+  const { nodeGravity, edgeGravity } = useMemo(
+    () =>
+      computeGravityField({
+        graphNodes,
+        graphEdges,
+        nodeById: graphNodeById,
+        incomingDependencyMap,
+        hoveredNodeId,
+      }),
+    [graphEdges, graphNodeById, graphNodes, hoveredNodeId, incomingDependencyMap]
   );
 
   const nodeContentById = useMemo(() => {
@@ -90,7 +112,7 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
   }, [graphNodeById, hoveredNodeId, incomingDependencyMap, lockedNodeIds]);
 
   const highlightedDependencyEdges = useMemo(() => {
-    if (!highlightNodeId) {
+    if (!hoveredNodeId) {
       return new Set<string>();
     }
     const edgeIds = new Set<string>();
@@ -98,15 +120,12 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
       if (edge.type !== 'dependency') {
         return;
       }
-      if (edge.from === highlightNodeId || edge.to === highlightNodeId) {
-        edgeIds.add(edge.id);
-      }
-      if (hoveredLockedSources.has(edge.from) && edge.to === hoveredNodeId) {
+      if (edge.from === hoveredNodeId || edge.to === hoveredNodeId) {
         edgeIds.add(edge.id);
       }
     });
     return edgeIds;
-  }, [graphEdges, highlightNodeId, hoveredLockedSources, hoveredNodeId]);
+  }, [graphEdges, hoveredNodeId]);
 
   const selectedOneHop = selectedNodeId
     ? neighborsByNode.get(selectedNodeId) ?? new Set<string>()
@@ -126,27 +145,55 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
     return twoHop;
   }, [neighborsByNode, selectedNodeId, selectedOneHop]);
 
-  const constrainedDownstreamNodes = useMemo(
-    () =>
-      new Set(
-        graphEdges
-          .filter(
-            (edge) =>
-              edge.type === 'dependency' &&
-              (edge.from === highlightNodeId || edge.to === highlightNodeId)
-          )
-          .map((edge) => edge.to)
-      ),
-    [graphEdges, highlightNodeId]
+  const guidedRecommendedId = journeyGuide?.guidedDimActive ? journeyGuide.recommendedNodeId : null;
+  const routePreviewNodeIds = journeyGuide?.routePreviewNodeIds ?? new Set<string>();
+  const routePreviewEdgeIds = journeyGuide?.routePreviewEdgeIds ?? new Set<string>();
+  const discoveryNodeIds = useMemo(
+    () => new Set(journeyGuide?.discovery?.nodeIds ?? []),
+    [journeyGuide?.discovery?.nodeIds]
   );
+  const lockedGuideNodeIds = useMemo(() => {
+    if (!journeyGuide?.lockedGuide) {
+      return new Set<string>();
+    }
+    return new Set([
+      journeyGuide.lockedGuide.nodeId,
+      ...journeyGuide.lockedGuide.prerequisiteIds,
+    ]);
+  }, [journeyGuide?.lockedGuide]);
 
   const getNodeVisualState = (nodeId: string): GalaxyNodeVisualState => {
+    const graphNode = graphNodeById.get(nodeId);
     const isJourneyNode = nodeId === JOURNEY_NODE_ID;
     const isSelected = nodeId === selectedNodeId;
     const isNeighbor = highlightedNeighbors.has(nodeId);
     const isHovered = hoveredNodeId === nodeId;
     const isLocked = lockedNodeIds.has(nodeId);
     const isDependencySourceHighlight = hoveredLockedSources.has(nodeId);
+    const gravity = nodeGravity.get(nodeId);
+    const scaleTier = resolvePlanetScaleTier({
+      nodeId,
+      status: graphNode?.status ?? 'future',
+      isJourneyNode,
+      isLocked,
+      primaryNodeId,
+      isSelected,
+      isHovered,
+      isNeighbor,
+    });
+
+    const isGuideHighlighted =
+      nodeId === guidedRecommendedId ||
+      routePreviewNodeIds.has(nodeId) ||
+      discoveryNodeIds.has(nodeId) ||
+      lockedGuideNodeIds.has(nodeId);
+    const isGuideDimmed =
+      Boolean(journeyGuide?.guidedDimActive || journeyGuide?.showWelcome) &&
+      !isJourneyNode &&
+      !isGuideHighlighted &&
+      !isSelected;
+    const isRoutePreview = routePreviewNodeIds.has(nodeId);
+    const isDiscoveryUnlock = discoveryNodeIds.has(nodeId);
 
     return {
       isJourneyNode,
@@ -155,58 +202,72 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
       isHovered,
       isLocked,
       isDependencySourceHighlight,
+      scaleTier,
+      isGravitySourceActive: gravity?.isSourceActive ?? false,
+      isGravityTargetPulled: gravity?.isTargetPulled ?? false,
+      gravityOffsetX: gravity?.offsetX ?? 0,
+      gravityOffsetY: gravity?.offsetY ?? 0,
+      gravityPullIntensity: gravity?.pullIntensity ?? 0,
       isDimmed:
         !isJourneyNode &&
         highlightNodeId != null &&
         !isSelected &&
         highlightNodeId !== nodeId &&
         !isNeighbor &&
-        !isDependencySourceHighlight,
-      isConstrainedDownstream:
-        !isJourneyNode &&
-        highlightNodeId != null &&
-        constrainedDownstreamNodes.has(nodeId) &&
-        nodeId !== highlightNodeId,
+        !isDependencySourceHighlight &&
+        !(gravity?.isSourceActive ?? false),
+      isConstrainedDownstream: false,
       isOneHopActive: selectedNodeId != null && selectedOneHop.has(nodeId),
-      isTwoHopDim: !isJourneyNode && selectedNodeId != null && selectedTwoHop.has(nodeId),
-      isPrimaryRecommended: nodeId === primaryNodeId && graphNodeById.get(nodeId)?.status === 'recommended',
+      isTwoHopDim: false,
+      isPrimaryRecommended: nodeId === primaryNodeId && graphNode?.status === 'recommended',
+      isGuideHighlighted,
+      isGuideDimmed,
+      isRoutePreview,
+      isDiscoveryUnlock,
     };
   };
 
   const getEdgeVisualState = (edge: SpatialGraphEdge): GalaxyEdgeVisualState => {
     const isDependency = edge.type === 'dependency';
     const isSatisfied = isDependencyEdgeSatisfied(edge, graphNodeById);
-    const isLocked = isDependency && !isSatisfied;
-    const isFlowHighlighted = highlightedDependencyEdges.has(edge.id);
+    const isLockedEdge = isDependency && !isSatisfied;
+    const gravity = edgeGravity.get(edge.id);
+    const isVisible = !isDependency || visibleDependencyEdgeIds.has(edge.id);
+    const isFlowHighlighted = isDependency && highlightedDependencyEdges.has(edge.id);
     const isHighlighted =
       isFlowHighlighted ||
-      (highlightNodeId != null &&
-        (edge.from === highlightNodeId ||
-          edge.to === highlightNodeId ||
-          (highlightedNeighbors.has(edge.from) && highlightedNeighbors.has(edge.to))));
+      (hoveredNodeId != null &&
+        isDependency &&
+        (edge.from === hoveredNodeId || edge.to === hoveredNodeId));
+
+    const touchesSelection =
+      selectedNodeId != null && (edge.from === selectedNodeId || edge.to === selectedNodeId);
+
+    const isRoutePreview = routePreviewEdgeIds.has(edge.id);
+    const isGuideDimmed =
+      Boolean(journeyGuide?.guidedDimActive || journeyGuide?.routePreview || journeyGuide?.showWelcome) &&
+      !isRoutePreview &&
+      !isHighlighted &&
+      !touchesSelection;
 
     return {
       isHighlighted,
       isCausalUnlock: isHighlighted && edge.type === 'unlock',
       isCausalDependency: isHighlighted && isDependency,
-      isSelectionContext:
-        selectedNodeId != null &&
-        (edge.from === selectedNodeId ||
-          edge.to === selectedNodeId ||
-          (selectedOneHop.has(edge.from) && selectedOneHop.has(edge.to))),
-      isPrimaryPulse:
-        edge.type === 'unlock' &&
-        primaryNodeId != null &&
-        selectedNodeId === primaryNodeId &&
-        edge.from === selectedNodeId,
+      isSelectionContext: touchesSelection,
+      isPrimaryPulse: false,
       isSatisfied,
-      isLocked,
+      isLocked: isLockedEdge,
       isFlowHighlighted,
-      isDimmed:
-        highlightNodeId != null &&
-        !isHighlighted &&
-        !isFlowHighlighted &&
-        isDependency,
+      isVisible,
+      isSelectionActive: touchesSelection,
+      isSelectionInactive: selectedNodeId != null && !touchesSelection,
+      isGravityActive: gravity?.isActive ?? false,
+      gravityIntensity: gravity?.intensity ?? 0,
+      gravityWeight: gravity?.weight ?? 0.5,
+      isDimmed: isGuideDimmed,
+      isRoutePreview,
+      isGuideDimmed,
     };
   };
 
@@ -214,14 +275,22 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
     setHoveredNodeId(nodeId === JOURNEY_NODE_ID ? null : nodeId);
   }, []);
 
+  const guideFocusActive = Boolean(journeyGuide?.ambientDimActive);
+
   return (
     <div
-      className={`le-galaxy-viewport__stage${isRebalancing ? ' is-rebalancing' : ''}`}
+      className={`le-galaxy-viewport__stage${isRebalancing ? ' is-rebalancing' : ''}${
+        journeyGuide?.showWelcome ? ' is-guide-welcome' : ''
+      }${journeyGuide?.guidedDimActive ? ' is-guide-guided' : ''}${
+        journeyGuide?.routePreview ? ' is-guide-route-preview' : ''
+      }${guideFocusActive ? ' is-guide-focus' : ''}`}
       role="listbox"
       aria-label="Consequence graph nodes"
       tabIndex={0}
       onKeyDown={onGraphKeyDown}
     >
+      {guideFocusActive && <div className="journey-guide-stage-veil" aria-hidden="true" />}
+
       <svg
         className="le-galaxy-viewport__orbits"
         viewBox="0 0 100 100"
@@ -247,33 +316,33 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
             viewBox="0 0 10 10"
             refX="8.5"
             refY="5"
-            markerWidth="4"
-            markerHeight="4"
+            markerWidth="4.2"
+            markerHeight="4.2"
             orient="auto"
           >
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(120, 140, 255, 0.75)" />
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(150, 172, 255, 0.88)" />
           </marker>
           <marker
             id="galaxy-dep-arrow-locked"
             viewBox="0 0 10 10"
             refX="8.5"
             refY="5"
-            markerWidth="4"
-            markerHeight="4"
+            markerWidth="4.2"
+            markerHeight="4.2"
             orient="auto"
           >
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(140, 140, 140, 0.45)" />
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(182, 188, 210, 0.8)" />
           </marker>
           <marker
-            id="galaxy-dep-arrow-flow"
+            id="galaxy-dep-arrow-hover"
             viewBox="0 0 10 10"
             refX="8.5"
             refY="5"
-            markerWidth="4.5"
-            markerHeight="4.5"
+            markerWidth="4.6"
+            markerHeight="4.6"
             orient="auto"
           >
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(150, 170, 255, 0.95)" />
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(168, 188, 255, 0.92)" />
           </marker>
         </defs>
 
@@ -283,11 +352,16 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
           if (!from || !to) return null;
 
           const visual = getEdgeVisualState(edge);
+          if (edge.type === 'dependency' && !visual.isVisible) {
+            return null;
+          }
+
           const curvatureOffset = dependencyCurvatureOffsets.get(edge.id) ?? 0;
+          const pathD = galaxyEdgePath(from, to, curvatureOffset);
           const markerEnd =
             edge.type === 'dependency'
               ? visual.isFlowHighlighted
-                ? 'url(#galaxy-dep-arrow-flow)'
+                ? 'url(#galaxy-dep-arrow-hover)'
                 : visual.isLocked
                   ? 'url(#galaxy-dep-arrow-locked)'
                   : 'url(#galaxy-dep-arrow-active)'
@@ -296,19 +370,21 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
           return (
             <path
               key={edge.id}
-              d={galaxyEdgePath(from, to, curvatureOffset)}
+              d={pathD}
               fill="none"
               markerEnd={markerEnd}
               className={`le-consequence-map__edge le-consequence-map__edge--${edge.type}${
                 visual.isHighlighted ? ' is-highlighted' : ''
               }${visual.isCausalUnlock ? ' is-causal-unlock' : ''}${
                 visual.isCausalDependency ? ' is-causal-dependency' : ''
-              }${visual.isSelectionContext ? ' is-selection-context' : ''}${
-                visual.isPrimaryPulse ? ' is-primary-pulse' : ''
               }${visual.isSatisfied ? ' is-satisfied' : ''}${
                 visual.isLocked ? ' is-locked' : ''
               }${visual.isFlowHighlighted ? ' is-flow-highlighted' : ''}${
-                visual.isDimmed ? ' is-dimmed' : ''
+                visual.isGravityActive ? ' is-gravity-active' : ''
+              }${visual.isSelectionActive ? ' is-selection-active' : ''}${
+                visual.isSelectionInactive ? ' is-selection-inactive' : ''
+              }${visual.isRoutePreview ? ' is-route-preview' : ''}${
+                visual.isGuideDimmed ? ' is-guide-dimmed' : ''
               }`}
             >
               <title>{edge.type === 'unlock' ? 'Unlock' : 'Dependency'}</title>
@@ -335,6 +411,7 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
             visual={visual}
             onHover={setHoveredNode}
             onSelect={setSelectedNodeId}
+            onLockedSelect={journeyGuide?.handleLockedNodeSelect}
           />
         );
       })}
