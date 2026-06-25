@@ -32,6 +32,8 @@ export type GalaxyNodeVisualState = {
   isOneHopActive: boolean;
   isTwoHopDim: boolean;
   isPrimaryRecommended: boolean;
+  isLocked: boolean;
+  isDependencySourceHighlight: boolean;
 };
 
 export type GalaxyEdgeVisualState = {
@@ -40,6 +42,10 @@ export type GalaxyEdgeVisualState = {
   isCausalDependency: boolean;
   isSelectionContext: boolean;
   isPrimaryPulse: boolean;
+  isSatisfied: boolean;
+  isLocked: boolean;
+  isFlowHighlighted: boolean;
+  isDimmed: boolean;
 };
 
 export type GalaxyInspectorSelection<TPayload> = {

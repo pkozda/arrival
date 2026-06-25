@@ -56,7 +56,7 @@ describe('EP-9 UI surface contract', () => {
 
   it('page module does not import EP-1–EP-6 engine functions', () => {
     const pageSource = readFileSync(
-      join(webModulesRoot, 'app/modules/economic-reality/page.tsx'),
+      join(webModulesRoot, 'app/(destinations)/modules/economic-reality/page.tsx'),
       'utf8'
     );
     expect(pageSource).toContain('useEconomicRealityPlan');

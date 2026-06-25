@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, type KeyboardEvent } from 'react';
+import { computeLockedNodeIds } from './galaxy-dependencies';
 import type { GalaxyInspectorSelection, SpatialGraphEdge, SpatialGraphNode } from './types';
 
 const JOURNEY_NODE_ID = '__journey__';
@@ -8,6 +9,7 @@ const JOURNEY_NODE_ID = '__journey__';
 type Input<TPayload> = {
   graphNodes: SpatialGraphNode<TPayload>[];
   graphEdges: SpatialGraphEdge[];
+  initialSelectedNodeId?: string | null;
 };
 
 function buildNeighborMap(edges: SpatialGraphEdge[]): Map<string, Set<string>> {
@@ -21,27 +23,49 @@ function buildNeighborMap(edges: SpatialGraphEdge[]): Map<string, Set<string>> {
   return map;
 }
 
-export function useGalaxyGraphModel<TPayload>({ graphNodes, graphEdges }: Input<TPayload>) {
+export function useGalaxyGraphModel<TPayload>({
+  graphNodes,
+  graphEdges,
+  initialSelectedNodeId = null,
+}: Input<TPayload>) {
   const graphNodeById = useMemo(
     () => new Map(graphNodes.map((node) => [node.id, node])),
     [graphNodes]
   );
 
+  const lockedNodeIds = useMemo(
+    () => computeLockedNodeIds(graphNodes, graphEdges),
+    [graphNodes, graphEdges]
+  );
+
   const selectableNodeIds = useMemo(
-    () => graphNodes.filter((node) => node.id !== JOURNEY_NODE_ID).map((node) => node.id),
-    [graphNodes]
+    () =>
+      graphNodes
+        .filter((node) => node.id !== JOURNEY_NODE_ID && !lockedNodeIds.has(node.id))
+        .map((node) => node.id),
+    [graphNodes, lockedNodeIds]
   );
 
   const neighborsByNode = useMemo(() => buildNeighborMap(graphEdges), [graphEdges]);
 
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(selectableNodeIds[0] ?? null);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(() => {
+    if (initialSelectedNodeId && graphNodes.some((node) => node.id === initialSelectedNodeId)) {
+      return initialSelectedNodeId;
+    }
+    const selectable = graphNodes.filter((node) => node.id !== JOURNEY_NODE_ID).map((node) => node.id);
+    return selectable[0] ?? null;
+  });
   const [isRebalancing, setIsRebalancing] = useState(false);
 
   useEffect(() => {
+    if (initialSelectedNodeId && selectableNodeIds.includes(initialSelectedNodeId)) {
+      setSelectedNodeId(initialSelectedNodeId);
+      return;
+    }
     if (!selectedNodeId || !selectableNodeIds.includes(selectedNodeId)) {
       setSelectedNodeId(selectableNodeIds[0] ?? null);
     }
-  }, [selectableNodeIds, selectedNodeId]);
+  }, [initialSelectedNodeId, selectableNodeIds, selectedNodeId]);
 
   useEffect(() => {
     if (!selectedNodeId) return;
@@ -90,6 +114,7 @@ export function useGalaxyGraphModel<TPayload>({ graphNodes, graphEdges }: Input<
     graphEdges,
     graphNodeById,
     neighborsByNode,
+    lockedNodeIds,
     selectableNodeIds,
     selectedNodeId,
     setSelectedNodeId,

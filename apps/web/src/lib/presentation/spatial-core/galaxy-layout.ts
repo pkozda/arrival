@@ -211,14 +211,15 @@ export function layoutGalaxyGraphNodes<TPayload>({
 
 export function galaxyEdgePath(
   from: { x: number; y: number },
-  to: { x: number; y: number }
+  to: { x: number; y: number },
+  curvatureOffset = 0
 ): string {
   const midX = (from.x + to.x) / 2;
   const midY = (from.y + to.y) / 2;
   const dx = to.x - from.x;
   const dy = to.y - from.y;
   const distance = Math.hypot(dx, dy) || 1;
-  const bend = Math.min(distance * 0.22, 9);
+  const bend = Math.min(distance * 0.22, 9) + curvatureOffset;
   const controlX = midX + (-dy / distance) * bend;
   const controlY = midY + (dx / distance) * bend;
   return `M ${from.x} ${from.y} Q ${controlX} ${controlY} ${to.x} ${to.y}`;

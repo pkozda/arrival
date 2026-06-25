@@ -10,6 +10,7 @@ import { useEconomicFeedbackTracker } from '@/lib/economic-reality/useEconomicFe
 import { SurfaceErrorPanel } from '@/components/surface/SurfaceErrorPanel';
 import { SurfaceLoadingSkeleton } from '@/components/surface/SurfaceLoadingSkeleton';
 import { useSurfaceRetry } from '@/components/surface/useSurfaceRetry';
+import { EconomicRealityGalaxyBridge } from './EconomicRealityGalaxyBridge';
 import { HighlightPanel } from './components/HighlightPanel';
 import { SystemBanner } from './components/SystemBanner';
 import {
@@ -47,7 +48,11 @@ export function EconomicRealityPage({ mode, state, showDebug = false, onRetry }:
   }, [state.presentation]);
 
   if (state.loading || retrying) {
-    return (
+    return mode === 'full' ? (
+      <div className="le-galaxy-viewport__overlay">
+        <SurfaceLoadingSkeleton />
+      </div>
+    ) : (
       <AtlasSurface data-ui-surface="economic-reality-module-body">
         <SurfaceLoadingSkeleton />
       </AtlasSurface>
@@ -55,7 +60,17 @@ export function EconomicRealityPage({ mode, state, showDebug = false, onRetry }:
   }
 
   if (state.error) {
-    return (
+    return mode === 'full' ? (
+      <div className="le-galaxy-viewport__overlay">
+        <SurfaceErrorPanel
+          message={copy(state.error)}
+          onRetry={handleRetry}
+          retrying={retrying}
+          title={copy(ER_COPY_KEYS.UI_ERROR)}
+          retryLabel={t('common.retry')}
+        />
+      </div>
+    ) : (
       <AtlasSurface data-ui-surface="economic-reality-module-body">
         <SurfaceErrorPanel
           message={copy(state.error)}
@@ -69,10 +84,41 @@ export function EconomicRealityPage({ mode, state, showDebug = false, onRetry }:
   }
 
   if (!state.presentation) {
-    return (
+    return mode === 'full' ? (
+      <div className="le-galaxy-viewport__overlay le-galaxy-viewport__overlay--message">
+        {copy(ER_COPY_KEYS.UI_NOT_AVAILABLE)}
+      </div>
+    ) : (
       <AtlasSurface className="text-body text-body--muted">
         {copy(ER_COPY_KEYS.UI_NOT_AVAILABLE)}
       </AtlasSurface>
+    );
+  }
+
+  if (mode === 'full') {
+    return (
+      <div data-ui-surface="economic-reality-module-body">
+        <EconomicRealityGalaxyBridge presentation={state.presentation} sections={sections} />
+
+        {showDebug && state.plan && (
+          <details className="le-galaxy-hud le-galaxy-hud--explorer">
+            <summary className="le-galaxy-hud__explorer-toggle">{copy(ER_COPY_KEYS.UI_DEBUG_PLAN)}</summary>
+            <div className="le-galaxy-hud__explorer-body">
+              <pre className="text-caption" style={{ overflowX: 'auto' }}>
+                {JSON.stringify(
+                  {
+                    planId: state.plan.planId,
+                    deterministicHash: state.deterministicHash,
+                    graphId: state.plan.graphId,
+                  },
+                  null,
+                  2
+                )}
+              </pre>
+            </div>
+          </details>
+        )}
+      </div>
     );
   }
 
@@ -93,25 +139,6 @@ export function EconomicRealityPage({ mode, state, showDebug = false, onRetry }:
       })}
 
       <SystemBanner highlights={state.presentation.systemHighlights} />
-
-      {showDebug && state.plan && (
-        <AtlasSurface as="details" className="mt-md" style={{ padding: '1rem' }}>
-          <summary className="text-section-title--sm" style={{ cursor: 'pointer' }}>
-            {copy(ER_COPY_KEYS.UI_DEBUG_PLAN)}
-          </summary>
-          <pre className="text-caption" style={{ marginTop: '0.75rem', overflowX: 'auto' }}>
-            {JSON.stringify(
-              {
-                planId: state.plan.planId,
-                deterministicHash: state.deterministicHash,
-                graphId: state.plan.graphId,
-              },
-              null,
-              2
-            )}
-          </pre>
-        </AtlasSurface>
-      )}
     </div>
   );
 }
