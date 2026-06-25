@@ -2,27 +2,24 @@
 
 import { Suspense, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { PageHeader } from '@/components/atlas-runtime';
-import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { useApp } from '@/components/AppProvider';
 import { LifeEventPlanView } from '@/components/life-event/LifeEventPlanView';
 import { LifeEventPlanIntake } from '@/components/life-event/LifeEventPlanIntake';
 import { LifeEventScenarioExplorer } from '@/components/life-event/LifeEventScenarioExplorer';
-import { ScenarioExplorerPanel } from '@/components/life-event/ScenarioExplorerPanel';
-import { lifeEventModuleDescription, lifeEventModuleTitle } from '@/lib/life-event/content-labels';
+import { lifeEventModuleTitle } from '@/lib/life-event/content-labels';
 import { shouldShowLifeEventPlanIntake } from '@/lib/life-event/cold-start-intake';
 import { resolveScenario } from '@/lib/life-event/scenarios';
 import { defaultScenarioExplorerOpen } from '@/lib/presentation/home-p0';
 import { hasUserContextProfile } from '@/lib/user-context';
-import { WireframeSkeleton } from '@/lib/presentation/le-ux';
+import { GalaxyViewport, WireframeSkeleton } from '@/lib/presentation/le-ux';
 import { SurfaceErrorPanel } from '@/components/surface/SurfaceErrorPanel';
 import { useSurfaceRetry } from '@/components/surface/useSurfaceRetry';
 
-function LoadingState() {
+function GalaxyLoadingOverlay() {
   return (
-    <AtlasSurface className="le-plan-card">
+    <div className="le-galaxy-viewport__overlay">
       <WireframeSkeleton />
-    </AtlasSurface>
+    </div>
   );
 }
 
@@ -43,6 +40,7 @@ function LifeEventModulePageContent() {
   const contract = modules.find((module) => module.id === 'life-event');
   const initialScenarioEvent = searchParams.get('event') ?? undefined;
   const scenariosMode = searchParams.get('mode') === 'scenarios';
+  const moduleLabel = contract ? lifeEventModuleTitle(t, contract.title) : 'Life Events';
 
   const scenarioMatch = useMemo(() => {
     if (!lifeEventPlan || !userContext) {
@@ -82,34 +80,30 @@ function LifeEventModulePageContent() {
 
   if (modulesLoading) {
     return (
-      <AtlasSurface className="text-center" style={{ padding: '2rem' }}>
-        {t('life-event.empty.loadingModule')}
-      </AtlasSurface>
+      <GalaxyViewport label={moduleLabel}>
+        <div className="le-galaxy-viewport__overlay le-galaxy-viewport__overlay--message">
+          {t('life-event.empty.loadingModule')}
+        </div>
+      </GalaxyViewport>
     );
   }
 
   if (modulesError || !contract || contract.status !== 'available') {
     return (
-      <AtlasSurface style={{ padding: '2rem' }}>
-        {modulesError ?? t('life-event.empty.moduleNotFound')}
-      </AtlasSurface>
+      <GalaxyViewport label={moduleLabel}>
+        <div className="le-galaxy-viewport__overlay le-galaxy-viewport__overlay--message">
+          {modulesError ?? t('life-event.empty.moduleNotFound')}
+        </div>
+      </GalaxyViewport>
     );
   }
 
   return (
-    <div className="le-module-page">
-      <PageHeader
-        eyebrow="Module"
-        title={lifeEventModuleTitle(t, contract.title)}
-        description={
-          contract.description ? lifeEventModuleDescription(t, contract.description) : undefined
-        }
-      />
-
-      {(lifeEventPlanLoading || retrying) && <LoadingState />}
+    <GalaxyViewport label={moduleLabel}>
+      {(lifeEventPlanLoading || retrying) && <GalaxyLoadingOverlay />}
 
       {!lifeEventPlanLoading && !retrying && lifeEventPlanError && !isProfileNotReadyPlanError && (
-        <AtlasSurface className="le-plan-card" data-ui-surface="life-event-module-body">
+        <div className="le-galaxy-viewport__overlay">
           <SurfaceErrorPanel
             message={lifeEventPlanError}
             onRetry={onRetry}
@@ -117,7 +111,7 @@ function LifeEventModulePageContent() {
             title={t('common.error')}
             retryLabel={t('common.retry')}
           />
-        </AtlasSurface>
+        </div>
       )}
 
       {!lifeEventPlanLoading && !retrying && lifeEventPlan && (
@@ -129,25 +123,31 @@ function LifeEventModulePageContent() {
         />
       )}
 
-      {showPlanIntakeForm && <LifeEventPlanIntake />}
-
-      {!showPlanIntakeForm && !lifeEventPlanLoading && !retrying && !lifeEventPlan && !lifeEventPlanError && scenarioExplorer && (
-        <ScenarioExplorerPanel defaultOpen={explorerDefaultOpen}>
-          {scenarioExplorer}
-        </ScenarioExplorerPanel>
+      {showPlanIntakeForm && (
+        <div className="le-galaxy-viewport__overlay le-galaxy-viewport__overlay--intake">
+          <LifeEventPlanIntake />
+        </div>
       )}
-    </div>
+
+      {!showPlanIntakeForm &&
+        !lifeEventPlanLoading &&
+        !retrying &&
+        !lifeEventPlan &&
+        !lifeEventPlanError &&
+        scenarioExplorer && (
+          <details className="le-galaxy-hud le-galaxy-hud--explorer" open={explorerDefaultOpen}>
+            <summary className="le-galaxy-hud__explorer-toggle">Scenarios</summary>
+            <div className="le-galaxy-hud__explorer-body">{scenarioExplorer}</div>
+          </details>
+        )}
+    </GalaxyViewport>
   );
 }
 
 export default function LifeEventModulePage() {
   return (
-    <main className="celestial-page-main">
-      <div className="container">
-        <Suspense fallback={<LoadingState />}>
-          <LifeEventModulePageContent />
-        </Suspense>
-      </div>
-    </main>
+    <Suspense fallback={<GalaxyViewport label="Life Events"><GalaxyLoadingOverlay /></GalaxyViewport>}>
+      <LifeEventModulePageContent />
+    </Suspense>
   );
 }

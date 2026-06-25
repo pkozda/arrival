@@ -42,11 +42,14 @@ export function LifeEventWireframeLayout({
       />
 
       <ActionBreakdownBlock
+        plan={plan}
+        primaryAction={surface.primaryAction}
         secondaryActions={surface.secondaryActions}
         blockedActions={surface.blockedActions}
         contextualActions={surface.contextualActions}
         isNodeDisabled={isNodeDisabled}
         contextualDefaultOpen={contextualDefaultOpen}
+        variant={variant}
       />
 
       <InsightBlock variant={variant} {...insight} />
