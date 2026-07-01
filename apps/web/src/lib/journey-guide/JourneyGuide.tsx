@@ -86,3 +86,21 @@ export function JourneyGuideFloatingButton({ onClick, label = 'Journey Guide' }:
     </button>
   );
 }
+
+type CinematicDiscoveryOverlayProps = {
+  title: string;
+  destinations: string[];
+};
+
+export function CinematicDiscoveryOverlay({ title, destinations }: CinematicDiscoveryOverlayProps) {
+  return (
+    <div className="cinematic-discovery-overlay" role="status" aria-live="polite">
+      <p className="cinematic-discovery-overlay__title">{title}</p>
+      <ul className="cinematic-discovery-overlay__list">
+        {destinations.map((destination) => (
+          <li key={destination}>{destination}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}

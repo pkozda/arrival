@@ -2,7 +2,6 @@
 
 import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/atlas-runtime';
 import { AtlasSurface } from '@/components/atlas-runtime/legacy';
 import { useApp } from '@/components/AppProvider';
@@ -19,10 +18,8 @@ type Props = {
 };
 
 export function ProfileDomainDetail({ domainSlug }: Props) {
-  const searchParams = useSearchParams();
   const { uiSnapshot, userContext, profileInsights, modules } = useApp();
   const profile = selectUserContextProfile(userContext);
-  const showUpdatedToast = searchParams.get('updated') === '1';
 
   const domain = useMemo(
     () =>
@@ -52,7 +49,7 @@ export function ProfileDomainDetail({ domainSlug }: Props) {
 
   return (
     <>
-      {showUpdatedToast && <ProfileCorrectionToast />}
+      <ProfileCorrectionToast />
 
       <PageHeader
         eyebrow="Profile"

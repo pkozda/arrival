@@ -148,10 +148,10 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
   const guidedRecommendedId = journeyGuide?.guidedDimActive ? journeyGuide.recommendedNodeId : null;
   const routePreviewNodeIds = journeyGuide?.routePreviewNodeIds ?? new Set<string>();
   const routePreviewEdgeIds = journeyGuide?.routePreviewEdgeIds ?? new Set<string>();
-  const discoveryNodeIds = useMemo(
-    () => new Set(journeyGuide?.discovery?.nodeIds ?? []),
-    [journeyGuide?.discovery?.nodeIds]
-  );
+  const cinematicUnlock = journeyGuide?.cinematicUnlock ?? null;
+  const cinematicRouteNodeIds = journeyGuide?.cinematicRouteNodeIds ?? new Set<string>();
+  const cinematicRouteEdgeIds = journeyGuide?.cinematicRouteEdgeIds ?? new Set<string>();
+  const cinematicEmergenceNodeIds = journeyGuide?.cinematicEmergenceNodeIds ?? new Set<string>();
   const lockedGuideNodeIds = useMemo(() => {
     if (!journeyGuide?.lockedGuide) {
       return new Set<string>();
@@ -182,18 +182,35 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
       isNeighbor,
     });
 
+    const isCinematicActive = Boolean(cinematicUnlock);
+    const isCinematicCompletion =
+      isCinematicActive &&
+      cinematicUnlock?.phase === 'completion' &&
+      nodeId === cinematicUnlock.sourceNodeId;
+    const isCinematicRoute = cinematicRouteNodeIds.has(nodeId);
+    const isCinematicEmergence = cinematicEmergenceNodeIds.has(nodeId);
+    const isCinematicEmerging =
+      isCinematicEmergence &&
+      cinematicUnlock?.newlyUnlockedNodeIds[cinematicUnlock.emergenceProgress - 1] === nodeId;
+
     const isGuideHighlighted =
       nodeId === guidedRecommendedId ||
       routePreviewNodeIds.has(nodeId) ||
-      discoveryNodeIds.has(nodeId) ||
+      isCinematicRoute ||
+      isCinematicEmergence ||
+      isCinematicCompletion ||
       lockedGuideNodeIds.has(nodeId);
     const isGuideDimmed =
       Boolean(journeyGuide?.guidedDimActive || journeyGuide?.showWelcome) &&
       !isJourneyNode &&
       !isGuideHighlighted &&
       !isSelected;
+    const isCinematicDimmed =
+      isCinematicActive &&
+      !isJourneyNode &&
+      !isGuideHighlighted &&
+      !isSelected;
     const isRoutePreview = routePreviewNodeIds.has(nodeId);
-    const isDiscoveryUnlock = discoveryNodeIds.has(nodeId);
 
     return {
       isJourneyNode,
@@ -223,7 +240,12 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
       isGuideHighlighted,
       isGuideDimmed,
       isRoutePreview,
-      isDiscoveryUnlock,
+      isDiscoveryUnlock: false,
+      isCinematicCompletion,
+      isCinematicRoute,
+      isCinematicEmergence,
+      isCinematicEmerging,
+      isCinematicDimmed,
     };
   };
 
@@ -244,9 +266,19 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
       selectedNodeId != null && (edge.from === selectedNodeId || edge.to === selectedNodeId);
 
     const isRoutePreview = routePreviewEdgeIds.has(edge.id);
+    const isCinematicTraverse = cinematicRouteEdgeIds.has(edge.id);
+    const isCinematicTraversing =
+      isCinematicTraverse &&
+      cinematicUnlock?.routeSteps[cinematicUnlock.routeProgress - 1]?.edgeId === edge.id;
     const isGuideDimmed =
-      Boolean(journeyGuide?.guidedDimActive || journeyGuide?.routePreview || journeyGuide?.showWelcome) &&
+      Boolean(
+        journeyGuide?.guidedDimActive ||
+          journeyGuide?.routePreview ||
+          journeyGuide?.showWelcome ||
+          cinematicUnlock
+      ) &&
       !isRoutePreview &&
+      !isCinematicTraverse &&
       !isHighlighted &&
       !touchesSelection;
 
@@ -255,7 +287,7 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
       isCausalUnlock: isHighlighted && edge.type === 'unlock',
       isCausalDependency: isHighlighted && isDependency,
       isSelectionContext: touchesSelection,
-      isPrimaryPulse: false,
+      isPrimaryPulse: isCinematicTraversing,
       isSatisfied,
       isLocked: isLockedEdge,
       isFlowHighlighted,
@@ -268,6 +300,8 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
       isDimmed: isGuideDimmed,
       isRoutePreview,
       isGuideDimmed,
+      isCinematicTraverse,
+      isCinematicTraversing,
     };
   };
 
@@ -283,7 +317,9 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
         journeyGuide?.showWelcome ? ' is-guide-welcome' : ''
       }${journeyGuide?.guidedDimActive ? ' is-guide-guided' : ''}${
         journeyGuide?.routePreview ? ' is-guide-route-preview' : ''
-      }${guideFocusActive ? ' is-guide-focus' : ''}`}
+      }${cinematicUnlock ? ' is-cinematic-unlock' : ''}${
+        guideFocusActive ? ' is-guide-focus' : ''
+      }`}
       role="listbox"
       aria-label="Consequence graph nodes"
       tabIndex={0}
@@ -385,6 +421,8 @@ function GalaxyGraphStageComponent<TPayload>({ model, primaryNodeId = null, rend
                 visual.isSelectionInactive ? ' is-selection-inactive' : ''
               }${visual.isRoutePreview ? ' is-route-preview' : ''}${
                 visual.isGuideDimmed ? ' is-guide-dimmed' : ''
+              }${visual.isCinematicTraverse ? ' is-cinematic-traverse' : ''}${
+                visual.isCinematicTraversing ? ' is-cinematic-traversing' : ''
               }`}
             >
               <title>{edge.type === 'unlock' ? 'Unlock' : 'Dependency'}</title>

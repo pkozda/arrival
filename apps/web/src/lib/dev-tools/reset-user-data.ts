@@ -4,6 +4,7 @@ import {
   createSession,
   readStoredSessionId,
 } from '@/lib/api';
+import { JOURNEY_GUIDE_STORAGE_KEY } from '@/lib/journey-guide/storage';
 import { resetRuntimeSessionState } from '@/lib/life-event/runtime/runtime-store';
 import { ONBOARDING_DISMISS_STORAGE_KEY } from '@/lib/situation-utils';
 import type { SupportedLanguage, ThemePreference } from '@/lib/product-contract';
@@ -23,6 +24,7 @@ export function clearDevClientState(): void {
 
   try {
     localStorage.removeItem(ONBOARDING_DISMISS_STORAGE_KEY);
+    localStorage.removeItem(JOURNEY_GUIDE_STORAGE_KEY);
   } catch {
     // ignore
   }

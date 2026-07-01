@@ -19,7 +19,7 @@ function GalaxyViewportShell({
     <div
       className={`le-galaxy-viewport${guide?.ambientDimActive ? ' is-guide-focus-active' : ''}${
         guide?.routePreview ? ' is-route-preview-active' : ''
-      }`}
+      }${guide?.cinematicUnlock ? ' is-cinematic-unlock-active' : ''}`}
       data-ui-surface={surfaceId}
     >
       <div className="le-galaxy-viewport__chrome" aria-hidden="true">

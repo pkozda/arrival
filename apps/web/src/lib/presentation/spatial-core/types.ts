@@ -48,6 +48,11 @@ export type GalaxyNodeVisualState = {
   isGuideDimmed: boolean;
   isRoutePreview: boolean;
   isDiscoveryUnlock: boolean;
+  isCinematicCompletion: boolean;
+  isCinematicRoute: boolean;
+  isCinematicEmergence: boolean;
+  isCinematicEmerging: boolean;
+  isCinematicDimmed: boolean;
 };
 
 export type { PlanetScaleTier };
@@ -70,6 +75,8 @@ export type GalaxyEdgeVisualState = {
   gravityWeight: number;
   isRoutePreview: boolean;
   isGuideDimmed: boolean;
+  isCinematicTraverse: boolean;
+  isCinematicTraversing: boolean;
 };
 
 export type GalaxyInspectorSelection<TPayload> = {

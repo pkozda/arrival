@@ -11,6 +11,16 @@ import {
   type ReactNode,
 } from 'react';
 import {
+  buildOverlayTitle,
+  buildUnlockGuideMessage,
+  buildUnlockSequence,
+  CINEMATIC_TIMING,
+  findNewlyCompletedNodeIds,
+  findNewlyUnlockedNodeIds,
+  sequenceToStoredEvent,
+  storedEventToSequence,
+} from './cinematic-unlock-engine';
+import {
   buildLockedGuideState,
   buildRoutePreviewChain,
   getRecommendedNextPlanet,
@@ -19,18 +29,20 @@ import {
   deriveAssistanceStage,
   persistGuideMode,
   persistLockedClick,
+  persistUnlockEvent,
   persistWelcomeDismissed,
   readJourneyGuideState,
   writeJourneyGuideState,
 } from './storage';
 import type {
-  DiscoveryState,
+  CinematicUnlockState,
   JourneyGuideGraphSnapshot,
   JourneyGuideMode,
   JourneyGuidePersistedState,
   LockedGuideState,
   PlanetRecommendation,
   RoutePreviewState,
+  StoredUnlockEvent,
 } from './types';
 
 type JourneyGuideContextValue = {
@@ -43,7 +55,7 @@ type JourneyGuideContextValue = {
   panelDismissed: boolean;
   recommendation: PlanetRecommendation | null;
   routePreview: RoutePreviewState | null;
-  discovery: DiscoveryState | null;
+  cinematicUnlock: CinematicUnlockState | null;
   lockedGuide: LockedGuideState | null;
   guidedDimActive: boolean;
   ambientDimActive: boolean;
@@ -51,6 +63,11 @@ type JourneyGuideContextValue = {
   recommendedNodeId: string | null;
   routePreviewNodeIds: Set<string>;
   routePreviewEdgeIds: Set<string>;
+  cinematicRouteNodeIds: Set<string>;
+  cinematicRouteEdgeIds: Set<string>;
+  cinematicEmergenceNodeIds: Set<string>;
+  lastUnlockEvent: StoredUnlockEvent | null;
+  canReplayUnlock: boolean;
   setGraphSnapshot: (snapshot: JourneyGuideGraphSnapshot | null) => void;
   startGuidedJourney: () => void;
   exploreOnMyOwn: () => void;
@@ -59,6 +76,7 @@ type JourneyGuideContextValue = {
   closePanel: () => void;
   resumeGuidedJourney: () => void;
   triggerRoutePreview: (nodeId?: string) => void;
+  replayCinematicUnlock: () => void;
   handleLockedNodeSelect: (nodeId: string) => void;
   goToPrerequisite: (nodeId: string) => void;
   clearLockedGuide: () => void;
@@ -73,21 +91,48 @@ type ProviderProps = {
   surfaceId: string;
 };
 
+function createCinematicState(
+  sequence: ReturnType<typeof storedEventToSequence>,
+  isReplay: boolean
+): CinematicUnlockState {
+  const guideMessage = buildUnlockGuideMessage(sequence.sourceTitle, sequence.newlyUnlockedTitles);
+  return {
+    ...sequence,
+    phase: 'completion',
+    routeProgress: 0,
+    emergenceProgress: 0,
+    phaseStartedAt: Date.now(),
+    startedAt: Date.now(),
+    isReplay,
+    guideTitle: guideMessage.title,
+    guideBody: guideMessage.body,
+    overlayTitle: buildOverlayTitle(sequence.newlyUnlockedNodeIds.length),
+  };
+}
+
 export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
   const [persisted, setPersisted] = useState<JourneyGuidePersistedState>(() => readJourneyGuideState());
   const [graphSnapshot, setGraphSnapshotState] = useState<JourneyGuideGraphSnapshot | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [panelDismissed, setPanelDismissed] = useState(false);
   const [routePreview, setRoutePreview] = useState<RoutePreviewState | null>(null);
-  const [discovery, setDiscovery] = useState<DiscoveryState | null>(null);
+  const [cinematicUnlock, setCinematicUnlock] = useState<CinematicUnlockState | null>(null);
   const [lockedGuide, setLockedGuide] = useState<LockedGuideState | null>(null);
   const selectNodeRef = useRef<((nodeId: string) => void) | null>(null);
-  const previousUnlockedRef = useRef<Set<string>>(new Set());
+  const previousLockedRef = useRef<Set<string>>(new Set());
+  const previousCompletedRef = useRef<Set<string>>(new Set());
+  const cinematicTimersRef = useRef<number[]>([]);
 
   const mode = persisted.hasChosenMode ? persisted.mode : null;
   const assistanceStage = deriveAssistanceStage(persisted);
   const showWelcome =
     !persisted.dismissedWelcomeSurfaces.includes(surfaceId) && !persisted.hasChosenMode;
+  const lastUnlockEvent = persisted.lastUnlockEvent;
+  const canReplayUnlock = Boolean(
+    lastUnlockEvent &&
+      lastUnlockEvent.surfaceId === surfaceId &&
+      (!cinematicUnlock || cinematicUnlock.phase === 'guide')
+  );
 
   const completedNodeIds = useMemo(() => {
     if (!graphSnapshot) {
@@ -113,15 +158,33 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
     });
   }, [completedNodeIds, graphSnapshot]);
 
-  const assistantUiActive = showWelcome || panelOpen || Boolean(lockedGuide);
+  const assistantUiActive =
+    showWelcome || panelOpen || Boolean(lockedGuide) || cinematicUnlock?.phase === 'guide';
   const ambientDimActive =
-    assistantUiActive || Boolean(routePreview) || Boolean(discovery);
+    assistantUiActive || Boolean(routePreview) || Boolean(cinematicUnlock);
   const guidedDimActive =
     mode === 'guided' &&
     assistanceStage <= 2 &&
     Boolean(recommendation) &&
     panelOpen &&
-    !showWelcome;
+    !showWelcome &&
+    !cinematicUnlock;
+
+  const clearCinematicTimers = useCallback(() => {
+    cinematicTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    cinematicTimersRef.current = [];
+  }, []);
+
+  const startCinematicUnlock = useCallback(
+    (event: StoredUnlockEvent, isReplay = false) => {
+      clearCinematicTimers();
+      setRoutePreview(null);
+      setLockedGuide(null);
+      const sequence = storedEventToSequence(event);
+      setCinematicUnlock(createCinematicState(sequence, isReplay));
+    },
+    [clearCinematicTimers]
+  );
 
   useEffect(() => {
     if (!graphSnapshot) {
@@ -150,39 +213,131 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
   }, [graphSnapshot]);
 
   useEffect(() => {
-    if (!recommendation && panelOpen && !lockedGuide) {
+    if (!recommendation && panelOpen && !lockedGuide && cinematicUnlock?.phase !== 'guide') {
       setPanelOpen(false);
       setPanelDismissed(true);
     }
-  }, [lockedGuide, panelOpen, recommendation]);
+  }, [cinematicUnlock?.phase, lockedGuide, panelOpen, recommendation]);
 
   useEffect(() => {
-    if (!graphSnapshot) {
+    if (!graphSnapshot || cinematicUnlock) {
       return;
     }
-    const unlocked = new Set(
+
+    const locked = graphSnapshot.lockedNodeIds;
+    const completed = new Set(
       graphSnapshot.graphNodes
-        .filter((node) => !graphSnapshot.lockedNodeIds.has(node.id))
+        .filter((node) => node.status === 'completed' && node.id !== '__journey__')
         .map((node) => node.id)
     );
-    const newlyUnlocked = [...unlocked].filter((id) => !previousUnlockedRef.current.has(id));
-    if (previousUnlockedRef.current.size > 0 && newlyUnlocked.length > 0) {
-      setDiscovery({
-        nodeIds: newlyUnlocked,
-        titles: newlyUnlocked.map((id) => graphSnapshot.nodeTitles[id] ?? id),
-        startedAt: Date.now(),
-      });
+
+    const newlyCompleted = findNewlyCompletedNodeIds(previousCompletedRef.current, graphSnapshot.graphNodes);
+    const newlyUnlocked = findNewlyUnlockedNodeIds(previousLockedRef.current, locked, graphSnapshot.graphNodes);
+
+    if (previousLockedRef.current.size > 0 && newlyUnlocked.length > 0 && newlyCompleted.length > 0) {
+      const sourceId = newlyCompleted[newlyCompleted.length - 1]!;
+      const sequence = buildUnlockSequence(
+        sourceId,
+        newlyUnlocked,
+        graphSnapshot.graphNodes,
+        graphSnapshot.graphEdges,
+        graphSnapshot.nodeTitles
+      );
+
+      if (sequence) {
+        const event = sequenceToStoredEvent(surfaceId, sequence);
+        const next = persistUnlockEvent(event);
+        setPersisted(next);
+        startCinematicUnlock(event);
+      }
     }
-    previousUnlockedRef.current = unlocked;
-  }, [graphSnapshot]);
+
+    previousLockedRef.current = new Set(locked);
+    previousCompletedRef.current = completed;
+  }, [cinematicUnlock, graphSnapshot, startCinematicUnlock, surfaceId]);
 
   useEffect(() => {
-    if (!discovery) {
+    if (!cinematicUnlock) {
       return;
     }
-    const timer = window.setTimeout(() => setDiscovery(null), 3200);
-    return () => window.clearTimeout(timer);
-  }, [discovery]);
+
+    const timers: number[] = [];
+    const { routeSteps, newlyUnlockedNodeIds } = cinematicUnlock;
+
+    timers.push(
+      window.setTimeout(() => {
+        setCinematicUnlock((current) =>
+          current ? { ...current, phase: 'routes', phaseStartedAt: Date.now() } : null
+        );
+      }, CINEMATIC_TIMING.completion)
+    );
+
+    routeSteps.forEach((_, index) => {
+      timers.push(
+        window.setTimeout(() => {
+          setCinematicUnlock((current) =>
+            current ? { ...current, routeProgress: index + 1, phaseStartedAt: Date.now() } : null
+          );
+        }, CINEMATIC_TIMING.completion + (index + 1) * CINEMATIC_TIMING.routeHop)
+      );
+    });
+
+    const routesEnd =
+      CINEMATIC_TIMING.completion + routeSteps.length * CINEMATIC_TIMING.routeHop + 180;
+
+    newlyUnlockedNodeIds.forEach((_, index) => {
+      timers.push(
+        window.setTimeout(() => {
+          setCinematicUnlock((current) =>
+            current
+              ? {
+                  ...current,
+                  phase: 'emergence',
+                  emergenceProgress: index + 1,
+                  phaseStartedAt: Date.now(),
+                }
+              : null
+          );
+        }, routesEnd + (index + 1) * CINEMATIC_TIMING.emergence)
+      );
+    });
+
+    const emergenceEnd =
+      routesEnd + newlyUnlockedNodeIds.length * CINEMATIC_TIMING.emergence + 180;
+
+    timers.push(
+      window.setTimeout(() => {
+        setCinematicUnlock((current) =>
+          current ? { ...current, phase: 'overlay', phaseStartedAt: Date.now() } : null
+        );
+      }, emergenceEnd)
+    );
+
+    timers.push(
+      window.setTimeout(() => {
+        setCinematicUnlock((current) =>
+          current ? { ...current, phase: 'guide', phaseStartedAt: Date.now() } : null
+        );
+        setPanelDismissed(false);
+        setPanelOpen(true);
+      }, emergenceEnd + CINEMATIC_TIMING.overlay)
+    );
+
+    timers.push(
+      window.setTimeout(() => {
+        setCinematicUnlock(null);
+      }, emergenceEnd + CINEMATIC_TIMING.overlay + CINEMATIC_TIMING.guide)
+    );
+
+    cinematicTimersRef.current = timers;
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer));
+    };
+  }, [cinematicUnlock?.startedAt]);
+
+  useEffect(() => {
+    return () => clearCinematicTimers();
+  }, [clearCinematicTimers]);
 
   useEffect(() => {
     if (!routePreview) {
@@ -199,7 +354,7 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
 
   const applyRoutePreview = useCallback(
     (nodeId: string | undefined) => {
-      if (!graphSnapshot || !nodeId) {
+      if (!graphSnapshot || !nodeId || cinematicUnlock) {
         return;
       }
       const chain = buildRoutePreviewChain(
@@ -217,7 +372,7 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
         startedAt: Date.now(),
       });
     },
-    [graphSnapshot]
+    [cinematicUnlock, graphSnapshot]
   );
 
   const startGuidedJourney = useCallback(() => {
@@ -249,6 +404,13 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
     },
     [applyRoutePreview, recommendation?.nodeId]
   );
+
+  const replayCinematicUnlock = useCallback(() => {
+    if (!lastUnlockEvent || lastUnlockEvent.surfaceId !== surfaceId) {
+      return;
+    }
+    startCinematicUnlock(lastUnlockEvent, true);
+  }, [lastUnlockEvent, startCinematicUnlock, surfaceId]);
 
   const handleLockedNodeSelect = useCallback(
     (nodeId: string) => {
@@ -299,6 +461,38 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
     [routePreview?.edgeIds]
   );
 
+  const cinematicRouteNodeIds = useMemo(() => {
+    if (!cinematicUnlock) {
+      return new Set<string>();
+    }
+    const revealed = new Set<string>();
+    if (cinematicUnlock.phase !== 'completion') {
+      revealed.add(cinematicUnlock.sourceNodeId);
+    }
+    cinematicUnlock.routeSteps.slice(0, cinematicUnlock.routeProgress).forEach((step) => {
+      revealed.add(step.toNodeId);
+    });
+    return revealed;
+  }, [cinematicUnlock]);
+
+  const cinematicRouteEdgeIds = useMemo(() => {
+    if (!cinematicUnlock) {
+      return new Set<string>();
+    }
+    return new Set(
+      cinematicUnlock.routeSteps.slice(0, cinematicUnlock.routeProgress).map((step) => step.edgeId)
+    );
+  }, [cinematicUnlock]);
+
+  const cinematicEmergenceNodeIds = useMemo(() => {
+    if (!cinematicUnlock) {
+      return new Set<string>();
+    }
+    return new Set(
+      cinematicUnlock.newlyUnlockedNodeIds.slice(0, cinematicUnlock.emergenceProgress)
+    );
+  }, [cinematicUnlock]);
+
   useEffect(() => {
     if (
       mode === 'guided' &&
@@ -306,11 +500,12 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       recommendation &&
       !panelDismissed &&
       !showWelcome &&
-      !lockedGuide
+      !lockedGuide &&
+      !cinematicUnlock
     ) {
       setPanelOpen(true);
     }
-  }, [assistanceStage, lockedGuide, mode, panelDismissed, recommendation, showWelcome]);
+  }, [assistanceStage, cinematicUnlock, lockedGuide, mode, panelDismissed, recommendation, showWelcome]);
 
   const value = useMemo(
     () => ({
@@ -323,7 +518,7 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       panelDismissed,
       recommendation,
       routePreview,
-      discovery,
+      cinematicUnlock,
       lockedGuide,
       guidedDimActive,
       ambientDimActive,
@@ -331,6 +526,11 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       recommendedNodeId: recommendation?.nodeId ?? null,
       routePreviewNodeIds,
       routePreviewEdgeIds,
+      cinematicRouteNodeIds,
+      cinematicRouteEdgeIds,
+      cinematicEmergenceNodeIds,
+      lastUnlockEvent,
+      canReplayUnlock,
       setGraphSnapshot,
       startGuidedJourney,
       exploreOnMyOwn,
@@ -344,6 +544,8 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
         setPanelDismissed(true);
         setLockedGuide(null);
         setRoutePreview(null);
+        setCinematicUnlock(null);
+        clearCinematicTimers();
       },
       resumeGuidedJourney: () => {
         const next = persistGuideMode('guided');
@@ -352,6 +554,7 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
         setPanelOpen(true);
       },
       triggerRoutePreview,
+      replayCinematicUnlock,
       handleLockedNodeSelect,
       goToPrerequisite,
       clearLockedGuide: () => setLockedGuide(null),
@@ -362,11 +565,17 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       assistanceStage,
       ambientDimActive,
       assistantUiActive,
-      discovery,
+      canReplayUnlock,
+      cinematicEmergenceNodeIds,
+      cinematicRouteEdgeIds,
+      cinematicRouteNodeIds,
+      cinematicUnlock,
+      clearCinematicTimers,
       exploreOnMyOwn,
       goToPrerequisite,
       guidedDimActive,
       handleLockedNodeSelect,
+      lastUnlockEvent,
       lockedGuide,
       mode,
       onNodeCompleted,
@@ -374,6 +583,7 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       panelDismissed,
       persisted,
       recommendation,
+      replayCinematicUnlock,
       routePreview,
       routePreviewEdgeIds,
       routePreviewNodeIds,

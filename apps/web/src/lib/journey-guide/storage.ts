@@ -1,4 +1,4 @@
-import type { AssistanceStage, JourneyGuideMode, JourneyGuidePersistedState } from './types';
+import type { AssistanceStage, JourneyGuideMode, JourneyGuidePersistedState, StoredUnlockEvent } from './types';
 
 export const JOURNEY_GUIDE_STORAGE_KEY = 'arrival-atlas-journey-guide-v1';
 
@@ -11,6 +11,7 @@ const DEFAULT_STATE: JourneyGuidePersistedState = {
   lockedClickCount: 0,
   lastActiveAt: null,
   dismissedWelcomeSurfaces: [],
+  lastUnlockEvent: null,
 };
 
 export function readJourneyGuideState(): JourneyGuidePersistedState {
@@ -30,6 +31,7 @@ export function readJourneyGuideState(): JourneyGuidePersistedState {
       version: 1,
       completedMissionIds: parsed.completedMissionIds ?? [],
       dismissedWelcomeSurfaces: parsed.dismissedWelcomeSurfaces ?? [],
+      lastUnlockEvent: parsed.lastUnlockEvent ?? null,
     };
   } catch {
     return DEFAULT_STATE;
@@ -84,6 +86,16 @@ export function persistLockedClick(): JourneyGuidePersistedState {
   const next = {
     ...readJourneyGuideState(),
     lockedClickCount: readJourneyGuideState().lockedClickCount + 1,
+    lastActiveAt: new Date().toISOString(),
+  };
+  writeJourneyGuideState(next);
+  return next;
+}
+
+export function persistUnlockEvent(event: StoredUnlockEvent): JourneyGuidePersistedState {
+  const next = {
+    ...readJourneyGuideState(),
+    lastUnlockEvent: event,
     lastActiveAt: new Date().toISOString(),
   };
   writeJourneyGuideState(next);
