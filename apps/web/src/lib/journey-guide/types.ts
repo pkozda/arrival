@@ -13,6 +13,7 @@ export type JourneyGuidePersistedState = {
   lockedClickCount: number;
   lastActiveAt: string | null;
   dismissedWelcomeSurfaces: string[];
+  lastUnlockEvent: StoredUnlockEvent | null;
 };
 
 export type PlanetRecommendation = {
@@ -42,6 +43,53 @@ export type DiscoveryState = {
   nodeIds: string[];
   titles: string[];
   startedAt: number;
+};
+
+export type CinematicUnlockPhase =
+  | 'completion'
+  | 'routes'
+  | 'emergence'
+  | 'overlay'
+  | 'guide';
+
+export type CinematicUnlockRouteStep = {
+  edgeId: string;
+  toNodeId: string;
+};
+
+export type CinematicUnlockSequence = {
+  sourceNodeId: string;
+  sourceTitle: string;
+  sourceMissionTitle: string;
+  newlyUnlockedNodeIds: string[];
+  newlyUnlockedTitles: string[];
+  routeSteps: CinematicUnlockRouteStep[];
+  chainNodeIds: string[];
+  chainEdgeIds: string[];
+};
+
+export type StoredUnlockEvent = {
+  surfaceId: string;
+  sourceNodeId: string;
+  sourceTitle: string;
+  newlyUnlockedNodeIds: string[];
+  newlyUnlockedTitles: string[];
+  chainNodeIds: string[];
+  chainEdgeIds: string[];
+  routeSteps: CinematicUnlockRouteStep[];
+  recordedAt: string;
+};
+
+export type CinematicUnlockState = CinematicUnlockSequence & {
+  phase: CinematicUnlockPhase;
+  routeProgress: number;
+  emergenceProgress: number;
+  phaseStartedAt: number;
+  startedAt: number;
+  isReplay: boolean;
+  guideTitle: string;
+  guideBody: string;
+  overlayTitle: string;
 };
 
 export type LockedGuideState = {

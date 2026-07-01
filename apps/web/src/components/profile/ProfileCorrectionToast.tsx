@@ -1,49 +1,61 @@
 'use client';
 
-import { AtlasSurface } from '@/components/atlas-runtime/legacy';
+import { useCallback, useEffect, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+const AUTO_DISMISS_MS = 4200;
 
 type Props = {
   title?: string;
   subtitle?: string;
-  onDismiss?: () => void;
 };
 
 export function ProfileCorrectionToast({
   title = 'Your situation was updated',
   subtitle = 'Updated from Profile correction',
-  onDismiss,
 }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isActive = searchParams.get('updated') === '1';
+  const [visible, setVisible] = useState(isActive);
+
+  useEffect(() => {
+    setVisible(isActive);
+  }, [isActive]);
+
+  const dismiss = useCallback(() => {
+    setVisible(false);
+    if (searchParams.get('updated') !== '1') {
+      return;
+    }
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('updated');
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }, [pathname, router, searchParams]);
+
+  useEffect(() => {
+    if (!visible) {
+      return;
+    }
+    const timer = window.setTimeout(dismiss, AUTO_DISMISS_MS);
+    return () => window.clearTimeout(timer);
+  }, [dismiss, visible]);
+
+  if (!visible || !isActive) {
+    return null;
+  }
+
   return (
-    <AtlasSurface
-      role="status"
-      className="mb-md"
-      style={{
-        borderColor: 'var(--color-accent)',
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
-        <div>
-          <p className="text-section-title--sm">{title}</p>
-          {subtitle && <p className="text-meta" style={{ marginTop: '0.25rem' }}>{subtitle}</p>}
-        </div>
-        {onDismiss && (
-          <button
-            type="button"
-            onClick={onDismiss}
-            aria-label="Dismiss"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--color-text-muted)',
-              cursor: 'pointer',
-              fontSize: '1.125rem',
-              lineHeight: 1,
-            }}
-          >
-            ×
-          </button>
-        )}
+    <div className="profile-correction-toast" role="status" aria-live="polite">
+      <div className="profile-correction-toast__content">
+        <p className="profile-correction-toast__title">{title}</p>
+        {subtitle && <p className="profile-correction-toast__subtitle">{subtitle}</p>}
       </div>
-    </AtlasSurface>
+      <button type="button" className="profile-correction-toast__close" onClick={dismiss} aria-label="Dismiss">
+        ×
+      </button>
+    </div>
   );
 }

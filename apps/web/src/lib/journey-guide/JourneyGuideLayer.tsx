@@ -7,6 +7,7 @@ import {
   JourneyGuideProbe,
   JourneyGuideSpeech,
   JourneyGuideWelcome,
+  CinematicDiscoveryOverlay,
 } from './JourneyGuide';
 import { useJourneyGuideContext } from './JourneyGuideProvider';
 
@@ -34,6 +35,12 @@ export function JourneyGuideLayer() {
   const [anchor, setAnchor] = useState<Anchor>(null);
 
   const targetNodeId = useMemo(() => {
+    if (guide.cinematicUnlock?.phase === 'guide') {
+      return (
+        guide.cinematicUnlock.newlyUnlockedNodeIds[0] ??
+        guide.cinematicUnlock.sourceNodeId
+      );
+    }
     if (guide.lockedGuide) {
       return guide.lockedGuide.prerequisiteIds[0] ?? guide.lockedGuide.nodeId;
     }
@@ -41,7 +48,7 @@ export function JourneyGuideLayer() {
       return guide.recommendedNodeId;
     }
     return null;
-  }, [guide.lockedGuide, guide.mode, guide.panelOpen, guide.recommendedNodeId]);
+  }, [guide.cinematicUnlock, guide.lockedGuide, guide.mode, guide.panelOpen, guide.recommendedNodeId]);
 
   const refreshAnchor = () => setAnchor(resolveNodeAnchor(targetNodeId));
 
@@ -56,11 +63,13 @@ export function JourneyGuideLayer() {
   }, [targetNodeId]);
 
   const probeState =
-    guide.routePreview || guide.discovery
+    guide.cinematicUnlock && guide.cinematicUnlock.phase !== 'guide'
       ? 'highlighting'
-      : guide.panelOpen || guide.lockedGuide
-        ? 'speaking'
-        : 'idle';
+      : guide.routePreview
+        ? 'highlighting'
+        : guide.panelOpen || guide.lockedGuide
+          ? 'speaking'
+          : 'idle';
 
   const stuckHint =
     guide.persisted.lockedClickCount >= 2 &&
@@ -69,13 +78,16 @@ export function JourneyGuideLayer() {
     guide.mode === 'guided' &&
     guide.assistanceStage <= 2;
 
-  const showGuidePanel = guide.panelOpen || Boolean(guide.lockedGuide) || stuckHint;
+  const showGuidePanel =
+    guide.panelOpen || Boolean(guide.lockedGuide) || stuckHint || guide.cinematicUnlock?.phase === 'guide';
 
   return (
     <>
       {guide.ambientDimActive && !guide.showWelcome && (
         <div
-          className={`journey-guide-ambient${guide.routePreview ? ' journey-guide-ambient--route-preview' : ''}`}
+          className={`journey-guide-ambient${
+            guide.routePreview ? ' journey-guide-ambient--route-preview' : ''
+          }${guide.cinematicUnlock ? ' journey-guide-ambient--cinematic-unlock' : ''}`}
           aria-hidden="true"
         />
       )}
@@ -86,14 +98,14 @@ export function JourneyGuideLayer() {
         </div>
       )}
 
-      {guide.discovery && (
-        <div className="journey-guide-discovery" role="status" aria-live="polite">
-          <JourneyGuideProbe state="highlighting" />
-          <p>New routes discovered.</p>
-        </div>
+      {guide.cinematicUnlock?.phase === 'overlay' && (
+        <CinematicDiscoveryOverlay
+          title={guide.cinematicUnlock.overlayTitle}
+          destinations={guide.cinematicUnlock.newlyUnlockedTitles}
+        />
       )}
 
-      {(showGuidePanel) && !guide.showWelcome && (
+      {showGuidePanel && !guide.showWelcome && (
         <div
           className="journey-guide-layer journey-guide-layer--anchored"
           style={
@@ -105,10 +117,29 @@ export function JourneyGuideLayer() {
           <div className="journey-guide-anchor">
             <JourneyGuideProbe state={probeState} />
             <JourneyGuideSpeech
-              title={guide.lockedGuide ? 'Destination locked' : 'Recommended next step'}
+              title={
+                guide.cinematicUnlock?.phase === 'guide'
+                  ? guide.cinematicUnlock.guideTitle
+                  : guide.lockedGuide
+                    ? 'Destination locked'
+                    : 'Recommended next step'
+              }
               onClose={guide.closePanel}
             >
-              {guide.lockedGuide ? (
+              {guide.cinematicUnlock?.phase === 'guide' ? (
+                <>
+                  <p>{guide.cinematicUnlock.guideBody}</p>
+                  {guide.canReplayUnlock && (
+                    <button
+                      type="button"
+                      className="journey-guide-btn journey-guide-btn--ghost"
+                      onClick={guide.replayCinematicUnlock}
+                    >
+                      Replay discovery
+                    </button>
+                  )}
+                </>
+              ) : guide.lockedGuide ? (
                 <>
                   <p>
                     <strong>{toMissionTitle(guide.lockedGuide.nodeId, guide.lockedGuide.title)}</strong> is not yet
@@ -153,6 +184,15 @@ export function JourneyGuideLayer() {
                   >
                     Preview route
                   </button>
+                  {guide.canReplayUnlock && (
+                    <button
+                      type="button"
+                      className="journey-guide-btn journey-guide-btn--ghost"
+                      onClick={guide.replayCinematicUnlock}
+                    >
+                      Replay discovery
+                    </button>
+                  )}
                 </>
               ) : (
                 <>

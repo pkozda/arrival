@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { ProfileGalaxyBridge } from '@/components/profile/ProfileGalaxyBridge';
 import { LegacyPanelSurface } from '@/components/atlas-runtime/legacy';
 import { GalaxyViewport } from '@/lib/presentation/spatial-core';
@@ -18,10 +18,8 @@ function LoadingOverlay() {
 
 function ProfileDomainGalaxyContent() {
   const params = useParams<{ domainSlug: string }>();
-  const searchParams = useSearchParams();
   const domainSlug = params.domainSlug;
   const { uiSnapshot, uiSnapshotLoading } = useApp();
-  const showUpdatedToast = searchParams.get('updated') === '1';
 
   const validSlug = isProfileMirrorDomainSlug(domainSlug) ? domainSlug : null;
 
@@ -43,7 +41,6 @@ function ProfileDomainGalaxyContent() {
     <ProfileGalaxyBridge
       initialSelectedSlug={validSlug}
       inspectorDepth="detail"
-      showUpdatedToast={showUpdatedToast}
     />
   );
 }

@@ -54,7 +54,13 @@ function GalaxyNodeRendererComponent({
         visual.isGuideHighlighted ? ' is-guide-highlighted' : ''
       }${visual.isGuideDimmed ? ' is-guide-dimmed' : ''}${
         visual.isRoutePreview ? ' is-route-preview' : ''
-      }${visual.isDiscoveryUnlock ? ' is-discovery-unlock' : ''}`}
+      }${visual.isDiscoveryUnlock ? ' is-discovery-unlock' : ''}${
+        visual.isCinematicCompletion ? ' is-cinematic-completion' : ''
+      }${visual.isCinematicRoute ? ' is-cinematic-route' : ''}${
+        visual.isCinematicEmergence ? ' is-cinematic-emergence' : ''
+      }${visual.isCinematicEmerging ? ' is-cinematic-emerging' : ''}${
+        visual.isCinematicDimmed ? ' is-cinematic-dimmed' : ''
+      }`}
       data-galaxy-node-id={id}
       style={
         {
@@ -87,7 +93,7 @@ function GalaxyNodeRendererComponent({
       <span className="le-consequence-node__beacon">
         <span className="le-consequence-node__halo" aria-hidden="true" />
         <span className="le-consequence-node__orb" aria-hidden="true" />
-        {visual.isLocked && (
+        {visual.isLocked && !visual.isCinematicEmergence && (
           <span className="le-consequence-node__lock" aria-hidden="true">
             <svg viewBox="0 0 16 16" width="14" height="14" fill="none">
               <circle cx="8" cy="8" r="7" fill="rgba(2, 6, 23, 0.55)" />

@@ -6,6 +6,7 @@ export {
   JourneyGuideSpeech,
   JourneyGuideWelcome,
   JourneyGuideFloatingButton,
+  CinematicDiscoveryOverlay,
 } from './JourneyGuide';
 export {
   getRecommendedNextPlanet,

@@ -34,7 +34,6 @@ import { formatDomainStatus } from '@/lib/profile-mirror-utils';
 type Props = {
   initialSelectedSlug?: ProfileMirrorDomainSlug | null;
   inspectorDepth?: 'summary' | 'detail';
-  showUpdatedToast?: boolean;
 };
 
 function domainContext(payload: ProfileGalaxyNodePayload | null): string {
@@ -47,7 +46,6 @@ function domainContext(payload: ProfileGalaxyNodePayload | null): string {
 export function ProfileGalaxyBridge({
   initialSelectedSlug = null,
   inspectorDepth = 'summary',
-  showUpdatedToast = false,
 }: Props) {
   const { uiSnapshot, userContext, modules, profileInsights } = useApp();
   const profile = selectUserContextProfile(userContext);
@@ -118,7 +116,7 @@ export function ProfileGalaxyBridge({
 
   return (
     <>
-      {showUpdatedToast && <ProfileCorrectionToast />}
+      <ProfileCorrectionToast />
 
       <GalaxyGraphStage
         model={model}
