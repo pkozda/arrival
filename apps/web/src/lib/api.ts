@@ -214,7 +214,16 @@ export async function isSessionValid(
   }
 }
 
-export async function ensureSession(context?: Record<string, unknown>): Promise<string> {
+export type EnsureSessionOutcome = 'existing' | 'created' | 'recreated';
+
+export type EnsureSessionResult = {
+  sessionId: string;
+  outcome: EnsureSessionOutcome;
+};
+
+export async function ensureSession(
+  context?: Record<string, unknown>
+): Promise<EnsureSessionResult> {
   const storedSessionId = readStoredSessionId();
   const storedToken = readStoredToken();
 
@@ -222,10 +231,16 @@ export async function ensureSession(context?: Record<string, unknown>): Promise<
     storedSessionId &&
     (await isSessionValid(storedSessionId, { token: storedToken, sessionId: storedSessionId }))
   ) {
-    return storedSessionId;
+    return { sessionId: storedSessionId, outcome: 'existing' };
   }
 
-  return createSession(context);
+  const hadStoredSession = storedSessionId !== null;
+  const sessionId = await createSession(context);
+
+  return {
+    sessionId,
+    outcome: hadStoredSession ? 'recreated' : 'created',
+  };
 }
 
 export const LEGACY_THEME_STORAGE_KEY = 'arrival-atlas-theme';

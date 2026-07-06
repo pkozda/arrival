@@ -29,6 +29,10 @@ const translations: Record<SupportedLanguage, Translations> = {
     'common.retry': 'Retry',
     'common.language': 'Language',
     'app.bootstrap.errorTitle': 'Unable to start session',
+    'app.sessionRecreated.title': 'A new Atlas session has started',
+    'app.sessionRecreated.message':
+      'Your previous local session is no longer available. Atlas has started a new session for you. Information you entered earlier may no longer be available.',
+    'app.sessionRecreated.continue': 'Continue',
     'app.profileLoad.errorTitle': 'Unable to load your profile',
     'financial.title': 'Financial Reality',
     'financial.description': 'Understand your net income, taxes, and benefit eligibility',
@@ -58,6 +62,10 @@ const translations: Record<SupportedLanguage, Translations> = {
     'common.retry': 'Erneut versuchen',
     'common.language': 'Sprache',
     'app.bootstrap.errorTitle': 'Sitzung konnte nicht gestartet werden',
+    'app.sessionRecreated.title': 'Eine neue Atlas-Sitzung wurde gestartet',
+    'app.sessionRecreated.message':
+      'Ihre vorherige lokale Sitzung ist nicht mehr verfügbar. Atlas hat eine neue Sitzung für Sie gestartet. Zuvor eingegebene Informationen sind möglicherweise nicht mehr verfügbar.',
+    'app.sessionRecreated.continue': 'Weiter',
     'app.profileLoad.errorTitle': 'Profil konnte nicht geladen werden',
     'financial.title': 'Finanzielle Realität',
     'financial.description': 'Verstehen Sie Ihr Nettoeinkommen, Steuern und Leistungsansprüche',
@@ -87,6 +95,10 @@ const translations: Record<SupportedLanguage, Translations> = {
     'common.retry': 'Повторить',
     'common.language': 'Язык',
     'app.bootstrap.errorTitle': 'Не удалось начать сессию',
+    'app.sessionRecreated.title': 'Начата новая сессия Atlas',
+    'app.sessionRecreated.message':
+      'Ваша предыдущая локальная сессия больше недоступна. Atlas начал для вас новую сессию. Ранее введённая информация может быть недоступна.',
+    'app.sessionRecreated.continue': 'Продолжить',
     'app.profileLoad.errorTitle': 'Не удалось загрузить профиль',
     'financial.title': 'Финансовая реальность',
     'financial.description': 'Понимание чистого дохода, налогов и права на пособия',
@@ -116,6 +128,10 @@ const translations: Record<SupportedLanguage, Translations> = {
     'common.retry': 'Повторити',
     'common.language': 'Мова',
     'app.bootstrap.errorTitle': 'Не вдалося розпочати сесію',
+    'app.sessionRecreated.title': 'Розпочато нову сесію Atlas',
+    'app.sessionRecreated.message':
+      'Ваша попередня локальна сесія більше недоступна. Atlas розпочав для вас нову сесію. Раніше введена інформація може бути недоступною.',
+    'app.sessionRecreated.continue': 'Продовжити',
     'app.profileLoad.errorTitle': 'Не вдалося завантажити профіль',
     'financial.title': 'Фінансова реальність',
     'financial.description': 'Розуміння чистого доходу, податків та права на допомогу',

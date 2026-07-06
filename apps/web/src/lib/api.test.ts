@@ -148,7 +148,10 @@ describe('authenticated session API calls', () => {
       });
     vi.stubGlobal('fetch', fetchMock);
 
-    await expect(ensureSession()).resolves.toBe('sess_1');
+    await expect(ensureSession()).resolves.toEqual({
+      sessionId: 'sess_1',
+      outcome: 'existing',
+    });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:3001/api/sessions/sess_1',
@@ -170,9 +173,27 @@ describe('authenticated session API calls', () => {
       });
     vi.stubGlobal('fetch', fetchMock);
 
-    await expect(ensureSession()).resolves.toBe('sess_new');
+    await expect(ensureSession()).resolves.toEqual({
+      sessionId: 'sess_new',
+      outcome: 'recreated',
+    });
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(storage.get(SESSION_STORAGE_KEY)).toBe('sess_new');
     expect(storage.get(TOKEN_STORAGE_KEY)).toBe('token_new');
+  });
+
+  it('ensureSession creates a first session when none is stored', async () => {
+    storage.clear();
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      json: async () => ({ sessionId: 'sess_first', token: 'token_first' }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(ensureSession()).resolves.toEqual({
+      sessionId: 'sess_first',
+      outcome: 'created',
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

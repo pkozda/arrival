@@ -15,6 +15,7 @@
 | index.md | This index |
 | implemented-baseline.md | BL-* immutable |
 | implementation-first-pass-plan.md | Developer execution plan (first pass) |
+| phase-1-release-blockers.md | Phase 1 release blocker checklist (UX audits) |
 
 ## UX IDs
 

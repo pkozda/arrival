@@ -1,6 +1,6 @@
 import type { AtlasSlideDefinition } from './types';
 
-/** Static map state for the unauthenticated landing — not a slider slide. */
+/** Static map state for the guest preview — not a slider slide. */
 export const GUEST_LANDING_MAP: AtlasSlideDefinition = {
   id: 'guest-landing',
   index: 0,
@@ -28,6 +28,6 @@ export const GUEST_LANDING_COPY = {
   headlineAccent: 'Mapped.',
   supporting:
     'Arrival Atlas is your interactive guide through everything you need to build a stable life in a new country.',
-  cta: 'Enter Your Atlas',
+  cta: 'Enter Atlas',
   secondary: "See what's next in 7 days",
 };

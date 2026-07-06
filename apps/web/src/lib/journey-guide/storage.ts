@@ -2,6 +2,8 @@ import type { AssistanceStage, JourneyGuideMode, JourneyGuidePersistedState, Sto
 
 export const JOURNEY_GUIDE_STORAGE_KEY = 'arrival-atlas-journey-guide-v1';
 
+export const JOURNEY_GUIDE_RESET_EVENT = 'arrival-atlas-journey-guide-reset';
+
 const DEFAULT_STATE: JourneyGuidePersistedState = {
   version: 1,
   hasChosenMode: false,
@@ -20,7 +22,7 @@ export function readJourneyGuideState(): JourneyGuidePersistedState {
   }
 
   try {
-    const raw = window.localStorage.getItem(JOURNEY_GUIDE_STORAGE_KEY);
+    const raw = globalThis.localStorage?.getItem(JOURNEY_GUIDE_STORAGE_KEY);
     if (!raw) {
       return DEFAULT_STATE;
     }
@@ -42,7 +44,21 @@ export function writeJourneyGuideState(state: JourneyGuidePersistedState): void 
   if (typeof window === 'undefined') {
     return;
   }
-  window.localStorage.setItem(JOURNEY_GUIDE_STORAGE_KEY, JSON.stringify(state));
+  globalThis.localStorage?.setItem(JOURNEY_GUIDE_STORAGE_KEY, JSON.stringify(state));
+}
+
+export function clearJourneyGuideState(): void {
+  if (typeof globalThis.localStorage === 'undefined') {
+    return;
+  }
+
+  try {
+    globalThis.localStorage?.removeItem(JOURNEY_GUIDE_STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+
+  globalThis.dispatchEvent?.(new Event(JOURNEY_GUIDE_RESET_EVENT));
 }
 
 export function persistGuideMode(mode: JourneyGuideMode): JourneyGuidePersistedState {

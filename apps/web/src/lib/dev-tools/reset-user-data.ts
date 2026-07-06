@@ -3,11 +3,11 @@ import {
   clearStoredSessionAuth,
   createSession,
   readStoredSessionId,
+  writeStoredSessionId,
 } from '@/lib/api';
-import { JOURNEY_GUIDE_STORAGE_KEY } from '@/lib/journey-guide/storage';
-import { resetRuntimeSessionState } from '@/lib/life-event/runtime/runtime-store';
-import { ONBOARDING_DISMISS_STORAGE_KEY } from '@/lib/situation-utils';
 import type { SupportedLanguage, ThemePreference } from '@/lib/product-contract';
+import { clearAtlasClientPersistedState } from '@/lib/atlas-reset/clear-client-state';
+import { clearJourneyGuideState } from '@/lib/journey-guide/storage';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
@@ -17,23 +17,13 @@ export function isDevToolsUiEnabled(): boolean {
   return process.env.NODE_ENV === 'development';
 }
 
+/** @deprecated Use `clearAtlasClientPersistedState` */
 export function clearDevClientState(): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  try {
-    localStorage.removeItem(ONBOARDING_DISMISS_STORAGE_KEY);
-    localStorage.removeItem(JOURNEY_GUIDE_STORAGE_KEY);
-  } catch {
-    // ignore
-  }
-
-  resetRuntimeSessionState();
+  clearAtlasClientPersistedState();
 }
 
 async function resetUserDataOnServer(sessionId: string, scope: DevResetScope): Promise<void> {
-  if (!sessionId) {
+  if (!sessionId && scope !== 'all') {
     return;
   }
 
@@ -42,7 +32,7 @@ async function resetUserDataOnServer(sessionId: string, scope: DevResetScope): P
 
   const res = await fetch(`${API_URL}${endpoint}`, {
     method: 'POST',
-    headers: buildAuthHeaders({ sessionId }),
+    headers: buildAuthHeaders({ sessionId: sessionId || undefined }),
   });
 
   if (!res.ok) {
@@ -51,27 +41,70 @@ async function resetUserDataOnServer(sessionId: string, scope: DevResetScope): P
   }
 }
 
+/** Follower tab: adopt recreated session without creating a new session. */
+export function adoptRecreatedSessionId(ownerSessionId: string): string {
+  const storedSessionId = readStoredSessionId();
+  if (storedSessionId !== ownerSessionId) {
+    writeStoredSessionId(ownerSessionId);
+  }
+
+  clearJourneyGuideState();
+  return ownerSessionId;
+}
+
+/** Follower tab: adopt owner session and clear client state without creating a new session. */
+export function adoptAtlasSessionAfterDemoReset(ownerSessionId: string): string {
+  const storedSessionId = readStoredSessionId();
+  if (storedSessionId !== ownerSessionId) {
+    writeStoredSessionId(ownerSessionId);
+  }
+
+  clearAtlasClientPersistedState();
+  return ownerSessionId;
+}
+
+export async function resetAtlasSession(input: {
+  sessionId?: string | null;
+  language?: SupportedLanguage;
+  theme?: ThemePreference;
+  serverScope?: DevResetScope;
+}): Promise<string> {
+  const activeSessionId = input.sessionId ?? readStoredSessionId();
+  const serverScope = input.serverScope ?? 'session';
+
+  if (isDevToolsUiEnabled()) {
+    try {
+      if (serverScope === 'all') {
+        await resetUserDataOnServer('', 'all');
+      } else if (activeSessionId) {
+        await resetUserDataOnServer(activeSessionId, 'session');
+      }
+    } catch {
+      // Production or unavailable dev endpoint — client reset + new session still applies.
+    }
+  }
+
+  clearStoredSessionAuth();
+  clearAtlasClientPersistedState();
+
+  return createSession({
+    userProfile: {
+      language: input.language ?? 'en',
+      uiPreferences: { theme: input.theme ?? 'dark' },
+    },
+  });
+}
+
 export async function resetDevUserData(input: {
   scope: DevResetScope;
   sessionId?: string | null;
   language: SupportedLanguage;
   theme: ThemePreference;
 }): Promise<string> {
-  const activeSessionId = input.sessionId ?? readStoredSessionId();
-
-  if (activeSessionId) {
-    await resetUserDataOnServer(activeSessionId, input.scope);
-  } else if (input.scope === 'all') {
-    await resetUserDataOnServer('', input.scope);
-  }
-
-  clearStoredSessionAuth();
-  clearDevClientState();
-
-  return createSession({
-    userProfile: {
-      language: input.language,
-      uiPreferences: { theme: input.theme },
-    },
+  return resetAtlasSession({
+    sessionId: input.sessionId,
+    language: input.language,
+    theme: input.theme,
+    serverScope: input.scope,
   });
 }

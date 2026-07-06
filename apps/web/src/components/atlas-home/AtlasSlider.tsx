@@ -57,7 +57,7 @@ export function AtlasMemberSlider() {
   return (
     <div
       ref={parallaxRef}
-      className="atlas-parallax-root atlas-slider atlas-slider--authenticated"
+      className="atlas-parallax-root atlas-slider atlas-slider--exploring"
       data-ui-surface="home-atlas"
     >
       <AtlasAmbientLayers loadPhase={loadPhase} />

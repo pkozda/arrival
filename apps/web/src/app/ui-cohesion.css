@@ -439,3 +439,68 @@ a.btn-primary-link:hover {
 .celestial-destination-root .er-module-page [data-ui-panel] + [data-ui-panel] {
   margin-top: 0.25rem;
 }
+
+/* ── Session recreated notice (RB-A03) ─────────────────── */
+
+.session-recreated-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.session-recreated-notice__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(2, 6, 23, 0.62);
+  cursor: pointer;
+}
+
+.session-recreated-notice__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(26rem, 100%);
+  padding: 1.35rem 1.4rem 1.45rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 176, 255, 0.22);
+  background: rgba(6, 10, 24, 0.94);
+  box-shadow: 0 24px 48px rgba(2, 6, 23, 0.45);
+}
+
+.session-recreated-notice__title {
+  margin: 0 0 0.65rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgba(241, 245, 249, 0.98);
+  line-height: 1.3;
+}
+
+.session-recreated-notice__lead {
+  margin: 0 0 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: rgba(148, 163, 184, 0.92);
+}
+
+.session-recreated-notice__actions {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.session-recreated-notice__btn {
+  border-radius: 999px;
+  padding: 0.62rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.session-recreated-notice__btn--primary {
+  border: 1px solid rgba(191, 219, 254, 0.35);
+  background: rgba(59, 130, 246, 0.22);
+  color: rgba(241, 245, 249, 0.98);
+}

@@ -3,14 +3,14 @@
 import { motion } from 'framer-motion';
 import { AtlasAmbientLayers } from './AtlasAmbientLayers';
 import { AtlasHUD } from './AtlasHUD';
-import { useAtlasHomeAuth } from './AtlasHomeProvider';
+import { useAtlasHomeDemo } from './AtlasHomeProvider';
 import { AtlasMap } from './AtlasMap';
 import { GUEST_LANDING_COPY, GUEST_LANDING_MAP } from './guest-landing-data';
 import { useAtlasLoadSequence } from './useAtlasLoadSequence';
 import { useAtlasParallax } from './useAtlasParallax';
 
 export function AtlasGuestLanding() {
-  const { login } = useAtlasHomeAuth();
+  const { enterAtlas } = useAtlasHomeDemo();
   const loadPhase = useAtlasLoadSequence(0);
   const { parallaxRef } = useAtlasParallax();
   const uiVisible = loadPhase >= 5;
@@ -42,12 +42,12 @@ export function AtlasGuestLanding() {
                 type="button"
                 className="atlas-slide__cta"
                 data-ui-surface="home-atlas-entry"
-                onClick={login}
+                onClick={enterAtlas}
               >
                 {GUEST_LANDING_COPY.cta}
                 <span aria-hidden="true">→</span>
               </button>
-              <button type="button" className="atlas-slide__secondary" onClick={login}>
+              <button type="button" className="atlas-slide__secondary" onClick={enterAtlas}>
                 {GUEST_LANDING_COPY.secondary}
                 <span aria-hidden="true">→</span>
               </button>

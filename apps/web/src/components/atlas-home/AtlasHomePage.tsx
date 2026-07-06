@@ -1,12 +1,12 @@
 'use client';
 
 import { AtlasGuestLanding } from './AtlasGuestLanding';
-import { AtlasHomeProvider, useAtlasHomeAuth } from './AtlasHomeProvider';
+import { AtlasHomeProvider, useAtlasHomeDemo } from './AtlasHomeProvider';
 import { AtlasMemberSlider } from './AtlasSlider';
 
 function AtlasHomeGate() {
-  const { isAuthenticated } = useAtlasHomeAuth();
-  return isAuthenticated ? <AtlasMemberSlider /> : <AtlasGuestLanding />;
+  const { isExploringAtlas } = useAtlasHomeDemo();
+  return isExploringAtlas ? <AtlasMemberSlider /> : <AtlasGuestLanding />;
 }
 
 export function AtlasHomePage() {
