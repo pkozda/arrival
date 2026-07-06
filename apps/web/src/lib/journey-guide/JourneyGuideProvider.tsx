@@ -33,6 +33,7 @@ import {
   persistWelcomeDismissed,
   readJourneyGuideState,
   writeJourneyGuideState,
+  JOURNEY_GUIDE_RESET_EVENT,
 } from './storage';
 import type {
   CinematicUnlockState,
@@ -337,6 +338,24 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
 
   useEffect(() => {
     return () => clearCinematicTimers();
+  }, [clearCinematicTimers]);
+
+  useEffect(() => {
+    const onGuideReset = () => {
+      clearCinematicTimers();
+      setPersisted(readJourneyGuideState());
+      setGraphSnapshotState(null);
+      setPanelOpen(false);
+      setPanelDismissed(false);
+      setRoutePreview(null);
+      setCinematicUnlock(null);
+      setLockedGuide(null);
+      previousLockedRef.current = new Set();
+      previousCompletedRef.current = new Set();
+    };
+
+    window.addEventListener(JOURNEY_GUIDE_RESET_EVENT, onGuideReset);
+    return () => window.removeEventListener(JOURNEY_GUIDE_RESET_EVENT, onGuideReset);
   }, [clearCinematicTimers]);
 
   useEffect(() => {

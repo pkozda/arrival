@@ -19,9 +19,23 @@ import {
   updateSessionTheme,
 } from '@/lib/api';
 import {
+  adoptAtlasSessionAfterDemoReset,
+  adoptRecreatedSessionId,
   resetDevUserData,
+  resetAtlasSession,
   type DevResetScope,
 } from '@/lib/dev-tools/reset-user-data';
+import {
+  ATLAS_DEMO_RESET_BROADCAST_KEY,
+  attemptAcquireResetOwnership,
+  broadcastAtlasDemoReset,
+  clearResetOwnershipLock,
+  getDemoResetTabId,
+  parseAtlasDemoResetBroadcast,
+  readResetOwnershipLock,
+  waitForDemoResetBroadcastCompletion,
+  writeAtlasDemoActive,
+} from '@/components/atlas-home/atlas-demo-state';
 import { loadDemoPreset as loadDemoPresetRequest } from '@/lib/demo/load-demo-preset';
 import type { DemoPersonaId } from '@arrival-atlas/life-event-demo/personas';
 import {
@@ -34,6 +48,7 @@ import {
   readStoredDisplayLanguage,
   writeStoredDisplayLanguage,
 } from '@/lib/i18n/display-language';
+import { clearJourneyGuideState } from '@/lib/journey-guide/storage';
 import { getRuntimeConsistencyModel } from '@/lib/runtime/runtimeConsistencyModel';
 import {
   RuntimeConsistencyProvider,
@@ -42,6 +57,7 @@ import {
 import { EconomicRealityPlanProvider } from '@/lib/economic-reality';
 import { BootstrapGate } from '@/components/BootstrapGate';
 import { ProfileLoadErrorBanner } from '@/components/ProfileLoadErrorBanner';
+import { SessionRecreatedNotice } from '@/components/SessionRecreatedNotice';
 import type {
   MutationRequest,
   ProfileInsightViewV1,
@@ -53,6 +69,15 @@ import type {
   UserContextV1,
 } from '@/lib/product-contract';
 import { getTranslations } from '@arrival-atlas/core';
+import {
+  acknowledgeSessionRecreatedNotice,
+  broadcastSessionRecreated,
+  markSessionRecreationNoticePending,
+  parseSessionRecreatedBroadcast,
+  resolveSessionRecreatedBroadcastFollow,
+  SESSION_RECREATED_BROADCAST_KEY,
+  shouldOpenSessionRecreatedNotice,
+} from '@/lib/session-recreation-notice';
 import {
   getSessionLanguage,
   getThemePreference,
@@ -89,6 +114,7 @@ interface AppState {
   refreshUiSnapshot: () => Promise<void>;
   refreshSessionState: () => Promise<void>;
   resetUserData: (scope?: DevResetScope) => Promise<void>;
+  leaveDemoAndReset: () => Promise<void>;
   loadDemoPreset: (presetId: DemoPersonaId) => Promise<void>;
   submitMutation: (request: MutationRequest) => Promise<{ userContext: UserContextV1; revision: number }>;
   profileHeadRevision: number;
@@ -202,9 +228,117 @@ function AppProviderSessionLayer({ children }: { children: ReactNode }) {
         theme: themePreference,
       });
       shell.setSessionId(newSessionId);
+      await consistency.requestSync('FULL');
     },
-    [shell, language, themePreference]
+    [shell, language, themePreference, consistency]
   );
+
+  const lastResetBroadcastRef = useRef<string | null>(null);
+  const lastSessionRecreatedBroadcastRef = useRef<string | null>(null);
+
+  const performAtlasDemoResetAsOwner = useCallback(async () => {
+    const newSessionId = await resetAtlasSession({
+      sessionId: shell.sessionId,
+      language: 'en',
+      theme: 'dark',
+    });
+    shell.setSessionId(newSessionId);
+    writeAtlasDemoActive(false);
+    languageRef.current = 'en';
+    await consistency.requestSync('FULL');
+    return newSessionId;
+  }, [shell, consistency]);
+
+  const followSessionRecreated = useCallback(
+    async (ownerSessionId: string) => {
+      const adoptedSessionId = adoptRecreatedSessionId(ownerSessionId);
+      shell.setSessionId(adoptedSessionId);
+      await consistency.requestSync('FULL');
+    },
+    [shell, consistency]
+  );
+
+  const followAtlasDemoReset = useCallback(
+    async (ownerSessionId: string) => {
+      const adoptedSessionId = adoptAtlasSessionAfterDemoReset(ownerSessionId);
+      shell.setSessionId(adoptedSessionId);
+      writeAtlasDemoActive(false);
+      languageRef.current = 'en';
+      await consistency.requestSync('FULL');
+    },
+    [shell, consistency]
+  );
+
+  const leaveDemoAndReset = useCallback(async () => {
+    const ownerId = getDemoResetTabId();
+
+    if (attemptAcquireResetOwnership(ownerId)) {
+      try {
+        const newSessionId = await performAtlasDemoResetAsOwner();
+        const broadcast = broadcastAtlasDemoReset(newSessionId);
+        lastResetBroadcastRef.current = broadcast;
+      } finally {
+        clearResetOwnershipLock();
+      }
+      return;
+    }
+
+    const lock = readResetOwnershipLock();
+    const broadcast = await waitForDemoResetBroadcastCompletion({
+      afterStartedAt: lock?.startedAt,
+    });
+
+    if (!broadcast) {
+      return;
+    }
+
+    const serialized = JSON.stringify(broadcast);
+    if (serialized === lastResetBroadcastRef.current) {
+      return;
+    }
+
+    lastResetBroadcastRef.current = serialized;
+    await followAtlasDemoReset(broadcast.sessionId);
+  }, [performAtlasDemoResetAsOwner, followAtlasDemoReset]);
+
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === SESSION_RECREATED_BROADCAST_KEY && event.newValue) {
+        const payload = resolveSessionRecreatedBroadcastFollow({
+          broadcastValue: event.newValue,
+          lastSeenBroadcastValue: lastSessionRecreatedBroadcastRef.current,
+          currentSessionId: shell.sessionId,
+        });
+
+        if (payload) {
+          lastSessionRecreatedBroadcastRef.current = event.newValue;
+          void followSessionRecreated(payload.sessionId);
+        } else if (parseSessionRecreatedBroadcast(event.newValue)) {
+          lastSessionRecreatedBroadcastRef.current = event.newValue;
+        }
+
+        return;
+      }
+
+      if (event.key !== ATLAS_DEMO_RESET_BROADCAST_KEY || !event.newValue) {
+        return;
+      }
+      if (event.newValue === lastResetBroadcastRef.current) {
+        return;
+      }
+
+      const broadcast = parseAtlasDemoResetBroadcast(event.newValue);
+      if (!broadcast) {
+        return;
+      }
+
+      lastResetBroadcastRef.current = event.newValue;
+      void followAtlasDemoReset(broadcast.sessionId);
+    };
+
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [followAtlasDemoReset, followSessionRecreated, shell.sessionId]);
 
   const loadDemoPreset = useCallback(
     async (presetId: DemoPersonaId) => {
@@ -296,6 +430,7 @@ function AppProviderSessionLayer({ children }: { children: ReactNode }) {
       refreshUiSnapshot: refreshProfileScope,
       refreshSessionState,
       resetUserData,
+      leaveDemoAndReset,
       loadDemoPreset,
       submitMutation,
       profileHeadRevision: consistency.profileHeadRevision,
@@ -332,6 +467,7 @@ function AppProviderSessionLayer({ children }: { children: ReactNode }) {
       refreshProfileScope,
       refreshSessionState,
       resetUserData,
+      leaveDemoAndReset,
       loadDemoPreset,
       submitMutation,
       changeLanguage,
@@ -356,19 +492,43 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [bootstrapLoading, setBootstrapLoading] = useState(true);
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
+  const [sessionRecreatedNoticeOpen, setSessionRecreatedNoticeOpen] = useState(false);
+  const [sessionRecreatedNoticeSessionId, setSessionRecreatedNoticeSessionId] = useState<
+    string | null
+  >(null);
+
+  const dismissSessionRecreatedNotice = useCallback(() => {
+    if (sessionRecreatedNoticeSessionId) {
+      acknowledgeSessionRecreatedNotice(sessionRecreatedNoticeSessionId);
+    }
+    setSessionRecreatedNoticeOpen(false);
+  }, [sessionRecreatedNoticeSessionId]);
 
   const retryBootstrap = useCallback(async () => {
     setBootstrapLoading(true);
     setBootstrapError(null);
+    setSessionRecreatedNoticeOpen(false);
 
     try {
-      const id = await ensureSession({
+      const result = await ensureSession({
         userProfile: {
           language: readStoredDisplayLanguage() ?? 'en',
           uiPreferences: { theme: 'dark' },
         },
       });
-      setSessionId(id);
+      setSessionId(result.sessionId);
+
+      if (result.outcome === 'recreated') {
+        clearJourneyGuideState();
+        writeAtlasDemoActive(false);
+        markSessionRecreationNoticePending(result.sessionId);
+        broadcastSessionRecreated(result.sessionId);
+      }
+
+      if (shouldOpenSessionRecreatedNotice(result.sessionId, result.outcome)) {
+        setSessionRecreatedNoticeSessionId(result.sessionId);
+        setSessionRecreatedNoticeOpen(true);
+      }
     } catch (error) {
       setBootstrapError(error instanceof Error ? error.message : 'Failed to start session');
     } finally {
@@ -431,6 +591,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     ]
   );
 
+  const bootstrapTranslations = useMemo(
+    () => getTranslations(readStoredDisplayLanguage() ?? 'en'),
+    []
+  );
+
   return (
     <ShellContext.Provider value={shellValue}>
       <RuntimeConsistencyProvider sessionId={sessionId}>
@@ -443,6 +608,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
             <ProfileLoadErrorBanner />
             {children}
           </AppProviderSessionLayer>
+          <SessionRecreatedNotice
+            open={sessionRecreatedNoticeOpen}
+            title={bootstrapTranslations['app.sessionRecreated.title']}
+            message={bootstrapTranslations['app.sessionRecreated.message']}
+            continueLabel={bootstrapTranslations['app.sessionRecreated.continue']}
+            onContinue={dismissSessionRecreatedNotice}
+          />
         </BootstrapGate>
       </RuntimeConsistencyProvider>
     </ShellContext.Provider>

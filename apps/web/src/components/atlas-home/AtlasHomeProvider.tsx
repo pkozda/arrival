@@ -9,49 +9,60 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import {
+  ATLAS_DEMO_STORAGE_KEY,
+  readAtlasDemoState,
+  writeAtlasDemoActive,
+} from './atlas-demo-state';
 
-const STORAGE_KEY = 'arrival_atlas_home_authenticated';
-
-type AtlasHomeAuthContextValue = {
-  isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
+type AtlasHomeDemoContextValue = {
+  /** User chose to explore the Atlas demo (nav + member home), not a real account. */
+  isExploringAtlas: boolean;
+  enterAtlas: () => void;
 };
 
-const AtlasHomeAuthContext = createContext<AtlasHomeAuthContextValue | null>(null);
+const AtlasHomeDemoContext = createContext<AtlasHomeDemoContextValue | null>(null);
 
 export function AtlasHomeProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
+  const [isExploringAtlas, setIsExploringAtlas] = useState(readAtlasDemoState);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem(STORAGE_KEY);
-    setIsAuthenticated(stored === '1');
-    setHydrated(true);
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== ATLAS_DEMO_STORAGE_KEY) {
+        return;
+      }
+      setIsExploringAtlas(event.newValue === '1');
+    };
+
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
-  const login = useCallback(() => {
-    setIsAuthenticated(true);
-    sessionStorage.setItem(STORAGE_KEY, '1');
-  }, []);
-
-  const logout = useCallback(() => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem(STORAGE_KEY);
+  const enterAtlas = useCallback(() => {
+    writeAtlasDemoActive(true);
+    setIsExploringAtlas(true);
   }, []);
 
   const value = useMemo(
-    () => ({ isAuthenticated: hydrated && isAuthenticated, login, logout }),
-    [hydrated, isAuthenticated, login, logout]
+    () => ({
+      isExploringAtlas,
+      enterAtlas,
+    }),
+    [isExploringAtlas, enterAtlas]
   );
 
-  return <AtlasHomeAuthContext.Provider value={value}>{children}</AtlasHomeAuthContext.Provider>;
+  return <AtlasHomeDemoContext.Provider value={value}>{children}</AtlasHomeDemoContext.Provider>;
 }
 
-export function useAtlasHomeAuth(): AtlasHomeAuthContextValue {
-  const context = useContext(AtlasHomeAuthContext);
+export function useAtlasHomeDemo(): AtlasHomeDemoContextValue {
+  const context = useContext(AtlasHomeDemoContext);
   if (!context) {
-    throw new Error('useAtlasHomeAuth must be used within AtlasHomeProvider');
+    throw new Error('useAtlasHomeDemo must be used within AtlasHomeProvider');
   }
   return context;
+}
+
+/** @deprecated Use `useAtlasHomeDemo` — kept for incremental migration only. */
+export function useAtlasHomeAuth(): AtlasHomeDemoContextValue {
+  return useAtlasHomeDemo();
 }

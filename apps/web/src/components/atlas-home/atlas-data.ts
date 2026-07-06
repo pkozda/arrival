@@ -40,7 +40,7 @@ export const JOURNEY_STAGES: Array<{ id: JourneyStageId; label: string; subtitle
   { id: 'build', label: 'Build', subtitle: 'Long term' },
 ];
 
-/** Member experience slides 01–06 (shown only after login). */
+/** Member experience slides 01–06 (shown after entering the Atlas demo). */
 export const ATLAS_SLIDES: AtlasSlideDefinition[] = [
   {
     id: 'orientation',
