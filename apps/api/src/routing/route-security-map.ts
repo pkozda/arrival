@@ -271,6 +271,60 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
     tier: 'credential-required',
     description: 'Dev-only: seed session with life-event demo persona',
   },
+  {
+    method: 'GET',
+    path: '/api/benefits/max',
+    tier: 'credential-required',
+    description: 'MBDE: ranked benefit opportunities for current profile',
+  },
+  {
+    method: 'POST',
+    path: '/api/benefits/recompute',
+    tier: 'credential-required',
+    description: 'MBDE: force recompute benefit opportunities',
+  },
+  {
+    method: 'GET',
+    path: '/api/benefits/clusters',
+    tier: 'credential-required',
+    description: 'MBDE: hidden/stackable benefit clusters',
+  },
+  {
+    method: 'GET',
+    path: '/api/benefits/impact-summary',
+    tier: 'credential-required',
+    description: 'MBDE: aggregate expected value summary',
+  },
+  {
+    method: 'GET',
+    path: '/api/benefits/admin/nodes',
+    tier: 'credential-required',
+    description: 'MBDE admin: list benefit graph nodes',
+  },
+  {
+    method: 'PATCH',
+    path: '/api/benefits/admin/nodes/:id',
+    tier: 'credential-required',
+    description: 'MBDE admin: update benefit node',
+  },
+  {
+    method: 'POST',
+    path: '/api/benefits/admin/nodes',
+    tier: 'credential-required',
+    description: 'MBDE admin: create benefit node',
+  },
+  {
+    method: 'POST',
+    path: '/api/benefits/admin/nodes/:id/deprecate',
+    tier: 'credential-required',
+    description: 'MBDE admin: mark benefit node deprecated',
+  },
+  {
+    method: 'POST',
+    path: '/api/benefits/admin/ingest',
+    tier: 'credential-required',
+    description: 'MBDE admin: ingest raw benefit documents',
+  },
 ];
 
 export const RouteSecurityMap: readonly RouteSecurityRule[] = Object.freeze(
