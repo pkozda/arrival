@@ -88,11 +88,13 @@ export class InMemoryBenefitGraphStore implements BenefitGraphStorePort {
 }
 
 export class FileBenefitGraphStore extends InMemoryBenefitGraphStore {
-  constructor(
-    private readonly filePath: string,
-    seed: BenefitNode[] = []
-  ) {
-    super(seed);
+  private readonly filePath: string;
+
+  constructor(filePath: string, seed: BenefitNode[] = []) {
+    // Seed via super([]) only — passing seed to super() triggers upsert→save before filePath exists.
+    super([]);
+    this.filePath = filePath;
+    seed.forEach((node) => super.upsert(node));
   }
 
   async load(): Promise<void> {

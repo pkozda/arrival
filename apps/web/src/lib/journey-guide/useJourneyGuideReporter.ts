@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from 'react';
 import { useOptionalJourneyGuideContext } from './JourneyGuideProvider';
-import type { JourneyGuideGraphSnapshot } from './types';
+import type { JourneyGuideCertaintySource, JourneyGuideGraphSnapshot } from './types';
 import type { SpatialGraphEdge, SpatialGraphNode } from '@/lib/presentation/spatial-core';
 
 type Input = {
@@ -13,6 +13,7 @@ type Input = {
   selectedNodeId: string | null;
   nodeTitles: Record<string, string>;
   onSelectNode?: (nodeId: string) => void;
+  certaintySource?: JourneyGuideCertaintySource | null;
 };
 
 export function useJourneyGuideReporter({
@@ -23,6 +24,7 @@ export function useJourneyGuideReporter({
   selectedNodeId,
   nodeTitles,
   onSelectNode,
+  certaintySource = null,
 }: Input) {
   const guide = useOptionalJourneyGuideContext();
 
@@ -46,6 +48,13 @@ export function useJourneyGuideReporter({
     }
     guide.setGraphSnapshot(snapshot);
   }, [guide, snapshot]);
+
+  useEffect(() => {
+    if (!guide) {
+      return;
+    }
+    guide.setCertaintySource(certaintySource ?? null);
+  }, [certaintySource, guide]);
 
   useEffect(() => {
     if (!guide) {

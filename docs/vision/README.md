@@ -262,6 +262,23 @@ Style inspiration (not copy):
 
 ---
 
+## Migration strategy (v1 → vision)
+
+Vision prescribes destination. These documents define **how** to get there without discarding engineering investments:
+
+| Doc | Role |
+|-----|------|
+| [implementation-roadmap.md](./implementation-roadmap.md) | Phased migration plan (Phase 0–6) |
+| [ux-migration-backlog.md](./ux-migration-backlog.md) | UX epics with dependencies |
+| [primitives/arrival-welcome.md](./primitives/arrival-welcome.md) | E0 first-contact primitive spec |
+| [primitives/certainty-layer.md](./primitives/certainty-layer.md) | E1 certainty UX contract (semantic model + formatters) |
+| [primitives/journey-guide-certainty.md](./primitives/journey-guide-certainty.md) | E1 Phase 3 — Guide consumes Certainty |
+| [primitives/current-situation-resolver.md](./primitives/current-situation-resolver.md) | E1 final — platform current situation authority |
+
+**Phase 0 — Arrival Welcome Layer** precedes all other phases: language and trust before complexity.
+
+---
+
 ## Related internal docs
 
 | Doc | Relationship |
