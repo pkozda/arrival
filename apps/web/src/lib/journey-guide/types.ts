@@ -1,3 +1,5 @@
+import type { ConfidencePresentation } from '@/lib/certainty/formatters';
+import type { CertaintyState } from '@/lib/certainty/types';
 import type { GalaxyNodeState, SpatialGraphEdge, SpatialGraphNode } from '@/lib/presentation/spatial-core';
 
 export type JourneyGuideMode = 'guided' | 'independent';
@@ -16,12 +18,36 @@ export type JourneyGuidePersistedState = {
   lastUnlockEvent: StoredUnlockEvent | null;
 };
 
+export type GuideTone = 'calm' | 'attentive' | 'blocked' | 'exploratory';
+
 export type PlanetRecommendation = {
   nodeId: string;
   title: string;
   missionTitle: string;
   reason: string;
   unlockPreview: Array<{ nodeId: string; title: string; missionTitle: string }>;
+};
+
+export type JourneyGuideViewModel = {
+  nodeId: string;
+  currentMission: string;
+  recommendedStep: string;
+  explanation: string;
+  outcome?: string;
+  tone: GuideTone;
+  confidencePresentation: ConfidencePresentation;
+  progress?: {
+    completed: number;
+    total: number;
+    label: string;
+  };
+  unlockPreview: PlanetRecommendation['unlockPreview'];
+};
+
+export type JourneyGuideCertaintySource = {
+  state: CertaintyState;
+  recommendedNodeId: string;
+  unlockPreview: Array<{ nodeId: string; title: string }>;
 };
 
 export type JourneyGuideGraphSnapshot = {

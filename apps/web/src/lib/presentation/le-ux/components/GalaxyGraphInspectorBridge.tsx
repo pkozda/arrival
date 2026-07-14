@@ -3,11 +3,15 @@
 import { useMemo } from 'react';
 import type { LifeEventPlanNode } from '@/lib/product-contract';
 import { LifeEventPlanNodeActions } from '@/components/life-event/LifeEventPlanNodeActions';
+import { LifeEventInspectorCertainty } from '@/components/certainty';
 import { useApp } from '@/components/AppProvider';
 import type { ActionBreakdownSectionProps } from '@/lib/presentation/le-ux/types';
 import { buildLifeEventGalaxyGraph } from '@/lib/presentation/le-ux/build-galaxy-graph';
 import { GalaxyGraphStage, GalaxyInspectorShell, useGalaxyGraphModel, useGalaxyProgressReporter } from '@/lib/presentation/spatial-core';
+import { buildLifeEventCertaintyBundle } from '@/lib/certainty';
+import { isGuideUseCertaintyEnabled } from '@/lib/journey-guide/guide-certainty-feature-flag';
 import { useJourneyGuideReporter } from '@/lib/journey-guide';
+import { collectUnlockPreview } from '@/lib/journey-guide/recommendation-engine';
 import { lifeEventNodeDescription, lifeEventNodeTitle } from '@/lib/life-event/content-labels';
 
 type GraphStatus = 'completed' | 'recommended' | 'blocked' | 'future' | 'core';
@@ -138,6 +142,47 @@ export function GalaxyGraphInspectorBridge({
     return titles;
   }, [model.graphNodes, t]);
 
+  const certaintySource = useMemo(() => {
+    if (!isGuideUseCertaintyEnabled()) {
+      return null;
+    }
+
+    const bundle = buildLifeEventCertaintyBundle({
+      selectedNode: selectedNodeRef,
+      primaryAction,
+      timeline: plan.timeline,
+      dependencyNodeIds: Array.from(model.inspectorSelection.dependencySources),
+      titleForNode: (node) => lifeEventNodeTitle(t, node),
+      descriptionForNode: (node) => lifeEventNodeDescription(t, node),
+    });
+
+    if (!bundle.recommendedNodeId || !bundle.state.nextAction) {
+      return null;
+    }
+
+    const unlockPreview = collectUnlockPreview(
+      bundle.recommendedNodeId,
+      model.graphNodes,
+      model.graphEdges,
+      nodeTitles
+    ).map((entry) => ({ nodeId: entry.nodeId, title: entry.title }));
+
+    return {
+      state: bundle.state,
+      recommendedNodeId: bundle.recommendedNodeId,
+      unlockPreview,
+    };
+  }, [
+    model.graphEdges,
+    model.graphNodes,
+    model.inspectorSelection.dependencySources,
+    nodeTitles,
+    plan.timeline,
+    primaryAction,
+    selectedNodeRef,
+    t,
+  ]);
+
   useJourneyGuideReporter({
     surfaceId: 'life-event-galaxy',
     graphNodes: model.graphNodes,
@@ -146,6 +191,7 @@ export function GalaxyGraphInspectorBridge({
     selectedNodeId: model.selectedNodeId,
     nodeTitles,
     onSelectNode: model.setSelectedNodeId,
+    certaintySource,
   });
 
   return (
@@ -174,6 +220,15 @@ export function GalaxyGraphInspectorBridge({
       />
 
       <GalaxyInspectorShell>
+        <LifeEventInspectorCertainty
+          selectedNode={selectedNodeRef}
+          primaryAction={primaryAction}
+          timeline={plan.timeline}
+          dependencyNodeIds={Array.from(model.inspectorSelection.dependencySources)}
+          titleForNode={(node) => lifeEventNodeTitle(t, node)}
+          descriptionForNode={(node) => lifeEventNodeDescription(t, node)}
+        />
+
         <h3 className="le-consequence-inspector__title">
           {selectedNodeRef ? lifeEventNodeTitle(t, selectedNodeRef) : 'Node Inspector'}
         </h3>

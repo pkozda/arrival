@@ -56,6 +56,7 @@ import {
 } from '@/lib/runtime/RuntimeConsistencyProvider';
 import { EconomicRealityPlanProvider } from '@/lib/economic-reality';
 import { BootstrapGate } from '@/components/BootstrapGate';
+import { ArrivalWelcomeGate } from '@/components/arrival/ArrivalWelcomeGate';
 import { ProfileLoadErrorBanner } from '@/components/ProfileLoadErrorBanner';
 import { SessionRecreatedNotice } from '@/components/SessionRecreatedNotice';
 import type {
@@ -606,7 +607,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         >
           <AppProviderSessionLayer>
             <ProfileLoadErrorBanner />
-            {children}
+            <ArrivalWelcomeGate>{children}</ArrivalWelcomeGate>
           </AppProviderSessionLayer>
           <SessionRecreatedNotice
             open={sessionRecreatedNoticeOpen}

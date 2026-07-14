@@ -21,10 +21,12 @@ import {
   storedEventToSequence,
 } from './cinematic-unlock-engine';
 import {
-  buildLockedGuideState,
-  buildRoutePreviewChain,
-  getRecommendedNextPlanet,
-} from './recommendation-engine';
+  buildJourneyGuideViewModelFromCertainty,
+  isGuideCertaintyComplete,
+  viewModelToPlanetRecommendation,
+} from './adapters/certainty';
+import { emitGuideCertaintyTelemetry } from './guide-certainty-events';
+import { isGuideUseCertaintyEnabled } from './guide-certainty-feature-flag';
 import {
   deriveAssistanceStage,
   persistGuideMode,
@@ -37,14 +39,21 @@ import {
 } from './storage';
 import type {
   CinematicUnlockState,
+  JourneyGuideCertaintySource,
   JourneyGuideGraphSnapshot,
   JourneyGuideMode,
   JourneyGuidePersistedState,
+  JourneyGuideViewModel,
   LockedGuideState,
   PlanetRecommendation,
   RoutePreviewState,
   StoredUnlockEvent,
 } from './types';
+import {
+  buildLockedGuideState,
+  buildRoutePreviewChain,
+  getRecommendedNextPlanet,
+} from './recommendation-engine';
 
 type JourneyGuideContextValue = {
   surfaceId: string;
@@ -55,6 +64,8 @@ type JourneyGuideContextValue = {
   panelOpen: boolean;
   panelDismissed: boolean;
   recommendation: PlanetRecommendation | null;
+  guideViewModel: JourneyGuideViewModel | null;
+  usesCertaintySource: boolean;
   routePreview: RoutePreviewState | null;
   cinematicUnlock: CinematicUnlockState | null;
   lockedGuide: LockedGuideState | null;
@@ -70,6 +81,7 @@ type JourneyGuideContextValue = {
   lastUnlockEvent: StoredUnlockEvent | null;
   canReplayUnlock: boolean;
   setGraphSnapshot: (snapshot: JourneyGuideGraphSnapshot | null) => void;
+  setCertaintySource: (source: JourneyGuideCertaintySource | null) => void;
   startGuidedJourney: () => void;
   exploreOnMyOwn: () => void;
   dismissWelcome: () => void;
@@ -114,6 +126,7 @@ function createCinematicState(
 export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
   const [persisted, setPersisted] = useState<JourneyGuidePersistedState>(() => readJourneyGuideState());
   const [graphSnapshot, setGraphSnapshotState] = useState<JourneyGuideGraphSnapshot | null>(null);
+  const [certaintySource, setCertaintySourceState] = useState<JourneyGuideCertaintySource | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [panelDismissed, setPanelDismissed] = useState(false);
   const [routePreview, setRoutePreview] = useState<RoutePreviewState | null>(null);
@@ -145,10 +158,28 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
     return new Set([...persisted.completedMissionIds, ...fromGraph]);
   }, [graphSnapshot, persisted.completedMissionIds]);
 
+  const guideUseCertainty = isGuideUseCertaintyEnabled();
+
+  const guideViewModel = useMemo(() => {
+    if (!guideUseCertainty || !certaintySource || !isGuideCertaintyComplete(certaintySource.state)) {
+      return null;
+    }
+
+    return buildJourneyGuideViewModelFromCertainty(certaintySource.state, {
+      recommendedNodeId: certaintySource.recommendedNodeId,
+      unlockPreview: certaintySource.unlockPreview,
+    });
+  }, [certaintySource, guideUseCertainty]);
+
   const recommendation = useMemo(() => {
     if (!graphSnapshot) {
       return null;
     }
+
+    if (guideViewModel) {
+      return viewModelToPlanetRecommendation(guideViewModel);
+    }
+
     return getRecommendedNextPlanet({
       graphNodes: graphSnapshot.graphNodes,
       graphEdges: graphSnapshot.graphEdges,
@@ -157,7 +188,27 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       primaryNodeId: recommendationPrimary(graphSnapshot, completedNodeIds),
       completedNodeIds,
     });
-  }, [completedNodeIds, graphSnapshot]);
+  }, [completedNodeIds, graphSnapshot, guideViewModel]);
+
+  const usesCertaintySource = Boolean(guideUseCertainty && guideViewModel);
+
+  useEffect(() => {
+    if (!guideUseCertainty || !graphSnapshot) {
+      return;
+    }
+
+    if (!certaintySource) {
+      emitGuideCertaintyTelemetry({ name: 'guide_certainty_missing', surface: surfaceId });
+      return;
+    }
+
+    if (!isGuideCertaintyComplete(certaintySource.state) || !guideViewModel) {
+      emitGuideCertaintyTelemetry({ name: 'guide_certainty_fallback', surface: surfaceId });
+      return;
+    }
+
+    emitGuideCertaintyTelemetry({ name: 'guide_certainty_enabled', surface: surfaceId });
+  }, [certaintySource, graphSnapshot, guideUseCertainty, guideViewModel, surfaceId]);
 
   const assistantUiActive =
     showWelcome || panelOpen || Boolean(lockedGuide) || cinematicUnlock?.phase === 'guide';
@@ -345,6 +396,7 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       clearCinematicTimers();
       setPersisted(readJourneyGuideState());
       setGraphSnapshotState(null);
+      setCertaintySourceState(null);
       setPanelOpen(false);
       setPanelDismissed(false);
       setRoutePreview(null);
@@ -369,6 +421,10 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
 
   const setGraphSnapshot = useCallback((snapshot: JourneyGuideGraphSnapshot | null) => {
     setGraphSnapshotState(snapshot);
+  }, []);
+
+  const setCertaintySource = useCallback((source: JourneyGuideCertaintySource | null) => {
+    setCertaintySourceState(source);
   }, []);
 
   const applyRoutePreview = useCallback(
@@ -536,6 +592,8 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       panelOpen,
       panelDismissed,
       recommendation,
+      guideViewModel,
+      usesCertaintySource,
       routePreview,
       cinematicUnlock,
       lockedGuide,
@@ -551,6 +609,7 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       lastUnlockEvent,
       canReplayUnlock,
       setGraphSnapshot,
+      setCertaintySource,
       startGuidedJourney,
       exploreOnMyOwn,
       dismissWelcome,
@@ -593,6 +652,7 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       exploreOnMyOwn,
       goToPrerequisite,
       guidedDimActive,
+      guideViewModel,
       handleLockedNodeSelect,
       lastUnlockEvent,
       lockedGuide,
@@ -606,12 +666,14 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       routePreview,
       routePreviewEdgeIds,
       routePreviewNodeIds,
+      setCertaintySource,
       setGraphSnapshot,
       showWelcome,
       startGuidedJourney,
       surfaceId,
       triggerRoutePreview,
       dismissWelcome,
+      usesCertaintySource,
     ]
   );
 

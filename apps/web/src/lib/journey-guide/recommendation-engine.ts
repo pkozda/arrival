@@ -54,7 +54,7 @@ function nodeTitle(nodeTitles: Record<string, string>, nodeId: string): string {
   return nodeTitles[nodeId] ?? nodeId;
 }
 
-function collectUnlockPreview(
+export function collectUnlockPreview(
   sourceId: string,
   graphNodes: SpatialGraphNode[],
   graphEdges: SpatialGraphEdge[],
