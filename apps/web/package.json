@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:e2e": "PW_SKIP_WEBSERVER=1 playwright test",
     "test:e2e:ci": "playwright test",
+    "test:e2e:localization": "PW_SKIP_WEBSERVER=1 playwright test localization/newcomer-localization",
     "test:e2e:install": "playwright install chromium"
   },
   "dependencies": {

@@ -16,6 +16,8 @@ type Props = {
   onSelectLanguage: (language: SupportedLanguage) => void | Promise<void>;
 };
 
+const LANGUAGE_GROUP_ARIA_LABEL = 'Deutsch · Українська · Русский · English';
+
 export function LanguageSelector({
   copy,
   suggestedLanguage,
@@ -24,6 +26,8 @@ export function LanguageSelector({
   onSelectLanguage,
 }: Props) {
   const initialFocusRef = useRef<HTMLButtonElement>(null);
+  const promptId = 'arrival-welcome-languages-heading';
+  const hasVisiblePrompt = Boolean(copy.languagePrompt.trim());
 
   useEffect(() => {
     initialFocusRef.current?.focus();
@@ -36,18 +40,25 @@ export function LanguageSelector({
 
   return (
     <div className="arrival-welcome__languages-wrap">
-      <h2 id="arrival-welcome-languages-heading" className="arrival-welcome__languages-heading">
-        {copy.languageHeading}
-      </h2>
+      {hasVisiblePrompt ? (
+        <p id={promptId} className="arrival-welcome__language-prompt">
+          {copy.languagePrompt}
+        </p>
+      ) : (
+        <span id={promptId} className="arrival-welcome__language-prompt-sr">
+          {LANGUAGE_GROUP_ARIA_LABEL}
+        </span>
+      )}
       <div
         className="arrival-welcome__languages"
         role="group"
-        aria-labelledby="arrival-welcome-languages-heading"
+        aria-labelledby={promptId}
       >
         {supportedLanguages.map((language) => {
           const isSelected = selectedLanguage === language;
           const isSuggested = suggestedLanguage === language && !selectedLanguage;
           const shouldReceiveInitialFocus = language === focusLanguage;
+          const nativeLabel = ARRIVAL_LANGUAGE_LABELS[language];
 
           return (
             <button
@@ -61,8 +72,10 @@ export function LanguageSelector({
               aria-pressed={isSelected}
               aria-label={
                 isSelected
-                  ? `${ARRIVAL_LANGUAGE_LABELS[language]}, selected`
-                  : ARRIVAL_LANGUAGE_LABELS[language]
+                  ? `${nativeLabel}, selected`
+                  : isSuggested
+                    ? `${nativeLabel}, suggested`
+                    : nativeLabel
               }
               data-suggested={isSuggested ? 'true' : undefined}
               onClick={() => void onSelectLanguage(language)}
@@ -71,10 +84,17 @@ export function LanguageSelector({
                 <span className="arrival-welcome__lang-flag" aria-hidden="true">
                   {ARRIVAL_LANGUAGE_FLAGS[language]}
                 </span>
-                <span className="arrival-welcome__lang-label">{ARRIVAL_LANGUAGE_LABELS[language]}</span>
+                <span className="arrival-welcome__lang-label">{nativeLabel}</span>
+                {isSelected && (
+                  <span className="arrival-welcome__lang-check" aria-hidden="true">
+                    ✓
+                  </span>
+                )}
               </span>
               {isSuggested && (
-                <span className="arrival-welcome__lang-hint">{copy.suggestedLabel}</span>
+                <span className="arrival-welcome__lang-hint" aria-hidden="true">
+                  {copy.suggestedLabel.trim() ? copy.suggestedLabel : '✦'}
+                </span>
               )}
             </button>
           );

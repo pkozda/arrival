@@ -26,10 +26,12 @@ type Props = {
 };
 
 export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props) {
-  const { userContext, submitMutation, profileHeadRevision, refreshSessionState, sessionId } =
+  const { t, userContext, submitMutation, profileHeadRevision, refreshSessionState, sessionId } =
     useApp();
   const profile = selectUserContextProfile(userContext);
   const section = getDomainEditSection(domainSlug);
+  const sectionTitle = t(section.titleKey);
+  const sectionSummary = t(section.summaryKey);
 
   const initialDraft = useMemo(
     () => buildInitialDraft(section, profile ?? undefined),
@@ -77,25 +79,27 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
       await refreshSessionState();
       onSuccess();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Could not save your changes');
+      setError(err instanceof Error ? err.message : t('profile.saveError'));
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <>
+    <div data-ui-surface="profile-intake">
       <PageHeader
-        eyebrow="Profile"
-        leading={<Link href={`/profile/${domainSlug}`}>{`← Back to ${section.title}`}</Link>}
-        title="Correct information"
-        description={section.summary}
+        eyebrow={t('profile.eyebrow')}
+        leading={
+          <Link href={`/profile/${domainSlug}`}>
+            {t('profile.backTo').replace('{title}', sectionTitle)}
+          </Link>
+        }
+        title={t('profile.correctInformation')}
+        description={sectionSummary}
       />
 
       <LegacyFormNode onSubmit={handleSave}>
-        <p className="text-meta mb-md">
-          Update what we know about your situation. Changes are saved securely.
-        </p>
+        <p className="text-meta mb-md">{t('profile.helper')}</p>
 
         {section.fields.map((field) => (
           <DomainFieldRenderer
@@ -115,13 +119,13 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
 
         <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
           <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? 'Saving…' : 'Save'}
+            {saving ? t('profile.saving') : t('profile.save')}
           </button>
           <AtlasSecondaryButton disabled={saving} onClick={onCancel}>
-            Cancel
+            {t('common.cancel')}
           </AtlasSecondaryButton>
         </div>
       </LegacyFormNode>
-    </>
+    </div>
   );
 }

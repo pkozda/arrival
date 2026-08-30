@@ -1,6 +1,9 @@
+'use client';
+
 import type { CertaintyLevel } from '@/lib/certainty/types';
 import { getConfidencePresentation } from '@/lib/certainty/formatters';
-import { CERTAINTY_COPY } from '@/lib/certainty/certainty-copy';
+import { CERTAINTY_COPY_KEYS } from '@/lib/certainty/certainty-copy';
+import { useApp } from '@/components/AppProvider';
 
 type Props = {
   location: string;
@@ -9,11 +12,12 @@ type Props = {
 };
 
 export function CertaintyHeader({ location, title, confidence }: Props) {
+  const { t } = useApp();
   const presentation = confidence ? getConfidencePresentation(confidence) : null;
 
   return (
     <header className="certainty-header">
-      <p className="certainty-header__eyebrow">{CERTAINTY_COPY.locationEyebrow}</p>
+      <p className="certainty-header__eyebrow">{t(CERTAINTY_COPY_KEYS.locationEyebrow)}</p>
       <p className="certainty-header__location">{location}</p>
       <h2 className="certainty-header__title">{title}</h2>
       {presentation && (
@@ -23,7 +27,7 @@ export function CertaintyHeader({ location, title, confidence }: Props) {
           data-certainty-tone={presentation.tone}
           data-certainty-badge={presentation.badgeVariant}
         >
-          {presentation.label}
+          {t(presentation.labelKey)}
         </p>
       )}
     </header>

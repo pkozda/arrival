@@ -5,135 +5,137 @@ export type DomainEditFieldType = 'text' | 'number' | 'select' | 'boolean';
 
 export type DomainEditFieldOption = {
   value: string;
-  label: string;
+  /** Translation key — never a display string */
+  labelKey: string;
 };
 
 export type DomainEditFieldDefinition = {
   /** Internal form key — never shown in UI */
   formKey: string;
-  label: string;
+  /** Translation key for the visible field label */
+  labelKey: string;
   type: DomainEditFieldType;
   options?: DomainEditFieldOption[];
   contractDomain: ProfileDomain;
-  placeholder?: string;
+  placeholderKey?: string;
   min?: number;
   max?: number;
 };
 
 export type DomainEditSection = {
   slug: ProfileMirrorDomainSlug;
-  title: string;
-  summary: string;
+  titleKey: string;
+  summaryKey: string;
   fields: DomainEditFieldDefinition[];
 };
 
 const RESIDENCY_OPTIONS: DomainEditFieldOption[] = [
-  { value: 'eu-citizen', label: 'EU citizen' },
-  { value: 'permanent-resident', label: 'Permanent resident' },
-  { value: 'temporary-resident', label: 'Temporary resident' },
-  { value: 'asylum-seeker', label: 'Asylum seeker' },
-  { value: 'student-visa', label: 'Student visa' },
-  { value: 'work-visa', label: 'Work visa' },
-  { value: 'tourist', label: 'Tourist / visitor' },
-  { value: 'unknown', label: 'Status not specified' },
+  { value: 'eu-citizen', labelKey: 'profile.options.residencyStatus.eu-citizen' },
+  { value: 'permanent-resident', labelKey: 'profile.options.residencyStatus.permanent-resident' },
+  { value: 'temporary-resident', labelKey: 'profile.options.residencyStatus.temporary-resident' },
+  { value: 'asylum-seeker', labelKey: 'profile.options.residencyStatus.asylum-seeker' },
+  { value: 'student-visa', labelKey: 'profile.options.residencyStatus.student-visa' },
+  { value: 'work-visa', labelKey: 'profile.options.residencyStatus.work-visa' },
+  { value: 'tourist', labelKey: 'profile.options.residencyStatus.tourist' },
+  { value: 'unknown', labelKey: 'profile.options.residencyStatus.unknown' },
 ];
 
 const EMPLOYMENT_OPTIONS: DomainEditFieldOption[] = [
-  { value: 'employed', label: 'Employed full-time' },
-  { value: 'self-employed', label: 'Self-employed' },
-  { value: 'unemployed', label: 'Unemployed' },
-  { value: 'part-time', label: 'Part-time employed' },
-  { value: 'student', label: 'Student' },
+  { value: 'employed', labelKey: 'profile.options.employmentStatus.employed' },
+  { value: 'self-employed', labelKey: 'profile.options.employmentStatus.self-employed' },
+  { value: 'unemployed', labelKey: 'profile.options.employmentStatus.unemployed' },
+  { value: 'part-time', labelKey: 'profile.options.employmentStatus.part-time' },
+  { value: 'student', labelKey: 'profile.options.employmentStatus.student' },
 ];
 
 const MARITAL_OPTIONS: DomainEditFieldOption[] = [
-  { value: 'single', label: 'Single' },
-  { value: 'married', label: 'Married' },
-  { value: 'divorced', label: 'Divorced' },
-  { value: 'widowed', label: 'Widowed' },
+  { value: 'single', labelKey: 'profile.options.maritalStatus.single' },
+  { value: 'married', labelKey: 'profile.options.maritalStatus.married' },
+  { value: 'divorced', labelKey: 'profile.options.maritalStatus.divorced' },
+  { value: 'widowed', labelKey: 'profile.options.maritalStatus.widowed' },
 ];
 
 const INSURANCE_OPTIONS: DomainEditFieldOption[] = [
-  { value: 'public', label: 'Public health insurance (GKV)' },
-  { value: 'private', label: 'Private health insurance (PKV)' },
-  { value: 'none', label: 'No coverage noted' },
+  { value: 'public', labelKey: 'profile.options.insuranceType.public' },
+  { value: 'private', labelKey: 'profile.options.insuranceType.private' },
+  { value: 'none', labelKey: 'profile.options.insuranceType.none' },
 ];
 
 const TAX_CLASS_OPTIONS: DomainEditFieldOption[] = [1, 2, 3, 4, 5, 6].map((value) => ({
   value: String(value),
-  label: `Tax class ${value}`,
+  labelKey: `profile.options.taxClass.${value}`,
 }));
 
 const LANGUAGE_OPTIONS: DomainEditFieldOption[] = [
-  { value: 'en', label: 'English' },
-  { value: 'de', label: 'German' },
-  { value: 'ru', label: 'Russian' },
-  { value: 'ua', label: 'Ukrainian' },
+  { value: 'en', labelKey: 'profile.options.preferredLanguage.en' },
+  { value: 'de', labelKey: 'profile.options.preferredLanguage.de' },
+  { value: 'ru', labelKey: 'profile.options.preferredLanguage.ru' },
+  { value: 'ua', labelKey: 'profile.options.preferredLanguage.ua' },
 ];
 
 const THEME_OPTIONS: DomainEditFieldOption[] = [
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
-  { value: 'system', label: 'Match system' },
+  { value: 'light', labelKey: 'profile.options.theme.light' },
+  { value: 'dark', labelKey: 'profile.options.theme.dark' },
+  { value: 'system', labelKey: 'profile.options.theme.system' },
 ];
 
 export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSection> = {
   'move-to-germany': {
     slug: 'move-to-germany',
-    title: 'Your move to Germany',
-    summary: 'Update arrival and residency details.',
+    titleKey: 'profile.sections.move-to-germany.title',
+    summaryKey: 'profile.sections.move-to-germany.summary',
     fields: [
       {
         formKey: 'countryOfOrigin',
-        label: 'Country of origin',
+        labelKey: 'profile.fields.countryOfOrigin',
         type: 'text',
         contractDomain: 'migration',
-        placeholder: 'e.g. UA',
+        placeholderKey: 'profile.placeholders.countryOfOrigin',
       },
       {
         formKey: 'residencyStatus',
-        label: 'Residency status',
+        labelKey: 'profile.fields.residencyStatus',
         type: 'select',
         contractDomain: 'migration',
         options: RESIDENCY_OPTIONS,
       },
       {
         formKey: 'arrivedAt',
-        label: 'When did you arrive in Germany?',
+        labelKey: 'profile.fields.arrivedAt',
         type: 'text',
         contractDomain: 'migration',
-        placeholder: 'YYYY-MM (e.g. 2024-03)',
+        placeholderKey: 'profile.placeholders.arrivedAt',
       },
     ],
   },
   'where-you-live': {
     slug: 'where-you-live',
-    title: 'Where you live',
-    summary: 'Update housing and location details.',
+    titleKey: 'profile.sections.where-you-live.title',
+    summaryKey: 'profile.sections.where-you-live.summary',
     fields: [
       {
         formKey: 'city',
-        label: 'City',
+        labelKey: 'profile.fields.city',
         type: 'text',
         contractDomain: 'housing',
       },
       {
         formKey: 'bundesland',
-        label: 'Federal state (code)',
+        labelKey: 'profile.fields.bundesland',
         type: 'text',
         contractDomain: 'housing',
-        placeholder: 'e.g. BE',
+        placeholderKey: 'profile.placeholders.bundesland',
       },
       {
         formKey: 'monthlyColdRent',
-        label: 'Monthly rent (cold)',
+        labelKey: 'profile.fields.monthlyColdRent',
         type: 'number',
         contractDomain: 'housing',
         min: 0,
       },
       {
         formKey: 'monthlyUtilities',
-        label: 'Monthly utilities',
+        labelKey: 'profile.fields.monthlyUtilities',
         type: 'number',
         contractDomain: 'housing',
         min: 0,
@@ -142,12 +144,12 @@ export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSec
   },
   'household-family': {
     slug: 'household-family',
-    title: 'Household & family',
-    summary: 'Update household composition.',
+    titleKey: 'profile.sections.household-family.title',
+    summaryKey: 'profile.sections.household-family.summary',
     fields: [
       {
         formKey: 'householdSize',
-        label: 'Household size',
+        labelKey: 'profile.fields.householdSize',
         type: 'number',
         contractDomain: 'household',
         min: 1,
@@ -155,7 +157,7 @@ export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSec
       },
       {
         formKey: 'maritalStatus',
-        label: 'Marital status',
+        labelKey: 'profile.fields.maritalStatus',
         type: 'select',
         contractDomain: 'household',
         options: MARITAL_OPTIONS,
@@ -164,33 +166,33 @@ export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSec
   },
   'work-income': {
     slug: 'work-income',
-    title: 'Work & income',
-    summary: 'Update employment and income details.',
+    titleKey: 'profile.sections.work-income.title',
+    summaryKey: 'profile.sections.work-income.summary',
     fields: [
       {
         formKey: 'employmentStatus',
-        label: 'Employment status',
+        labelKey: 'profile.fields.employmentStatus',
         type: 'select',
         contractDomain: 'employment',
         options: EMPLOYMENT_OPTIONS,
       },
       {
         formKey: 'grossMonthlyIncome',
-        label: 'Gross monthly income (EUR)',
+        labelKey: 'profile.fields.grossMonthlyIncome',
         type: 'number',
         contractDomain: 'income',
         min: 0,
       },
       {
         formKey: 'taxClass',
-        label: 'Tax class',
+        labelKey: 'profile.fields.taxClass',
         type: 'select',
         contractDomain: 'employment',
         options: TAX_CLASS_OPTIONS,
       },
       {
         formKey: 'churchTax',
-        label: 'Pay church tax',
+        labelKey: 'profile.fields.churchTax',
         type: 'boolean',
         contractDomain: 'employment',
       },
@@ -198,19 +200,19 @@ export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSec
   },
   'health-insurance': {
     slug: 'health-insurance',
-    title: 'Health insurance',
-    summary: 'Update coverage information.',
+    titleKey: 'profile.sections.health-insurance.title',
+    summaryKey: 'profile.sections.health-insurance.summary',
     fields: [
       {
         formKey: 'insuranceType',
-        label: 'Coverage type',
+        labelKey: 'profile.fields.insuranceType',
         type: 'select',
         contractDomain: 'healthInsurance',
         options: INSURANCE_OPTIONS,
       },
       {
         formKey: 'hasCoverage',
-        label: 'Currently enrolled in health insurance',
+        labelKey: 'profile.fields.hasCoverage',
         type: 'boolean',
         contractDomain: 'healthInsurance',
       },
@@ -218,30 +220,30 @@ export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSec
   },
   'benefits-support': {
     slug: 'benefits-support',
-    title: 'Benefits & support',
-    summary: 'Update benefits information.',
+    titleKey: 'profile.sections.benefits-support.title',
+    summaryKey: 'profile.sections.benefits-support.summary',
     fields: [
       {
         formKey: 'receivingBuergergeld',
-        label: 'Receiving Bürgergeld',
+        labelKey: 'profile.fields.receivingBuergergeld',
         type: 'boolean',
         contractDomain: 'benefits',
       },
       {
         formKey: 'receivingAlg1',
-        label: 'Receiving ALG I',
+        labelKey: 'profile.fields.receivingAlg1',
         type: 'boolean',
         contractDomain: 'benefits',
       },
       {
         formKey: 'receivingWohngeld',
-        label: 'Receiving Wohngeld',
+        labelKey: 'profile.fields.receivingWohngeld',
         type: 'boolean',
         contractDomain: 'benefits',
       },
       {
         formKey: 'daysInGermany',
-        label: 'Days in Germany',
+        labelKey: 'profile.fields.daysInGermany',
         type: 'number',
         contractDomain: 'benefits',
         min: 0,
@@ -250,19 +252,19 @@ export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSec
   },
   'language-display': {
     slug: 'language-display',
-    title: 'Language & display',
-    summary: 'Update language and display preferences.',
+    titleKey: 'profile.sections.language-display.title',
+    summaryKey: 'profile.sections.language-display.summary',
     fields: [
       {
         formKey: 'preferredLanguage',
-        label: 'Preferred language',
+        labelKey: 'profile.fields.preferredLanguage',
         type: 'select',
         contractDomain: 'preferences',
         options: LANGUAGE_OPTIONS,
       },
       {
         formKey: 'theme',
-        label: 'Display theme',
+        labelKey: 'profile.fields.theme',
         type: 'select',
         contractDomain: 'preferences',
         options: THEME_OPTIONS,

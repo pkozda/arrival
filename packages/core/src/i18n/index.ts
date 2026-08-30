@@ -3,6 +3,10 @@ import type { SupportedLanguage } from '@arrival-atlas/ui-contract';
 import { LIFE_EVENT_I18N } from './life-event-translations.js';
 import { LIFE_EVENT_CONTENT_I18N } from './life-event-content-translations.js';
 import { ECONOMIC_REALITY_I18N } from './economic-reality-translations.js';
+import { SHELL_HOME_I18N } from './shell-home-translations.js';
+import { GUIDE_I18N } from './guide-translations.js';
+import { CERTAINTY_I18N } from './certainty-translations.js';
+import { PROFILE_I18N } from './profile-translations.js';
 
 export { LIFE_EVENT_I18N, LIFE_EVENT_I18N_KEYS } from './life-event-translations.js';
 export { LIFE_EVENT_CONTENT_I18N, LIFE_EVENT_CONTENT_I18N_KEYS } from './life-event-content-translations.js';
@@ -10,6 +14,10 @@ export {
   ECONOMIC_REALITY_I18N,
   ECONOMIC_REALITY_I18N_KEYS,
 } from './economic-reality-translations.js';
+export { SHELL_HOME_I18N, SHELL_HOME_I18N_KEYS } from './shell-home-translations.js';
+export { GUIDE_I18N, GUIDE_I18N_KEYS } from './guide-translations.js';
+export { CERTAINTY_I18N, CERTAINTY_I18N_KEYS } from './certainty-translations.js';
+export { PROFILE_I18N, PROFILE_I18N_KEYS } from './profile-translations.js';
 
 type TranslationKey = string;
 type Translations = Record<TranslationKey, string>;
@@ -44,6 +52,10 @@ const translations: Record<SupportedLanguage, Translations> = {
     'translation.description': 'Translate German administrative terms into plain language',
     'lifeEvent.title': 'Life Events',
     'lifeEvent.description': 'Scenario-based guidance for major life changes',
+    ...SHELL_HOME_I18N.en,
+    ...GUIDE_I18N.en,
+    ...CERTAINTY_I18N.en,
+    ...PROFILE_I18N.en,
     ...LIFE_EVENT_I18N.en,
     ...LIFE_EVENT_CONTENT_I18N.en,
     ...ECONOMIC_REALITY_I18N.en,
@@ -77,6 +89,10 @@ const translations: Record<SupportedLanguage, Translations> = {
     'translation.description': 'Deutsche Verwaltungsbegriffe in einfache Sprache übersetzen',
     'lifeEvent.title': 'Lebensereignisse',
     'lifeEvent.description': 'Szenariobasierte Beratung bei wichtigen Lebensveränderungen',
+    ...SHELL_HOME_I18N.de,
+    ...GUIDE_I18N.de,
+    ...CERTAINTY_I18N.de,
+    ...PROFILE_I18N.de,
     ...LIFE_EVENT_I18N.de,
     ...LIFE_EVENT_CONTENT_I18N.de,
     ...ECONOMIC_REALITY_I18N.de,
@@ -110,6 +126,10 @@ const translations: Record<SupportedLanguage, Translations> = {
     'translation.description': 'Перевод немецких административных терминов',
     'lifeEvent.title': 'Жизненные события',
     'lifeEvent.description': 'Сценарная помощь при важных жизненных изменениях',
+    ...SHELL_HOME_I18N.ru,
+    ...GUIDE_I18N.ru,
+    ...CERTAINTY_I18N.ru,
+    ...PROFILE_I18N.ru,
     ...LIFE_EVENT_I18N.ru,
     ...LIFE_EVENT_CONTENT_I18N.ru,
     ...ECONOMIC_REALITY_I18N.ru,
@@ -143,6 +163,10 @@ const translations: Record<SupportedLanguage, Translations> = {
     'translation.description': 'Переклад німецьких адміністративних термінів',
     'lifeEvent.title': 'Життєві події',
     'lifeEvent.description': 'Сценарна допомога при важливих життєвих змінах',
+    ...SHELL_HOME_I18N.ua,
+    ...GUIDE_I18N.ua,
+    ...CERTAINTY_I18N.ua,
+    ...PROFILE_I18N.ua,
     ...LIFE_EVENT_I18N.ua,
     ...LIFE_EVENT_CONTENT_I18N.ua,
     ...ECONOMIC_REALITY_I18N.ua,

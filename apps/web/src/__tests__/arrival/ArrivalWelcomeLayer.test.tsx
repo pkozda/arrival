@@ -22,6 +22,7 @@ describe('ArrivalWelcomeLayer', () => {
     onSelectLanguage.mockReset();
     onComplete.mockReset();
     stubMatchMedia(false);
+    document.documentElement.lang = 'en';
   });
 
   afterEach(() => {
@@ -64,8 +65,40 @@ describe('ArrivalWelcomeLayer', () => {
     expect(container.textContent).toContain('🇺🇦');
     expect(container.textContent).toContain('🇷🇺');
     expect(container.textContent).toContain('🇬🇧');
+    expect(container.textContent).toContain('Deutsch');
+    expect(container.textContent).toContain('Українська');
+    expect(container.textContent).toContain('Русский');
+    expect(container.textContent).toContain('English');
     expect(container.querySelector('.arrival-welcome__card')).not.toBeNull();
     expect(container.querySelector('.arrival-welcome__scrim')).not.toBeNull();
+  });
+
+  it('places the language selector before trust copy in the DOM', async () => {
+    const container = await renderLayer('de');
+    const card = container.querySelector('.arrival-welcome__card');
+    const children = Array.from(card?.children ?? []);
+
+    const languagesIndex = children.findIndex((node) =>
+      node.classList.contains('arrival-welcome__languages-wrap')
+    );
+    const trustIndex = children.findIndex((node) => node.classList.contains('arrival-welcome__trust'));
+    const continueIndex = children.findIndex((node) =>
+      node.classList.contains('arrival-welcome__continue')
+    );
+
+    expect(languagesIndex).toBeGreaterThan(-1);
+    expect(trustIndex).toBeGreaterThan(languagesIndex);
+    expect(continueIndex).toBeGreaterThan(trustIndex);
+    expect(container.querySelector('.arrival-welcome__languages-heading')).toBeNull();
+  });
+
+  it('keeps pre-selection chrome free of English explanatory paragraphs', async () => {
+    const container = await renderLayer();
+
+    expect(container.querySelector('.arrival-welcome__trust')).toBeNull();
+    expect(container.textContent).not.toContain('Choose your language');
+    expect(container.textContent).not.toContain('Private guidance');
+    expect(container.querySelector('.arrival-welcome__languages-wrap')).not.toBeNull();
   });
 
   it('disables Continue until a language is selected', async () => {
@@ -81,7 +114,11 @@ describe('ArrivalWelcomeLayer', () => {
     const continueButton = container.querySelector('.arrival-welcome__cta') as HTMLButtonElement;
 
     expect(selected?.getAttribute('aria-pressed')).toBe('true');
+    expect(selected?.classList.contains('is-selected')).toBe(true);
+    expect(selected?.textContent).toContain('✓');
     expect(continueButton.disabled).toBe(false);
+    expect(container.textContent).toContain('Sie sind angekommen');
+    expect(container.textContent).toContain('Private Orientierung');
 
     await act(async () => {
       continueButton.click();
@@ -96,7 +133,8 @@ describe('ArrivalWelcomeLayer', () => {
 
     expect(suggested).not.toBeNull();
     expect(suggested?.getAttribute('aria-pressed')).toBe('false');
-    expect(suggested?.textContent).toContain('Suggested for you');
+    expect(suggested?.classList.contains('is-suggested')).toBe(true);
+    expect(suggested?.getAttribute('aria-label')).toContain('suggested');
   });
 
   it('focuses language selection first for keyboard users', async () => {

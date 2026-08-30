@@ -1,8 +1,16 @@
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { getTranslations } from '@arrival-atlas/core';
 import { LifeEventInspectorCertainty } from '@/components/certainty/LifeEventInspectorCertainty';
 import type { LifeEventPlanNode } from '@/lib/product-contract';
+
+vi.mock('@/components/AppProvider', () => ({
+  useApp: () => ({
+    language: 'en',
+    t: (key: string) => getTranslations('en')[key] ?? key,
+  }),
+}));
 
 function node(partial: Partial<LifeEventPlanNode> & { id: string; title: string }): LifeEventPlanNode {
   return {

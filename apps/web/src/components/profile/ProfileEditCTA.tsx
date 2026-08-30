@@ -1,4 +1,7 @@
+'use client';
+
 import { AtlasLink as Link, AtlasSecondaryLink } from '@/components/atlas-runtime';
+import { useApp } from '@/components/AppProvider';
 import type { ProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
 
 type Props = {
@@ -9,20 +12,23 @@ type Props = {
 
 export function ProfileEditCTA({
   domainSlug,
-  label = 'Correct information',
+  label,
   variant = 'button',
 }: Props) {
+  const { t } = useApp();
+  const resolvedLabel = label ?? t('profile.correctInformation');
+
   if (variant === 'link') {
     return (
       <Link href={`/profile/${domainSlug}/edit`} className="text-link-accent">
-        {label}
+        {resolvedLabel}
       </Link>
     );
   }
 
   return (
     <AtlasSecondaryLink href={`/profile/${domainSlug}/edit`}>
-      {label}
+      {resolvedLabel}
     </AtlasSecondaryLink>
   );
 }

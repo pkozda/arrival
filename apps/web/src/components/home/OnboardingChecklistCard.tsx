@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useApp } from '@/components/AppProvider';
 import type { OnboardingStep } from '@/lib/situation-utils';
 import { ONBOARDING_DISMISS_STORAGE_KEY } from '@/lib/situation-utils';
 
@@ -58,10 +59,14 @@ export function useOnboardingDismissed(): [boolean, () => void] {
 }
 
 export function OnboardingChecklistCard({ steps, onDismiss }: Props) {
+  const { t } = useApp();
   const completedCount = steps.filter((step) => step.complete).length;
+  const progress = t('home.onboarding.progress')
+    .replace('{completed}', String(completedCount))
+    .replace('{total}', String(steps.length));
 
   return (
-    <section className="card" style={{ marginBottom: '1rem' }}>
+    <section className="card" style={{ marginBottom: '1rem' }} aria-label={t('home.onboarding.title')}>
       <div
         style={{
           display: 'flex',
@@ -73,16 +78,15 @@ export function OnboardingChecklistCard({ steps, onDismiss }: Props) {
       >
         <div>
           <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.25rem' }}>
-            Getting oriented in Germany
+            {t('home.onboarding.title')}
           </h2>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-            {completedCount} of {steps.length} steps complete
-          </p>
+          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>{progress}</p>
         </div>
         {onDismiss && (
           <button
             type="button"
             onClick={onDismiss}
+            aria-label={t('home.onboarding.dismiss')}
             style={{
               background: 'transparent',
               border: 'none',
@@ -92,7 +96,7 @@ export function OnboardingChecklistCard({ steps, onDismiss }: Props) {
               whiteSpace: 'nowrap',
             }}
           >
-            Dismiss
+            {t('home.onboarding.dismiss')}
           </button>
         )}
       </div>
@@ -110,7 +114,7 @@ export function OnboardingChecklistCard({ steps, onDismiss }: Props) {
             }}
           >
             <StepIcon complete={step.complete} />
-            <span>{step.label}</span>
+            <span>{t(`home.onboarding.step.${step.id}`)}</span>
           </li>
         ))}
       </ul>

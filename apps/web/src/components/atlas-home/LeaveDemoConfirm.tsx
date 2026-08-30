@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import { useApp } from '@/components/AppProvider';
 import { useFocusTrap } from '@/lib/a11y/useFocusTrap';
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function LeaveDemoConfirm({ open, leaving, onCancel, onConfirm }: Props) {
+  const { t } = useApp();
   const dialogRef = useRef<HTMLDivElement>(null);
   const primaryRef = useRef<HTMLButtonElement>(null);
 
@@ -30,7 +32,7 @@ export function LeaveDemoConfirm({ open, leaving, onCancel, onConfirm }: Props) 
       <button
         type="button"
         className="leave-demo-confirm__backdrop"
-        aria-label="Close"
+        aria-label={t('common.close')}
         onClick={onCancel}
         disabled={leaving}
       />
@@ -42,12 +44,9 @@ export function LeaveDemoConfirm({ open, leaving, onCancel, onConfirm }: Props) 
         aria-labelledby="leave-demo-confirm-title"
       >
         <h2 id="leave-demo-confirm-title" className="leave-demo-confirm__title">
-          Leave demo and start over?
+          {t('home.leaveDemo.title')}
         </h2>
-        <p className="leave-demo-confirm__lead">
-          Your demo profile, journey progress, and local settings on this device will be cleared.
-          You will return to the Atlas preview.
-        </p>
+        <p className="leave-demo-confirm__lead">{t('home.leaveDemo.message')}</p>
         <div className="leave-demo-confirm__actions">
           <button
             ref={primaryRef}
@@ -56,7 +55,7 @@ export function LeaveDemoConfirm({ open, leaving, onCancel, onConfirm }: Props) 
             onClick={onConfirm}
             disabled={leaving}
           >
-            {leaving ? 'Resetting…' : 'Start over'}
+            {leaving ? t('home.leaveDemo.resetting') : t('home.leaveDemo.confirm')}
           </button>
           <button
             type="button"
@@ -64,7 +63,7 @@ export function LeaveDemoConfirm({ open, leaving, onCancel, onConfirm }: Props) 
             onClick={onCancel}
             disabled={leaving}
           >
-            Keep exploring
+            {t('home.leaveDemo.cancel')}
           </button>
         </div>
       </div>

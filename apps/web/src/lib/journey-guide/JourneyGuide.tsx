@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useApp } from '@/components/AppProvider';
 import type { JourneyGuideProbeState } from './types';
 
 type ProbeProps = {
@@ -28,12 +28,18 @@ type SpeechProps = {
 };
 
 export function JourneyGuideSpeech({ title, children, onClose }: SpeechProps) {
+  const { t } = useApp();
   return (
     <div className="journey-guide-speech" role="status" aria-live="polite">
       {title && <p className="journey-guide-speech__title">{title}</p>}
       <div className="journey-guide-speech__body">{children}</div>
       {onClose && (
-        <button type="button" className="journey-guide-speech__close" onClick={onClose} aria-label="Dismiss guide">
+        <button
+          type="button"
+          className="journey-guide-speech__close"
+          onClick={onClose}
+          aria-label={t('guide.dismissAria')}
+        >
           ×
         </button>
       )}
@@ -47,20 +53,21 @@ type WelcomeProps = {
 };
 
 export function JourneyGuideWelcome({ onStartGuided, onExploreAlone }: WelcomeProps) {
+  const { t } = useApp();
   return (
     <div className="journey-guide-welcome" role="dialog" aria-labelledby="journey-guide-welcome-title">
       <JourneyGuideProbe state="speaking" />
       <div className="journey-guide-welcome__panel">
         <h2 id="journey-guide-welcome-title" className="journey-guide-welcome__title">
-          Welcome to Arrival Atlas.
+          {t('guide.welcome.title')}
         </h2>
-        <p className="journey-guide-welcome__lead">Let&apos;s build your journey together.</p>
+        <p className="journey-guide-welcome__lead">{t('guide.welcome.lead')}</p>
         <div className="journey-guide-welcome__actions">
           <button type="button" className="journey-guide-btn journey-guide-btn--primary" onClick={onStartGuided}>
-            Start Guided Journey
+            {t('guide.welcome.startGuided')}
           </button>
           <button type="button" className="journey-guide-btn journey-guide-btn--ghost" onClick={onExploreAlone}>
-            Explore On My Own
+            {t('guide.welcome.exploreAlone')}
           </button>
         </div>
       </div>
@@ -73,14 +80,16 @@ type FloatingButtonProps = {
   label?: string;
 };
 
-export function JourneyGuideFloatingButton({ onClick, label = 'Journey Guide' }: FloatingButtonProps) {
+export function JourneyGuideFloatingButton({ onClick, label }: FloatingButtonProps) {
+  const { t } = useApp();
+  const resolvedLabel = label ?? t('guide.fabLabel');
   return (
     <button
       type="button"
       className="journey-guide-fab"
       onClick={onClick}
-      aria-label={label}
-      title={label}
+      aria-label={resolvedLabel}
+      title={resolvedLabel}
     >
       <JourneyGuideProbe state="idle" />
     </button>

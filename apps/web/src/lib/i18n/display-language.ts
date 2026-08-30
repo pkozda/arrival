@@ -40,3 +40,20 @@ export function clearStoredDisplayLanguage(): void {
     // ignore
   }
 }
+
+/** Map app language codes to valid HTML `lang` tags (`ua` → `uk`). */
+export function toDocumentLanguageTag(language: SupportedLanguage): string {
+  if (language === 'ua') {
+    return 'uk';
+  }
+  return language;
+}
+
+/** Sync `document.documentElement.lang` after an explicit language choice. */
+export function syncDocumentLanguage(language: SupportedLanguage): void {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  document.documentElement.lang = toDocumentLanguageTag(language);
+}

@@ -1,9 +1,10 @@
+import { getTranslations } from '@arrival-atlas/core';
 import {
   buildIncomingDependencyMap,
   getUnsatisfiedDependencySources,
   JOURNEY_NODE_ID,
 } from '@/lib/presentation/spatial-core';
-import { toMissionTitle } from './mission-labels';
+import { toMissionTitle, type GuideTranslate } from './mission-labels';
 import type { PlanetRecommendation } from './types';
 import type { SpatialGraphEdge, SpatialGraphNode } from '@/lib/presentation/spatial-core';
 
@@ -14,7 +15,12 @@ type Input = {
   nodeTitles: Record<string, string>;
   primaryNodeId?: string | null;
   completedNodeIds?: Set<string>;
+  t?: GuideTranslate;
 };
+
+function defaultTranslate(key: string): string {
+  return getTranslations('en')[key] ?? key;
+}
 
 function isCompletedNode(
   node: SpatialGraphNode,
@@ -58,7 +64,8 @@ export function collectUnlockPreview(
   sourceId: string,
   graphNodes: SpatialGraphNode[],
   graphEdges: SpatialGraphEdge[],
-  nodeTitles: Record<string, string>
+  nodeTitles: Record<string, string>,
+  translate?: GuideTranslate
 ): PlanetRecommendation['unlockPreview'] {
   const preview: PlanetRecommendation['unlockPreview'] = [];
   const seen = new Set<string>();
@@ -90,7 +97,7 @@ export function collectUnlockPreview(
       preview.push({
         nodeId: target.id,
         title,
-        missionTitle: toMissionTitle(target.id, title),
+        missionTitle: toMissionTitle(target.id, title, translate),
       });
     });
 
@@ -104,7 +111,9 @@ export function getRecommendedNextPlanet({
   nodeTitles,
   primaryNodeId = null,
   completedNodeIds,
+  t,
 }: Input): PlanetRecommendation | null {
+  const translate = t ?? defaultTranslate;
   const candidates = graphNodes
     .map((node) => ({
       node,
@@ -119,19 +128,25 @@ export function getRecommendedNextPlanet({
   }
 
   const title = nodeTitle(nodeTitles, next.id);
-  const unlockPreview = collectUnlockPreview(next.id, graphNodes, graphEdges, nodeTitles);
+  const unlockPreview = collectUnlockPreview(
+    next.id,
+    graphNodes,
+    graphEdges,
+    nodeTitles,
+    translate
+  );
 
   const reason =
     next.status === 'recommended'
-      ? 'This is the most actionable step on your current route.'
+      ? translate('guide.reason.recommended')
       : next.status === 'blocked'
-        ? 'Resolving this blocker clears the path ahead.'
-        : 'This node opens nearby progression.';
+        ? translate('guide.reason.blocked')
+        : translate('guide.reason.default');
 
   return {
     nodeId: next.id,
     title,
-    missionTitle: toMissionTitle(next.id, title),
+    missionTitle: toMissionTitle(next.id, title, translate),
     reason,
     unlockPreview,
   };
@@ -141,11 +156,12 @@ export function buildRoutePreviewChain(
   startNodeId: string,
   graphNodes: SpatialGraphNode[],
   graphEdges: SpatialGraphEdge[],
-  nodeTitles: Record<string, string>
+  nodeTitles: Record<string, string>,
+  translate?: GuideTranslate
 ): { nodeIds: string[]; edgeIds: string[]; labels: string[] } {
   const nodeIds = [startNodeId];
   const edgeIds: string[] = [];
-  const labels = [toMissionTitle(startNodeId, nodeTitle(nodeTitles, startNodeId))];
+  const labels = [toMissionTitle(startNodeId, nodeTitle(nodeTitles, startNodeId), translate)];
   const visited = new Set<string>([startNodeId]);
 
   let currentId = startNodeId;
@@ -170,7 +186,7 @@ export function buildRoutePreviewChain(
     currentId = nextEdge.to;
     visited.add(currentId);
     nodeIds.push(currentId);
-    labels.push(toMissionTitle(currentId, nodeTitle(nodeTitles, currentId)));
+    labels.push(toMissionTitle(currentId, nodeTitle(nodeTitles, currentId), translate));
   }
 
   return { nodeIds, edgeIds, labels };

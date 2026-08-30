@@ -2,7 +2,7 @@
 
 import { AtlasSecondaryLink } from '@/components/atlas-runtime';
 import { AtlasSurface } from '@/components/atlas-runtime/legacy';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '@/components/AppProvider';
 import { DomainFieldRenderer } from '@/components/profile/DomainFieldRenderer';
 import {
@@ -13,44 +13,11 @@ import {
 import type { DomainDraftValues } from '@/lib/profile-correction';
 import { submitDomainCorrectionRequests } from '@/lib/profile-correction/submit-domain-correction';
 
-function translateLabel(
-  t: (key: string) => string,
-  key: string,
-  fallback: string
-): string {
-  const value = t(key);
-  return value === key ? fallback : value;
-}
-
 export function LifeEventPlanIntake() {
   const { t, submitMutation, profileHeadRevision } = useApp();
   const [draft, setDraft] = useState<DomainDraftValues>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const fields = useMemo(
-    () =>
-      LIFE_EVENT_COLD_START_FIELDS.map((field) => ({
-        ...field,
-        label: translateLabel(t, `life-event.intake.field.${field.formKey}`, field.label),
-        placeholder: field.placeholder
-          ? translateLabel(
-              t,
-              `life-event.intake.placeholder.${field.formKey}`,
-              field.placeholder
-            )
-          : undefined,
-        options: field.options?.map((option) => ({
-          ...option,
-          label: translateLabel(
-            t,
-            `life-event.intake.option.${field.formKey}.${option.value}`,
-            option.label
-          ),
-        })),
-      })),
-    [t]
-  );
 
   const handleFieldChange = (formKey: string, value: string | boolean | number | undefined) => {
     setDraft((current) => ({ ...current, [formKey]: value }));
@@ -95,7 +62,7 @@ export function LifeEventPlanIntake() {
       </header>
 
       <form onSubmit={handleSubmit} className="le-plan-intake__form">
-        {fields.map((field) => (
+        {LIFE_EVENT_COLD_START_FIELDS.map((field) => (
           <DomainFieldRenderer
             key={field.formKey}
             field={field}

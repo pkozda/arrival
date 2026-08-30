@@ -6,7 +6,7 @@ const API_URL = process.env.PLAYWRIGHT_API_URL ?? 'http://localhost:3001';
 const useManagedServers = process.env.PW_SKIP_WEBSERVER !== '1';
 
 export default defineConfig({
-  testDir: './tests/e2e/arr-023',
+  testDir: './tests/e2e',
   testMatch: '**/*.spec.ts',
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),

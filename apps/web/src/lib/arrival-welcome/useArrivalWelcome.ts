@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { SupportedLanguage } from '@/lib/product-contract';
 import { SUPPORTED_LANGUAGES } from '@/lib/product-contract';
-import { writeStoredDisplayLanguage } from '@/lib/i18n/display-language';
+import {
+  syncDocumentLanguage,
+  writeStoredDisplayLanguage,
+} from '@/lib/i18n/display-language';
 import {
   detectBrowserLanguage,
   persistArrivalLanguageSelected,
@@ -40,6 +43,7 @@ export function useArrivalWelcome() {
   const selectLanguage = useCallback(
     async (language: SupportedLanguage, changeLanguage?: ChangeLanguageFn) => {
       writeStoredDisplayLanguage(language);
+      syncDocumentLanguage(language);
       const next = persistArrivalLanguageSelected(language);
       setRecord(next);
       trackArrivalLanguageSelected(language);

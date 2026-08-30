@@ -1,6 +1,15 @@
 export type CertaintyLevel = 'clear' | 'needs_attention' | 'blocked' | 'unknown';
 
-/** Semantic "why" — adapters describe meaning; formatters own language. */
+/**
+ * Language-neutral presentation descriptor.
+ * Domain/formatters emit this; UI resolves via translation keys + params.
+ */
+export type CertaintyMessageDescriptor = {
+  key: string;
+  params?: Record<string, string | number>;
+};
+
+/** Semantic "why" — adapters describe meaning; formatters own language keys. */
 export type CertaintyReason =
   | {
       type: 'dependency';
@@ -44,4 +53,4 @@ export interface CertaintyState {
   nextAction?: CertaintyNextAction;
   progress?: CertaintyProgress;
   confidence?: CertaintyLevel;
-}
+};
