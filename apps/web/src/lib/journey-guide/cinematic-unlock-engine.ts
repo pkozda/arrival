@@ -1,7 +1,10 @@
+import { getTranslations } from '@arrival-atlas/core';
 import { JOURNEY_NODE_ID } from '@/lib/presentation/spatial-core';
-import { toMissionTitle } from './mission-labels';
+import { toMissionTitle, type GuideTranslate } from './mission-labels';
 import type { CinematicUnlockSequence, StoredUnlockEvent } from './types';
 import type { SpatialGraphEdge, SpatialGraphNode } from '@/lib/presentation/spatial-core';
+
+export type { GuideTranslate } from './mission-labels';
 
 export const CINEMATIC_TIMING = {
   completion: 1000,
@@ -10,6 +13,20 @@ export const CINEMATIC_TIMING = {
   overlay: 2800,
   guide: 4000,
 } as const;
+
+export function fillGuideTemplate(
+  template: string,
+  vars: Record<string, string | number>
+): string {
+  return Object.entries(vars).reduce(
+    (result, [key, value]) => result.replaceAll(`{${key}}`, String(value)),
+    template
+  );
+}
+
+function defaultTranslate(key: string): string {
+  return getTranslations('en')[key] ?? key;
+}
 
 export function findNewlyCompletedNodeIds(
   previous: Set<string>,
@@ -99,7 +116,8 @@ export function buildUnlockSequence(
   newlyUnlockedIds: string[],
   graphNodes: SpatialGraphNode[],
   graphEdges: SpatialGraphEdge[],
-  nodeTitles: Record<string, string>
+  nodeTitles: Record<string, string>,
+  translate?: GuideTranslate
 ): CinematicUnlockSequence | null {
   if (newlyUnlockedIds.length === 0) {
     return null;
@@ -156,7 +174,7 @@ export function buildUnlockSequence(
   return {
     sourceNodeId,
     sourceTitle,
-    sourceMissionTitle: toMissionTitle(sourceNodeId, sourceTitle),
+    sourceMissionTitle: toMissionTitle(sourceNodeId, sourceTitle, translate),
     newlyUnlockedNodeIds: emergenceOrder,
     newlyUnlockedTitles,
     routeSteps,
@@ -167,34 +185,48 @@ export function buildUnlockSequence(
 
 export function buildUnlockGuideMessage(
   sourceTitle: string,
-  unlockedTitles: string[]
+  unlockedTitles: string[],
+  translate: GuideTranslate = defaultTranslate
 ): { title: string; body: string } {
   if (unlockedTitles.length === 0) {
     return {
-      title: 'Progress recorded',
-      body: 'Your route has been updated.',
+      title: translate('guide.unlock.progressTitle'),
+      body: translate('guide.unlock.progressBody'),
     };
   }
 
   if (unlockedTitles.length === 1) {
     return {
-      title: 'A new route has become available',
-      body: `Completing ${sourceTitle} unlocked your access to ${unlockedTitles[0]}.`,
+      title: translate('guide.unlock.newRouteTitle'),
+      body: fillGuideTemplate(translate('guide.unlock.newRouteBody'), {
+        source: sourceTitle,
+        target: unlockedTitles[0]!,
+      }),
     };
   }
 
   if (unlockedTitles.length === 2) {
     return {
-      title: 'New routes discovered',
-      body: `Completing ${sourceTitle} unlocked ${unlockedTitles[0]} and ${unlockedTitles[1]}.`,
+      title: translate('guide.unlock.newRoutesTitle'),
+      body: fillGuideTemplate(translate('guide.unlock.newRoutesBodyTwo'), {
+        source: sourceTitle,
+        a: unlockedTitles[0]!,
+        b: unlockedTitles[1]!,
+      }),
     };
   }
 
   const last = unlockedTitles[unlockedTitles.length - 1]!;
-  const rest = unlockedTitles.slice(0, -1).join(', ');
+  const list = unlockedTitles.slice(0, -1).join(', ');
   return {
-    title: `${unlockedTitles.length} new destinations available`,
-    body: `Completing ${sourceTitle} unlocked ${rest}, and ${last}.`,
+    title: fillGuideTemplate(translate('guide.unlock.destinationsAvailable'), {
+      count: unlockedTitles.length,
+    }),
+    body: fillGuideTemplate(translate('guide.unlock.newRoutesBodyMany'), {
+      source: sourceTitle,
+      list,
+      last,
+    }),
   };
 }
 
@@ -215,11 +247,14 @@ export function sequenceToStoredEvent(
   };
 }
 
-export function storedEventToSequence(event: StoredUnlockEvent): CinematicUnlockSequence {
+export function storedEventToSequence(
+  event: StoredUnlockEvent,
+  translate?: GuideTranslate
+): CinematicUnlockSequence {
   return {
     sourceNodeId: event.sourceNodeId,
     sourceTitle: event.sourceTitle,
-    sourceMissionTitle: toMissionTitle(event.sourceNodeId, event.sourceTitle),
+    sourceMissionTitle: toMissionTitle(event.sourceNodeId, event.sourceTitle, translate),
     newlyUnlockedNodeIds: event.newlyUnlockedNodeIds,
     newlyUnlockedTitles: event.newlyUnlockedTitles,
     routeSteps: event.routeSteps,
@@ -228,9 +263,12 @@ export function storedEventToSequence(event: StoredUnlockEvent): CinematicUnlock
   };
 }
 
-export function buildOverlayTitle(unlockedCount: number): string {
+export function buildOverlayTitle(
+  unlockedCount: number,
+  translate: GuideTranslate = defaultTranslate
+): string {
   if (unlockedCount === 1) {
-    return 'New route discovered';
+    return translate('guide.unlock.overlayOne');
   }
-  return `${unlockedCount} new destinations available`;
+  return fillGuideTemplate(translate('guide.unlock.overlayMany'), { count: unlockedCount });
 }

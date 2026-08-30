@@ -1,7 +1,9 @@
-import type { CertaintyProgress } from '../types';
+import type { CertaintyMessageDescriptor, CertaintyProgress } from '../types';
 
-/** Formats progress delta copy from semantic counts. */
-export function formatProgressDelta(progress: CertaintyProgress): string | null {
+/** Maps progress counts → language-neutral translation descriptor. */
+export function formatProgressDelta(
+  progress: CertaintyProgress
+): CertaintyMessageDescriptor | null {
   const { completed, total } = progress;
 
   if (total <= 0) {
@@ -9,8 +11,14 @@ export function formatProgressDelta(progress: CertaintyProgress): string | null 
   }
 
   if (completed > 0) {
-    return `${completed} of ${total} steps are already in place.`;
+    return {
+      key: 'certainty.progress.partial',
+      params: { completed, total },
+    };
   }
 
-  return `${total} steps in your plan.`;
+  return {
+    key: 'certainty.progress.noneCompleted',
+    params: { total },
+  };
 }

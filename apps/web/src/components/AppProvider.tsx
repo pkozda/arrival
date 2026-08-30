@@ -46,6 +46,7 @@ import {
 import { selectAppDisplayLanguage } from '@/lib/user-context';
 import {
   readStoredDisplayLanguage,
+  syncDocumentLanguage,
   writeStoredDisplayLanguage,
 } from '@/lib/i18n/display-language';
 import { clearJourneyGuideState } from '@/lib/journey-guide/storage';
@@ -197,6 +198,19 @@ function AppProviderSessionLayer({ children }: { children: ReactNode }) {
     }
     setClientLocaleReady(true);
   }, []);
+
+  /**
+   * Authoritative html lang sync: whenever AppProvider's resolved language is ready
+   * (including restore from arrival_atlas_display_language after full navigation/SSR),
+   * keep document.documentElement.lang aligned. SSR layout may start as lang="en".
+   */
+  useEffect(() => {
+    if (!clientLocaleReady) {
+      return;
+    }
+    syncDocumentLanguage(language);
+  }, [clientLocaleReady, language]);
+
   const theme: ResolvedTheme = 'dark';
 
   useEffect(() => {
@@ -374,6 +388,7 @@ function AppProviderSessionLayer({ children }: { children: ReactNode }) {
       if (!shell.sessionId) return;
       languageRef.current = lang;
       writeStoredDisplayLanguage(lang);
+      syncDocumentLanguage(lang);
       await submitMutation(buildHeaderLanguageMutation(lang));
       await updateSessionLanguage(shell.sessionId, lang);
       await consistency.requestSync('FULL');

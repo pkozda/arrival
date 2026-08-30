@@ -10,6 +10,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useApp } from '@/components/AppProvider';
 import {
   buildOverlayTitle,
   buildUnlockGuideMessage,
@@ -27,6 +28,7 @@ import {
 } from './adapters/certainty';
 import { emitGuideCertaintyTelemetry } from './guide-certainty-events';
 import { isGuideUseCertaintyEnabled } from './guide-certainty-feature-flag';
+import { toMissionTitle, type GuideTranslate } from './mission-labels';
 import {
   deriveAssistanceStage,
   persistGuideMode,
@@ -106,11 +108,17 @@ type ProviderProps = {
 
 function createCinematicState(
   sequence: ReturnType<typeof storedEventToSequence>,
-  isReplay: boolean
+  isReplay: boolean,
+  translate: GuideTranslate
 ): CinematicUnlockState {
-  const guideMessage = buildUnlockGuideMessage(sequence.sourceTitle, sequence.newlyUnlockedTitles);
+  const sourceLabel = toMissionTitle(sequence.sourceNodeId, sequence.sourceTitle, translate);
+  const unlockedLabels = sequence.newlyUnlockedNodeIds.map((id, index) =>
+    toMissionTitle(id, sequence.newlyUnlockedTitles[index] ?? id, translate)
+  );
+  const guideMessage = buildUnlockGuideMessage(sourceLabel, unlockedLabels, translate);
   return {
     ...sequence,
+    sourceMissionTitle: sourceLabel,
     phase: 'completion',
     routeProgress: 0,
     emergenceProgress: 0,
@@ -119,11 +127,12 @@ function createCinematicState(
     isReplay,
     guideTitle: guideMessage.title,
     guideBody: guideMessage.body,
-    overlayTitle: buildOverlayTitle(sequence.newlyUnlockedNodeIds.length),
+    overlayTitle: buildOverlayTitle(sequence.newlyUnlockedNodeIds.length, translate),
   };
 }
 
 export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
+  const { t, language } = useApp();
   const [persisted, setPersisted] = useState<JourneyGuidePersistedState>(() => readJourneyGuideState());
   const [graphSnapshot, setGraphSnapshotState] = useState<JourneyGuideGraphSnapshot | null>(null);
   const [certaintySource, setCertaintySourceState] = useState<JourneyGuideCertaintySource | null>(null);
@@ -168,8 +177,9 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
     return buildJourneyGuideViewModelFromCertainty(certaintySource.state, {
       recommendedNodeId: certaintySource.recommendedNodeId,
       unlockPreview: certaintySource.unlockPreview,
+      t,
     });
-  }, [certaintySource, guideUseCertainty]);
+  }, [certaintySource, guideUseCertainty, t]);
 
   const recommendation = useMemo(() => {
     if (!graphSnapshot) {
@@ -187,8 +197,9 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       nodeTitles: graphSnapshot.nodeTitles,
       primaryNodeId: recommendationPrimary(graphSnapshot, completedNodeIds),
       completedNodeIds,
+      t,
     });
-  }, [completedNodeIds, graphSnapshot, guideViewModel]);
+  }, [completedNodeIds, graphSnapshot, guideViewModel, t]);
 
   const usesCertaintySource = Boolean(guideUseCertainty && guideViewModel);
 
@@ -232,11 +243,31 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
       clearCinematicTimers();
       setRoutePreview(null);
       setLockedGuide(null);
-      const sequence = storedEventToSequence(event);
-      setCinematicUnlock(createCinematicState(sequence, isReplay));
+      const sequence = storedEventToSequence(event, t);
+      setCinematicUnlock(createCinematicState(sequence, isReplay, t));
     },
-    [clearCinematicTimers]
+    [clearCinematicTimers, t]
   );
+
+  useEffect(() => {
+    setCinematicUnlock((current) => {
+      if (!current) {
+        return null;
+      }
+      const sourceLabel = toMissionTitle(current.sourceNodeId, current.sourceTitle, t);
+      const unlockedLabels = current.newlyUnlockedNodeIds.map((id, index) =>
+        toMissionTitle(id, current.newlyUnlockedTitles[index] ?? id, t)
+      );
+      const guideMessage = buildUnlockGuideMessage(sourceLabel, unlockedLabels, t);
+      return {
+        ...current,
+        sourceMissionTitle: sourceLabel,
+        guideTitle: guideMessage.title,
+        guideBody: guideMessage.body,
+        overlayTitle: buildOverlayTitle(current.newlyUnlockedNodeIds.length, t),
+      };
+    });
+  }, [language, t]);
 
   useEffect(() => {
     if (!graphSnapshot) {
@@ -293,7 +324,8 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
         newlyUnlocked,
         graphSnapshot.graphNodes,
         graphSnapshot.graphEdges,
-        graphSnapshot.nodeTitles
+        graphSnapshot.nodeTitles,
+        t
       );
 
       if (sequence) {
@@ -306,7 +338,7 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
 
     previousLockedRef.current = new Set(locked);
     previousCompletedRef.current = completed;
-  }, [cinematicUnlock, graphSnapshot, startCinematicUnlock, surfaceId]);
+  }, [cinematicUnlock, graphSnapshot, startCinematicUnlock, surfaceId, t]);
 
   useEffect(() => {
     if (!cinematicUnlock) {
@@ -436,7 +468,8 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
         nodeId,
         graphSnapshot.graphNodes,
         graphSnapshot.graphEdges,
-        graphSnapshot.nodeTitles
+        graphSnapshot.nodeTitles,
+        t
       );
       if (chain.nodeIds.length < 2 && chain.edgeIds.length === 0) {
         return;
@@ -447,7 +480,7 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
         startedAt: Date.now(),
       });
     },
-    [cinematicUnlock, graphSnapshot]
+    [cinematicUnlock, graphSnapshot, t]
   );
 
   const startGuidedJourney = useCallback(() => {

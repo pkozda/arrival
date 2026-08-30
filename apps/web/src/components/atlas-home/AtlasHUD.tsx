@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { usePathname } from 'next/navigation';
@@ -9,33 +9,40 @@ import { useAtlasHomeDemo } from './AtlasHomeProvider';
 import { AtlasLogo } from './AtlasLogo';
 import { LeaveDemoConfirm } from './LeaveDemoConfirm';
 
-const EXPLORING_NAV_ITEMS = [
-  { href: '/', label: 'Explore Atlas', match: (path: string) => path === '/' },
-  {
-    href: '/modules/life-event',
-    label: 'Life Events',
-    match: (path: string) => path.startsWith('/modules/life-event'),
-  },
-  {
-    href: '/modules/economic-reality',
-    label: 'Economic Reality',
-    match: (path: string) => path.startsWith('/modules/economic-reality'),
-  },
-  {
-    href: '/profile',
-    label: 'Profile',
-    match: (path: string) => path.startsWith('/profile'),
-  },
-] as const;
-
 export function AtlasHUD() {
   const pathname = usePathname();
   const router = useRouter();
   const { isExploringAtlas, enterAtlas } = useAtlasHomeDemo();
-  const { leaveDemoAndReset } = useApp();
+  const { leaveDemoAndReset, t } = useApp();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [leaveError, setLeaveError] = useState<string | null>(null);
+
+  const exploringNavItems = useMemo(
+    () => [
+      {
+        href: '/',
+        label: t('nav.exploreAtlas'),
+        match: (path: string) => path === '/',
+      },
+      {
+        href: '/modules/life-event',
+        label: t('nav.lifeEvents'),
+        match: (path: string) => path.startsWith('/modules/life-event'),
+      },
+      {
+        href: '/modules/economic-reality',
+        label: t('nav.economicReality'),
+        match: (path: string) => path.startsWith('/modules/economic-reality'),
+      },
+      {
+        href: '/profile',
+        label: t('nav.profile'),
+        match: (path: string) => path.startsWith('/profile'),
+      },
+    ],
+    [t]
+  );
 
   const handleLeaveRequest = () => {
     setLeaveError(null);
@@ -51,7 +58,7 @@ export function AtlasHUD() {
       setConfirmOpen(false);
       router.push('/');
     } catch (error) {
-      setLeaveError(error instanceof Error ? error.message : 'Could not reset demo');
+      setLeaveError(error instanceof Error ? error.message : t('home.leaveDemo.error'));
     } finally {
       setLeaving(false);
     }
@@ -65,8 +72,8 @@ export function AtlasHUD() {
         </Link>
 
         {isExploringAtlas ? (
-          <nav className="atlas-hud__nav" aria-label="Primary">
-            {EXPLORING_NAV_ITEMS.map((item) => {
+          <nav className="atlas-hud__nav" aria-label={t('nav.primary')}>
+            {exploringNavItems.map((item) => {
               const active = item.match(pathname);
               return (
                 <Link
@@ -95,18 +102,18 @@ export function AtlasHUD() {
               type="button"
               className="atlas-hud__ghost"
               onClick={handleLeaveRequest}
-              aria-label="Leave Atlas demo and start over"
+              aria-label={t('nav.leaveDemoAria')}
             >
-              Leave demo
+              {t('nav.leaveDemo')}
             </button>
           ) : (
             <button
               type="button"
               className="atlas-hud__cta"
               onClick={enterAtlas}
-              aria-label="Enter Atlas demo"
+              aria-label={t('nav.enterAtlasAria')}
             >
-              Enter Atlas
+              {t('nav.enterAtlas')}
             </button>
           )}
         </div>

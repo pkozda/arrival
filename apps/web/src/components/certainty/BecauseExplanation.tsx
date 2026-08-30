@@ -1,13 +1,18 @@
+'use client';
+
 import type { CertaintyReason } from '@/lib/certainty/types';
 import { formatReason } from '@/lib/certainty/formatters';
-import { CERTAINTY_COPY } from '@/lib/certainty/certainty-copy';
+import { CERTAINTY_COPY_KEYS } from '@/lib/certainty/certainty-copy';
+import { resolveCertaintyMessage } from '@/lib/certainty/resolve-message';
+import { useApp } from '@/components/AppProvider';
 
 type Props = {
   reason: CertaintyReason;
 };
 
 export function BecauseExplanation({ reason }: Props) {
-  const text = formatReason(reason);
+  const { t } = useApp();
+  const text = resolveCertaintyMessage(formatReason(reason), t);
 
   if (!text.trim()) {
     return null;
@@ -16,7 +21,7 @@ export function BecauseExplanation({ reason }: Props) {
   return (
     <section className="certainty-because" aria-labelledby="certainty-because-heading">
       <h3 id="certainty-because-heading" className="certainty-because__heading">
-        {CERTAINTY_COPY.becauseHeading}
+        {t(CERTAINTY_COPY_KEYS.becauseHeading)}
       </h3>
       <p className="certainty-because__text">{text}</p>
     </section>

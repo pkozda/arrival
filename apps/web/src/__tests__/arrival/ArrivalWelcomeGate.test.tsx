@@ -8,11 +8,16 @@ import {
   ARRIVAL_WELCOME_STORAGE_KEY,
   persistArrivalWelcomeCompleted,
 } from '@/lib/arrival-welcome';
-import { DISPLAY_LANGUAGE_STORAGE_KEY } from '@/lib/i18n/display-language';
+import {
+  DISPLAY_LANGUAGE_STORAGE_KEY,
+  toDocumentLanguageTag,
+} from '@/lib/i18n/display-language';
+
+const changeLanguage = vi.fn(async () => undefined);
 
 vi.mock('@/components/AppProvider', () => ({
   useApp: () => ({
-    changeLanguage: vi.fn(async () => undefined),
+    changeLanguage,
   }),
 }));
 
@@ -36,7 +41,9 @@ describe('ArrivalWelcomeGate', () => {
 
   beforeEach(() => {
     storage.clear();
+    changeLanguage.mockClear();
     stubMatchMedia();
+    document.documentElement.lang = 'en';
     vi.stubGlobal('localStorage', {
       getItem: (key: string) => storage.get(key) ?? null,
       setItem: (key: string, value: string) => {
@@ -70,6 +77,7 @@ describe('ArrivalWelcomeGate', () => {
     }
     root = null;
     document.body.innerHTML = '';
+    document.documentElement.lang = 'en';
     vi.unstubAllGlobals();
   });
 
@@ -115,6 +123,38 @@ describe('ArrivalWelcomeGate', () => {
     expect(container.querySelector('[data-ui-surface="arrival-welcome"]')).toBeNull();
     expect(container.querySelector('[data-testid="guest-child"]')).not.toBeNull();
     expect(container.querySelector('[data-arrival-welcome-active]')).toBeNull();
+  });
+
+  it('persists display language and syncs document lang on selection', async () => {
+    expect(toDocumentLanguageTag('ua')).toBe('uk');
+    expect(toDocumentLanguageTag('de')).toBe('de');
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+
+    await act(async () => {
+      root!.render(
+        <ArrivalWelcomeGate>
+          <div data-testid="guest-child">Guest landing</div>
+        </ArrivalWelcomeGate>
+      );
+      await Promise.resolve();
+    });
+
+    const uaButton = Array.from(
+      container.querySelectorAll<HTMLButtonElement>('.arrival-welcome__lang-btn')
+    ).find((button) => button.textContent?.includes('Українська'));
+
+    await act(async () => {
+      uaButton?.click();
+      await Promise.resolve();
+    });
+
+    expect(storage.get(DISPLAY_LANGUAGE_STORAGE_KEY)).toBe('ua');
+    expect(document.documentElement.lang).toBe('uk');
+    expect(changeLanguage).toHaveBeenCalledWith('ua');
+    expect(container.textContent).toContain('Ви на місці');
   });
 
   it('does not clear arrival welcome state when demo flag changes', async () => {

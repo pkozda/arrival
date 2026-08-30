@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useApp } from '@/components/AppProvider';
+import { buildOverlayTitle, buildUnlockGuideMessage } from './cinematic-unlock-engine';
 import { toMissionTitle } from './mission-labels';
 import {
   JourneyGuideFloatingButton,
@@ -32,6 +34,7 @@ function resolveNodeAnchor(nodeId: string | null): Anchor {
 
 export function JourneyGuideLayer() {
   const guide = useJourneyGuideContext();
+  const { t } = useApp();
   const [anchor, setAnchor] = useState<Anchor>(null);
 
   const targetNodeId = useMemo(() => {
@@ -62,6 +65,24 @@ export function JourneyGuideLayer() {
     return () => window.removeEventListener('resize', onResize);
   }, [targetNodeId]);
 
+  const cinematicCopy = useMemo(() => {
+    if (!guide.cinematicUnlock) {
+      return null;
+    }
+    const unlock = guide.cinematicUnlock;
+    const sourceLabel = toMissionTitle(unlock.sourceNodeId, unlock.sourceTitle, t);
+    const destinationLabels = unlock.newlyUnlockedNodeIds.map((id, index) =>
+      toMissionTitle(id, unlock.newlyUnlockedTitles[index] ?? id, t)
+    );
+    const message = buildUnlockGuideMessage(sourceLabel, destinationLabels, t);
+    return {
+      guideTitle: message.title,
+      guideBody: message.body,
+      overlayTitle: buildOverlayTitle(unlock.newlyUnlockedNodeIds.length, t),
+      destinations: destinationLabels,
+    };
+  }, [guide.cinematicUnlock, t]);
+
   const probeState =
     guide.cinematicUnlock && guide.cinematicUnlock.phase !== 'guide'
       ? 'highlighting'
@@ -81,6 +102,13 @@ export function JourneyGuideLayer() {
   const showGuidePanel =
     guide.panelOpen || Boolean(guide.lockedGuide) || stuckHint || guide.cinematicUnlock?.phase === 'guide';
 
+  const speechTitle =
+    guide.cinematicUnlock?.phase === 'guide'
+      ? cinematicCopy?.guideTitle
+      : guide.lockedGuide
+        ? t('guide.destinationLocked')
+        : t('guide.recommendedNextStep');
+
   return (
     <>
       {guide.ambientDimActive && !guide.showWelcome && (
@@ -98,10 +126,10 @@ export function JourneyGuideLayer() {
         </div>
       )}
 
-      {guide.cinematicUnlock?.phase === 'overlay' && (
+      {guide.cinematicUnlock?.phase === 'overlay' && cinematicCopy && (
         <CinematicDiscoveryOverlay
-          title={guide.cinematicUnlock.overlayTitle}
-          destinations={guide.cinematicUnlock.newlyUnlockedTitles}
+          title={cinematicCopy.overlayTitle}
+          destinations={cinematicCopy.destinations}
         />
       )}
 
@@ -116,40 +144,31 @@ export function JourneyGuideLayer() {
         >
           <div className="journey-guide-anchor">
             <JourneyGuideProbe state={probeState} />
-            <JourneyGuideSpeech
-              title={
-                guide.cinematicUnlock?.phase === 'guide'
-                  ? guide.cinematicUnlock.guideTitle
-                  : guide.lockedGuide
-                    ? 'Destination locked'
-                    : 'Recommended next step'
-              }
-              onClose={guide.closePanel}
-            >
-              {guide.cinematicUnlock?.phase === 'guide' ? (
+            <JourneyGuideSpeech title={speechTitle} onClose={guide.closePanel}>
+              {guide.cinematicUnlock?.phase === 'guide' && cinematicCopy ? (
                 <>
-                  <p>{guide.cinematicUnlock.guideBody}</p>
+                  <p>{cinematicCopy.guideBody}</p>
                   {guide.canReplayUnlock && (
                     <button
                       type="button"
                       className="journey-guide-btn journey-guide-btn--ghost"
                       onClick={guide.replayCinematicUnlock}
                     >
-                      Replay discovery
+                      {t('guide.replayDiscovery')}
                     </button>
                   )}
                 </>
               ) : guide.lockedGuide ? (
                 <>
                   <p>
-                    <strong>{toMissionTitle(guide.lockedGuide.nodeId, guide.lockedGuide.title)}</strong> is not yet
-                    accessible.
+                    <strong>{toMissionTitle(guide.lockedGuide.nodeId, guide.lockedGuide.title, t)}</strong>
+                    {t('guide.lockedNotAccessibleRest')}
                   </p>
-                  <p className="journey-guide-speech__label">Required steps</p>
+                  <p className="journey-guide-speech__label">{t('guide.requiredSteps')}</p>
                   <ul className="journey-guide-speech__list">
                     {guide.lockedGuide.prerequisiteTitles.map((title, index) => (
                       <li key={guide.lockedGuide!.prerequisiteIds[index]}>
-                        {toMissionTitle(guide.lockedGuide!.prerequisiteIds[index]!, title)}
+                        {toMissionTitle(guide.lockedGuide!.prerequisiteIds[index]!, title, t)}
                       </li>
                     ))}
                   </ul>
@@ -159,7 +178,7 @@ export function JourneyGuideLayer() {
                       className="journey-guide-btn journey-guide-btn--primary"
                       onClick={() => guide.goToPrerequisite(guide.lockedGuide!.prerequisiteIds[0]!)}
                     >
-                      Take Me There
+                      {t('guide.takeMeThere')}
                     </button>
                   )}
                 </>
@@ -169,7 +188,7 @@ export function JourneyGuideLayer() {
                   <p>{guide.recommendation.reason}</p>
                   {guide.recommendation.unlockPreview.length > 0 && (
                     <>
-                      <p className="journey-guide-speech__label">Completing this unlocks</p>
+                      <p className="journey-guide-speech__label">{t('guide.completingUnlocks')}</p>
                       <ul className="journey-guide-speech__list">
                         {guide.recommendation.unlockPreview.map((entry) => (
                           <li key={entry.nodeId}>{entry.missionTitle}</li>
@@ -182,7 +201,7 @@ export function JourneyGuideLayer() {
                     className="journey-guide-btn journey-guide-btn--ghost"
                     onClick={() => guide.triggerRoutePreview()}
                   >
-                    Preview route
+                    {t('guide.previewRoute')}
                   </button>
                   {guide.canReplayUnlock && (
                     <button
@@ -190,20 +209,20 @@ export function JourneyGuideLayer() {
                       className="journey-guide-btn journey-guide-btn--ghost"
                       onClick={guide.replayCinematicUnlock}
                     >
-                      Replay discovery
+                      {t('guide.replayDiscovery')}
                     </button>
                   )}
                 </>
               ) : (
                 <>
-                  <p>Need help finding your next step? Select any available planet to continue your journey.</p>
+                  <p>{t('guide.emptyHelp')}</p>
                   {guide.mode === 'independent' && (
                     <button
                       type="button"
                       className="journey-guide-btn journey-guide-btn--ghost"
                       onClick={guide.resumeGuidedJourney}
                     >
-                      Resume guided journey
+                      {t('guide.resumeGuided')}
                     </button>
                   )}
                 </>

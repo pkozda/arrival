@@ -5,7 +5,7 @@ export type { ProfileCertaintyBundle, BuildProfileCertaintyInput } from './adapt
 export { buildEconomicCertaintyState, buildEconomicCertaintyBundle } from './adapters/economic-certainty';
 export type { EconomicCertaintyBundle, BuildEconomicCertaintyInput } from './adapters/economic-certainty';
 export type { CertaintyBundleMeta, CertaintySurfaceBundle } from './types-bundle';
-export { CERTAINTY_COPY } from './certainty-copy';
+export { CERTAINTY_COPY, CERTAINTY_COPY_KEYS } from './certainty-copy';
 export {
   CERTAINTY_TELEMETRY_EVENT,
   emitCertaintyTelemetry,
@@ -24,6 +24,11 @@ export {
   type ConfidencePresentation,
 } from './formatters';
 export {
+  fillCertaintyTemplate,
+  resolveCertaintyMessage,
+  type CertaintyTranslate,
+} from './resolve-message';
+export {
   isCertaintyExpectedOutcome,
   isCertaintyLevel,
   isCertaintyReason,
@@ -32,6 +37,7 @@ export {
 export type {
   CertaintyExpectedOutcome,
   CertaintyLevel,
+  CertaintyMessageDescriptor,
   CertaintyNextAction,
   CertaintyProgress,
   CertaintyReason,

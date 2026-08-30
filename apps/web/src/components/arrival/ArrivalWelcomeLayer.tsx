@@ -22,10 +22,9 @@ export function ArrivalWelcomeLayer({
   onComplete,
 }: ArrivalWelcomeLayerProps) {
   const reducedMotion = usePrefersReducedMotion();
-  const previewLanguage = selectedLanguage ?? 'en';
   const copy = useMemo(
-    () => (selectedLanguage ? ARRIVAL_WELCOME_COPY[previewLanguage] : ARRIVAL_WELCOME_NEUTRAL_COPY),
-    [previewLanguage, selectedLanguage]
+    () => (selectedLanguage ? ARRIVAL_WELCOME_COPY[selectedLanguage] : ARRIVAL_WELCOME_NEUTRAL_COPY),
+    [selectedLanguage]
   );
 
   const handleContinue = useCallback(() => {
@@ -37,6 +36,7 @@ export function ArrivalWelcomeLayer({
 
   return (
     <WelcomeShell reducedMotion={reducedMotion}>
+      {/* Hierarchy: arrival → languages (primary) → trust → continue */}
       <WelcomeMessage copy={copy} />
       <LanguageSelector
         copy={copy}
@@ -45,6 +45,7 @@ export function ArrivalWelcomeLayer({
         supportedLanguages={supportedLanguages}
         onSelectLanguage={onSelectLanguage}
       />
+      {copy.trust ? <p className="arrival-welcome__trust">{copy.trust}</p> : null}
       <ContinueAction
         label={copy.continue}
         disabled={!selectedLanguage}

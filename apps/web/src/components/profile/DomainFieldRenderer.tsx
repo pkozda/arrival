@@ -1,5 +1,6 @@
 'use client';
 
+import { useApp } from '@/components/AppProvider';
 import type { DomainDraftValues, DomainEditFieldDefinition } from '@/lib/profile-correction';
 
 type Props = {
@@ -10,7 +11,10 @@ type Props = {
 };
 
 export function DomainFieldRenderer({ field, value, onChange, disabled = false }: Props) {
+  const { t } = useApp();
   const inputId = `profile-field-${field.formKey}`;
+  const label = t(field.labelKey);
+  const placeholder = field.placeholderKey ? t(field.placeholderKey) : undefined;
 
   if (field.type === 'boolean') {
     return (
@@ -21,8 +25,9 @@ export function DomainFieldRenderer({ field, value, onChange, disabled = false }
           checked={Boolean(value)}
           disabled={disabled}
           onChange={(event) => onChange(field.formKey, event.target.checked)}
+          aria-label={label}
         />
-        <label htmlFor={inputId}>{field.label}</label>
+        <label htmlFor={inputId}>{label}</label>
       </div>
     );
   }
@@ -30,18 +35,19 @@ export function DomainFieldRenderer({ field, value, onChange, disabled = false }
   if (field.type === 'select' && field.options) {
     return (
       <div className="form-group">
-        <label htmlFor={inputId}>{field.label}</label>
+        <label htmlFor={inputId}>{label}</label>
         <select
           id={inputId}
           className="form-control"
           value={value === undefined ? '' : String(value)}
           disabled={disabled}
           onChange={(event) => onChange(field.formKey, event.target.value)}
+          aria-label={label}
         >
-          <option value="">Select…</option>
+          <option value="">{t('profile.selectPlaceholder')}</option>
           {field.options.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {t(option.labelKey)}
             </option>
           ))}
         </select>
@@ -51,16 +57,17 @@ export function DomainFieldRenderer({ field, value, onChange, disabled = false }
 
   return (
     <div className="form-group">
-      <label htmlFor={inputId}>{field.label}</label>
+      <label htmlFor={inputId}>{label}</label>
       <input
         id={inputId}
         className="form-control"
         type={field.type === 'number' ? 'number' : 'text'}
         value={value === undefined ? '' : String(value)}
-        placeholder={field.placeholder}
+        placeholder={placeholder}
         min={field.min}
         max={field.max}
         disabled={disabled}
+        aria-label={label}
         onChange={(event) =>
           onChange(
             field.formKey,

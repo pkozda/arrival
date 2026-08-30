@@ -96,6 +96,8 @@ vi.mock('@/lib/user-context', () => ({
 vi.mock('@/lib/i18n/display-language', () => ({
   readStoredDisplayLanguage: () => 'en',
   writeStoredDisplayLanguage: vi.fn(),
+  syncDocumentLanguage: vi.fn(),
+  toDocumentLanguageTag: (language: string) => (language === 'ua' ? 'uk' : language),
 }));
 
 vi.mock('@/lib/runtime/runtimeConsistencyModel', () => ({

@@ -1,49 +1,55 @@
 import type { SupportedLanguage } from '@/lib/product-contract';
 
 export type ArrivalWelcomeCopy = {
+  /** Short arrival statement — not a product slogan. */
   title: string;
-  subtitle: string;
+  /** Single language-oriented instruction (no duplicate heading). */
+  languagePrompt: string;
+  /** Quiet trust / purpose line after the language list. */
   trust: string;
-  languageHeading: string;
   continue: string;
   suggestedLabel: string;
 };
 
 export const ARRIVAL_WELCOME_COPY: Record<SupportedLanguage, ArrivalWelcomeCopy> = {
   en: {
-    title: 'Welcome to Arrival Atlas',
-    subtitle: 'Choose your language. We will guide you through your first steps in Germany.',
-    trust: 'Private guidance for your life here — not a government website.',
-    languageHeading: 'Choose your language',
+    title: 'You’ve arrived.',
+    languagePrompt: 'Start in the language you’re most comfortable with.',
+    trust: 'Private guidance for life in Germany — not a government website.',
     continue: 'Continue',
     suggestedLabel: 'Suggested for you',
   },
   de: {
-    title: 'Willkommen bei Arrival Atlas',
-    subtitle:
-      'Wählen Sie Ihre Sprache. Wir begleiten Sie durch Ihre ersten Schritte in Deutschland.',
-    trust: 'Private Orientierung für Ihr Leben hier — keine Behörden-Website.',
-    languageHeading: 'Sprache wählen',
+    title: 'Sie sind angekommen.',
+    languagePrompt: 'Beginnen Sie in der Sprache, in der Sie sich am wohlsten fühlen.',
+    trust: 'Private Orientierung für Ihr Leben in Deutschland — keine Behörden-Website.',
     continue: 'Weiter',
     suggestedLabel: 'Für Sie vorgeschlagen',
   },
   ru: {
-    title: 'Добро пожаловать в Arrival Atlas',
-    subtitle: 'Выберите язык. Мы поможем вам с первыми шагами в Германии.',
-    trust: 'Личная поддержка для вашей жизни здесь — это не сайт государственных органов.',
-    languageHeading: 'Выберите язык',
+    title: 'Вы на месте.',
+    languagePrompt: 'Начните на языке, на котором вам удобнее всего.',
+    trust: 'Личная поддержка для жизни в Германии — это не сайт госорганов.',
     continue: 'Продолжить',
-    suggestedLabel: 'Рекомендуем для вас',
+    suggestedLabel: 'Подходит вам',
   },
   ua: {
-    title: 'Ласкаво просимо до Arrival Atlas',
-    subtitle: 'Оберіть мову. Ми проведемо вас через перші кроки в Німеччині.',
-    trust: 'Приватна підтримка для вашого життя тут — це не державний сайт.',
-    languageHeading: 'Оберіть мову',
+    title: 'Ви на місці.',
+    languagePrompt: 'Почніть мовою, якою вам найзручніше.',
+    trust: 'Приватна підтримка для життя в Німеччині — це не державний сайт.',
     continue: 'Продовжити',
-    suggestedLabel: 'Рекомендовано для вас',
+    suggestedLabel: 'Підходить вам',
   },
 };
 
-/** Chrome copy before a language is explicitly selected. */
-export const ARRIVAL_WELCOME_NEUTRAL_COPY: ArrivalWelcomeCopy = ARRIVAL_WELCOME_COPY.en;
+/**
+ * Pre-selection chrome: no English paragraph wall.
+ * Native language button labels carry the primary action.
+ */
+export const ARRIVAL_WELCOME_NEUTRAL_COPY: ArrivalWelcomeCopy = {
+  title: 'Arrival Atlas',
+  languagePrompt: '',
+  trust: '',
+  continue: '→',
+  suggestedLabel: '',
+};

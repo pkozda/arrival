@@ -1,4 +1,18 @@
-const MISSION_LABELS: Record<string, string> = {
+export type GuideTranslate = (key: string) => string;
+
+const MISSION_KEY_BY_ID: Record<string, string> = {
+  'move-to-germany': 'guide.mission.moveToGermany',
+  'where-you-live': 'guide.mission.whereYouLive',
+  'household-family': 'guide.mission.householdFamily',
+  'work-income': 'guide.mission.workIncome',
+  'health-insurance': 'guide.mission.healthInsurance',
+  'benefits-support': 'guide.mission.benefitsSupport',
+  'language-display': 'guide.mission.languageDisplay',
+  __journey__: 'guide.mission.journey',
+};
+
+/** English fallbacks for engine unit tests that omit `t`. */
+const MISSION_LABELS_EN: Record<string, string> = {
   'move-to-germany': 'Establish Your Arrival Base',
   'where-you-live': 'Set Your Home Base',
   'household-family': 'Map Your Household Constellation',
@@ -20,9 +34,20 @@ const MISSION_PREFIX_REPLACEMENTS: Array<[RegExp, string]> = [
   [/^register\s+/i, 'Register '],
 ];
 
-export function toMissionTitle(nodeId: string, title: string): string {
-  if (MISSION_LABELS[nodeId]) {
-    return MISSION_LABELS[nodeId]!;
+export function missionLabelKey(nodeId: string): string | undefined {
+  return MISSION_KEY_BY_ID[nodeId];
+}
+
+export function toMissionTitle(nodeId: string, title: string, t?: GuideTranslate): string {
+  const key = MISSION_KEY_BY_ID[nodeId];
+  if (key) {
+    if (t) {
+      const localized = t(key);
+      if (localized !== key) {
+        return localized;
+      }
+    }
+    return MISSION_LABELS_EN[nodeId] ?? title;
   }
 
   let mission = title.trim();

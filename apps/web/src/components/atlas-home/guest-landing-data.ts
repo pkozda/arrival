@@ -22,12 +22,12 @@ export const GUEST_LANDING_MAP: AtlasSlideDefinition = {
   mapZoom: 1,
 };
 
-export const GUEST_LANDING_COPY = {
-  eyebrow: 'Personal Life Navigation',
-  headline: 'Your new life.',
-  headlineAccent: 'Mapped.',
-  supporting:
-    'Arrival Atlas is your interactive guide through everything you need to build a stable life in a new country.',
-  cta: 'Enter Atlas',
-  secondary: "See what's next in 7 days",
-};
+/** Translation keys for guest landing copy — resolve via `useApp().t`. */
+export const GUEST_LANDING_COPY_KEYS = {
+  eyebrow: 'home.guest.eyebrow',
+  headline: 'home.guest.headline',
+  headlineAccent: 'home.guest.headlineAccent',
+  supporting: 'home.guest.supporting',
+  cta: 'home.guest.enterAtlas',
+  secondary: 'home.guest.secondary',
+} as const;

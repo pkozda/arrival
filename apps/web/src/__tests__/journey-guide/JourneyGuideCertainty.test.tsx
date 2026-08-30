@@ -1,9 +1,17 @@
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { getTranslations } from '@arrival-atlas/core';
 import { JourneyGuideProvider } from '@/lib/journey-guide/JourneyGuideProvider';
 import { useJourneyGuideContext } from '@/lib/journey-guide/JourneyGuideProvider';
 import type { JourneyGuideCertaintySource } from '@/lib/journey-guide/types';
+
+vi.mock('@/components/AppProvider', () => ({
+  useApp: () => ({
+    language: 'en',
+    t: (key: string) => getTranslations('en')[key] ?? key,
+  }),
+}));
 
 function Probe() {
   const guide = useJourneyGuideContext();
@@ -111,6 +119,8 @@ describe('JourneyGuideProvider certainty integration', () => {
           {
             id: 'registration',
             status: 'recommended',
+            x: 30,
+            y: 40,
             payload: null,
           },
         ],
@@ -140,7 +150,7 @@ describe('JourneyGuideProvider certainty integration', () => {
     );
   });
 
-  it('consumes certainty when feature flag is on', async () => {
+  it('consumes certainty when feature flag is on and resolves localized speech', async () => {
     process.env.NEXT_PUBLIC_GUIDE_USE_CERTAINTY = 'true';
 
     const container = document.createElement('div');
@@ -169,6 +179,8 @@ describe('JourneyGuideProvider certainty integration', () => {
           {
             id: 'registration',
             status: 'recommended',
+            x: 30,
+            y: 40,
             payload: null,
           },
         ],
@@ -195,6 +207,8 @@ describe('JourneyGuideProvider certainty integration', () => {
 
     const probe = container.querySelector('[data-testid="probe"]');
     expect(probe?.getAttribute('data-uses-certainty')).toBe('true');
-    expect(probe?.getAttribute('data-reason')).toContain('from certainty adapter');
+    expect(probe?.getAttribute('data-reason')).toBe(
+      'Do this now because from certainty adapter.'
+    );
   });
 });

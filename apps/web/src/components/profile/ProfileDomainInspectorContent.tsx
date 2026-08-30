@@ -1,6 +1,7 @@
 'use client';
 
 import { AtlasLink as Link, AtlasSecondaryLink } from '@/components/atlas-runtime';
+import { useApp } from '@/components/AppProvider';
 import type { ProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
 import { formatDomainStatus } from '@/lib/profile-mirror-utils';
 import type { ProfileGalaxyNodePayload } from '@/lib/presentation/profile/build-galaxy-graph';
@@ -13,22 +14,23 @@ type Props = {
 };
 
 export function ProfileDomainInspectorActions({ payload, depth }: Props) {
+  const { t } = useApp();
   const { domain, moduleHref, moduleTitle } = payload;
 
   return (
     <div className="stack-sm">
       {moduleHref && moduleTitle && (
         <AtlasSecondaryLink href={moduleHref}>
-          {`Open ${moduleTitle}`}
+          {t('profile.openModule').replace('{title}', moduleTitle)}
         </AtlasSecondaryLink>
       )}
       <ProfileEditCTA
         domainSlug={domain.slug as ProfileMirrorDomainSlug}
-        label={depth === 'detail' ? 'Correct information' : 'Edit domain'}
+        label={depth === 'detail' ? t('profile.correctInformation') : t('profile.editDomain')}
       />
       {depth === 'summary' && (
         <Link href={payload.detailHref} className="text-link-accent">
-          View full domain
+          {t('profile.viewFullDomain')}
         </Link>
       )}
     </div>

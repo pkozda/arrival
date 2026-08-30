@@ -139,44 +139,64 @@ describe('certainty domain', () => {
 });
 
 describe('certainty formatters', () => {
-  it('formats semantic reason into Calm Navigator copy', () => {
+  it('maps semantic reason to language-neutral descriptors', () => {
     expect(
       formatReason({
         type: 'dependency',
         prerequisite: 'Registration',
         target: 'Housing support',
       })
-    ).toBe('To unlock Housing support, Registration is needed first.');
+    ).toEqual({
+      key: 'certainty.reason.dependency',
+      params: {
+        target: 'Housing support',
+        prerequisite: 'Registration',
+      },
+    });
 
     expect(
       formatReason({
         type: 'description',
         description: 'housing support becomes available after registration',
       })
-    ).toBe('Do this now because housing support becomes available after registration.');
+    ).toEqual({
+      key: 'certainty.reason.description',
+      params: {
+        description: 'housing support becomes available after registration',
+      },
+    });
 
-    expect(formatReason({ type: 'progress', target: 'Registration' })).toBe(
-      'Do this now because it moves Registration forward.'
-    );
+    expect(formatReason({ type: 'progress', target: 'Registration' })).toEqual({
+      key: 'certainty.reason.progress',
+      params: { target: 'Registration' },
+    });
+
+    expect(formatReason({ type: 'description', description: '   ' })).toBeNull();
   });
 
-  it('formats expected outcome and progress delta', () => {
-    expect(formatExpectedOutcome({ type: 'unlock', target: 'Housing support' })).toBe(
-      'This unlocks Housing support.'
-    );
-    expect(formatExpectedOutcome({ type: 'openPath', target: 'Housing' })).toBe(
-      'This opens the path to Housing.'
-    );
+  it('maps expected outcome and progress delta to descriptors', () => {
+    expect(formatExpectedOutcome({ type: 'unlock', target: 'Housing support' })).toEqual({
+      key: 'certainty.outcome.unlock',
+      params: { target: 'Housing support' },
+    });
+    expect(formatExpectedOutcome({ type: 'openPath', target: 'Housing' })).toEqual({
+      key: 'certainty.outcome.openPath',
+      params: { target: 'Housing' },
+    });
 
-    expect(formatProgressDelta({ completed: 2, total: 5 })).toBe(
-      '2 of 5 steps are already in place.'
-    );
-    expect(formatProgressDelta({ completed: 0, total: 4 })).toBe('4 steps in your plan.');
+    expect(formatProgressDelta({ completed: 2, total: 5 })).toEqual({
+      key: 'certainty.progress.partial',
+      params: { completed: 2, total: 5 },
+    });
+    expect(formatProgressDelta({ completed: 0, total: 4 })).toEqual({
+      key: 'certainty.progress.noneCompleted',
+      params: { total: 4 },
+    });
   });
 
-  it('returns confidence presentation metadata', () => {
+  it('returns confidence presentation metadata with label keys', () => {
     const blocked = getConfidencePresentation('blocked');
-    expect(blocked.label).toBe('Blocked for now');
+    expect(blocked.labelKey).toBe('certainty.confidence.blocked');
     expect(blocked.icon).toBe('lock');
     expect(blocked.colorToken).toBe('blocked');
   });

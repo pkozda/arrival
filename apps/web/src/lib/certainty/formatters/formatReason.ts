@@ -1,17 +1,30 @@
-import type { CertaintyReason } from '../types';
+import type { CertaintyReason, CertaintyMessageDescriptor } from '../types';
 
-/** Formats semantic reason into Calm Navigator copy. */
-export function formatReason(reason: CertaintyReason): string {
+/** Maps semantic reason → language-neutral translation descriptor. */
+export function formatReason(reason: CertaintyReason): CertaintyMessageDescriptor | null {
   switch (reason.type) {
     case 'dependency':
-      return `To unlock ${reason.target}, ${reason.prerequisite} is needed first.`;
+      return {
+        key: 'certainty.reason.dependency',
+        params: {
+          target: reason.target,
+          prerequisite: reason.prerequisite,
+        },
+      };
     case 'description': {
       const description = reason.description.trim().replace(/\.$/, '');
-      return description.length > 0
-        ? `Do this now because ${description}.`
-        : '';
+      if (description.length === 0) {
+        return null;
+      }
+      return {
+        key: 'certainty.reason.description',
+        params: { description },
+      };
     }
     case 'progress':
-      return `Do this now because it moves ${reason.target} forward.`;
+      return {
+        key: 'certainty.reason.progress',
+        params: { target: reason.target },
+      };
   }
 }

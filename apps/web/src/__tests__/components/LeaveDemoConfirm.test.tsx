@@ -1,7 +1,14 @@
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { getTranslations } from '@arrival-atlas/core';
 import { LeaveDemoConfirm } from '@/components/atlas-home/LeaveDemoConfirm';
+
+vi.mock('@/components/AppProvider', () => ({
+  useApp: () => ({
+    t: (key: string) => getTranslations('en')[key] ?? key,
+  }),
+}));
 
 function createTabEvent(shiftKey = false): KeyboardEvent {
   return new KeyboardEvent('keydown', {
@@ -53,6 +60,7 @@ describe('LeaveDemoConfirm', () => {
     ) as HTMLButtonElement;
 
     expect(document.activeElement).toBe(primary);
+    expect(primary.textContent).toContain('Start over');
 
     await act(async () => {
       window.dispatchEvent(createTabEvent());

@@ -1,16 +1,18 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useApp } from '@/components/AppProvider';
 import { AtlasAmbientLayers } from './AtlasAmbientLayers';
 import { AtlasHUD } from './AtlasHUD';
 import { useAtlasHomeDemo } from './AtlasHomeProvider';
 import { AtlasMap } from './AtlasMap';
-import { GUEST_LANDING_COPY, GUEST_LANDING_MAP } from './guest-landing-data';
+import { GUEST_LANDING_COPY_KEYS, GUEST_LANDING_MAP } from './guest-landing-data';
 import { useAtlasLoadSequence } from './useAtlasLoadSequence';
 import { useAtlasParallax } from './useAtlasParallax';
 
 export function AtlasGuestLanding() {
   const { enterAtlas } = useAtlasHomeDemo();
+  const { t } = useApp();
   const loadPhase = useAtlasLoadSequence(0);
   const { parallaxRef } = useAtlasParallax();
   const uiVisible = loadPhase >= 5;
@@ -30,13 +32,13 @@ export function AtlasGuestLanding() {
               animate={{ opacity: uiVisible ? 1 : 0, y: uiVisible ? 0 : 20 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             >
-            <p className="atlas-slide__eyebrow">{GUEST_LANDING_COPY.eyebrow}</p>
+            <p className="atlas-slide__eyebrow">{t(GUEST_LANDING_COPY_KEYS.eyebrow)}</p>
             <h1 className="atlas-slide__headline">
-              {GUEST_LANDING_COPY.headline}
+              {t(GUEST_LANDING_COPY_KEYS.headline)}
               <br />
-              <span className="atlas-slide__accent">{GUEST_LANDING_COPY.headlineAccent}</span>
+              <span className="atlas-slide__accent">{t(GUEST_LANDING_COPY_KEYS.headlineAccent)}</span>
             </h1>
-            <p className="atlas-slide__supporting">{GUEST_LANDING_COPY.supporting}</p>
+            <p className="atlas-slide__supporting">{t(GUEST_LANDING_COPY_KEYS.supporting)}</p>
             <div className="atlas-slide__actions">
               <button
                 type="button"
@@ -44,11 +46,11 @@ export function AtlasGuestLanding() {
                 data-ui-surface="home-atlas-entry"
                 onClick={enterAtlas}
               >
-                {GUEST_LANDING_COPY.cta}
+                {t(GUEST_LANDING_COPY_KEYS.cta)}
                 <span aria-hidden="true">→</span>
               </button>
               <button type="button" className="atlas-slide__secondary" onClick={enterAtlas}>
-                {GUEST_LANDING_COPY.secondary}
+                {t(GUEST_LANDING_COPY_KEYS.secondary)}
                 <span aria-hidden="true">→</span>
               </button>
             </div>

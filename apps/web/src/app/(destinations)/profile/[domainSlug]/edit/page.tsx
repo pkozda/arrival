@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { AtlasSurface } from '@/components/atlas-runtime/legacy';
+import { useApp } from '@/components/AppProvider';
 import { useCelestialNavigation } from '@/components/celestial/useCelestialNavigation';
 import { DomainMutationEditor } from '@/components/profile/DomainMutationEditor';
 import { isProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
@@ -9,6 +10,7 @@ import { isProfileMirrorDomainSlug } from '@/lib/profile-mirror-utils';
 export default function ProfileDomainEditPage() {
   const params = useParams<{ domainSlug: string }>();
   const { arriveAt } = useCelestialNavigation();
+  const { t } = useApp();
   const domainSlug = params.domainSlug;
 
   if (!isProfileMirrorDomainSlug(domainSlug)) {
@@ -16,7 +18,7 @@ export default function ProfileDomainEditPage() {
       <main className="celestial-page-main">
         <div className="container" style={{ maxWidth: '720px' }}>
           <AtlasSurface>
-            <p className="text-body text-body--muted">This section could not be found.</p>
+            <p className="text-body text-body--muted">{t('profile.sectionNotFound')}</p>
           </AtlasSurface>
         </div>
       </main>

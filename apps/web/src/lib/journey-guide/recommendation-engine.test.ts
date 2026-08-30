@@ -38,6 +38,7 @@ describe('getRecommendedNextPlanet', () => {
 
     expect(result?.nodeId).toBe('anmeldung');
     expect(result?.unlockPreview.map((entry) => entry.nodeId)).toEqual(['tax-id']);
+    expect(result?.reason).toBe('This is the most actionable step on your current route.');
   });
 
   it('skips completed nodes and advances to the next actionable step', () => {

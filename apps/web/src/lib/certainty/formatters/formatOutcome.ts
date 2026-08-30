@@ -1,11 +1,19 @@
-import type { CertaintyExpectedOutcome } from '../types';
+import type { CertaintyExpectedOutcome, CertaintyMessageDescriptor } from '../types';
 
-/** Formats semantic expected outcome for display alongside next-step copy. */
-export function formatExpectedOutcome(outcome: CertaintyExpectedOutcome): string {
+/** Maps semantic expected outcome → language-neutral translation descriptor. */
+export function formatExpectedOutcome(
+  outcome: CertaintyExpectedOutcome
+): CertaintyMessageDescriptor {
   switch (outcome.type) {
     case 'unlock':
-      return `This unlocks ${outcome.target}.`;
+      return {
+        key: 'certainty.outcome.unlock',
+        params: { target: outcome.target },
+      };
     case 'openPath':
-      return `This opens the path to ${outcome.target}.`;
+      return {
+        key: 'certainty.outcome.openPath',
+        params: { target: outcome.target },
+      };
   }
 }
