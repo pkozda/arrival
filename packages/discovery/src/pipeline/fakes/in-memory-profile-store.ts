@@ -1,0 +1,21 @@
+import type { DiscoveryProfile } from '../../types/profile.js';
+import type { ProfileStore } from '../profile-store.js';
+
+export function createInMemoryProfileStore(
+  profiles: DiscoveryProfile[] = []
+): ProfileStore & { upsert: (profile: DiscoveryProfile) => void } {
+  const byId = new Map<string, DiscoveryProfile>();
+  for (const profile of profiles) {
+    byId.set(profile.id, structuredClone(profile));
+  }
+
+  return {
+    async get(profileId) {
+      const found = byId.get(profileId);
+      return found ? structuredClone(found) : null;
+    },
+    upsert(profile) {
+      byId.set(profile.id, structuredClone(profile));
+    },
+  };
+}

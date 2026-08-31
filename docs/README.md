@@ -13,10 +13,11 @@ tags:
   - domain-index
   - knowledge-base
 created: 2026-06-19
-updated: 2026-06-19
+updated: 2026-08-30
 related:
   - taxonomy
   - index-schema
+  - personal-discovery-engine-architecture
 ---
 
 # Arrival Atlas Documentation
@@ -35,6 +36,7 @@ docs/
 ├── onboarding/            Registration, Anmeldung, FTU flows
 ├── migration/             Relocation logic, cross-country transitions
 ├── identity/              Profiles, merging, verification, profile UX
+├── discovery/             Personal Discovery Engine (jobs, giveaways, …)
 ├── benefits/              Jobcenter, Bürgergeld, benefit simulations
 ├── housing/               Accommodation, rent support
 ├── legal/                 Legal status, compliance, official procedures
@@ -42,7 +44,8 @@ docs/
 ├── integrations/          External APIs, connectors, data sources
 ├── platform/              IAM, infrastructure, platform roadmaps
 ├── audits/                Gate audits, readiness reviews
-├── decisions/             Architecture Decision Records (ADRs)
+├── decisions/             Architecture Decision Records (ADRs) index
+├── adr/                   Formal ADRs (LE, PDE, …)
 ├── refactors/             Completed migration and refactor logs
 ├── archive/               Superseded historical documents
 └── meta/                  Taxonomy, index schema, tooling
@@ -55,6 +58,7 @@ docs/
 | **core/** | Define system-wide architecture, MRC, governance kernel |
 | **product/** | Describe cross-cutting UX or product concepts |
 | **identity/** | Cover profiles, user context, profile UX, merging |
+| **discovery/** | Cover Personal Discovery Engine (external opportunity discovery) |
 | **benefits/** | Cover Jobcenter, Bürgergeld, benefit simulations |
 | **finance/** | Cover income, payroll, subsidies, financial modules |
 | **platform/** | Cover IAM, backend, shared services, platform evolution |
@@ -62,7 +66,7 @@ docs/
 | **migration/** | Cover relocation assistance, cross-border transitions |
 | **audits/** | Record read-only assessments and gate verdicts |
 | **refactors/** | Document completed migrations and refactors |
-| **decisions/** | Short ADRs with context, decision, consequences |
+| **decisions/** / **adr/** | Short ADRs with context, decision, consequences |
 | **archive/** | Superseded docs kept for history |
 
 Reserved empty domains (`housing/`, `legal/`, `integrations/`) have stub indexes — add docs as those areas grow.
@@ -112,6 +116,20 @@ Reserved empty domains (`housing/`, `legal/`, `integrations/`) have stub indexes
 | **Life Event platform integration audit (ARR-018)** | [audits/life-event-platform-integration-audit.md](./audits/life-event-platform-integration-audit.md) |
 | Profile mutation contract summary | [contracts/profile-mutation-contract-summary.md](./contracts/profile-mutation-contract-summary.md) |
 | User Profile Engine design | [identity/user-profile-engine-design.md](./identity/user-profile-engine-design.md) |
+
+### Discovery (Personal Discovery Engine)
+
+| Document | Path |
+|----------|------|
+| Domain index | [discovery/README.md](./discovery/README.md) |
+| PDE architecture & product design (RFC) | [discovery/personal-discovery-engine-architecture.md](./discovery/personal-discovery-engine-architecture.md) |
+| **PDE domain model (E1 prerequisite)** | [discovery/personal-discovery-engine-domain-model.md](./discovery/personal-discovery-engine-domain-model.md) |
+| PDE pipeline contract | [discovery/personal-discovery-engine-pipeline.md](./discovery/personal-discovery-engine-pipeline.md) |
+| PDE strategy contract | [discovery/personal-discovery-engine-strategy-contract.md](./discovery/personal-discovery-engine-strategy-contract.md) |
+| PDE implementation roadmap (E1–E11) | [discovery/personal-discovery-engine-roadmap.md](./discovery/personal-discovery-engine-roadmap.md) |
+| PDE MVP scope | [discovery/personal-discovery-engine-mvp.md](./discovery/personal-discovery-engine-mvp.md) |
+| ADR-006 — PDE boundaries | [adr/adr-006-personal-discovery-engine-boundaries.md](./adr/adr-006-personal-discovery-engine-boundaries.md) |
+| ADR-006 addendum — E1 API spike | [adr/adr-006-addendum-e1-api-spike.md](./adr/adr-006-addendum-e1-api-spike.md) |
 
 ### Benefits & finance
 

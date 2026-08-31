@@ -12,7 +12,7 @@
         "documentation-system"
       ],
       "created": "2026-06-19",
-      "updated": "2026-06-19",
+      "updated": "2026-08-30",
       "related": [
         "taxonomy"
       ],
@@ -24,6 +24,7 @@
         "Key documents (start here)",
         "Platform & core",
         "Identity & profile",
+        "Discovery (Personal Discovery Engine)",
         "Benefits & finance",
         "Gate audit chain",
         "Adding new documentation",
@@ -182,6 +183,64 @@
         "Forbidden",
         "Allowed",
         "References"
+      ]
+    },
+    {
+      "id": "adr-006-addendum-e1-api-spike",
+      "title": "ADR-006 Addendum \u2014 PDE E1 API Spike Decisions",
+      "path": "docs/adr/adr-006-addendum-e1-api-spike.md",
+      "type": null,
+      "domain": null,
+      "status": "accepted",
+      "maturity": "evolving",
+      "tags": [],
+      "created": "2026-08-30",
+      "updated": "2026-08-30",
+      "related": [
+        "adr-006-personal-discovery-engine-boundaries"
+      ],
+      "summary": "**Status:** Accepted (E1 spike)",
+      "headings": [
+        "ADR-006 Addendum \u2014 PDE E1 API Spike Decisions",
+        "Decision 1 \u2014 Strategy typing",
+        "Decision 2 \u2014 Ranking ownership",
+        "Decision 3 \u2014 `DiscoveryQuery`",
+        "Decision 4 \u2014 `normalize()` return type",
+        "Implementation pointer"
+      ]
+    },
+    {
+      "id": "adr-006-personal-discovery-engine-boundaries",
+      "title": "ADR-006 \u2014 Personal Discovery Engine Boundaries",
+      "path": "docs/adr/adr-006-personal-discovery-engine-boundaries.md",
+      "type": null,
+      "domain": null,
+      "status": "proposed",
+      "maturity": "evolving",
+      "tags": [],
+      "created": "2026-08-30",
+      "updated": "2026-08-30",
+      "related": [
+        "personal-discovery-engine-architecture"
+      ],
+      "summary": "**Status:** Proposed",
+      "headings": [
+        "ADR-006 \u2014 Personal Discovery Engine Boundaries",
+        "Context",
+        "Decision",
+        "1. Found \u2260 verified",
+        "2. AI interprets; AI does not fabricate evidence",
+        "3. Aggregators discover; authorities verify (when required)",
+        "4. Optimize for attention, not volume",
+        "5. Strategy \u2260 prompt",
+        "6. PDE is a separate capability",
+        "7. Domain package boundary",
+        "Consequences",
+        "Positive",
+        "Negative / costs",
+        "Forbidden patterns",
+        "Status notes",
+        "Related"
       ]
     },
     {
@@ -1792,6 +1851,62 @@
       ]
     },
     {
+      "id": "product-walkthrough-ux-consultant",
+      "title": "Arrival Atlas \u2014 Complete Product Walkthrough (UX Consultant Edition)",
+      "path": "docs/audits/product-walkthrough-ux-consultant.md",
+      "type": "walkthrough",
+      "domain": "product",
+      "status": "active",
+      "maturity": "draft",
+      "tags": [
+        "ux"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "ux-cognition-audit-immigrant-persona"
+      ],
+      "summary": "**Audience:** UX consultant who has never seen the project",
+      "headings": [
+        "Arrival Atlas \u2014 Complete Product Walkthrough",
+        "0. Product in one sentence",
+        "1. Global shell \u2014 what wraps every screen",
+        "1.1 Bootstrap (first paint)",
+        "1.2 Persistent spatial background",
+        "1.3 Atlas HUD (primary chrome)",
+        "1.4 Demo state machine",
+        "2. Route map (complete)",
+        "3. Screen-by-screen walkthrough",
+        "3.1 `/` \u2014 Atlas Home",
+        "3.2 `/modules/life-event` \u2014 Life Events Galaxy",
+        "3.3 `/modules/economic-reality` \u2014 Economic Reality Galaxy",
+        "3.4 `/profile` \u2014 Profile Galaxy (summary)",
+        "3.5 `/profile/[domainSlug]` \u2014 Domain detail galaxy",
+        "3.6 `/profile/[domainSlug]/edit` \u2014 Domain correction form",
+        "3.7 `/modules/[moduleId]` \u2014 Generic contract modules",
+        "3.8 `/admin/mbde` \u2014 Internal admin",
+        "4. Overlay & modal inventory",
+        "5. Journey Guide \u2014 complete interaction model",
+        "5.1 Welcome (first visit)",
+        "5.2 Guided mode",
+        "5.3 Independent mode",
+        "5.4 Locked planet interaction",
+        "5.5 Cinematic unlock (arr-031)",
+        "6. Animation & motion catalog",
+        "7. i18n exposure",
+        "8. First-time user journey \u2014 launch to first important task",
+        "Act 1 \u2014 Arrival (0\u201330 seconds)",
+        "Act 2 \u2014 Orientation (30\u201390 seconds)",
+        "Act 3 \u2014 Life Events entry (90\u2013180 seconds)",
+        "Act 4 \u2014 First important task (3\u201310 minutes)",
+        "Act 5 \u2014 First \u201cwin\u201d moment",
+        "9. Visual hierarchy principles (product-wide)",
+        "10. Screenshot reference map",
+        "11. State diagram (simplified)",
+        "12. Related documentation"
+      ]
+    },
+    {
       "id": "production-readiness-ui-ux-audit",
       "title": "Production Readiness UI/UX Audit",
       "path": "docs/audits/production-readiness-ui-ux-audit.md",
@@ -2072,6 +2187,67 @@
         "Quaternary break (durability ceiling): All server state is in-memory",
         "Summary Table",
         "Root Cause Statement"
+      ]
+    },
+    {
+      "id": "ux-cognition-audit-immigrant-persona",
+      "title": "UX Cognition Audit \u2014 Stressed First-Time Immigrant Persona",
+      "path": "docs/audits/ux-cognition-audit-immigrant-persona.md",
+      "type": "audit",
+      "domain": "product",
+      "status": "active",
+      "maturity": "draft",
+      "tags": [
+        "ux"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "product-walkthrough-ux-consultant"
+      ],
+      "summary": "**Reviewer lens:** Senior UX Researcher (Apple clarity + GOV.UK plain language + Airbnb emotional design)",
+      "headings": [
+        "UX Cognition Audit \u2014 Arrival Atlas",
+        "Persona constraints",
+        "Part A \u2014 Per-screen cognitive analysis",
+        "A1. Bootstrap loading",
+        "A2. Bootstrap error",
+        "A3. Session recreated modal",
+        "A4. Guest landing (`/` \u2014 not exploring)",
+        "A5. Member slider (`/` \u2014 exploring)",
+        "A6. Atlas HUD (exploring)",
+        "A7. Life Events galaxy \u2014 loading",
+        "A8. Life Events \u2014 Journey Guide welcome",
+        "A9. Life Events \u2014 cold-start intake overlay",
+        "A10. Life Events \u2014 guided galaxy (active)",
+        "A11. Life Events \u2014 locked planet",
+        "A12. Life Events \u2014 cinematic unlock",
+        "A13. Economic Reality galaxy",
+        "A14. Profile galaxy (summary)",
+        "A15. Profile domain edit form",
+        "A16. Generic module page (`/modules/financial-reality`)",
+        "A17. Inline not-found states",
+        "A18. Leave demo confirm",
+        "Part B \u2014 Cross-product cognition review",
+        "B1. Is the galaxy metaphor helping or decoration?",
+        "B2. Are planets self-explanatory?",
+        "B3. Does motion guide attention or distract?",
+        "B4. Is information architecture obvious?",
+        "B5. Does every interaction reduce uncertainty?",
+        "B6. Does every screen answer the three questions?",
+        "Part C \u2014 Problem synthesis",
+        "Biggest UX problems",
+        "Biggest cognitive problems",
+        "Biggest onboarding problems",
+        "Biggest navigation problems",
+        "Biggest emotional problems",
+        "Part D \u2014 Prioritized roadmap",
+        "P0 \u2014 Must fix before public beta",
+        "P1 \u2014 High impact, soon after P0",
+        "P2 \u2014 Polish and comprehension",
+        "P3 \u2014 Future excellence",
+        "Part E \u2014 Executive verdict",
+        "Related documents"
       ]
     },
     {
@@ -2448,11 +2624,344 @@
         "adr"
       ],
       "created": "2026-06-01",
-      "updated": "2026-06-19",
-      "related": [],
+      "updated": "2026-08-30",
+      "related": [
+        "personal-discovery-engine-architecture"
+      ],
       "summary": "Reserved for short, durable decision records using the format:",
       "headings": [
         "Architecture Decision Records (ADR)"
+      ]
+    },
+    {
+      "id": "discovery-domain-index",
+      "title": "Personal Discovery Engine \u2014 Domain Index",
+      "path": "docs/discovery/README.md",
+      "type": "system",
+      "domain": "discovery",
+      "status": "active",
+      "maturity": "proposed",
+      "tags": [
+        "domain-index"
+      ],
+      "created": "2026-08-30",
+      "updated": "2026-08-30",
+      "related": [
+        "personal-discovery-engine-architecture"
+      ],
+      "summary": "Domain documentation for the **Personal Discovery Engine** \u2014 Arrival Atlas\u2019s always-on capability for finding, verifying, ranking, and notifying users about external opportunities that match their criteria.",
+      "headings": [
+        "Personal Discovery Engine (PDE)",
+        "Document map",
+        "Package",
+        "Reading order (design \u2192 implement)",
+        "Status",
+        "Initial strategies",
+        "Consistency review (2026-08-30)"
+      ]
+    },
+    {
+      "id": "personal-discovery-engine-architecture",
+      "title": "Personal Discovery Engine \u2014 Architecture & Product Design",
+      "path": "docs/discovery/personal-discovery-engine-architecture.md",
+      "type": "rfc",
+      "domain": "discovery",
+      "status": "proposed",
+      "maturity": "evolving",
+      "tags": [
+        "discovery"
+      ],
+      "created": "2026-08-30",
+      "updated": "2026-08-30",
+      "related": [
+        "personal-discovery-engine-roadmap"
+      ],
+      "summary": "**Status:** Proposed",
+      "headings": [
+        "Arrival Atlas \u2014 Personal Discovery Engine",
+        "Architecture & Product Design Document",
+        "1. Executive Summary",
+        "2. Problem",
+        "3. Product Principle",
+        "4. Relationship to Existing Arrival Atlas Architecture",
+        "CSR \u2014 Current Situation Resolver",
+        "MBDE \u2014 Maximum Benefits Discovery Engine",
+        "PDE \u2014 Personal Discovery Engine",
+        "5. Core Domain Model",
+        "6. DiscoveryProfile",
+        "7. Criteria",
+        "Required",
+        "Preferred",
+        "Excluded",
+        "Flexible",
+        "8. Strategy",
+        "9. Example: Job Discovery Strategy",
+        "Required",
+        "Verification",
+        "AI evaluation",
+        "Scoring dimensions",
+        "10. Example: Giveaway Strategy",
+        "Required",
+        "Excluded",
+        "Verification",
+        "AI evaluation",
+        "11. Discovery Pipeline",
+        "12. Candidate vs Result",
+        "DiscoveryCandidate",
+        "DiscoveryResult",
+        "13. Source Model",
+        "14. Evidence",
+        "15. Verification",
+        "16. Freshness",
+        "17. Deduplication",
+        "18. AI Layer",
+        "Suitable for AI",
+        "Must not be the sole source of truth for",
+        "19. Scoring",
+        "Match Score",
+        "Confidence Score",
+        "20. Opportunity Ranking",
+        "21. Discovery State",
+        "22. Change Detection",
+        "23. Discovery Run",
+        "24. Scheduling",
+        "25. Digest",
+        "26. Daily Email",
+        "27. Zero-Result Policy",
+        "28. User Configuration",
+        "29. Criteria UI",
+        "30. Package Boundary",
+        "31. Adapters",
+        "32. Source Adapter",
+        "33. Persistence",
+        "34. Failure Handling",
+        "35. Security",
+        "36. Observability",
+        "37. Cost Control",
+        "38. Versioning",
+        "39. Auditability",
+        "40\u201342. MVP, Non-Goals, Epics",
+        "43. Non-Negotiable Principles",
+        "44. Long-Term Vision",
+        "Related documents"
+      ]
+    },
+    {
+      "id": "personal-discovery-engine-domain-model",
+      "title": "Personal Discovery Engine \u2014 Domain Model",
+      "path": "docs/discovery/personal-discovery-engine-domain-model.md",
+      "type": "spec",
+      "domain": "discovery",
+      "status": "proposed",
+      "maturity": "evolving",
+      "tags": [
+        "discovery"
+      ],
+      "created": "2026-08-30",
+      "updated": "2026-08-30",
+      "related": [
+        "personal-discovery-engine-pipeline"
+      ],
+      "summary": "**Status:** Proposed",
+      "headings": [
+        "Personal Discovery Engine \u2014 Domain Model",
+        "0. Design rules",
+        "1. TriState (three-valued logic)",
+        "Invariants",
+        "2. Entity overview",
+        "3. DiscoveryProfile",
+        "Conceptual fields",
+        "Mutability",
+        "Invariants",
+        "4. DiscoveryCriteria",
+        "5. DiscoveryStrategy (registry metadata)",
+        "6. DiscoveryRun (runtime)",
+        "Invariants",
+        "7. DiscoveryCandidate",
+        "Identity",
+        "When can a Candidate become a Result?",
+        "8. ExtractedFacts vs Evidence",
+        "ExtractedFacts",
+        "Evidence",
+        "Invariants",
+        "9. VerificationResult",
+        "PASS / FAIL / UNKNOWN",
+        "Invariants",
+        "10. Score",
+        "Why both match and confidence?",
+        "Ranking formula",
+        "Invariants",
+        "11. DiscoveryResult",
+        "Invariants",
+        "12. ResultState (user-facing)",
+        "Who may transition",
+        "Invariants",
+        "13. RejectionRecord",
+        "14. Digest",
+        "15. EnginePolicy vs Strategy policy",
+        "16. Package sketch (E1)",
+        "17. Open points (explicitly deferred)",
+        "Related"
+      ]
+    },
+    {
+      "id": "personal-discovery-engine-mvp",
+      "title": "Personal Discovery Engine \u2014 MVP Scope",
+      "path": "docs/discovery/personal-discovery-engine-mvp.md",
+      "type": "spec",
+      "domain": "discovery",
+      "status": "proposed",
+      "maturity": "evolving",
+      "tags": [
+        "discovery"
+      ],
+      "created": "2026-08-30",
+      "updated": "2026-08-30",
+      "related": [
+        "adr-006-personal-discovery-engine-boundaries"
+      ],
+      "summary": "**Status:** Proposed",
+      "headings": [
+        "Personal Discovery Engine \u2014 MVP Scope",
+        "MVP in one sentence",
+        "In scope",
+        "Domain",
+        "Strategies",
+        "Pipeline",
+        "UI",
+        "Automation",
+        "Package",
+        "Out of scope (do not build in MVP)",
+        "Acceptance loop (definition of done)",
+        "Success metrics (directional)",
+        "Risks for MVP",
+        "Related"
+      ]
+    },
+    {
+      "id": "personal-discovery-engine-pipeline",
+      "title": "Personal Discovery Engine \u2014 Pipeline Contract",
+      "path": "docs/discovery/personal-discovery-engine-pipeline.md",
+      "type": "spec",
+      "domain": "discovery",
+      "status": "proposed",
+      "maturity": "evolving",
+      "tags": [
+        "discovery"
+      ],
+      "created": "2026-08-30",
+      "updated": "2026-08-30",
+      "related": [
+        "personal-discovery-engine-strategy-contract"
+      ],
+      "summary": "**Status:** Proposed",
+      "headings": [
+        "Personal Discovery Engine \u2014 Pipeline Contract",
+        "1. Goals",
+        "2. Immutability model",
+        "Stage function shape",
+        "3. Canonical stage order",
+        "4. Stage contracts",
+        "0 \u2014 ResolveStrategy + SnapshotCriteria",
+        "1 \u2014 BuildQueries",
+        "2 \u2014 Search / Discover",
+        "3 \u2014 Collect / Fetch",
+        "4 \u2014 Parse",
+        "5 \u2014 Normalize",
+        "6 \u2014 Deduplicate",
+        "7 \u2014 Deterministic Filter",
+        "8 \u2014 Verify",
+        "9 \u2014 AI Evaluate",
+        "10 \u2014 Score",
+        "11 \u2014 Novelty / State",
+        "12 \u2014 Persist + Promote",
+        "5. Rejection reasons",
+        "Placement",
+        "Fate of rejected candidates",
+        "6. AI gate (formal)",
+        "7. Hold vs reject",
+        "8. Run status mapping",
+        "9. Observability hooks (per stage)",
+        "10. What the pipeline does **not** know",
+        "11. Consistency with ranking",
+        "Related"
+      ]
+    },
+    {
+      "id": "personal-discovery-engine-roadmap",
+      "title": "Personal Discovery Engine \u2014 Implementation Roadmap",
+      "path": "docs/discovery/personal-discovery-engine-roadmap.md",
+      "type": "roadmap",
+      "domain": "discovery",
+      "status": "proposed",
+      "maturity": "evolving",
+      "tags": [
+        "discovery"
+      ],
+      "created": "2026-08-30",
+      "updated": "2026-08-30",
+      "related": [
+        "personal-discovery-engine-mvp"
+      ],
+      "summary": "**Capability:** Personal Discovery Engine (PDE)",
+      "headings": [
+        "Personal Discovery Engine \u2014 Implementation Roadmap",
+        "Dependency graph",
+        "E1 \u2014 Discovery Domain Foundation",
+        "E2 \u2014 Discovery Pipeline",
+        "E3 \u2014 Verification Infrastructure",
+        "E4 \u2014 Job Discovery Strategy",
+        "E5 \u2014 Giveaway Discovery Strategy",
+        "E6 \u2014 AI Evaluation Layer",
+        "E7 \u2014 Persistence & History",
+        "E8 \u2014 Scheduler",
+        "E9 \u2014 Discovery UI",
+        "E10 \u2014 Daily Digest / Email",
+        "E11 \u2014 Production Hardening",
+        "Suggested delivery order for MVP",
+        "Out of roadmap (explicitly deferred)",
+        "Related"
+      ]
+    },
+    {
+      "id": "personal-discovery-engine-strategy-contract",
+      "title": "Personal Discovery Engine \u2014 Strategy Contract",
+      "path": "docs/discovery/personal-discovery-engine-strategy-contract.md",
+      "type": "spec",
+      "domain": "discovery",
+      "status": "proposed",
+      "maturity": "evolving",
+      "tags": [
+        "discovery"
+      ],
+      "created": "2026-08-30",
+      "updated": "2026-08-30",
+      "related": [
+        "personal-discovery-engine-mvp"
+      ],
+      "summary": "**Status:** Proposed (API not frozen until E1/E4 review)",
+      "headings": [
+        "Personal Discovery Engine \u2014 Strategy Contract",
+        "1. Core separation",
+        "Architectural error (forbidden)",
+        "Correct mental model",
+        "2. Engine policy vs strategy policy",
+        "3. Strategy interface (E1 resolved)",
+        "Pure vs effectful",
+        "4. Policy object shapes (draft)",
+        "VerificationPolicy",
+        "ScoringPolicy",
+        "FreshnessPolicy",
+        "DeduplicationPolicy",
+        "AiEvaluationPolicy",
+        "5. JobDiscoveryStrategyV1 (intent)",
+        "6. GiveawayDiscoveryStrategyV1 (intent)",
+        "7. Criteria UI coupling",
+        "8. Versioning rules",
+        "9. Testing contract",
+        "10. Registration",
+        "11. E1 API decisions (resolved)",
+        "Related"
       ]
     },
     {
@@ -5238,7 +5747,566 @@
         "14.4 Snapshot architecture (permanent)",
         "13. Canonical Principle (v2)"
       ]
+    },
+    {
+      "id": "vision-readme",
+      "title": "Arrival Atlas \u2014 UX Vision & Design Bible",
+      "path": "docs/vision/README.md",
+      "type": "index",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "vision"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "arrival-atlas-philosophy"
+      ],
+      "summary": "This folder is the **design constitution** for Arrival Atlas.",
+      "headings": [
+        "Arrival Atlas \u2014 UX Vision & Design Bible",
+        "What this is",
+        "Document map",
+        "Documents",
+        "How to use this bible (contributors)",
+        "Before designing a feature",
+        "Before implementing UI",
+        "Before shipping",
+        "When vision conflicts with v1 code",
+        "Version 1 vs vision",
+        "The unifying design philosophy",
+        "**Certainty Navigation**",
+        "The three pillars (inseparable)",
+        "Why this is impossible to confuse with other migration platforms",
+        "Radical model (future \u2014 preserves engineering)",
+        "Governance",
+        "Related external references",
+        "Migration strategy (v1 \u2192 vision)",
+        "Related internal docs"
+      ]
+    },
+    {
+      "id": "arrival-atlas-philosophy",
+      "title": "Arrival Atlas \u2014 Product Philosophy",
+      "path": "docs/vision/arrival-atlas-philosophy.md",
+      "type": "vision",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "philosophy"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "ux-principles"
+      ],
+      "summary": "This document describes **why** Arrival Atlas exists \u2014 not what it ships today.",
+      "headings": [
+        "Arrival Atlas \u2014 Why We Exist",
+        "The real problem",
+        "The emotional state of arrival",
+        "How users arrive",
+        "How users should leave",
+        "What Arrival Atlas is not",
+        "Not a government portal",
+        "Not an AI chatbot",
+        "Not a task manager",
+        "Why the galaxy metaphor exists",
+        "Time horizons \u2014 what users should feel",
+        "After 30 seconds",
+        "After 5 minutes",
+        "After one week",
+        "The north star sentence",
+        "Version 1 is not the vision",
+        "Related documents"
+      ]
+    },
+    {
+      "id": "cognitive-load-rules",
+      "title": "Cognitive Load Rules \u2014 Measurable Limits",
+      "path": "docs/vision/cognitive-load-rules.md",
+      "type": "vision",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "cognitive-load"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "ux-principles"
+      ],
+      "summary": "Principles are qualitative. These rules are **testable**.",
+      "headings": [
+        "Cognitive Load Rules",
+        "1. Simultaneous decisions",
+        "2. Primary CTAs",
+        "3. Attention hotspots",
+        "4. Overlays",
+        "5. Motion",
+        "6. Reading before action",
+        "7. Uncertainty",
+        "8. Navigation reachability",
+        "9. Inspector complexity",
+        "10. Form cognitive load",
+        "11. Language consistency",
+        "12. Error recovery",
+        "Cognitive load scorecard (review template)",
+        "Relationship to audits",
+        "Related documents"
+      ]
+    },
+    {
+      "id": "emotional-design",
+      "title": "Emotional Design \u2014 The Arrival Curve",
+      "path": "docs/vision/emotional-design.md",
+      "type": "vision",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "emotion"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "arrival-atlas-philosophy"
+      ],
+      "summary": "Arrival Atlas designs **feelings on purpose**.",
+      "headings": [
+        "Emotional Design",
+        "The Arrival Curve",
+        "Phase 1 \u2014 Curiosity",
+        "Phase 2 \u2014 Safety",
+        "Phase 3 \u2014 Understanding",
+        "Phase 4 \u2014 Confidence",
+        "Phase 5 \u2014 Achievement",
+        "Phase 6 \u2014 Ownership",
+        "Phase 7 \u2014 Independence",
+        "Negative emotions we must never cause",
+        "Crisis emotional mode",
+        "Measuring emotional success",
+        "Related documents"
+      ]
+    },
+    {
+      "id": "galaxy-design-language",
+      "title": "Galaxy Design Language \u2014 Semantic Specification",
+      "path": "docs/vision/galaxy-design-language.md",
+      "type": "vision",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "galaxy"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "arrival-atlas-philosophy"
+      ],
+      "summary": "This document defines what the galaxy **means** \u2014 not how it is drawn.",
+      "headings": [
+        "Galaxy Design Language",
+        "Core thesis",
+        "The center",
+        "A planet",
+        "A connection (route / edge)",
+        "Gravity",
+        "Distance",
+        "A constellation",
+        "A nebula",
+        "Light",
+        "Darkness",
+        "Animation",
+        "Discovery",
+        "Completion",
+        "Progression",
+        "The Journey Guide (in galaxy context)",
+        "Galaxy modes (conceptual)",
+        "When galaxy is the wrong UI",
+        "Validation checklist",
+        "Related documents"
+      ]
+    },
+    {
+      "id": "interaction-principles",
+      "title": "Interaction Principles",
+      "path": "docs/vision/interaction-principles.md",
+      "type": "vision",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "interaction"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "galaxy-design-language"
+      ],
+      "summary": "Rules for how Arrival Atlas **behaves** when touched.",
+      "headings": [
+        "Interaction Principles",
+        "1. When animation should happen",
+        "2. When animation must never happen",
+        "3. How unlocking should work",
+        "4. Discovery vs guidance",
+        "5. When the interface becomes quieter",
+        "6. When information should appear",
+        "7. When complexity may increase",
+        "8. Touch and mobile interactions",
+        "9. Keyboard and assistive interaction",
+        "10. Error interaction",
+        "11. Save interaction",
+        "12. Navigation interaction",
+        "Related documents"
+      ]
+    },
+    {
+      "id": "journey-guide-philosophy",
+      "title": "Journey Guide \u2014 Philosophy & Future Role",
+      "path": "docs/vision/journey-guide-philosophy.md",
+      "type": "vision",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "journey-guide"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "galaxy-design-language"
+      ],
+      "summary": "The Journey Guide is the most important \u2014 and most misunderstood \u2014 surface in Arrival Atlas.",
+      "headings": [
+        "Journey Guide Philosophy",
+        "What the Guide is NOT",
+        "What the Guide IS",
+        "Primary archetype: **Navigator**",
+        "Should users make choices?",
+        "Default answer: **No \u2014 not at entry**",
+        "v1 challenge",
+        "Should the Guide reduce choices?",
+        "Should the Guide ever disappear?",
+        "Never disappear entirely",
+        "Guide visibility should fade in **intensity**, not availability",
+        "Should the Guide become the primary interface?",
+        "Long-term: **Yes \u2014 for novice and crisis modes**",
+        "Dual-mode interface (future)",
+        "Guide speech principles",
+        "Locked planet philosophy",
+        "Cinematic unlock philosophy",
+        "Guide vs Situation Map",
+        "Failure modes to eliminate",
+        "Success metric",
+        "Related documents"
+      ]
+    },
+    {
+      "id": "mental-model",
+      "title": "Arrival Atlas \u2014 User Mental Model",
+      "path": "docs/vision/mental-model.md",
+      "type": "vision",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "mental-model"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "arrival-atlas-philosophy"
+      ],
+      "summary": "Users do not think in routes, modules, or galaxies.",
+      "headings": [
+        "User Mental Model",
+        "The user's internal monologue",
+        "What users think",
+        "What users do NOT think",
+        "The cognitive journey (ideal)",
+        "Layer 1 \u2014 Situation awareness",
+        "Layer 2 \u2014 Problem framing",
+        "Layer 3 \u2014 Process position",
+        "Layer 4 \u2014 Dependency understanding",
+        "Layer 5 \u2014 Action selection",
+        "Layer 6 \u2014 Outcome verification",
+        "Layer 7 \u2014 Growing independence",
+        "How the UI must adapt (not the user)",
+        "The forbidden mental model",
+        "Ideal information architecture (conceptual)",
+        "Related documents"
+      ]
+    },
+    {
+      "id": "onboarding-philosophy",
+      "title": "Onboarding Philosophy",
+      "path": "docs/vision/onboarding-philosophy.md",
+      "type": "vision",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "onboarding"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "mental-model"
+      ],
+      "summary": "**Do not optimize the current onboarding. Design the ideal.**",
+      "headings": [
+        "Onboarding Philosophy",
+        "Onboarding is not introduction",
+        "Ideal first session (stressed immigrant, Germany, day 1)",
+        "Step 0 \u2014 Language (5 seconds)",
+        "Step 1 \u2014 Safety (10 seconds)",
+        "Step 2 \u2014 Problem intake (30 seconds)",
+        "Step 3 \u2014 Minimum facts (60 seconds, only if needed)",
+        "Step 4 \u2014 First map view (30 seconds)",
+        "Step 5 \u2014 First action (5\u201310 minutes)",
+        "What we deliberately omit from onboarding",
+        "Returning user onboarding",
+        "Crisis onboarding variant",
+        "Onboarding success criteria",
+        "Relationship to Journey Guide",
+        "v1 \u2192 vision migration (preserving engineering)",
+        "Related documents"
+      ]
+    },
+    {
+      "id": "arrival-welcome",
+      "title": "Arrival Welcome \u2014 UX Primitive Specification",
+      "path": "docs/vision/primitives/arrival-welcome.md",
+      "type": "primitive",
+      "domain": "product",
+      "status": "draft",
+      "maturity": "canonical",
+      "tags": [
+        "onboarding"
+      ],
+      "created": "2026-07-13",
+      "updated": "2026-07-13",
+      "related": [
+        "../onboarding-philosophy.md"
+      ],
+      "summary": "**Behavioral design specification \u2014 not implementation.**",
+      "headings": [
+        "Arrival Welcome \u2014 UX Primitive Specification",
+        "Purpose",
+        "User Problem",
+        "Product Principles Supported",
+        "Experience Goals",
+        "First 30 Seconds Experience",
+        "Information Hierarchy",
+        "States",
+        "First visit",
+        "Language not detected",
+        "Language detected",
+        "Language selected",
+        "Returning user",
+        "State Machine (First Session)",
+        "Rules",
+        "Must",
+        "Must not",
+        "Visual Concept",
+        "Motion Rules",
+        "Copy Rules",
+        "Accessibility",
+        "Integration Points (Architecture \u2014 Not Implementation)",
+        "Success Metrics",
+        "Out of Scope (This Primitive)",
+        "Related Documents"
+      ]
+    },
+    {
+      "id": "certainty-layer",
+      "title": "Certainty Layer \u2014 UX Contract Specification",
+      "path": "docs/vision/primitives/certainty-layer.md",
+      "type": "primitive",
+      "domain": "product",
+      "status": "draft",
+      "maturity": "canonical",
+      "tags": [
+        "certainty"
+      ],
+      "created": "2026-07-13",
+      "updated": "2026-07-13",
+      "related": [
+        "../ux-principles.md"
+      ],
+      "summary": "**Semantic contract \u2014 adapters describe reality; UI owns language.**",
+      "headings": [
+        "Certainty Layer \u2014 UX Contract Specification",
+        "Architecture",
+        "CertaintyState",
+        "Semantic reason variants",
+        "Semantic expected outcome variants",
+        "Confidence presentation",
+        "Consumers",
+        "Shared bundle shape",
+        "Adapter responsibilities",
+        "UI primitives",
+        "Feature flags",
+        "Journey Guide compatibility",
+        "Product principles supported",
+        "Implementation location",
+        "Migration path"
+      ]
+    },
+    {
+      "id": "current-situation-resolver",
+      "title": "Current Situation Resolver \u2014 Platform Authority",
+      "path": "docs/vision/primitives/current-situation-resolver.md",
+      "type": "primitive",
+      "domain": "product",
+      "status": "draft",
+      "maturity": "canonical",
+      "tags": [
+        "certainty"
+      ],
+      "created": "2026-07-13",
+      "updated": "2026-07-13",
+      "related": [
+        "./certainty-layer.md"
+      ],
+      "summary": "**Domain architecture \u2014 not presentation. Not E2 Situation Layer.**",
+      "headings": [
+        "Current Situation Resolver (CSR)",
+        "Problem",
+        "Architecture",
+        "Responsibilities",
+        "Registration API",
+        "Resolution algorithm",
+        "1. Confidence precedence",
+        "2. Surface priority tie-break",
+        "Resolution reason (semantic)",
+        "Output shape",
+        "Validation & safety",
+        "Feature flag",
+        "Future consumers (E2+)",
+        "Implementation",
+        "Relationship to Certainty Layer"
+      ]
+    },
+    {
+      "id": "journey-guide-certainty",
+      "title": "Journey Guide \u00d7 Certainty Layer Integration",
+      "path": "docs/vision/primitives/journey-guide-certainty.md",
+      "type": "primitive",
+      "domain": "product",
+      "status": "draft",
+      "maturity": "canonical",
+      "tags": [
+        "journey-guide"
+      ],
+      "created": "2026-07-13",
+      "updated": "2026-07-13",
+      "related": [
+        "./certainty-layer.md"
+      ],
+      "summary": "**Architectural contract \u2014 not a Journey Guide redesign.**",
+      "headings": [
+        "Journey Guide \u00d7 Certainty Layer Integration",
+        "Ownership",
+        "Data flow (Life Events)",
+        "Mapping",
+        "Guide formatters",
+        "Feature flag",
+        "Fallback policy",
+        "Rollout strategy",
+        "Telemetry",
+        "Implementation location",
+        "Principles supported"
+      ]
+    },
+    {
+      "id": "product-personality",
+      "title": "Product Personality",
+      "path": "docs/vision/product-personality.md",
+      "type": "vision",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "voice"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "emotional-design"
+      ],
+      "summary": "If Arrival Atlas were a person at your side during bureaucracy, who would they be?",
+      "headings": [
+        "Product Personality",
+        "Archetype",
+        "How Arrival Atlas speaks",
+        "Voice examples",
+        "When Arrival Atlas is silent",
+        "Apologies",
+        "Celebration",
+        "Warnings",
+        "Teaching",
+        "Multilingual personality",
+        "Who Arrival Atlas is NOT",
+        "Consistency test",
+        "Related documents"
+      ]
+    },
+    {
+      "id": "ux-principles",
+      "title": "Arrival Atlas \u2014 Immutable UX Principles",
+      "path": "docs/vision/ux-principles.md",
+      "type": "vision",
+      "domain": "product",
+      "status": "active",
+      "maturity": "canonical",
+      "tags": [
+        "principles"
+      ],
+      "created": "2026-07-06",
+      "updated": "2026-07-06",
+      "related": [
+        "cognitive-load-rules"
+      ],
+      "summary": "These principles are **constitutional**. They outrank feature requests, aesthetics, and engineering convenience.",
+      "headings": [
+        "Immutable UX Principles",
+        "1. One primary next step",
+        "2. Every screen answers three questions",
+        "3. Calm before complexity",
+        "4. Reduce uncertainty before adding information",
+        "5. Guide before exploration",
+        "6. Progress before navigation",
+        "7. Never punish curiosity",
+        "8. Every animation teaches something",
+        "9. Every interaction reduces anxiety",
+        "10. Bureaucracy must become understandable",
+        "11. Every visual element justifies its existence",
+        "12. Honesty over comfort",
+        "13. Dependencies are first-class UX",
+        "14. Language is infrastructure",
+        "15. Mobile is the primary reality",
+        "16. Dead ends are unacceptable",
+        "17. Forms are conversations, not interrogations",
+        "18. Celebration is proportional",
+        "19. Silence is a design choice",
+        "20. The map persists; the guide fades",
+        "21. One overlay at a time",
+        "22. Writes must close the loop",
+        "23. Complexity is opt-in",
+        "24. Accessibility is clarity for everyone",
+        "25. Design for the worst day",
+        "Using these principles",
+        "Related documents"
+      ]
     }
   ],
-  "count": 109
+  "count": 135
 }
