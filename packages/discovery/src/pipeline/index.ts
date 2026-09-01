@@ -68,6 +68,25 @@ export {
 } from './verification-integrity.js';
 export type { AiGateBlockReason, AiGateDecision, AiEvaluationValidationResult } from './ai-gate.js';
 export { evaluateAiGate, validateAiEvaluation } from './ai-gate.js';
+export type { AiCostPolicy } from './ai-cost.js';
+export {
+  resolveAiCostPolicy,
+  estimateTokensFromStructuredPayload,
+  estimateReservedOutputTokens,
+  stableJsonStringify,
+  DEFAULT_AI_OUTPUT_TOKEN_RESERVE_PER_TASK,
+  DEFAULT_AI_OUTPUT_TOKEN_RESERVE_MIN,
+} from './ai-cost.js';
+export type { AiEvaluationFingerprintInput } from './ai-fingerprint.js';
+export {
+  computeAiEvaluationFingerprint,
+  buildAiAccountingPayload,
+} from './ai-fingerprint.js';
+export type {
+  AiEvaluationCache,
+  AiEvaluationCacheEntry,
+} from './ai-evaluation-cache.js';
+export { createInMemoryAiEvaluationCache } from './ai-evaluation-cache.js';
 export type { ResultStore } from './result-store.js';
 export { ResultStoreError, resultIdentityKey } from './result-store.js';
 export type { ResultWriter } from './result-writer.js';
@@ -79,6 +98,19 @@ export {
 } from './novelty-decision.js';
 export { buildPersistPlan } from './persist-plan.js';
 export type { PersistPromotionBuildInput, PersistPromotionPlan } from './persist-plan.js';
+export {
+  validateResultStateTransition,
+  type ResultStateTransitionInput,
+  type ResultStateTransitionResult,
+} from './result-state-transition.js';
+export {
+  createResultStateWriter,
+  transitionResultsToNotified,
+  ResultStateWriterError,
+  type ResultStateWriter,
+  type ResultStateTransitionRequest,
+  type CreateResultStateWriterDeps,
+} from './result-state-writer.js';
 export { createInMemoryResultStore } from './fakes/in-memory-result-store.js';
 /** Alias — in-memory fake implements ResultStore + ResultWriter */
 export { createInMemoryResultStore as createInMemoryResultWriter } from './fakes/in-memory-result-store.js';

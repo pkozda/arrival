@@ -19,7 +19,7 @@ export {
 } from './timeout.js';
 export type { TimeoutExecutionOptions } from './timeout.js';
 
-export { wouldRetry } from './retry-policy.js';
+export { wouldRetry, isRetryableAdapterFailure, defaultShouldRetryAdapterFailure, RETRYABLE_ADAPTER_FAILURE_CODES, NON_RETRYABLE_ADAPTER_FAILURE_CODES } from './retry-policy.js';
 
 export { createInMemoryRateLimiter } from './rate-limiter.js';
 export type { InMemoryRateLimiterOptions } from './rate-limiter.js';

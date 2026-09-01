@@ -295,6 +295,7 @@ describe('E2.7 Persist + Promote', () => {
         userState: 'NEW',
         shouldNotify: true,
         reason: 'NEW_OPPORTUNITY',
+        changedFields: [],
       },
       candidate: { ...base.candidate, evidence: [] },
     });

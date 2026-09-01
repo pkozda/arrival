@@ -17,9 +17,19 @@ export type EnginePolicy = {
   aiEnabled: boolean;
   /**
    * Max AI evaluations per DiscoveryRun.
-   * 0 = budget exhausted / no AI calls. Not token billing — a simple cost gate for E2.4.
+   * 0 = budget exhausted / no AI calls. Count gate for cost-aware AI (roadmap E6).
    */
   maxAiEvaluationsPerRun: number;
+  /**
+   * Optional estimated input-token budget per DiscoveryRun.
+   * Deterministic estimate only — not provider billing. Undefined = unlimited.
+   */
+  maxEstimatedAiInputTokensPerRun?: number;
+  /**
+   * Optional estimated output-token budget per DiscoveryRun.
+   * Deterministic estimate only — not provider billing. Undefined = unlimited.
+   */
+  maxEstimatedAiOutputTokensPerRun?: number;
 };
 
 export const DEFAULT_ENGINE_POLICY: EnginePolicy = {

@@ -205,3 +205,53 @@ describe('E4.7 runtime restart persistence', () => {
     }
   });
 });
+
+describe('E5.2 durable queue crash recovery (runtime)', () => {
+  it('abandoned RUNNING claim recovers and executes same runId', async () => {
+    const transport = happyPathTransport();
+    const persistence = tempPersistencePaths();
+    const { runtime: a, clock } = createRuntimeHarness({
+      transport,
+      persistence,
+      queueVisibilityTimeoutMs: 1_000,
+      workerId: 'worker-A',
+    });
+
+    await registerDueSchedule(a, 'sched-crash');
+    await a.scheduler.triggerDueRuns();
+    const claimed = await a.queue.dequeue({ claimOwner: 'worker-A' });
+    expect(claimed?.status).toBe('RUNNING');
+    const runId = claimed!.runId;
+    a.close();
+
+    clock.set('2026-08-31T10:00:05.000Z');
+
+    const { runtime: b } = createRuntimeHarness({
+      transport,
+      persistence,
+      start: '2026-08-31T10:00:05.000Z',
+      queueVisibilityTimeoutMs: 1_000,
+      workerId: 'worker-B',
+    });
+
+    try {
+      const pending = await b.queue.getPending();
+      expect(pending).toHaveLength(1);
+      expect(pending[0]?.runId).toBe(runId);
+      expect(pending[0]?.attempt).toBe(2);
+
+      const processed = await b.worker.processNext();
+      expect(processed).toMatchObject({
+        kind: 'processed',
+        runId,
+        pipelineStatus: 'SUCCESS',
+      });
+      expect(
+        (await b.scheduleStore.get('sched-crash'))?.runningRunId
+      ).toBeNull();
+    } finally {
+      b.close();
+      persistence.cleanup();
+    }
+  });
+});

@@ -26,7 +26,14 @@ export type DiscoveryExecutionJob = {
   startedAt?: string;
   finishedAt?: string;
   failureReason?: string;
+  /** Safe string map only — never secrets / tokens / auth headers. */
   metadata?: Record<string, string>;
+  /** When the job becomes claimable (E5.2 durable queue). */
+  availableAt?: string;
+  /** Claim lease start (E5.2). */
+  claimedAt?: string;
+  /** Worker identity that owns the claim (E5.2). */
+  claimOwner?: string;
 };
 
 export type EnqueueJobInput = {
@@ -51,5 +58,14 @@ export type JobIdGenerator = () => string;
 
 export type WorkerProcessResult =
   | { kind: 'processed'; jobId: string; runId: string; pipelineStatus: string }
+  | {
+      kind: 'retry_scheduled';
+      jobId: string;
+      runId: string;
+      attempt: number;
+      availableAt: string;
+      failureCode: string;
+      diagnostic: 'RETRY_SCHEDULED';
+    }
   | { kind: 'empty' }
   | { kind: 'skipped'; jobId: string; reason: string };

@@ -102,24 +102,40 @@ export {
 
 export type {
   DiscoveryResultRecordV1,
+  DiscoveryProfileRecordV1,
 } from './persistence/index.js';
 export {
   DISCOVERY_RESULT_RECORD_SCHEMA_VERSION,
   serializeDiscoveryResult,
   deserializeDiscoveryResult,
   createSqliteResultPersistence,
+  DISCOVERY_PROFILE_RECORD_SCHEMA_VERSION,
+  serializeDiscoveryProfile,
+  deserializeDiscoveryProfile,
+  createSqliteProfilePersistence,
 } from './persistence/index.js';
 export type {
   SqliteResultPersistenceConfig,
   SqliteResultPersistence,
+  SqliteProfilePersistenceConfig,
+  SqliteProfilePersistence,
   SqliteSchedulerPersistenceConfig,
   SqliteSchedulerPersistence,
   SqliteNotificationPersistenceConfig,
   SqliteNotificationPersistence,
+  SqliteExecutionQueueConfig,
+  SqliteExecutionQueue,
+  SqliteSchedulerLockConfig,
+  SqliteSchedulerLock,
 } from './persistence/index.js';
 export {
   DISCOVERY_SCHEDULER_SCHEMA_VERSION,
   createSqliteSchedulerPersistence,
   DISCOVERY_NOTIFICATION_SCHEMA_VERSION,
   createSqliteNotificationPersistence,
+  DISCOVERY_EXECUTION_QUEUE_SCHEMA_VERSION,
+  DEFAULT_QUEUE_VISIBILITY_TIMEOUT_MS,
+  createSqliteExecutionQueue,
+  DISCOVERY_SCHEDULER_LOCK_SCHEMA_VERSION,
+  createSqliteSchedulerLock,
 } from './persistence/index.js';

@@ -37,6 +37,14 @@ export function createInMemoryRunStore(
         .map((r) => structuredClone(r));
     },
 
+    async listRecent(limit) {
+      const n = Math.max(0, Math.floor(limit));
+      return [...runs.values()]
+        .sort((a, b) => Date.parse(b.startedAt) - Date.parse(a.startedAt))
+        .slice(0, n)
+        .map((r) => structuredClone(r));
+    },
+
     snapshot() {
       return [...runs.values()].map((r) => structuredClone(r));
     },

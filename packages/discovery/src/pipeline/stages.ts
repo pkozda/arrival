@@ -7,7 +7,16 @@ import { AdapterFailureError, adapterFailureReasonCode } from '../adapter-infra/
 import type { DiscoveryCandidate } from '../types/candidate.js';
 import { finalizeVerificationResult } from './verification-integrity.js';
 import { evaluateAiGate, validateAiEvaluation } from './ai-gate.js';
+import {
+  estimateReservedOutputTokens,
+  estimateTokensFromStructuredPayload,
+} from './ai-cost.js';
+import {
+  buildAiAccountingPayload,
+  computeAiEvaluationFingerprint,
+} from './ai-fingerprint.js';
 import { validateScore } from '../invariants/score.js';
+import type { AiEvaluation } from '../types/ai-evaluation.js';
 import type { RankContext } from '../types/score.js';
 import {
   decideNovelty,
@@ -1058,6 +1067,7 @@ export async function runVerifyStage(
 /**
  * AI Evaluate — interprets verified material only.
  * Never modifies VerificationResult / Evidence; never fabricates URLs.
+ * Cost/dedupe skips are not AI failures (roadmap E6).
  */
 export async function runAiEvaluateStage(
   batch: PipelineBatch,
@@ -1068,23 +1078,150 @@ export async function runAiEvaluateStage(
   const partialFailures: string[] = [];
   let next: PipelineBatch = { active: [], rejected: [...batch.rejected] };
   let aiUsed = context.aiEvaluationsUsed;
+  let inputTokensUsed = context.aiEstimatedInputTokensUsed;
+  let outputTokensUsed = context.aiEstimatedOutputTokensUsed;
   let rejectedCount = 0;
+  const cache = context.aiEvaluationCache;
 
   const policy = context.strategy.aiEvaluationPolicy;
   const adapter = context.adapters.ai;
+  const emitAi = (
+    eventName:
+      | 'ai.gate.skipped'
+      | 'ai.evaluation.started'
+      | 'ai.evaluation.completed'
+      | 'ai.evaluation.deduplicated'
+      | 'ai.budget.exhausted',
+    attributes?: Record<string, string | number | boolean | undefined>
+  ) => {
+    context.telemetry?.emit({
+      eventName,
+      runId: context.run.id,
+      profileId: context.profile.id,
+      strategyId: context.strategy.id,
+      attributes,
+    });
+  };
 
   for (const candidate of batch.active) {
     const candStarted = Date.now();
+    const knownEvidence = candidate.evidence ?? [];
+    const tasksForEstimate = [...policy.tasks];
+
+    const fingerprint =
+      candidate.verification?.status === 'PASS'
+        ? computeAiEvaluationFingerprint({
+            strategyId: context.strategy.id,
+            strategyVersion: context.strategy.version,
+            identity: candidate.identity,
+            criteria: context.run.criteriaSnapshot,
+            verification: candidate.verification,
+            allowedTasks: tasksForEstimate,
+            rejectOn: policy.rejectOn,
+            extracted: candidate.extracted,
+            evidenceIds: knownEvidence.map((e) => e.id),
+          })
+        : undefined;
+
+    const cachedEntry =
+      fingerprint !== undefined ? cache.find(fingerprint) : undefined;
+    const candidateExisting =
+      fingerprint &&
+      candidate.aiEvaluation?.inputFingerprint === fingerprint
+        ? candidate.aiEvaluation
+        : undefined;
+
+    let reusable: AiEvaluation | undefined;
+    if (cachedEntry || candidateExisting) {
+      const candidateEval = cachedEntry?.evaluation ?? candidateExisting!;
+      const validatedCached = validateAiEvaluation({
+        evaluation: candidateEval,
+        allowedTasks: tasksForEstimate,
+        rejectOn: policy.rejectOn,
+        knownEvidenceIds: new Set(knownEvidence.map((e) => e.id)),
+      });
+      if (validatedCached.ok) {
+        reusable = {
+          ...validatedCached.evaluation,
+          inputFingerprint: fingerprint,
+        };
+      }
+    }
+
+    const accountingPayload =
+      candidate.verification?.status === 'PASS'
+        ? buildAiAccountingPayload({
+            allowedTasks: tasksForEstimate,
+            rejectOn: policy.rejectOn,
+            identity: candidate.identity,
+            verification: candidate.verification,
+            evidence: knownEvidence.map((e) => ({
+              id: e.id,
+              type: e.type,
+              statement: e.statement,
+            })),
+            criteria: context.run.criteriaSnapshot,
+            extracted: candidate.extracted,
+          })
+        : null;
+    const pendingInput = accountingPayload
+      ? estimateTokensFromStructuredPayload(accountingPayload)
+      : 0;
+    const pendingOutput = estimateReservedOutputTokens(tasksForEstimate.length);
+
     const gate = evaluateAiGate({
       candidate,
       strategyPolicy: policy,
       enginePolicy: context.enginePolicy,
       aiEvaluationsUsed: aiUsed,
       hasAdapter: Boolean(adapter),
+      alreadyEvaluated: Boolean(reusable),
+      estimatedInputTokensUsed: inputTokensUsed,
+      estimatedOutputTokensUsed: outputTokensUsed,
+      pendingEstimatedInputTokens: pendingInput,
+      pendingEstimatedOutputTokens: pendingOutput,
     });
 
     if (!gate.allow) {
-      // Continue toward Score without AI — not a rejection (unless filter/verify already did)
+      if (gate.reason === 'AI_ALREADY_EVALUATED' && reusable && fingerprint) {
+        const attached = applyAiEvaluation(candidate, reusable, context.now);
+        if (attached.kind === 'reject') {
+          rejectedCount += 1;
+          next = {
+            active: [...next.active],
+            rejected: [
+              ...next.rejected,
+              { candidate: attached.candidate, rejection: attached.rejection },
+            ],
+          };
+        } else {
+          next = {
+            active: [...next.active, attached.candidate],
+            rejected: [...next.rejected],
+          };
+        }
+        diagnostics.push(
+          stageDiagnostic({
+            runId: context.run.id,
+            stage: 'ai_evaluate',
+            candidateId: candidate.id,
+            startedAtMs: candStarted,
+            outcome: attached.kind === 'reject' ? 'reject' : 'ok',
+            reasonCode: 'AI_ALREADY_EVALUATED',
+            message: 'AI skipped: SKIPPED_ALREADY_EVALUATED',
+          })
+        );
+        emitAi('ai.evaluation.deduplicated', {
+          candidateId: candidate.id,
+          fingerprintPrefix: fingerprint.slice(0, 12),
+        });
+        emitAi('ai.gate.skipped', {
+          candidateId: candidate.id,
+          reason: 'AI_ALREADY_EVALUATED',
+        });
+        continue;
+      }
+
       next = {
         active: [...next.active, { ...candidate }],
         rejected: [...next.rejected],
@@ -1100,11 +1237,30 @@ export async function runAiEvaluateStage(
           message: `AI skipped: ${gate.reason}`,
         })
       );
+      emitAi('ai.gate.skipped', {
+        candidateId: candidate.id,
+        reason: gate.reason,
+      });
+      if (
+        gate.reason === 'AI_BUDGET_EXHAUSTED' ||
+        gate.reason === 'AI_TOKEN_BUDGET_EXHAUSTED'
+      ) {
+        emitAi('ai.budget.exhausted', {
+          candidateId: candidate.id,
+          reason: gate.reason,
+          aiEvaluationsUsed: aiUsed,
+          estimatedInputTokensUsed: inputTokensUsed,
+          estimatedOutputTokensUsed: outputTokensUsed,
+        });
+      }
       continue;
     }
 
     try {
-      const knownEvidence = candidate.evidence ?? [];
+      emitAi('ai.evaluation.started', {
+        candidateId: candidate.id,
+        pendingEstimatedInputTokens: pendingInput,
+      });
       const adapterResult = await adapter!.evaluate({
         candidateId: candidate.id,
         identity: candidate.identity,
@@ -1172,36 +1328,31 @@ export async function runAiEvaluateStage(
         continue;
       }
 
-      const rejectTask = validated.evaluation.tasks.find(
-        (t) => t.outcome === 'REJECT_RECOMMENDED' && t.recommendedRejection
+      inputTokensUsed += pendingInput;
+      outputTokensUsed += estimateTokensFromStructuredPayload(
+        validated.evaluation
       );
-      if (rejectTask?.recommendedRejection) {
+
+      const evaluationWithFp: AiEvaluation = {
+        ...validated.evaluation,
+        inputFingerprint: fingerprint,
+      };
+      if (fingerprint) {
+        cache.save(fingerprint, evaluationWithFp);
+      }
+
+      const attached = applyAiEvaluation(
+        candidate,
+        evaluationWithFp,
+        context.now
+      );
+      if (attached.kind === 'reject') {
         rejectedCount += 1;
-        const rejection = {
-          reasonCode: rejectTask.recommendedRejection,
-          atStage: 'AI_EVALUATING' as const,
-          at: context.now(),
-          details: {
-            task: rejectTask.task,
-            via: 'AI_INTERPRETATION',
-          },
-        };
-        // Preserve verification/evidence unchanged on rejected copy
-        const rejectedCandidate: DiscoveryCandidate = {
-          ...candidate,
-          stage: 'REJECTED',
-          rejection,
-          aiEvaluation: validated.evaluation,
-          verification: candidate.verification
-            ? { ...candidate.verification, checks: [...candidate.verification.checks] }
-            : undefined,
-          evidence: candidate.evidence?.map((e) => ({ ...e })),
-        };
         next = {
           active: [...next.active],
           rejected: [
             ...next.rejected,
-            { candidate: rejectedCandidate, rejection },
+            { candidate: attached.candidate, rejection: attached.rejection },
           ],
         };
         diagnostics.push(
@@ -1212,44 +1363,36 @@ export async function runAiEvaluateStage(
             startedAtMs: candStarted,
             outcome: 'reject',
             adapter: 'ai',
-            reasonCode: rejectTask.recommendedRejection,
-            message: `AI recommended rejection: ${rejectTask.recommendedRejection}`,
+            reasonCode: attached.rejection.reasonCode,
+            message: `AI recommended rejection: ${attached.rejection.reasonCode}`,
             costUnits: 1,
           })
         );
-        continue;
+      } else {
+        next = {
+          active: [...next.active, attached.candidate],
+          rejected: [...next.rejected],
+        };
+        diagnostics.push(
+          stageDiagnostic({
+            runId: context.run.id,
+            stage: 'ai_evaluate',
+            candidateId: candidate.id,
+            startedAtMs: candStarted,
+            outcome: 'ok',
+            adapter: 'ai',
+            message: `AI evaluated ${evaluationWithFp.tasks.length} task(s)`,
+            costUnits: 1,
+          })
+        );
       }
-
-      const nextCandidate: DiscoveryCandidate = {
-        ...candidate,
-        stage: 'AI_EVALUATING',
-        aiEvaluation: validated.evaluation,
-        // Explicit copies — verification/evidence unchanged
-        verification: candidate.verification
-          ? {
-              ...candidate.verification,
-              checks: candidate.verification.checks.map((c) => ({ ...c })),
-              evidenceIds: [...candidate.verification.evidenceIds],
-            }
-          : undefined,
-        evidence: candidate.evidence?.map((e) => ({ ...e })),
-      };
-      next = {
-        active: [...next.active, nextCandidate],
-        rejected: [...next.rejected],
-      };
-      diagnostics.push(
-        stageDiagnostic({
-          runId: context.run.id,
-          stage: 'ai_evaluate',
-          candidateId: candidate.id,
-          startedAtMs: candStarted,
-          outcome: 'ok',
-          adapter: 'ai',
-          message: `AI evaluated ${validated.evaluation.tasks.length} task(s)`,
-          costUnits: 1,
-        })
-      );
+      emitAi('ai.evaluation.completed', {
+        candidateId: candidate.id,
+        estimatedInputTokens: pendingInput,
+        estimatedOutputTokens: estimateTokensFromStructuredPayload(
+          evaluationWithFp
+        ),
+      });
     } catch (err) {
       aiUsed += 1;
       const message =
@@ -1295,7 +1438,7 @@ export async function runAiEvaluateStage(
       outcome:
         partialFailures.length > 0 || rejectedCount > 0 ? 'partial' : 'ok',
       adapter: 'ai',
-      message: `AI evaluate complete; used=${aiUsed}`,
+      message: `AI evaluate complete; used=${aiUsed}; estIn=${inputTokensUsed}; estOut=${outputTokensUsed}`,
       costUnits: Math.max(0, aiUsed - context.aiEvaluationsUsed),
     })
   );
@@ -1306,9 +1449,74 @@ export async function runAiEvaluateStage(
       ...context,
       run: nextRun,
       aiEvaluationsUsed: aiUsed,
+      aiEstimatedInputTokensUsed: inputTokensUsed,
+      aiEstimatedOutputTokensUsed: outputTokensUsed,
+      aiEvaluationCache: cache,
     },
     diagnostics,
     partialFailures,
+  };
+}
+
+function applyAiEvaluation(
+  candidate: DiscoveryCandidate,
+  evaluation: AiEvaluation,
+  now: () => string
+):
+  | {
+      kind: 'active';
+      candidate: DiscoveryCandidate;
+    }
+  | {
+      kind: 'reject';
+      candidate: DiscoveryCandidate;
+      rejection: NonNullable<DiscoveryCandidate['rejection']>;
+    } {
+  const rejectTask = evaluation.tasks.find(
+    (t) => t.outcome === 'REJECT_RECOMMENDED' && t.recommendedRejection
+  );
+  const verificationCopy = candidate.verification
+    ? {
+        ...candidate.verification,
+        checks: candidate.verification.checks.map((c) => ({ ...c })),
+        evidenceIds: [...candidate.verification.evidenceIds],
+      }
+    : undefined;
+  const evidenceCopy = candidate.evidence?.map((e) => ({ ...e }));
+
+  if (rejectTask?.recommendedRejection) {
+    const rejection = {
+      reasonCode: rejectTask.recommendedRejection,
+      atStage: 'AI_EVALUATING' as const,
+      at: now(),
+      details: {
+        task: rejectTask.task,
+        via: 'AI_INTERPRETATION',
+      },
+    };
+    return {
+      kind: 'reject',
+      rejection,
+      candidate: {
+        ...candidate,
+        stage: 'REJECTED',
+        rejection,
+        aiEvaluation: evaluation,
+        verification: verificationCopy,
+        evidence: evidenceCopy,
+      },
+    };
+  }
+
+  return {
+    kind: 'active',
+    candidate: {
+      ...candidate,
+      stage: 'AI_EVALUATING',
+      aiEvaluation: evaluation,
+      verification: verificationCopy,
+      evidence: evidenceCopy,
+    },
   };
 }
 
@@ -1829,6 +2037,8 @@ export async function runPersistPromoteStage(
       strategyId: context.strategy.id,
       strategyVersion: context.strategy.version,
       identityFingerprintFields: fields,
+      materialExtractedFields:
+        context.strategy.noveltyPolicy.materialExtractedFields,
       now: context.now(),
     });
 

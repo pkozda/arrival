@@ -13,6 +13,7 @@ export type PersistPromotionBuildInput = {
   strategyId: string;
   strategyVersion: string;
   identityFingerprintFields: readonly string[];
+  materialExtractedFields?: readonly string[];
   now: string;
 };
 
@@ -59,6 +60,10 @@ export function buildPersistPlan(
       lastChangedAt: input.now,
       promotedFromCandidateId: input.candidate.id,
       promotedFromRunId: input.candidate.runId,
+      materialFields: snapshotMaterialFields(
+        input.candidate,
+        input.materialExtractedFields
+      ),
     };
     return { action: 'CREATE', result };
   }
@@ -89,8 +94,27 @@ export function buildPersistPlan(
     strategyVersion: input.strategyVersion,
     promotedFromCandidateId: input.candidate.id,
     promotedFromRunId: input.candidate.runId,
+    materialFields: snapshotMaterialFields(
+      input.candidate,
+      input.materialExtractedFields
+    ),
   };
   return { action: 'UPDATE', result };
+}
+
+function snapshotMaterialFields(
+  candidate: DiscoveryCandidate,
+  keys: readonly string[] | undefined
+): Record<string, string | number | boolean | null> | undefined {
+  if (!keys || keys.length === 0) return undefined;
+  const out: Record<string, string | number | boolean | null> = {};
+  for (const key of keys) {
+    const value = candidate.extracted.fields[key];
+    if (value !== undefined) {
+      out[key] = value;
+    }
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
 }
 
 function mergeEvidence(

@@ -5,6 +5,7 @@ import {
   createInMemoryProfileStore,
   createInMemoryResultStore,
   decideNovelty,
+  detectMaterialChange,
   emptyCriteria,
   executeDiscoveryPipeline,
   presentationFromCandidate,
@@ -14,6 +15,7 @@ import {
   type DiscoveryResult,
   type NoveltyPolicy,
 } from '../index.js';
+import { jobDiscoveryStrategyV1 } from '../strategies/job-discovery-v1.js';
 
 function jobProfile(overrides: Partial<DiscoveryProfile> = {}): DiscoveryProfile {
   return {
@@ -129,6 +131,28 @@ const jobNoveltyPolicy: NoveltyPolicy = {
   notifyOnMeaningfulUpdate: true,
 };
 
+const jobPolicyWithSalary = jobDiscoveryStrategyV1.noveltyPolicy;
+
+function scoredCandidate(
+  overrides: Partial<DiscoveryCandidate> = {}
+): DiscoveryCandidate {
+  const existing = baseExisting();
+  return {
+    id: 'c1',
+    runId: 'r1',
+    identity: structuredClone(existing.identity),
+    source: { trust: 'AGGREGATOR', url: 'https://employer.example/jobs/1' },
+    discoveredAt: '2026-08-30T12:00:00.000Z',
+    raw: { ref: 'r' },
+    extracted: { fields: { title: 'Frontend Engineer' } },
+    stage: 'SCORED',
+    deterministicFilterPassed: true,
+    verification: structuredClone(existing.verification),
+    score: structuredClone(existing.score),
+    ...overrides,
+  };
+}
+
 describe('E2.6 Novelty / State', () => {
   it('no existing Result → NEW + ACTIVE + notify', async () => {
     const store = createInMemoryResultStore([]);
@@ -156,6 +180,7 @@ describe('E2.6 Novelty / State', () => {
       userState: 'NEW',
       shouldNotify: true,
       reason: 'NEW_OPPORTUNITY',
+      changedFields: [],
     });
   });
 
@@ -207,6 +232,7 @@ describe('E2.6 Novelty / State', () => {
     expect(decision.lifecycle).toBe('ACTIVE');
     expect(decision.shouldNotify).toBe(false);
     expect(decision.reason).toBe('NO_MATERIAL_CHANGE');
+    expect(decision.changedFields).toEqual([]);
   });
 
   it('source URL change alone does not create NEW when identity fingerprints match', async () => {
@@ -506,6 +532,154 @@ describe('E2.6 Novelty / State', () => {
     expect(stages.indexOf('score')).toBeLessThan(stages.indexOf('novelty_state'));
     expect(stages.indexOf('novelty_state')).toBeLessThan(
       stages.indexOf('persist_promote')
+    );
+  });
+});
+
+describe('E7.5 changedFields', () => {
+  it('NEW → changedFields is empty', () => {
+    const decision = decideNovelty({
+      existing: null,
+      candidate: scoredCandidate(),
+      presentation: { title: 'Frontend Engineer' },
+      policy: jobPolicyWithSalary,
+      notification: { emailEnabled: true, skipEmptyDigest: true },
+    });
+    expect(decision.changedFields).toEqual([]);
+  });
+
+  it('UNCHANGED → changedFields is empty', () => {
+    const existing = baseExisting({
+      materialFields: { salary: null },
+    });
+    const candidate = scoredCandidate({
+      extracted: { fields: { title: 'Frontend Engineer', salary: null } },
+    });
+    const decision = decideNovelty({
+      existing,
+      candidate,
+      presentation: presentationFromCandidate(candidate),
+      policy: jobPolicyWithSalary,
+      notification: { emailEnabled: true, skipEmptyDigest: true },
+    });
+    expect(decision.novelty).toBe('UNCHANGED');
+    expect(decision.changedFields).toEqual([]);
+  });
+
+  it('material update → deterministic sorted changedFields', () => {
+    const existing = baseExisting();
+    const candidate = scoredCandidate({
+      identity: {
+        ...structuredClone(existing.identity),
+        fingerprintMaterial: {
+          title: 'Frontend Engineer II',
+          company: 'Beta',
+          url: 'https://employer.example/jobs/1',
+        },
+      },
+      extracted: {
+        fields: { title: 'Frontend Engineer II', company: 'Beta' },
+      },
+    });
+    const material = detectMaterialChange({
+      existing,
+      candidate,
+      presentation: {
+        title: 'Frontend Engineer II',
+        primaryUrl: 'https://employer.example/jobs/1',
+      },
+      policy: jobPolicyWithSalary,
+    });
+    expect(material.changed).toBe(true);
+    expect(material.fields).toEqual([
+      'fingerprint.company',
+      'fingerprint.title',
+      'presentation.title',
+    ]);
+    const decision = decideNovelty({
+      existing,
+      candidate,
+      presentation: {
+        title: 'Frontend Engineer II',
+        primaryUrl: 'https://employer.example/jobs/1',
+      },
+      policy: jobPolicyWithSalary,
+      notification: { emailEnabled: true, skipEmptyDigest: true },
+    });
+    expect(decision.changedFields).toEqual(material.fields);
+    expect(decision.reason).toBe(
+      `MATERIAL_UPDATE:${material.fields.join(',')}`
+    );
+  });
+});
+
+describe('E7.6 salary material change (Job strategy)', () => {
+  it('salary change → UPDATED with extracted.salary in changedFields', () => {
+    const existing = baseExisting({
+      materialFields: { salary: '€60,000' },
+    });
+    const candidate = scoredCandidate({
+      extracted: { fields: { title: 'Frontend Engineer', salary: '€65,000' } },
+    });
+    const decision = decideNovelty({
+      existing,
+      candidate,
+      presentation: presentationFromCandidate(candidate),
+      policy: jobPolicyWithSalary,
+      notification: { emailEnabled: true, skipEmptyDigest: true },
+    });
+    expect(decision.novelty).toBe('UPDATED');
+    expect(decision.changedFields).toEqual(['extracted.salary']);
+    expect(decision.shouldNotify).toBe(true);
+    expect(decision.existingResultId).toBe(existing.id);
+  });
+
+  it('salary absent → present → UPDATED', () => {
+    const existing = baseExisting({ materialFields: { salary: null } });
+    const candidate = scoredCandidate({
+      extracted: { fields: { title: 'Frontend Engineer', salary: '€60,000' } },
+    });
+    const decision = decideNovelty({
+      existing,
+      candidate,
+      presentation: presentationFromCandidate(candidate),
+      policy: jobPolicyWithSalary,
+      notification: { emailEnabled: true, skipEmptyDigest: true },
+    });
+    expect(decision.novelty).toBe('UPDATED');
+    expect(decision.changedFields).toContain('extracted.salary');
+  });
+
+  it('unchanged salary → UNCHANGED', () => {
+    const existing = baseExisting({
+      materialFields: { salary: '€60,000' },
+    });
+    const candidate = scoredCandidate({
+      extracted: { fields: { title: 'Frontend Engineer', salary: '€60,000' } },
+    });
+    const decision = decideNovelty({
+      existing,
+      candidate,
+      presentation: presentationFromCandidate(candidate),
+      policy: jobPolicyWithSalary,
+      notification: { emailEnabled: true, skipEmptyDigest: true },
+    });
+    expect(decision.novelty).toBe('UNCHANGED');
+    expect(decision.changedFields).toEqual([]);
+  });
+
+  it('salary change does not alter result identity fingerprints', () => {
+    const existing = baseExisting({
+      materialFields: { salary: '€60,000' },
+    });
+    const candidate = scoredCandidate({
+      extracted: { fields: { title: 'Frontend Engineer', salary: '€65,000' } },
+    });
+    expect(candidate.identity.fingerprintMaterial.title).toBe(
+      existing.identity.fingerprintMaterial.title
+    );
+    expect(candidate.identity.fingerprintMaterial.company).toBe(
+      existing.identity.fingerprintMaterial.company
     );
   });
 });

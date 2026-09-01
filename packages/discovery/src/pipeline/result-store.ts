@@ -11,6 +11,8 @@ export interface ResultStore {
     identity: CandidateIdentity,
     identityFingerprintFields: readonly string[]
   ): Promise<DiscoveryResult | null>;
+  /** Direct lookup by persisted result id (E7 state transitions). */
+  getById?(profileId: string, resultId: string): Promise<DiscoveryResult | null>;
 }
 
 export class ResultStoreError extends Error {

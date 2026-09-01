@@ -134,6 +134,18 @@ export function createSqliteSchedulerPersistence(
       }
     },
 
+    async listAll() {
+      try {
+        const rows = db
+          .prepare(`SELECT * FROM discovery_schedules`)
+          .all() as ScheduleRow[];
+        return rows.map(fromScheduleRow);
+      } catch (err) {
+        if (err instanceof ScheduleStoreError) throw err;
+        throw new ScheduleStoreError('Schedule persistence listAll failed');
+      }
+    },
+
     async getDueSchedules(now) {
       try {
         const rows = db
@@ -196,8 +208,33 @@ export function createSqliteSchedulerPersistence(
       }
     },
 
-    async clearRunningLock(scheduleId, now) {
+    async clearRunningLock(scheduleId, now, expectedRunId) {
       try {
+        if (expectedRunId !== undefined) {
+          const existing = db
+            .prepare(
+              `SELECT schedule_id, running_run_id FROM discovery_schedules WHERE schedule_id = ?`
+            )
+            .get(scheduleId) as
+            | { schedule_id: string; running_run_id: string | null }
+            | undefined;
+          if (!existing) {
+            throw new ScheduleStoreError(`Schedule not found: ${scheduleId}`);
+          }
+          if (
+            existing.running_run_id !== null &&
+            existing.running_run_id !== expectedRunId
+          ) {
+            return;
+          }
+          db.prepare(
+            `UPDATE discovery_schedules
+             SET running_run_id = NULL, updated_at = ?
+             WHERE schedule_id = ? AND (running_run_id IS NULL OR running_run_id = ?)`
+          ).run(now, scheduleId, expectedRunId);
+          return;
+        }
+
         const info = db
           .prepare(
             `UPDATE discovery_schedules
@@ -307,6 +344,22 @@ export function createSqliteSchedulerPersistence(
         return rows.map(fromRunRow);
       } catch (err) {
         throw new RunStoreError('Run metadata list failed');
+      }
+    },
+
+    async listRecent(limit) {
+      try {
+        const n = Math.max(0, Math.floor(limit));
+        const rows = db
+          .prepare(
+            `SELECT * FROM discovery_scheduler_runs
+             ORDER BY started_at DESC
+             LIMIT ?`
+          )
+          .all(n) as RunRow[];
+        return rows.map(fromRunRow);
+      } catch (err) {
+        throw new RunStoreError('Run metadata listRecent failed');
       }
     },
   };

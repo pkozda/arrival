@@ -14,6 +14,9 @@ import type {
   NotificationFailureCode,
   NotificationRecord,
 } from './types.js';
+import type { TelemetryEmitter } from '../telemetry/emitter.js';
+import type { ResultStateWriter } from '../pipeline/result-state-writer.js';
+import { transitionResultsToNotified } from '../pipeline/result-state-writer.js';
 
 export type DiscoveryNotificationService = {
   deliverDigest(input: DeliverDigestInput): Promise<DeliverDigestOutcome>;
@@ -23,6 +26,10 @@ export type DiscoveryNotificationServiceConfig = {
   store: NotificationStore;
   adapter: NotificationAdapter;
   clock: Clock;
+  /** Optional side-channel telemetry (E5.5). */
+  telemetry?: TelemetryEmitter;
+  /** E7.4 — write NOTIFIED after successful delivery only. */
+  resultStateWriter?: ResultStateWriter;
 };
 
 const NOTIFICATION_ADAPTER_ID = 'notification';
@@ -34,7 +41,7 @@ const NOTIFICATION_ADAPTER_ID = 'notification';
 export function createDiscoveryNotificationService(
   config: DiscoveryNotificationServiceConfig
 ): DiscoveryNotificationService {
-  const { store, adapter, clock } = config;
+  const { store, adapter, clock, telemetry, resultStateWriter } = config;
 
   async function deliverDigest(input: DeliverDigestInput): Promise<DeliverDigestOutcome> {
     const plan = buildNotificationPlan({
@@ -43,6 +50,12 @@ export function createDiscoveryNotificationService(
       channel: input.channel,
     });
     if (!plan) {
+      telemetry?.emit({
+        eventName: 'notification.skipped',
+        runId: input.digest.runId,
+        profileId: input.digest.profileId,
+        attributes: { channel: input.channel, reason: 'empty_digest' },
+      });
       return { kind: 'skipped', reason: 'empty_digest' };
     }
 
@@ -55,6 +68,17 @@ export function createDiscoveryNotificationService(
 
     const existing = await store.findById(notificationId);
     if (existing) {
+      telemetry?.emit({
+        eventName: 'notification.skipped',
+        runId: plan.runId,
+        profileId: plan.profileId,
+        attributes: {
+          channel: plan.channel,
+          digestId: plan.digestId,
+          notificationId,
+          reason: 'already_delivered',
+        },
+      });
       return { kind: 'skipped', reason: 'already_delivered' };
     }
 
@@ -75,10 +99,33 @@ export function createDiscoveryNotificationService(
       await store.create(pending);
     } catch (err) {
       if (err instanceof NotificationStoreError && err.message.includes('already exists')) {
+        telemetry?.emit({
+          eventName: 'notification.skipped',
+          runId: plan.runId,
+          profileId: plan.profileId,
+          attributes: {
+            channel: plan.channel,
+            digestId: plan.digestId,
+            notificationId,
+            reason: 'already_delivered',
+          },
+        });
         return { kind: 'skipped', reason: 'already_delivered' };
       }
       throw err;
     }
+
+    const startedMs = clock.now().getTime();
+    telemetry?.emit({
+      eventName: 'notification.started',
+      runId: plan.runId,
+      profileId: plan.profileId,
+      attributes: {
+        channel: plan.channel,
+        digestId: plan.digestId,
+        notificationId,
+      },
+    });
 
     let deliveryResult;
     try {
@@ -111,6 +158,18 @@ export function createDiscoveryNotificationService(
         failure,
       };
       await store.update(failed);
+      telemetry?.emit({
+        eventName: 'notification.failed',
+        runId: plan.runId,
+        profileId: plan.profileId,
+        durationMs: Math.max(0, clock.now().getTime() - startedMs),
+        attributes: {
+          channel: plan.channel,
+          digestId: plan.digestId,
+          notificationId,
+          failureCode: failure.code,
+        },
+      });
       return { kind: 'failed', notificationId, failure };
     }
 
@@ -124,6 +183,18 @@ export function createDiscoveryNotificationService(
         },
       };
       await store.update(failed);
+      telemetry?.emit({
+        eventName: 'notification.failed',
+        runId: plan.runId,
+        profileId: plan.profileId,
+        durationMs: Math.max(0, clock.now().getTime() - startedMs),
+        attributes: {
+          channel: plan.channel,
+          digestId: plan.digestId,
+          notificationId,
+          failureCode: deliveryResult.code,
+        },
+      });
       return {
         kind: 'failed',
         notificationId,
@@ -137,6 +208,25 @@ export function createDiscoveryNotificationService(
       sentAt: clockIso(clock),
     };
     await store.update(sent);
+    if (resultStateWriter && plan.payload.resultIds.length > 0) {
+      await transitionResultsToNotified({
+        writer: resultStateWriter,
+        profileId: plan.profileId,
+        resultIds: plan.payload.resultIds,
+        at: sent.sentAt ?? now,
+      });
+    }
+    telemetry?.emit({
+      eventName: 'notification.sent',
+      runId: plan.runId,
+      profileId: plan.profileId,
+      durationMs: Math.max(0, clock.now().getTime() - startedMs),
+      attributes: {
+        channel: plan.channel,
+        digestId: plan.digestId,
+        notificationId,
+      },
+    });
     return { kind: 'delivered', notificationId };
   }
 

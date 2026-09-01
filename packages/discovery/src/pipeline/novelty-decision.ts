@@ -26,6 +26,7 @@ export function decideNovelty(input: NoveltyDecisionInput): NoveltyDecision {
       lifecycle: 'ACTIVE',
       userState: 'NEW',
       shouldNotify,
+      changedFields: [],
       reason: shouldNotify ? 'NEW_OPPORTUNITY' : 'NEW_OPPORTUNITY_NOTIFY_DISABLED',
     };
   }
@@ -41,6 +42,7 @@ export function decideNovelty(input: NoveltyDecisionInput): NoveltyDecision {
       lifecycle: existing.lifecycle,
       userState: existing.userState === 'EXPIRED' ? 'EXPIRED' : existing.userState,
       shouldNotify: false,
+      changedFields: [],
       reason: 'EXPIRED_OR_REMOVED_NOT_RESURRECTED',
       existingResultId: existing.id,
     };
@@ -74,6 +76,7 @@ export function decideNovelty(input: NoveltyDecisionInput): NoveltyDecision {
     lifecycle,
     userState,
     shouldNotify,
+    changedFields: [...material.fields],
     reason: material.changed
       ? `MATERIAL_UPDATE:${material.fields.join(',')}`
       : 'NO_MATERIAL_CHANGE',
@@ -130,6 +133,14 @@ export function detectMaterialChange(input: {
     }
   }
 
+  for (const key of policy.materialExtractedFields ?? []) {
+    const prev = existing.materialFields?.[key];
+    const next = candidate.extracted.fields[key];
+    if (normalizeComparable(prev) !== normalizeComparable(next)) {
+      fields.push(`extracted.${key}`);
+    }
+  }
+
   if (policy.comparePresentation) {
     if (
       normalizeComparable(existing.canonicalPresentation.title) !==
@@ -170,6 +181,7 @@ export function detectMaterialChange(input: {
     }
   }
 
+  fields.sort();
   return { changed: fields.length > 0, fields };
 }
 

@@ -247,6 +247,8 @@ export function tempPersistencePaths(): DiscoveryRuntimePersistencePaths & {
     resultsDatabasePath: path.join(dir, 'results.sqlite'),
     schedulerDatabasePath: path.join(dir, 'scheduler.sqlite'),
     notificationsDatabasePath: path.join(dir, 'notifications.sqlite'),
+    queueDatabasePath: path.join(dir, 'queue.sqlite'),
+    profilesDatabasePath: path.join(dir, 'profiles.sqlite'),
     cleanup() {
       try {
         rmSync(dir, { recursive: true, force: true });
@@ -267,6 +269,16 @@ export type RuntimeHarnessOptions = {
   signal?: AbortSignal;
   adapterTimeoutMs?: number;
   persistence?: DiscoveryRuntimePersistencePaths;
+  queueVisibilityTimeoutMs?: number;
+  workerId?: string;
+  runtimeInstanceId?: string;
+  telemetry?: import('../telemetry/types.js').DiscoveryTelemetry;
+  telemetryEventIdGenerator?: () => string;
+  retry?: {
+    maxAttempts?: number;
+    baseDelayMs?: number;
+    maxDelayMs?: number;
+  };
 };
 
 export function createRuntimeHarness(
@@ -313,6 +325,12 @@ export function createRuntimeHarness(
     transport: opts.transport,
     signal: opts.signal,
     adapterTimeoutMs: opts.adapterTimeoutMs,
+    queueVisibilityTimeoutMs: opts.queueVisibilityTimeoutMs,
+    workerId: opts.workerId,
+    runtimeInstanceId: opts.runtimeInstanceId,
+    telemetry: opts.telemetry,
+    telemetryEventIdGenerator: opts.telemetryEventIdGenerator,
+    retry: opts.retry,
     resolveNotificationTarget: () => ({
       channel,
       recipient: { userId: 'user-1', address },

@@ -46,10 +46,8 @@ describe('E4.7 runtime happy path', () => {
       expect(runs[0]?.status).toBe('SUCCESS');
       expect(await runtime.queue.getPending()).toHaveLength(0);
 
-      const completed = (runtime.queue as { snapshot(): { status: string }[] })
-        .snapshot()
-        .filter((j) => j.status === 'COMPLETED');
-      expect(completed.length).toBe(1);
+      const completed = await runtime.queue.getByRunId(runs[0]!.runId);
+      expect(completed?.status).toBe('COMPLETED');
 
       expect(
         (runtime.resultStore as { count(): number }).count()
@@ -214,7 +212,7 @@ describe('E4.7 scheduler semantics at runtime', () => {
       await runtime.scheduler.triggerDueRuns();
       const again = await runtime.scheduler.triggerDueRuns();
       expect(again.outcomes).toHaveLength(0);
-      expect((runtime.queue as { size(): number }).size()).toBe(1);
+      expect(await runtime.queue.getPending()).toHaveLength(1);
     } finally {
       runtime.close();
       persistence.cleanup();
@@ -242,7 +240,7 @@ describe('E4.7 configuration + lifecycle', () => {
         registry: smokeRegistry(),
         profileStore: createInMemoryProfileStore([]),
       })
-    ).toThrow(/Invalid discovery production config/);
+    ).toThrow(/Invalid discovery (runtime|production) config/);
     persistence.cleanup();
   });
 
@@ -269,7 +267,7 @@ describe('E4.7 configuration + lifecycle', () => {
     persistence.cleanup();
   });
 
-  it('queue jobs are not durable across runtime instances (documented gap)', async () => {
+  it('queue jobs survive restart (E5.2 durable queue)', async () => {
     const transport = happyPathTransport();
     const persistence = tempPersistencePaths();
     const { runtime } = createRuntimeHarness({ transport, persistence });
@@ -287,10 +285,18 @@ describe('E4.7 configuration + lifecycle', () => {
       persistence,
     });
     try {
-      expect(await runtimeB.queue.getPending()).toHaveLength(0);
+      expect(await runtimeB.queue.getPending()).toHaveLength(1);
       const schedule = await runtimeB.scheduleStore.get('sched-runtime');
       expect(schedule?.nextRunAt).toBe('2026-08-31T11:00:00.000Z');
       expect(schedule?.runningRunId).toBeTruthy();
+      const workerResult = await runtimeB.worker.processNext();
+      expect(workerResult).toMatchObject({
+        kind: 'processed',
+        pipelineStatus: 'SUCCESS',
+      });
+      expect(
+        (await runtimeB.scheduleStore.get('sched-runtime'))?.runningRunId
+      ).toBeNull();
     } finally {
       runtimeB.close();
       persistence.cleanup();

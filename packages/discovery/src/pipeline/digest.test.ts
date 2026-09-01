@@ -118,6 +118,7 @@ function source(
     userState: 'NEW',
     shouldNotify: true,
     reason: 'NEW_OPPORTUNITY',
+    changedFields: [],
     ...noveltyOverrides,
   };
   const result = baseResult({
