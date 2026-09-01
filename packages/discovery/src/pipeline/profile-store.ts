@@ -1,8 +1,9 @@
 import type { DiscoveryProfile } from '../types/profile.js';
 
-/** Port for loading profiles — E2.1 uses in-memory fakes; no DB in domain. */
+/** Port for profile persistence — E7.1 adds durable SQLite adapter. */
 export interface ProfileStore {
   get(profileId: string): Promise<DiscoveryProfile | null>;
+  upsert(profile: DiscoveryProfile): Promise<void>;
 }
 
 export class ProfileStoreError extends Error {

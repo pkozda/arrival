@@ -17,6 +17,8 @@ export type NoveltyDecision = {
   shouldNotify: boolean;
   /** Explainable machine-readable reason */
   reason: string;
+  /** Deterministic material field keys that changed (E7) */
+  changedFields: string[];
   /** Existing Result id when looked up */
   existingResultId?: string;
 };
@@ -35,6 +37,11 @@ export type NoveltyPolicy = {
    * FingerprintMaterial keys that count as material opportunity change when they differ.
    */
   materialFingerprintFields: string[];
+  /**
+   * Extracted.fields keys compared against persisted materialFields snapshot (E7).
+   * Must not overlap identityFingerprintFields (e.g. salary).
+   */
+  materialExtractedFields?: string[];
   /** Compare title / summary / primaryUrl as material */
   comparePresentation: boolean;
   /** Compare VerificationResult.status as material */

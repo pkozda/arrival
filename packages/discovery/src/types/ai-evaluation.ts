@@ -45,4 +45,9 @@ export type AiEvaluation = {
   evaluatedAt: string;
   /** Opaque diagnostic label — not a vendor SDK type */
   modelLabel?: string;
+  /**
+   * Deterministic input fingerprint for run-scoped AI dedupe (roadmap E6).
+   * Never a source of truth for verification / promotion.
+   */
+  inputFingerprint?: string;
 };

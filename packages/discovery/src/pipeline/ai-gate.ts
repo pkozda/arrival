@@ -5,6 +5,7 @@ import type {
 } from '../types/ai-evaluation.js';
 import type { AiEvaluationPolicy } from '../types/strategy.js';
 import type { EnginePolicy } from '../engine-policy.js';
+import { resolveAiCostPolicy } from './ai-cost.js';
 
 export type AiGateBlockReason =
   | 'FILTER_NOT_PASSED'
@@ -12,6 +13,8 @@ export type AiGateBlockReason =
   | 'AI_DISABLED_STRATEGY'
   | 'AI_DISABLED_ENGINE'
   | 'AI_BUDGET_EXHAUSTED'
+  | 'AI_TOKEN_BUDGET_EXHAUSTED'
+  | 'AI_ALREADY_EVALUATED'
   | 'NO_TASKS'
   | 'ADAPTER_MISSING';
 
@@ -20,8 +23,9 @@ export type AiGateDecision =
   | { allow: false; reason: AiGateBlockReason };
 
 /**
- * Formal AI gate (pipeline §6 + E2.4).
+ * Formal AI gate (pipeline §6 + E2.4 + roadmap E6 cost/dedupe).
  * Verification establishes facts; AI may interpret only after PASS.
+ * Budget exhaustion and dedupe are skips — not adapter failures.
  */
 export function evaluateAiGate(input: {
   candidate: {
@@ -33,6 +37,12 @@ export function evaluateAiGate(input: {
   enginePolicy: EnginePolicy;
   aiEvaluationsUsed: number;
   hasAdapter: boolean;
+  /** When true, compatible evaluation already exists — skip provider */
+  alreadyEvaluated?: boolean;
+  estimatedInputTokensUsed?: number;
+  estimatedOutputTokensUsed?: number;
+  pendingEstimatedInputTokens?: number;
+  pendingEstimatedOutputTokens?: number;
 }): AiGateDecision {
   if (!input.candidate.deterministicFilterPassed || input.candidate.rejection) {
     return { allow: false, reason: 'FILTER_NOT_PASSED' };
@@ -53,8 +63,33 @@ export function evaluateAiGate(input: {
     return { allow: false, reason: 'AI_DISABLED_STRATEGY' };
   }
 
-  if (input.aiEvaluationsUsed >= input.enginePolicy.maxAiEvaluationsPerRun) {
+  if (input.alreadyEvaluated) {
+    return { allow: false, reason: 'AI_ALREADY_EVALUATED' };
+  }
+
+  const cost = resolveAiCostPolicy(input.enginePolicy);
+
+  if (input.aiEvaluationsUsed >= cost.maxEvaluationsPerRun) {
     return { allow: false, reason: 'AI_BUDGET_EXHAUSTED' };
+  }
+
+  const inputUsed = input.estimatedInputTokensUsed ?? 0;
+  const outputUsed = input.estimatedOutputTokensUsed ?? 0;
+  const pendingIn = input.pendingEstimatedInputTokens ?? 0;
+  const pendingOut = input.pendingEstimatedOutputTokens ?? 0;
+
+  if (
+    cost.maxEstimatedInputTokensPerRun !== undefined &&
+    inputUsed + pendingIn > cost.maxEstimatedInputTokensPerRun
+  ) {
+    return { allow: false, reason: 'AI_TOKEN_BUDGET_EXHAUSTED' };
+  }
+
+  if (
+    cost.maxEstimatedOutputTokensPerRun !== undefined &&
+    outputUsed + pendingOut > cost.maxEstimatedOutputTokensPerRun
+  ) {
+    return { allow: false, reason: 'AI_TOKEN_BUDGET_EXHAUSTED' };
   }
 
   if (!input.hasAdapter) {
@@ -183,6 +218,7 @@ export function validateAiEvaluation(input: {
       tasks,
       evaluatedAt: input.evaluation.evaluatedAt,
       modelLabel: input.evaluation.modelLabel,
+      inputFingerprint: input.evaluation.inputFingerprint,
     },
   };
 }

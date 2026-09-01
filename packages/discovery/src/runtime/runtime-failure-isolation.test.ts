@@ -155,11 +155,9 @@ describe('E4.7 runtime failure isolation', () => {
       expect(
         (await runtime.scheduleStore.get('sched-notify-fail'))?.runningRunId
       ).toBeNull();
-      expect(
-        (runtime.queue as { snapshot(): { status: string }[] })
-          .snapshot()
-          .every((j) => j.status === 'COMPLETED')
-      ).toBe(true);
+      const runs = await runtime.runStore.listBySchedule('sched-notify-fail');
+      const job = await runtime.queue.getByRunId(runs[0]!.runId);
+      expect(job?.status).toBe('COMPLETED');
     } finally {
       runtime.close();
       persistence.cleanup();

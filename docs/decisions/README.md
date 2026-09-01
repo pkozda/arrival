@@ -55,6 +55,17 @@ Formal ADRs currently live under [../adr/](../adr/):
 | [ADR-006 addendum](../adr/adr-006-addendum-e4-5-production-email-notifications.md) | PDE E4.5 production email (Resend) |
 | [ADR-006 addendum](../adr/adr-006-addendum-e4-6-telegram-notification.md) | PDE E4.6 Telegram notifications |
 | [ADR-006 addendum](../adr/adr-006-addendum-e4-7-production-runtime-readiness.md) | PDE E4.7 production runtime readiness (E4 complete) |
+| [ADR-006 addendum](../adr/adr-006-addendum-e5-1-runtime-configuration-boundary.md) | PDE E5.1 runtime configuration boundary |
+| [ADR-006 addendum](../adr/adr-006-addendum-e5-2-durable-execution-queue.md) | PDE E5.2 durable execution queue & crash recovery |
+| [ADR-006 addendum](../adr/adr-006-addendum-e5-3-distributed-scheduling-lock.md) | PDE E5.3 distributed-safe scheduling & locking |
+| [ADR-006 addendum](../adr/adr-006-addendum-e5-4-durable-retry-policy.md) | PDE E5.4 durable retry & failure recovery |
+| [ADR-006 addendum](../adr/adr-006-addendum-e5-5-observability.md) | PDE E5.5 observability & operational telemetry |
+| [ADR-006 addendum](../adr/adr-006-addendum-e5-6-operational-health.md) | PDE E5.6 operational health & runtime control |
+| [ADR-006 addendum](../adr/adr-006-addendum-e6-1-production-application-boundary.md) | PDE E6.1 production application boundary |
+| [ADR-006 addendum](../adr/adr-006-addendum-e6-2-http-admin-api-boundary.md) | PDE E6.2 HTTP / admin API boundary |
+| [ADR-006 addendum](../adr/adr-006-addendum-e6-3-http-authn-authz.md) | PDE E6.3 HTTP admin authentication & authorization |
+| [ADR-006 addendum](../adr/adr-006-addendum-e6-ai-cost-and-deduplication.md) | PDE roadmap E6 AI cost & deduplication (AI Evaluation Layer closure) |
+| [ADR-006 addendum](../adr/adr-006-addendum-e7-persistence-and-history.md) | PDE E7 persistence & history (functional closure) |
 
 Formal specifications and long-form design docs belong in [../core/](../core/) and domain folders (e.g. [../platform/](../platform/), [../identity/](../identity/), [../discovery/](../discovery/)) instead.
 

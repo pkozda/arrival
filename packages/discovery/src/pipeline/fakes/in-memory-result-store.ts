@@ -36,6 +36,12 @@ export function createInMemoryResultStore(
       );
       return found ? structuredClone(found) : null;
     },
+    async getById(profileId: string, resultId: string) {
+      const found = results.find(
+        (r) => r.profileId === profileId && r.id === resultId
+      );
+      return found ? structuredClone(found) : null;
+    },
     async create(result: DiscoveryResult) {
       if (results.some((r) => r.id === result.id)) {
         throw new ResultWriterError(`Result already exists: ${result.id}`);

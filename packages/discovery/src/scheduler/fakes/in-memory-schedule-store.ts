@@ -31,6 +31,10 @@ export function createInMemoryScheduleStore(
         .map(clone);
     },
 
+    async listAll() {
+      return [...schedules.values()].map(clone);
+    },
+
     async getDueSchedules(now) {
       const nowMs = Date.parse(now);
       return [...schedules.values()]
@@ -71,10 +75,17 @@ export function createInMemoryScheduleStore(
       });
     },
 
-    async clearRunningLock(scheduleId, now) {
+    async clearRunningLock(scheduleId, now, expectedRunId) {
       const current = schedules.get(scheduleId);
       if (!current) {
         throw new ScheduleStoreError(`Schedule not found: ${scheduleId}`);
+      }
+      if (
+        expectedRunId !== undefined &&
+        current.runningRunId !== null &&
+        current.runningRunId !== expectedRunId
+      ) {
+        return;
       }
       schedules.set(scheduleId, {
         ...current,

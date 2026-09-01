@@ -28,4 +28,9 @@ export type DiscoveryResult = {
   lastChangedAt: string;
   promotedFromCandidateId?: string;
   promotedFromRunId?: string;
+  /**
+   * Snapshot of material extracted fields at last promote (E7).
+   * Not part of identity — used for field-level change detection.
+   */
+  materialFields?: Record<string, string | number | boolean | null>;
 };

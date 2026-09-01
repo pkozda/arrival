@@ -191,6 +191,7 @@ MVP ships a vertical slice through **E1–E10** for Jobs + Giveaways (see MVP do
 **Objective:** Durable profiles, runs, results, and user-facing state.  
 **Effort:** M · **Risk:** Medium  
 **Depends on:** E1–E3  
+**Status:** **Functional closure complete** (see [ADR-006 addendum — E7](../adr/adr-006-addendum-e7-persistence-and-history.md))
 
 **Contains:**
 
@@ -198,7 +199,11 @@ MVP ships a vertical slice through **E1–E10** for Jobs + Giveaways (see MVP do
 - result states: NEW · SEEN · NOTIFIED · OPENED · SAVED · DISMISSED · EXPIRED
 - change detection (field-level updates)
 
-**Exit criteria:** Rerun does not re-notify unchanged results; salary newly discovered surfaces as UPDATED.
+**Implemented (functional closure):** durable Profile + Result persistence; history-scoped novelty; `changedFields`; Job salary material updates; result state transitions; notification → `NOTIFIED`; restart-safe proofs.
+
+**Deferred by design:** `CandidateStore`, `DigestStore`, full pipeline `DiscoveryRun` archival, durable raw-content store. Operational scheduler/queue run metadata remains separate from pipeline `DiscoveryRun`.
+
+**Exit criteria:** Rerun does not re-notify unchanged results; salary newly discovered surfaces as UPDATED. **Met** — see `packages/discovery/src/runtime/e7-history.test.ts` and `packages/discovery/src/pipeline/novelty.test.ts`.
 
 ---
 

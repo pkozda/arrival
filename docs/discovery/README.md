@@ -64,12 +64,31 @@ PDE complements existing engines:
 | [ADR-006 addendum — E4.5 production email](../adr/adr-006-addendum-e4-5-production-email-notifications.md) | Resend email NotificationAdapter (E4.5) |
 | [ADR-006 addendum — E4.6 Telegram](../adr/adr-006-addendum-e4-6-telegram-notification.md) | Telegram Bot API NotificationAdapter (E4.6) |
 | [ADR-006 addendum — E4.7 runtime readiness](../adr/adr-006-addendum-e4-7-production-runtime-readiness.md) | Production runtime composition + E4 gate (E4.7) |
+| [ADR-006 addendum — E5.1 runtime configuration](../adr/adr-006-addendum-e5-1-runtime-configuration-boundary.md) | Runtime config boundary, validation, redaction, lifecycle (E5.1) |
+| [ADR-006 addendum — E5.2 durable execution queue](../adr/adr-006-addendum-e5-2-durable-execution-queue.md) | Durable SQLite queue + crash recovery (E5.2) |
+| [ADR-006 addendum — E5.3 scheduling lock](../adr/adr-006-addendum-e5-3-distributed-scheduling-lock.md) | Distributed-safe scheduler locking (E5.3) |
+| [ADR-006 addendum — E5.4 durable retry](../adr/adr-006-addendum-e5-4-durable-retry-policy.md) | Durable execution retry & failure recovery (E5.4) |
+| [ADR-006 addendum — E5.5 observability](../adr/adr-006-addendum-e5-5-observability.md) | Provider-neutral operational telemetry (E5.5) |
+| [ADR-006 addendum — E5.6 operational health](../adr/adr-006-addendum-e5-6-operational-health.md) | Operational health & runtime control (E5.6) |
+| [ADR-006 addendum — E6.1 application boundary](../adr/adr-006-addendum-e6-1-production-application-boundary.md) | Production application/service boundary (E6.1) |
+| [ADR-006 addendum — E6.2 HTTP admin API](../adr/adr-006-addendum-e6-2-http-admin-api-boundary.md) | HTTP / admin API boundary (E6.2) |
+| [ADR-006 addendum — E6.3 HTTP authn/authz](../adr/adr-006-addendum-e6-3-http-authn-authz.md) | HTTP admin authentication & authorization (E6.3) |
+| [ADR-006 addendum — roadmap E6 AI cost & dedupe](../adr/adr-006-addendum-e6-ai-cost-and-deduplication.md) | Canonical roadmap E6 AI cost/dedupe closure |
+| [ADR-006 addendum — E7 persistence & history](../adr/adr-006-addendum-e7-persistence-and-history.md) | Canonical roadmap E7 persistence & history closure |
 
 ## Package
 
 | Package | Status |
 |---------|--------|
-| `@arrival-atlas/discovery` | **E1–E4 complete**: domain + pipeline + production adapters + durable Results + scheduler + queue + notifications (Email + Telegram) + **runtime composition (E4.7)**. |
+| `@arrival-atlas/discovery` | **E1–E6.3** + **canonical E7 functional closure**: durable profiles/results, novelty/`changedFields`, result state transitions, notification → `NOTIFIED`. |
+
+## Canonical E7 status
+
+**Canonical E7 functional closure: COMPLETE**
+
+> CandidateStore, DigestStore, and full DiscoveryRun archival remain deferred by design and are not required for the current E7 functional closure.
+
+See [ADR-006 addendum — E7 persistence & history](../adr/adr-006-addendum-e7-persistence-and-history.md).
 
 ## Reading order (design → implement)
 
@@ -89,16 +108,15 @@ ADR-006 (engine invariants; further ADRs as needed)
 
 ## Status
 
-**Active (E4 complete)** — `@arrival-atlas/discovery` implements E1 through **E4.7 Production Runtime Readiness**:
+**Active (E7)** — `@arrival-atlas/discovery` implements E1 through **canonical E7 functional closure** (Persistence & History):
 
-* `createDiscoveryRuntime` wires scheduler → queue → worker → production pipeline → notifications
-* Durable SQLite: Results, schedules/runs, notification idempotency
-* In-memory execution queue (jobs **not** durable — intentional E4.3 limitation)
-* `createProductionEmailNotificationAdapter` (Resend) + `createProductionTelegramNotificationAdapter`
-* Channel router selects provider; pipeline remains provider-agnostic
-* Pull/trigger lifecycle only — no cron / background daemon
-* Notification / provider / worker failures isolated from discovery success semantics
-* Deferred to E5+: PostgreSQL, durable queue, distributed locking, UI, retries, push, observability platform
+* Durable SQLite: **Profiles** (E7.1), **Results** (E4.1), schedules/runs, notification idempotency, execution jobs, scheduler locks
+* History-scoped novelty: `NEW` / `UNCHANGED` / `UPDATED`, `SKIP_UNCHANGED`, structured `changedFields`, Job **salary** as material extracted field
+* Result user-state transitions + notification → `NOTIFIED` write-back (restart-safe)
+* `createDiscoveryRuntime` wires scheduler → durable queue → worker → pipeline → notifications
+* **E6.1–E6.3** (DiscoveryService / HTTP / auth) are implementation epics separate from canonical roadmap E6/E7
+* Deferred by design (not blocking E7 closure): `CandidateStore`, `DigestStore`, full pipeline `DiscoveryRun` archival, durable raw-content store
+* Deferred past E7: PostgreSQL, Redis, notification retries, distributed worker orchestration, cron daemon, UI (E9), observability platform, new strategies
 
 ## Initial strategies
 

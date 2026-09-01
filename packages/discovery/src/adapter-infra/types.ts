@@ -25,6 +25,7 @@ export type AdapterFailureCode =
   | 'NETWORK_ERROR'
   | 'AUTH_REQUIRED'
   | 'POLICY_BLOCKED'
+  | 'AI_OUTPUT_INVALID'
   | 'UNKNOWN';
 
 export type AdapterFailure = {

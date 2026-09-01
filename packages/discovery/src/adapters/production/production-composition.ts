@@ -299,6 +299,7 @@ export function loadDiscoveryProductionConfig(
   const openaiKey = env.OPENAI_API_KEY?.trim();
 
   if (!braveKey) {
+    // Composition-boundary failure — never include secret material.
     throw new Error(
       'Missing required environment variable: BRAVE_SEARCH_API_KEY'
     );

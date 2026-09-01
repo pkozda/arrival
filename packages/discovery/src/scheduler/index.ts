@@ -23,6 +23,20 @@ export type {
 export type { ScheduleStore } from './schedule-store.js';
 export type { RunStore } from './run-store.js';
 
+export type {
+  SchedulerLock,
+  SchedulerLockRecord,
+  SchedulerLockAcquireResult,
+  SchedulerLockReleaseResult,
+  SchedulerLockRecoverResult,
+} from './scheduler-lock.js';
+export {
+  DEFAULT_SCHEDULER_LOCK_LEASE_MS,
+  scheduleLockKey,
+  schedulerOwnerId,
+  expiresAtIso,
+} from './scheduler-lock.js';
+
 export {
   calculateNextRunAt,
   initialNextRunAt,
@@ -47,3 +61,4 @@ export {
 
 export { createInMemoryScheduleStore } from './fakes/in-memory-schedule-store.js';
 export { createInMemoryRunStore } from './fakes/in-memory-run-store.js';
+export { createInMemorySchedulerLock } from './fakes/in-memory-scheduler-lock.js';

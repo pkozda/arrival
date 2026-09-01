@@ -121,6 +121,21 @@ export function createSqliteResultPersistence(
       }
     },
 
+    async getById(
+      profileId: string,
+      resultId: string
+    ): Promise<DiscoveryResult | null> {
+      try {
+        const row = selectById.get(resultId, profileId) as
+          | { payload: string }
+          | undefined;
+        if (!row) return null;
+        return deserializeDiscoveryResult(row.payload);
+      } catch (err) {
+        mapReadError(err);
+      }
+    },
+
     async create(result: DiscoveryResult): Promise<DiscoveryResult> {
       const payload = serializeDiscoveryResult(result);
       const now = result.firstSeenAt || result.lastChangedAt;

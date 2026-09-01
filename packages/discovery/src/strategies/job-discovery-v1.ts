@@ -215,6 +215,7 @@ export const jobDiscoveryStrategyV1: DiscoveryStrategyModule = {
     // URL churn alone must not invent a new opportunity
     identityFingerprintFields: ['title', 'company'],
     materialFingerprintFields: ['title', 'company'],
+    materialExtractedFields: ['salary'],
     comparePresentation: true,
     compareVerificationStatus: true,
     scoreDeltaThreshold: 5,

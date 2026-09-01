@@ -35,6 +35,8 @@ import {
 import type { ResultStore } from './result-store.js';
 import type { ResultWriter } from './result-writer.js';
 import { stageDiagnostic } from './diagnostics.js';
+import type { TelemetryEmitter } from '../telemetry/emitter.js';
+import { createInMemoryAiEvaluationCache } from './ai-evaluation-cache.js';
 
 export type PipelineExecuteRequest = {
   profileId: string;
@@ -52,6 +54,8 @@ export type PipelineExecuteRequest = {
   signal?: AbortSignal;
   /** Optional default adapter timeout ms (E3.1) */
   adapterTimeoutMs?: number;
+  /** Optional side-channel telemetry (E5.5). */
+  telemetry?: TelemetryEmitter;
 };
 
 export type PipelineExecuteResult = {
@@ -105,10 +109,40 @@ export async function executeDiscoveryPipeline(
 ): Promise<PipelineExecuteResult> {
   const nowFn = request.now ?? (() => new Date().toISOString());
   const startedAt = nowFn();
+  const pipelineStartedMs = Date.parse(startedAt);
   const runId = request.runId ?? `run:${request.profileId}:${startedAt}`;
   const stageOrder = [...CANONICAL_STAGE_ORDER];
   const stageDiagnostics: StageDiagnostic[] = [];
   const partialFailures: string[] = [];
+  const telemetry = request.telemetry;
+
+  const emitPipelineTerminal = (
+    eventName:
+      | 'pipeline.completed'
+      | 'pipeline.partial_success'
+      | 'pipeline.failed',
+    run: DiscoveryRun
+  ) => {
+    telemetry?.emit({
+      eventName,
+      runId: run.id,
+      profileId: run.profileId,
+      strategyId: run.strategyId,
+      durationMs: Math.max(0, Date.parse(nowFn()) - pipelineStartedMs),
+      attributes: {
+        status: run.status,
+        candidatesFound: run.stats.candidatesFound,
+        resultsCreated: run.stats.resultsCreated,
+        resultsUpdated: run.stats.resultsUpdated,
+      },
+    });
+  };
+
+  telemetry?.emit({
+    eventName: 'pipeline.started',
+    runId,
+    profileId: request.profileId,
+  });
 
   let profile: DiscoveryProfile;
   try {
@@ -123,6 +157,7 @@ export async function executeDiscoveryPipeline(
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Profile load failed';
     const failedRun = failRunSkeleton(request.profileId, runId, startedAt, message);
+    emitPipelineTerminal('pipeline.failed', failedRun);
     return {
       run: failedRun,
       batch: emptyBatch(),
@@ -167,6 +202,7 @@ export async function executeDiscoveryPipeline(
         { code: 'STRATEGY_NOT_FOUND', message, at: nowFn() },
       ],
     };
+    emitPipelineTerminal('pipeline.failed', run);
     return {
       run,
       batch: emptyBatch(),
@@ -193,14 +229,16 @@ export async function executeDiscoveryPipeline(
   if (!validation.ok) {
     run = transitionRun(run, 'FAILED', nowFn());
     const message = validation.errors.map((e) => `${e.path}:${e.code}`).join('; ');
+    const failed = {
+      ...run,
+      diagnostics: [
+        ...(run.diagnostics ?? []),
+        { code: 'CRITERIA_INVALID', message, at: nowFn() },
+      ],
+    };
+    emitPipelineTerminal('pipeline.failed', failed);
     return {
-      run: {
-        ...run,
-        diagnostics: [
-          ...(run.diagnostics ?? []),
-          { code: 'CRITERIA_INVALID', message, at: nowFn() },
-        ],
-      },
+      run: failed,
       batch: emptyBatch(),
       stageOrder,
       stageDiagnostics: [
@@ -236,6 +274,10 @@ export async function executeDiscoveryPipeline(
     queries: [],
     now: nowFn,
     aiEvaluationsUsed: 0,
+    aiEstimatedInputTokensUsed: 0,
+    aiEstimatedOutputTokensUsed: 0,
+    aiEvaluationCache: createInMemoryAiEvaluationCache(),
+    telemetry,
     resultStore: request.resultStore,
     resultWriter: request.resultWriter,
     signal: request.signal,
@@ -285,6 +327,11 @@ export async function executeDiscoveryPipeline(
       })),
     ],
   };
+
+  emitPipelineTerminal(
+    terminal === 'PARTIAL_SUCCESS' ? 'pipeline.partial_success' : 'pipeline.completed',
+    run
+  );
 
   return {
     run,

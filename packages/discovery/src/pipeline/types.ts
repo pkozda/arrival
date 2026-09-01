@@ -6,7 +6,9 @@ import type { RejectionRecord } from '../types/rejection.js';
 import type { DiscoveryRun } from '../types/run.js';
 import type { DiscoveryStrategyModule } from '../types/strategy.js';
 import type { EnginePolicy } from '../engine-policy.js';
+import type { TelemetryEmitter } from '../telemetry/emitter.js';
 import type { AdapterPorts } from './adapters.js';
+import type { AiEvaluationCache } from './ai-evaluation-cache.js';
 import type { ResultStore } from './result-store.js';
 import type { ResultWriter } from './result-writer.js';
 
@@ -82,8 +84,16 @@ export type PipelineContext = {
   adapters: AdapterPorts;
   queries: DiscoveryQuery[];
   now: () => string;
-  /** AI evaluations consumed in this run (cost gate) */
+  /** AI evaluations consumed in this run (count cost gate) */
   aiEvaluationsUsed: number;
+  /** Estimated AI input tokens consumed this run (deterministic; not billing) */
+  aiEstimatedInputTokensUsed: number;
+  /** Estimated AI output tokens consumed this run (deterministic; not billing) */
+  aiEstimatedOutputTokensUsed: number;
+  /** Run-scoped AI evaluation dedupe cache (roadmap E6) */
+  aiEvaluationCache: AiEvaluationCache;
+  /** Optional side-channel telemetry (E5.5) */
+  telemetry?: TelemetryEmitter;
   /** Read-only Result lookup for Novelty / State (E2.6) */
   resultStore?: ResultStore;
   /** Result persistence writer (E2.7) */

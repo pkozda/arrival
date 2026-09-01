@@ -8,6 +8,8 @@ export interface ScheduleStore {
   upsert(schedule: DiscoveryScheduleRecord): Promise<void>;
   get(scheduleId: string): Promise<DiscoveryScheduleRecord | null>;
   listEnabled(): Promise<DiscoveryScheduleRecord[]>;
+  /** All schedules (enabled + disabled) — read-only health/inspection (E5.6). */
+  listAll(): Promise<DiscoveryScheduleRecord[]>;
   /** Enabled schedules with nextRunAt <= now and not currently running. */
   getDueSchedules(now: string): Promise<DiscoveryScheduleRecord[]>;
   /**
@@ -20,8 +22,16 @@ export interface ScheduleStore {
     now: string,
     options?: { requireDue?: boolean }
   ): Promise<boolean>;
-  /** Clear running lock after worker completes; does not change nextRunAt. */
-  clearRunningLock(scheduleId: string, now: string): Promise<void>;
+  /**
+   * Clear running lock after worker completes; does not change nextRunAt.
+   * When `expectedRunId` is provided, clears only if `runningRunId` matches
+   * (stale workers must not clear a newer run's lock).
+   */
+  clearRunningLock(
+    scheduleId: string,
+    now: string,
+    expectedRunId?: string
+  ): Promise<void>;
   /** Advance nextRunAt on enqueue (scheduled); keeps runningRunId set. */
   advanceNextRunAt(scheduleId: string, nextRunAt: string, now: string): Promise<void>;
   /** @deprecated Use clearRunningLock — retained for backward compatibility in tests */

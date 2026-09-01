@@ -62,7 +62,9 @@ export type TriggerSkipReason =
   | 'already_running'
   | 'not_found'
   | 'claim_failed'
-  | 'duplicate_enqueue';
+  | 'duplicate_enqueue'
+  /** Another scheduler holds the schedule lock (E5.3). */
+  | 'lock_contended';
 
 export type TriggerRunOutcome =
   | {
