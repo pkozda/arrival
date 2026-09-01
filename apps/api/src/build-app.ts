@@ -41,6 +41,7 @@ import { registerLifeEventPlanRoutes } from './routes/life-event-plan.js';
 import { registerEconomicRealityPlanRoutes } from './routes/economic-reality-plan.js';
 import { registerEconomicRealityActionRoutes } from './routes/economic-reality-action.js';
 import { registerMbdeRoutes } from './routes/mbde.js';
+import { registerDiscoveryRoutes } from './routes/discovery.js';
 import { registerUiSnapshotRoutes } from './routes/ui-snapshot.js';
 import { randomUUID } from 'node:crypto';
 import { systemStateCoordinator } from './state/system-state-coordinator.js';
@@ -446,6 +447,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
   await registerEconomicRealityPlanRoutes(app);
   await registerEconomicRealityActionRoutes(app);
   await registerMbdeRoutes(app);
+  await registerDiscoveryRoutes(app);
   await registerUiSnapshotRoutes(app);
   await registerAccountRoutes(app);
   await registerSessionLifecycleRoutes(app);

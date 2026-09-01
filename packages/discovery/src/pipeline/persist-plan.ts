@@ -64,6 +64,7 @@ export function buildPersistPlan(
         input.candidate,
         input.materialExtractedFields
       ),
+      changedFields: [],
     };
     return { action: 'CREATE', result };
   }
@@ -98,6 +99,7 @@ export function buildPersistPlan(
       input.candidate,
       input.materialExtractedFields
     ),
+    changedFields: [...input.novelty.changedFields],
   };
   return { action: 'UPDATE', result };
 }

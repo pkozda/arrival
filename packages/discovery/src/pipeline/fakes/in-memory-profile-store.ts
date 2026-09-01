@@ -17,5 +17,10 @@ export function createInMemoryProfileStore(
     async upsert(profile) {
       byId.set(profile.id, structuredClone(profile));
     },
+    async listByUserId(userId) {
+      return [...byId.values()]
+        .filter((p) => p.userId === userId)
+        .map((p) => structuredClone(p));
+    },
   };
 }

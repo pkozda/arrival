@@ -33,4 +33,9 @@ export type DiscoveryResult = {
    * Not part of identity — used for field-level change detection.
    */
   materialFields?: Record<string, string | number | boolean | null>;
+  /**
+   * Field paths that changed on the last material update (E7.5).
+   * Empty for NEW and UNCHANGED promotions.
+   */
+  changedFields?: string[];
 };

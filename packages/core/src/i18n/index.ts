@@ -7,6 +7,7 @@ import { SHELL_HOME_I18N } from './shell-home-translations.js';
 import { GUIDE_I18N } from './guide-translations.js';
 import { CERTAINTY_I18N } from './certainty-translations.js';
 import { PROFILE_I18N } from './profile-translations.js';
+import { DISCOVERY_I18N } from './discovery-translations.js';
 
 export { LIFE_EVENT_I18N, LIFE_EVENT_I18N_KEYS } from './life-event-translations.js';
 export { LIFE_EVENT_CONTENT_I18N, LIFE_EVENT_CONTENT_I18N_KEYS } from './life-event-content-translations.js';
@@ -18,6 +19,7 @@ export { SHELL_HOME_I18N, SHELL_HOME_I18N_KEYS } from './shell-home-translations
 export { GUIDE_I18N, GUIDE_I18N_KEYS } from './guide-translations.js';
 export { CERTAINTY_I18N, CERTAINTY_I18N_KEYS } from './certainty-translations.js';
 export { PROFILE_I18N, PROFILE_I18N_KEYS } from './profile-translations.js';
+export { DISCOVERY_I18N, DISCOVERY_I18N_KEYS } from './discovery-translations.js';
 
 type TranslationKey = string;
 type Translations = Record<TranslationKey, string>;
@@ -59,6 +61,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     ...LIFE_EVENT_I18N.en,
     ...LIFE_EVENT_CONTENT_I18N.en,
     ...ECONOMIC_REALITY_I18N.en,
+    ...DISCOVERY_I18N.en,
   },
   de: {
     'app.title': PRODUCT_NAME,
@@ -96,6 +99,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     ...LIFE_EVENT_I18N.de,
     ...LIFE_EVENT_CONTENT_I18N.de,
     ...ECONOMIC_REALITY_I18N.de,
+    ...DISCOVERY_I18N.de,
   },
   ru: {
     'app.title': PRODUCT_NAME,
@@ -133,6 +137,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     ...LIFE_EVENT_I18N.ru,
     ...LIFE_EVENT_CONTENT_I18N.ru,
     ...ECONOMIC_REALITY_I18N.ru,
+    ...DISCOVERY_I18N.ru,
   },
   ua: {
     'app.title': PRODUCT_NAME,
@@ -170,6 +175,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     ...LIFE_EVENT_I18N.ua,
     ...LIFE_EVENT_CONTENT_I18N.ua,
     ...ECONOMIC_REALITY_I18N.ua,
+    ...DISCOVERY_I18N.ua,
   },
 };
 

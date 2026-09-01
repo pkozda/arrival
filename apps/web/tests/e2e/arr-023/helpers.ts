@@ -4,6 +4,7 @@ import type { DemoPersonaId } from '@arrival-atlas/life-event-demo/personas';
 
 export const API_URL = process.env.PLAYWRIGHT_API_URL ?? 'http://localhost:3001';
 export const SESSION_STORAGE_KEY = 'arrival_atlas_session_id';
+const JOURNEY_GUIDE_STORAGE_KEY = 'arrival-atlas-journey-guide-v1';
 
 export const SURFACES = {
   bootstrapLoading: '[data-ui-surface="bootstrap-loading"]',
@@ -68,9 +69,63 @@ export async function primeSession(page: Page, sessionId: string): Promise<void>
   );
 }
 
+/** Skips Journey Guide welcome overlay on galaxy surfaces (Discovery E9 e2e). */
+export async function primeDiscoverySession(page: Page, sessionId: string): Promise<void> {
+  await page.addInitScript(
+    ({ storageKey, id, guideKey }) => {
+      localStorage.setItem(storageKey, id);
+      localStorage.setItem(
+        guideKey,
+        JSON.stringify({
+          version: 1,
+          hasChosenMode: true,
+          mode: 'independent',
+          assistanceStage: 1,
+          completedMissionIds: [],
+          lockedClickCount: 0,
+          lastActiveAt: null,
+          dismissedWelcomeSurfaces: ['discovery-galaxy'],
+          lastUnlockEvent: null,
+        })
+      );
+    },
+    { storageKey: SESSION_STORAGE_KEY, id: sessionId, guideKey: JOURNEY_GUIDE_STORAGE_KEY }
+  );
+}
+
 export async function waitForAppShell(page: Page): Promise<void> {
   await expect(page.locator(SURFACES.bootstrapLoading)).toHaveCount(0, { timeout: 30_000 });
   await expect(page.locator('header.header, header.atlas-hud').first()).toBeVisible();
+}
+
+/** Dismiss Arrival Welcome language gate when it blocks module routes. */
+export async function dismissArrivalWelcomeIfPresent(page: Page): Promise<void> {
+  const english = page.getByRole('button', { name: /English/ });
+  if (!(await english.isVisible({ timeout: 5000 }).catch(() => false))) {
+    return;
+  }
+  await english.click();
+  const cta = page.locator('.arrival-welcome__cta');
+  if (await cta.isEnabled({ timeout: 5000 }).catch(() => false)) {
+    await cta.click();
+    await expect(page.locator('[data-ui-surface="arrival-welcome"]')).toHaveCount(0, {
+      timeout: 15_000,
+    });
+  }
+}
+
+export async function enterAtlasHud(page: Page): Promise<void> {
+  await page.goto('/');
+  await waitForAppShell(page);
+  await dismissArrivalWelcomeIfPresent(page);
+
+  const atlasEntry = page.locator('[data-ui-surface="home-atlas-entry"]');
+  if (await atlasEntry.isVisible({ timeout: 10_000 }).catch(() => false)) {
+    await atlasEntry.click();
+  } else {
+    await page.getByRole('button', { name: 'Enter Atlas' }).click();
+  }
+  await expect(page.locator('[data-ui-surface="atlas-hud"]')).toBeVisible({ timeout: 20_000 });
 }
 
 export async function assertNoBlankMain(page: Page): Promise<void> {

@@ -12,7 +12,7 @@ tags:
   - adr
   - decision-log
 created: 2026-06-01
-updated: 2026-08-30
+updated: 2026-09-01
 related:
   - personal-discovery-engine-architecture
 ---
@@ -66,6 +66,8 @@ Formal ADRs currently live under [../adr/](../adr/):
 | [ADR-006 addendum](../adr/adr-006-addendum-e6-3-http-authn-authz.md) | PDE E6.3 HTTP admin authentication & authorization |
 | [ADR-006 addendum](../adr/adr-006-addendum-e6-ai-cost-and-deduplication.md) | PDE roadmap E6 AI cost & deduplication (AI Evaluation Layer closure) |
 | [ADR-006 addendum](../adr/adr-006-addendum-e7-persistence-and-history.md) | PDE E7 persistence & history (functional closure) |
+| [ADR-006 addendum](../adr/adr-006-addendum-e8-scheduler.md) | PDE E8 scheduler (functional closure) |
+| [ADR-006 addendum](../adr/adr-006-addendum-e9-discovery-ui.md) | PDE E9 Discovery UI (functional closure) |
 
 Formal specifications and long-form design docs belong in [../core/](../core/) and domain folders (e.g. [../platform/](../platform/), [../identity/](../identity/), [../discovery/](../discovery/)) instead.
 

@@ -58,6 +58,8 @@ export type RegisterScheduleInput = {
 
 export type TriggerSkipReason =
   | 'disabled'
+  /** Profile exists but DiscoveryProfile.enabled is false (E8). */
+  | 'profile_disabled'
   | 'not_due'
   | 'already_running'
   | 'not_found'

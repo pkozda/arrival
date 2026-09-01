@@ -8,4 +8,6 @@ export interface RunStore {
   listBySchedule(scheduleId: string): Promise<ScheduledRunRecord[]>;
   /** Most recent runs by startedAt descending — read-only health (E5.6). */
   listRecent(limit: number): Promise<ScheduledRunRecord[]>;
+  /** Runs for a profile, most recent first (E9.1 user API). */
+  listByProfileId(profileId: string, limit?: number): Promise<ScheduledRunRecord[]>;
 }

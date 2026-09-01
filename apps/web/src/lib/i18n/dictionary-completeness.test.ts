@@ -1,6 +1,8 @@
 import {
   CERTAINTY_I18N,
   CERTAINTY_I18N_KEYS,
+  DISCOVERY_I18N,
+  DISCOVERY_I18N_KEYS,
   GUIDE_I18N,
   GUIDE_I18N_KEYS,
   LIFE_EVENT_CONTENT_I18N,
@@ -49,6 +51,10 @@ describe('Localization dictionary completeness', () => {
 
   it('keeps profile.* keys complete across locales', () => {
     assertKeyParity('PROFILE_I18N', PROFILE_I18N, PROFILE_I18N_KEYS);
+  });
+
+  it('keeps discovery.* keys complete across locales', () => {
+    assertKeyParity('DISCOVERY_I18N', DISCOVERY_I18N, DISCOVERY_I18N_KEYS);
   });
 
   it('keeps life-event UI keys complete across locales', () => {
