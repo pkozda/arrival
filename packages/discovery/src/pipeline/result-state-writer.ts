@@ -41,10 +41,6 @@ export function createResultStateWriter(
 ): ResultStateWriter {
   return {
     async transitionUserState(request) {
-      if (!deps.store.getById) {
-        throw new ResultStateWriterError('ResultStore does not support getById');
-      }
-
       const existing = await deps.store.getById(request.profileId, request.resultId);
       if (!existing) {
         throw new ResultStateWriterError(`Result not found: ${request.resultId}`);

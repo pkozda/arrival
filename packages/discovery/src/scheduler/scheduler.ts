@@ -11,6 +11,7 @@ import {
   schedulerOwnerId,
   type SchedulerLock,
 } from './scheduler-lock.js';
+import type { ProfileStore } from '../pipeline/profile-store.js';
 import type { TelemetryEmitter } from '../telemetry/emitter.js';
 import type {
   DiscoveryScheduleRecord,
@@ -52,6 +53,11 @@ export type DiscoverySchedulerConfig = {
   schedulerLockLeaseMs?: number;
   /** Optional side-channel telemetry (E5.5). */
   telemetry?: TelemetryEmitter;
+  /**
+   * When provided, enforces DiscoveryProfile.enabled before enqueue (E8).
+   * Missing profiles are not gated here — pipeline remains authoritative.
+   */
+  profileStore?: ProfileStore;
 };
 
 /**
@@ -103,6 +109,7 @@ export function createDiscoveryScheduler(
   const leaseMs = config.schedulerLockLeaseMs ?? DEFAULT_SCHEDULER_LOCK_LEASE_MS;
   const telemetry = config.telemetry;
   const runtimeInstanceId = config.runtimeInstanceId;
+  const profileStore = config.profileStore;
 
   function emitOutcome(outcome: TriggerRunOutcome): void {
     if (!telemetry) return;
@@ -272,6 +279,12 @@ export function createDiscoveryScheduler(
       }
       if (schedule.runningRunId) {
         return { kind: 'skipped', scheduleId, reason: 'already_running' };
+      }
+      if (profileStore) {
+        const profile = await profileStore.get(schedule.profileId);
+        if (profile !== null && !profile.enabled) {
+          return { kind: 'skipped', scheduleId, reason: 'profile_disabled' };
+        }
       }
 
       const runId = runIdGenerator();

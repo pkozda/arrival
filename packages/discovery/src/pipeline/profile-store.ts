@@ -4,6 +4,8 @@ import type { DiscoveryProfile } from '../types/profile.js';
 export interface ProfileStore {
   get(profileId: string): Promise<DiscoveryProfile | null>;
   upsert(profile: DiscoveryProfile): Promise<void>;
+  /** List profiles owned by a user (E9.1 user API). */
+  listByUserId(userId: string): Promise<DiscoveryProfile[]>;
 }
 
 export class ProfileStoreError extends Error {

@@ -69,6 +69,7 @@ export function createSqliteProfilePersistence(
     `SELECT profile_id FROM discovery_profiles WHERE profile_id = ?`
   );
   const countStmt = db.prepare(`SELECT COUNT(*) AS count FROM discovery_profiles`);
+  const listAllStmt = db.prepare(`SELECT payload FROM discovery_profiles`);
 
   function mapReadError(err: unknown): never {
     if (err instanceof ProfileStoreError) throw err;
@@ -116,6 +117,17 @@ export function createSqliteProfilePersistence(
         write();
       } catch (err) {
         mapWriteError(err);
+      }
+    },
+
+    async listByUserId(userId: string): Promise<DiscoveryProfile[]> {
+      try {
+        const rows = listAllStmt.all() as { payload: string }[];
+        return rows
+          .map((row) => deserializeDiscoveryProfile(row.payload))
+          .filter((p) => p.userId === userId);
+      } catch (err) {
+        mapReadError(err);
       }
     },
 

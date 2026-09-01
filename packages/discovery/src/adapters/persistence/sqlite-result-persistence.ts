@@ -81,6 +81,9 @@ export function createSqliteResultPersistence(
      WHERE id = ?`
   );
   const countStmt = db.prepare(`SELECT COUNT(*) AS count FROM discovery_results`);
+  const listByProfileStmt = db.prepare(
+    `SELECT payload FROM discovery_results WHERE profile_id = ? ORDER BY updated_at DESC`
+  );
 
   function resultIdForLookup(
     profileId: string,
@@ -131,6 +134,15 @@ export function createSqliteResultPersistence(
           | undefined;
         if (!row) return null;
         return deserializeDiscoveryResult(row.payload);
+      } catch (err) {
+        mapReadError(err);
+      }
+    },
+
+    async listByProfile(profileId: string): Promise<DiscoveryResult[]> {
+      try {
+        const rows = listByProfileStmt.all(profileId) as { payload: string }[];
+        return rows.map((row) => deserializeDiscoveryResult(row.payload));
       } catch (err) {
         mapReadError(err);
       }

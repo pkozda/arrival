@@ -11,8 +11,10 @@ export interface ResultStore {
     identity: CandidateIdentity,
     identityFingerprintFields: readonly string[]
   ): Promise<DiscoveryResult | null>;
-  /** Direct lookup by persisted result id (E7 state transitions). */
-  getById?(profileId: string, resultId: string): Promise<DiscoveryResult | null>;
+  /** Direct lookup by persisted result id (E7 state transitions, E9.1 user API). */
+  getById(profileId: string, resultId: string): Promise<DiscoveryResult | null>;
+  /** List all results for a profile, most recently changed first (E9.1 user API). */
+  listByProfile(profileId: string): Promise<DiscoveryResult[]>;
 }
 
 export class ResultStoreError extends Error {

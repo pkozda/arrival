@@ -5,7 +5,7 @@ project: Arrival Atlas
 system: Arrival Atlas
 type: roadmap
 domain: discovery
-status: proposed
+status: active
 maturity: evolving
 owner: product
 tags:
@@ -14,7 +14,7 @@ tags:
   - epic
   - roadmap
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-09-01
 depends_on:
   - personal-discovery-engine-architecture
   - adr-006-personal-discovery-engine-boundaries
@@ -31,7 +31,7 @@ related:
 **Pipeline contract:** [personal-discovery-engine-pipeline.md](./personal-discovery-engine-pipeline.md)  
 **Strategy contract:** [personal-discovery-engine-strategy-contract.md](./personal-discovery-engine-strategy-contract.md)  
 **MVP slice:** [personal-discovery-engine-mvp.md](./personal-discovery-engine-mvp.md)  
-**Status:** Proposed — implement in epic order unless dependencies force a parallel track
+**Status:** Active — E1–E9 functionally closed; E10–E11 remain
 
 Effort scale: **S** ≤1 sprint · **M** 1–2 sprints · **L** 2–4 sprints  
 Risk: Low / Medium / High
@@ -212,6 +212,7 @@ MVP ships a vertical slice through **E1–E10** for Jobs + Giveaways (see MVP do
 **Objective:** Time-based DiscoveryRuns without domain-specific knowledge.  
 **Effort:** M · **Risk:** Medium  
 **Depends on:** E7, E2  
+**Status:** **Functional closure complete** (see [ADR-006 addendum — E8](../adr/adr-006-addendum-e8-scheduler.md))
 
 **Contains:**
 
@@ -219,7 +220,13 @@ MVP ships a vertical slice through **E1–E10** for Jobs + Giveaways (see MVP do
 - daily runner for enabled profiles
 - idempotent run keys / overlap guards
 
-**Exit criteria:** Enabled profile runs on schedule; disabled profile skipped; overlapping run rejected or coalesced.
+**Implemented (functional closure):** operational `DiscoveryScheduleRecord` scheduler (E4.2/E5); profile `enabled` gate (`profile_disabled`); overlap/coalescing; durable queue/locks/retry. Pull-driven — hosts call `triggerDueRuns()`.
+
+**Architectural note:** `DiscoveryProfile.schedule` is declarative product intent. It does **not** directly drive the operational scheduler. Hosts/service may project profile intent into `DiscoveryScheduleRecord`.
+
+**Deferred by design:** cron daemon, automatic profile-schedule projection, timezone-aware daily slots, Redis/distributed scheduler redesign.
+
+**Exit criteria:** Enabled profile runs on schedule; disabled profile skipped; overlapping run rejected or coalesced. **Met** — see `packages/discovery/src/scheduler/scheduler.test.ts` (`E8 profile enabled gate`) and existing E4.2/E5 scheduler tests.
 
 ---
 
@@ -227,18 +234,38 @@ MVP ships a vertical slice through **E1–E10** for Jobs + Giveaways (see MVP do
 
 **Objective:** Strategy-driven profile creation, criteria edit, enable/disable, results + evidence.  
 **Effort:** L · **Risk:** Medium  
-**Depends on:** E4 or E5, E7  
+**Depends on:** E4 or E5, E7, E8  
+**Status:** **Functional closure complete** (see [ADR-006 addendum — E9](../adr/adr-006-addendum-e9-discovery-ui.md))
 
 **Contains:**
 
-- “What are you looking for?” entry
-- Jobs / Giveaways criteria forms
-- results list with Match / Confidence / Why / Evidence
+- “What are you looking for?” entry (Jobs / Giveaways templates)
+- profile create + criteria edit (name, country, role)
+- enable/disable profile
+- results list with Match / Confidence / Why / Evidence / changed fields
 - last-scan summary (including zero-new)
+- **Run now** (manual trigger, pull-driven execution)
 
 **Does not contain:** automatic applications or giveaway entries.
 
-**Exit criteria:** User can create profile, wait for (or trigger) a run, inspect evidence without leaving Atlas chrome conventions / i18n (`useApp().t()`).
+**Implemented (functional closure):**
+
+| Slice | Delivered |
+|-------|-----------|
+| **E9.1** | User-facing Discovery API in `packages/discovery/src/user-api/` — profiles, results, user-state, run-summary, run-now; Bearer auth for framework-free hosts |
+| **E9.2** | API gateway (`/api/modules/discovery/*`, session auth) + web module (`/modules/discovery`, Atlas HUD nav, i18n) |
+| **E9.3** | Run now UI + API; profile criteria PATCH/edit; persisted `changedFields` API projection; `discovery.score.*` i18n; canonical organic Playwright journey |
+
+**Architectural notes:**
+
+- User API is **distinct** from E6.2/E6.3 admin API (different routes and auth).
+- CSR `Profile` remains **separate** from `DiscoveryProfile`.
+- Run now reuses `DiscoveryService.runNow` + `processNext()` — no cron daemon or scheduler redesign.
+- `changedFields` are computed in E7 and projected through the user API; web does not recompute novelty.
+
+**Deferred by design:** automatic `DiscoveryProfile.schedule` projection; rich/advanced criteria editor; CandidateStore/DigestStore/full DiscoveryRun archival; E10 digest/notification UI; module catalog/home-card work; cron/Redis.
+
+**Exit criteria:** User can create profile, edit criteria, trigger a run, inspect evidence and changed fields, update user state, and reload with persisted state — within Atlas chrome / i18n conventions. **Met** — see verification table in [E9 ADR](../adr/adr-006-addendum-e9-discovery-ui.md).
 
 ---
 

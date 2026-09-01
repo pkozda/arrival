@@ -14,7 +14,7 @@ tags:
   - pde
   - personal-discovery-engine
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-09-01
 related:
   - personal-discovery-engine-architecture
   - personal-discovery-engine-domain-model
@@ -75,12 +75,53 @@ PDE complements existing engines:
 | [ADR-006 addendum — E6.3 HTTP authn/authz](../adr/adr-006-addendum-e6-3-http-authn-authz.md) | HTTP admin authentication & authorization (E6.3) |
 | [ADR-006 addendum — roadmap E6 AI cost & dedupe](../adr/adr-006-addendum-e6-ai-cost-and-deduplication.md) | Canonical roadmap E6 AI cost/dedupe closure |
 | [ADR-006 addendum — E7 persistence & history](../adr/adr-006-addendum-e7-persistence-and-history.md) | Canonical roadmap E7 persistence & history closure |
+| [ADR-006 addendum — E8 scheduler](../adr/adr-006-addendum-e8-scheduler.md) | Canonical roadmap E8 scheduler closure |
+| [ADR-006 addendum — E9 Discovery UI](../adr/adr-006-addendum-e9-discovery-ui.md) | Canonical roadmap E9 Discovery UI closure |
 
 ## Package
 
 | Package | Status |
 |---------|--------|
-| `@arrival-atlas/discovery` | **E1–E6.3** + **canonical E7 functional closure**: durable profiles/results, novelty/`changedFields`, result state transitions, notification → `NOTIFIED`. |
+| `@arrival-atlas/discovery` | **E1–E9** canonical functional closure (engine + user API). |
+| `@arrival-atlas/web` | Discovery module at `/modules/discovery` (E9.2/E9.3). |
+| `@arrival-atlas/api` | Session-scoped gateway at `/api/modules/discovery/*` (E9.2/E9.3). |
+
+## Canonical E9 status
+
+**Canonical E9 functional closure: COMPLETE**
+
+> User-facing Discovery API (E9.1), web UI + gateway (E9.2), and functional closure (E9.3: Run now, profile edit, `changedFields` projection, score i18n, canonical Playwright) are implemented and verified. CSR `Profile` remains separate from `DiscoveryProfile`. E6 admin API remains separate from the user API.
+
+See [ADR-006 addendum — E9 Discovery UI](../adr/adr-006-addendum-e9-discovery-ui.md).
+
+### E9 capabilities (summary)
+
+| Area | Delivered |
+|------|-----------|
+| **Profiles** | Create (Jobs/Giveaways templates), edit criteria, enable/disable |
+| **Runs** | Run now (pull-driven via `DiscoveryService`); last-run summary |
+| **Results** | List/detail with verification, evidence, score breakdown, novelty/changed fields |
+| **User state** | SEEN / OPENED / SAVED / DISMISSED via E7 transition rules |
+| **i18n** | en, de, ru, ua — including `discovery.score.*` keys |
+| **E2E** | Canonical organic journey (`e2e-discovery-canonical-journey.spec.ts`) |
+
+### E9 explicit deferrals
+
+- Scheduler redesign, cron daemon, Redis
+- Automatic `DiscoveryProfile.schedule` → operational schedule projection
+- Rich/advanced criteria editor beyond current templates
+- CandidateStore, DigestStore, full DiscoveryRun archival
+- E10 notification/digest UI
+- Module catalog / home-card (HUD nav only)
+- Automatic applications or giveaway entries
+
+## Canonical E8 status
+
+**Canonical E8 functional closure: COMPLETE**
+
+> Operational scheduling is implemented via `DiscoveryScheduleRecord` (E4.2/E5). `DiscoveryProfile.schedule` is declarative product intent and does not directly drive the scheduler. Automatic daily/timezone projection, cron daemons, and Redis remain deferred.
+
+See [ADR-006 addendum — E8 scheduler](../adr/adr-006-addendum-e8-scheduler.md).
 
 ## Canonical E7 status
 
@@ -108,15 +149,19 @@ ADR-006 (engine invariants; further ADRs as needed)
 
 ## Status
 
-**Active (E7)** — `@arrival-atlas/discovery` implements E1 through **canonical E7 functional closure** (Persistence & History):
+**Active (E9)** — `@arrival-atlas/discovery` implements E1 through **canonical E9 functional closure** (Discovery UI):
 
-* Durable SQLite: **Profiles** (E7.1), **Results** (E4.1), schedules/runs, notification idempotency, execution jobs, scheduler locks
-* History-scoped novelty: `NEW` / `UNCHANGED` / `UPDATED`, `SKIP_UNCHANGED`, structured `changedFields`, Job **salary** as material extracted field
-* Result user-state transitions + notification → `NOTIFIED` write-back (restart-safe)
-* `createDiscoveryRuntime` wires scheduler → durable queue → worker → pipeline → notifications
-* **E6.1–E6.3** (DiscoveryService / HTTP / auth) are implementation epics separate from canonical roadmap E6/E7
-* Deferred by design (not blocking E7 closure): `CandidateStore`, `DigestStore`, full pipeline `DiscoveryRun` archival, durable raw-content store
-* Deferred past E7: PostgreSQL, Redis, notification retries, distributed worker orchestration, cron daemon, UI (E9), observability platform, new strategies
+* **E9.1** user-facing API (`packages/discovery/src/user-api/`)
+* **E9.2** gateway + web module (`/api/modules/discovery/*`, `/modules/discovery`)
+* **E9.3** Run now, profile edit, `changedFields` projection, score i18n, canonical Playwright
+* Pull-driven Run now via existing `DiscoveryService` / scheduler / queue (no cron daemon)
+* CSR `Profile` separate from `DiscoveryProfile`; E6 admin API separate from user API
+* Deferred: E10 digest UI, advanced criteria editor, profile-schedule projection, cron/Redis
+
+Prior closures:
+
+* **E8** — operational scheduler, profile enabled gate, pull-driven `triggerDueRuns()`
+* **E7** — durable profiles/results, history-scoped novelty, `changedFields`, user-state transitions
 
 ## Initial strategies
 

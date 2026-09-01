@@ -36,6 +36,11 @@ export function AtlasHUD() {
         match: (path: string) => path.startsWith('/modules/economic-reality'),
       },
       {
+        href: '/modules/discovery',
+        label: t('nav.discovery'),
+        match: (path: string) => path.startsWith('/modules/discovery'),
+      },
+      {
         href: '/profile',
         label: t('nav.profile'),
         match: (path: string) => path.startsWith('/profile'),

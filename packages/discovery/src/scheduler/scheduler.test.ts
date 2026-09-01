@@ -6,9 +6,12 @@ import {
   createIncrementingJobIdGenerator,
   createIncrementingRunIdGenerator,
   createInMemoryExecutionQueue,
+  createInMemoryProfileStore,
   createInMemoryRunStore,
   createInMemoryScheduleStore,
+  emptyCriteria,
   initialNextRunAt,
+  type DiscoveryProfile,
 } from '../index.js';
 
 describe('E4.2 scheduler recurrence', () => {
@@ -228,5 +231,130 @@ describe('E4.3 discovery scheduler (enqueue-only)', () => {
     const again = await scheduler.triggerDueRuns();
     expect(again.outcomes).toHaveLength(0);
     expect(queue.size()).toBe(1);
+  });
+});
+
+function jobProfile(overrides?: Partial<DiscoveryProfile>): DiscoveryProfile {
+  return {
+    id: 'profile-job',
+    userId: 'user-1',
+    name: 'Jobs',
+    strategyId: 'job-discovery',
+    strategyVersion: '1',
+    criteria: {
+      ...emptyCriteria(),
+      required: [{ key: 'country', value: 'DE' }],
+    },
+    schedule: { cadence: 'manual' },
+    notification: { emailEnabled: true, skipEmptyDigest: true },
+    enabled: true,
+    createdAt: '2026-08-30T00:00:00.000Z',
+    updatedAt: '2026-08-30T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+describe('E8 profile enabled gate', () => {
+  function harness(profile: DiscoveryProfile) {
+    const clock = createFakeClock('2026-08-31T10:00:00.000Z');
+    const scheduleStore = createInMemoryScheduleStore();
+    const runStore = createInMemoryRunStore();
+    const queue = createInMemoryExecutionQueue();
+    const profileStore = createInMemoryProfileStore([profile]);
+    const scheduler = createDiscoveryScheduler({
+      scheduleStore,
+      runStore,
+      queue,
+      clock,
+      profileStore,
+      runIdGenerator: createIncrementingRunIdGenerator('e8-run'),
+      jobIdGenerator: createIncrementingJobIdGenerator('e8-job'),
+    });
+    return { clock, scheduleStore, runStore, queue, scheduler, profileStore };
+  }
+
+  async function registerDue(
+    scheduler: ReturnType<typeof harness>['scheduler'],
+    scheduleId = 'sched-e8'
+  ) {
+    await scheduler.registerSchedule({
+      scheduleId,
+      profileId: 'profile-job',
+      strategyId: 'job-discovery',
+      strategyVersion: '1',
+      intervalSeconds: 3600,
+      nextRunAt: '2026-08-31T10:00:00.000Z',
+    });
+  }
+
+  it('enabled profile + due operational schedule enqueues', async () => {
+    const { queue, scheduler } = harness(jobProfile({ enabled: true }));
+    await registerDue(scheduler);
+    const tick = await scheduler.triggerDueRuns();
+    expect(tick.outcomes[0]).toMatchObject({
+      kind: 'enqueued',
+      scheduleId: 'sched-e8',
+    });
+    expect((await queue.getPending())).toHaveLength(1);
+  });
+
+  it('disabled profile + due operational schedule is skipped (profile_disabled)', async () => {
+    const { queue, runStore, scheduler } = harness(jobProfile({ enabled: false }));
+    await registerDue(scheduler);
+    const tick = await scheduler.triggerDueRuns();
+    expect(tick.outcomes[0]).toMatchObject({
+      kind: 'skipped',
+      reason: 'profile_disabled',
+    });
+    expect((await queue.getPending())).toHaveLength(0);
+    expect(runStore.snapshot()).toHaveLength(0);
+    const manual = await scheduler.triggerNow('sched-e8');
+    expect(manual).toMatchObject({ kind: 'skipped', reason: 'profile_disabled' });
+  });
+
+  it('schedule-level disable still skips before profile gate', async () => {
+    const { queue, scheduler } = harness(jobProfile({ enabled: true }));
+    await registerDue(scheduler);
+    await scheduler.disableSchedule('sched-e8');
+    const tick = await scheduler.triggerDueRuns();
+    expect(tick.outcomes).toHaveLength(0);
+    const manual = await scheduler.triggerNow('sched-e8');
+    expect(manual).toMatchObject({ kind: 'skipped', reason: 'disabled' });
+    expect((await queue.getPending())).toHaveLength(0);
+  });
+
+  it('overlap protection unchanged when profileStore is wired', async () => {
+    const { scheduleStore, scheduler } = harness(jobProfile({ enabled: true }));
+    await registerDue(scheduler, 'sched-overlap-e8');
+    await scheduleStore.upsert({
+      ...(await scheduleStore.get('sched-overlap-e8'))!,
+      runningRunId: 'existing-run',
+    });
+    const manual = await scheduler.triggerNow('sched-overlap-e8');
+    expect(manual).toMatchObject({
+      kind: 'skipped',
+      reason: 'already_running',
+    });
+  });
+
+  it('missed-interval coalescing unchanged when profileStore is wired', async () => {
+    const { clock, scheduleStore, runStore, scheduler } = harness(
+      jobProfile({ enabled: true })
+    );
+    clock.set('2026-08-31T12:30:00.000Z');
+    await scheduler.registerSchedule({
+      scheduleId: 'sched-coalesce-e8',
+      profileId: 'profile-job',
+      strategyId: 'job-discovery',
+      strategyVersion: '1',
+      intervalSeconds: 3600,
+      nextRunAt: '2026-08-31T10:00:00.000Z',
+    });
+    const tick = await scheduler.triggerDueRuns();
+    expect(tick.outcomes).toHaveLength(1);
+    expect(runStore.snapshot()).toHaveLength(1);
+    expect((await scheduleStore.get('sched-coalesce-e8'))?.nextRunAt).toBe(
+      '2026-08-31T13:00:00.000Z'
+    );
   });
 });

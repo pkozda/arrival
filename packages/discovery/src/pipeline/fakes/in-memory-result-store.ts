@@ -42,6 +42,14 @@ export function createInMemoryResultStore(
       );
       return found ? structuredClone(found) : null;
     },
+    async listByProfile(profileId: string) {
+      return results
+        .filter((r) => r.profileId === profileId)
+        .sort(
+          (a, b) => Date.parse(b.lastChangedAt) - Date.parse(a.lastChangedAt)
+        )
+        .map((r) => structuredClone(r));
+    },
     async create(result: DiscoveryResult) {
       if (results.some((r) => r.id === result.id)) {
         throw new ResultWriterError(`Result already exists: ${result.id}`);

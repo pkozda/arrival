@@ -486,6 +486,12 @@ describe('E2.6 Novelty / State', () => {
       async findByIdentity() {
         throw new ResultStoreError('boom');
       },
+      async getById() {
+        throw new ResultStoreError('boom');
+      },
+      async listByProfile() {
+        throw new ResultStoreError('boom');
+      },
     };
     const result = await executeDiscoveryPipeline({
       profileId: 'profile-job',

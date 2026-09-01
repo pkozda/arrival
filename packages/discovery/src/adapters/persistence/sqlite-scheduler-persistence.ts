@@ -59,6 +59,9 @@ CREATE TABLE IF NOT EXISTS discovery_scheduler_runs (
 
 CREATE INDEX IF NOT EXISTS idx_discovery_scheduler_runs_schedule
   ON discovery_scheduler_runs (schedule_id);
+
+CREATE INDEX IF NOT EXISTS idx_discovery_scheduler_runs_profile
+  ON discovery_scheduler_runs (profile_id, started_at);
 `;
 
 export function createSqliteSchedulerPersistence(
@@ -360,6 +363,23 @@ export function createSqliteSchedulerPersistence(
         return rows.map(fromRunRow);
       } catch (err) {
         throw new RunStoreError('Run metadata listRecent failed');
+      }
+    },
+
+    async listByProfileId(profileId, limit = 20) {
+      try {
+        const n = Math.max(0, Math.floor(limit));
+        const rows = db
+          .prepare(
+            `SELECT * FROM discovery_scheduler_runs
+             WHERE profile_id = ?
+             ORDER BY started_at DESC
+             LIMIT ?`
+          )
+          .all(profileId, n) as RunRow[];
+        return rows.map(fromRunRow);
+      } catch (err) {
+        throw new RunStoreError('Run metadata listByProfileId failed');
       }
     },
   };

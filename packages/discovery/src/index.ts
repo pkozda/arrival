@@ -458,6 +458,47 @@ export type {
   RedactedDiscoveryAdminAuthConfig,
 } from './http/index.js';
 export type {
+  DiscoveryUserPrincipal,
+  DiscoveryUserAuthenticator,
+  UserAuthenticationResult,
+  DiscoveryResultUserView,
+  DiscoveryResultChangeMetadata,
+  ProfileRunSummary,
+  ProfileRunNowResult,
+  ProfileRunNowStatus,
+  CreateDiscoveryProfileInput,
+  UpdateDiscoveryProfileInput,
+  UpdateResultUserStateInput,
+  DiscoveryUserService,
+  DiscoveryUserServiceDeps,
+  DiscoveryUserHttpHandler,
+  DiscoveryUserHttpHandlerOptions,
+  StaticUserTokenConfig,
+} from './user-api/index.js';
+export {
+  DiscoveryUserNotFoundError,
+  DiscoveryUserForbiddenError,
+  DiscoveryUserValidationError,
+  DiscoveryUserConflictError,
+  createDiscoveryUserService,
+  createDiscoveryUserHttpHandler,
+  createStaticUserTokenAuthenticator,
+  createStaticUserTokenRegistryAuthenticator,
+  parseCreateProfileBody,
+  parseUpdateProfileBody,
+  toDiscoveryResultUserView,
+  inferNoveltyFromResult,
+  validateProfileId as validateUserProfileId,
+  validateResultId as validateUserResultId,
+  validateUserStateBody,
+  executeProfileRunNow,
+  scheduleIdForProfile,
+} from './user-api/index.js';
+export {
+  happyPathTransport,
+  smokeRegistry,
+} from './runtime/runtime-test-helpers.js';
+export type {
   DiscoveryTelemetry,
   DiscoveryTelemetryEvent,
   DiscoveryTelemetryEventName,

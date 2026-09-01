@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@arrival-atlas/discovery": "*",
     "@arrival-atlas/core": "*",
     "@arrival-atlas/module-runtime": "*",
     "@arrival-atlas/module-sdk": "*",

@@ -487,6 +487,7 @@ export function createDiscoveryRuntime(
     runtimeInstanceId: config.runtimeInstanceId,
     schedulerLockLeaseMs: config.schedulerLockLeaseMs,
     telemetry: telemetryEmitter,
+    profileStore,
   });
 
   const innerWorker = createDiscoveryExecutionWorker({

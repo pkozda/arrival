@@ -325,6 +325,78 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
     tier: 'credential-required',
     description: 'MBDE admin: ingest raw benefit documents',
   },
+  {
+    method: 'GET',
+    path: '/api/modules/discovery/profiles',
+    tier: 'credential-required',
+    description: 'Discovery: list user profiles',
+  },
+  {
+    method: 'POST',
+    path: '/api/modules/discovery/profiles',
+    tier: 'credential-required',
+    description: 'Discovery: create profile',
+  },
+  {
+    method: 'GET',
+    path: '/api/modules/discovery/profiles/:profileId',
+    tier: 'credential-required',
+    description: 'Discovery: get profile',
+  },
+  {
+    method: 'PATCH',
+    path: '/api/modules/discovery/profiles/:profileId',
+    tier: 'credential-required',
+    description: 'Discovery: update profile',
+  },
+  {
+    method: 'POST',
+    path: '/api/modules/discovery/profiles/:profileId/enable',
+    tier: 'credential-required',
+    description: 'Discovery: enable profile',
+  },
+  {
+    method: 'POST',
+    path: '/api/modules/discovery/profiles/:profileId/disable',
+    tier: 'credential-required',
+    description: 'Discovery: disable profile',
+  },
+  {
+    method: 'GET',
+    path: '/api/modules/discovery/profiles/:profileId/results',
+    tier: 'credential-required',
+    description: 'Discovery: list profile results',
+  },
+  {
+    method: 'GET',
+    path: '/api/modules/discovery/profiles/:profileId/results/:resultId',
+    tier: 'credential-required',
+    description: 'Discovery: get result detail',
+  },
+  {
+    method: 'PATCH',
+    path: '/api/modules/discovery/profiles/:profileId/results/:resultId/user-state',
+    tier: 'credential-required',
+    description: 'Discovery: update result user state',
+  },
+  {
+    method: 'GET',
+    path: '/api/modules/discovery/profiles/:profileId/run-summary',
+    tier: 'credential-required',
+    description: 'Discovery: latest run summary',
+  },
+  {
+    method: 'POST',
+    path: '/api/modules/discovery/profiles/:profileId/run-now',
+    tier: 'credential-required',
+    description: 'Discovery: trigger manual run for profile',
+  },
+  {
+    method: 'POST',
+    path: '/api/dev/discovery/seed-fixture',
+    tier: 'credential-required',
+    description: 'Dev-only: seed discovery E2E fixture',
+  },
 ];
 
 export const RouteSecurityMap: readonly RouteSecurityRule[] = Object.freeze(
