@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   AdapterFailureError,
+  buildTavilySearchRequestBody,
   createInMemoryRateLimiter,
   createMockHttpTransport,
   createProductionDiscoveryAdapters,
@@ -88,6 +89,11 @@ describe('E12.3a Tavily SearchAdapter', () => {
     expect(body.query).toBe('Frontend Engineer job DE Bremen');
     expect(body.max_results).toBe(5);
     expect(body.include_answer).toBe(false);
+    expect(body.include_raw_content).toBe(false);
+    expect(body.include_images).toBe(false);
+    // E12.20 — Jobs + DE geography
+    expect(body.country).toBe('germany');
+    expect(body.search_depth).toBe('advanced');
 
     expect(results).toHaveLength(1);
     expect(results[0]?.discoveredUrl).toBe('https://employer.example/jobs/1');
@@ -210,6 +216,121 @@ describe('E12.3a Tavily SearchAdapter', () => {
       );
       expect(partial.failures.some((f) => f.includes('SKIP'))).toBe(true);
     }
+  });
+});
+
+describe('E12.20 Tavily Germany Jobs retrieval tuning', () => {
+  it('Jobs + DE sends country=germany and search_depth=advanced with unchanged base fields', async () => {
+    const seen: HttpRequest[] = [];
+    const adapter = createTavilySearchAdapter({
+      apiKey: 'tvly-test-key',
+      transport: createMockHttpTransport(async (req) => {
+        seen.push(req);
+        return { status: 200, bodyText: tavilyOkBody([]) };
+      }),
+      maxResults: 10,
+    });
+
+    const q = query({
+      text: 'Senior Frontend Engineer hiring vacancy Stellenangebot DE -template -"job description" -resources',
+      geography: { countryCode: 'DE' },
+    });
+
+    await adapter.search([q], {
+      run: runStub(),
+      now: () => '2026-09-02T12:00:00.000Z',
+    });
+
+    const body = JSON.parse(seen[0]!.body!);
+    expect(body).toEqual({
+      query: q.text,
+      max_results: 10,
+      include_answer: false,
+      include_raw_content: false,
+      include_images: false,
+      country: 'germany',
+      search_depth: 'advanced',
+    });
+  });
+
+  it('passes query text through unchanged for Jobs DE', () => {
+    const text =
+      'Senior Frontend Engineer Stellenanzeige Bewerbung vacancy Germany -template -"job description" -site:linkedin.com';
+    const body = buildTavilySearchRequestBody({
+      query: query({ text, geography: { countryCode: 'DE' } }),
+      strategyId: 'job-discovery',
+      maxResults: 10,
+    });
+    expect(body.query).toBe(text);
+    expect(body.country).toBe('germany');
+    expect(body.search_depth).toBe('advanced');
+  });
+
+  it('does not add Germany tuning for giveaway-discovery (shared adapter)', () => {
+    const body = buildTavilySearchRequestBody({
+      query: query({
+        text: 'giveaway free DE',
+        geography: { countryCode: 'DE' },
+        metadata: { strategy: 'giveaway-discovery', version: '1' },
+      }),
+      strategyId: 'giveaway-discovery',
+      maxResults: 10,
+    });
+    expect(body).toEqual({
+      query: 'giveaway free DE',
+      max_results: 10,
+      include_answer: false,
+      include_raw_content: false,
+      include_images: false,
+    });
+    expect(body).not.toHaveProperty('country');
+    expect(body).not.toHaveProperty('search_depth');
+  });
+
+  it('does not add Germany tuning for Jobs with non-DE geography', () => {
+    const body = buildTavilySearchRequestBody({
+      query: query({
+        text: 'Frontend Engineer vacancy NL',
+        geography: { countryCode: 'NL' },
+      }),
+      strategyId: 'job-discovery',
+      maxResults: 8,
+    });
+    expect(body.max_results).toBe(8);
+    expect(body).not.toHaveProperty('country');
+    expect(body).not.toHaveProperty('search_depth');
+  });
+
+  it('giveaway run via adapter omits country and search_depth on the wire', async () => {
+    const seen: HttpRequest[] = [];
+    const adapter = createTavilySearchAdapter({
+      apiKey: 'tvly-test-key',
+      transport: createMockHttpTransport(async (req) => {
+        seen.push(req);
+        return { status: 200, bodyText: tavilyOkBody([]) };
+      }),
+    });
+
+    await adapter.search(
+      [
+        query({
+          text: 'giveaway free gadgets DE',
+          geography: { countryCode: 'DE' },
+        }),
+      ],
+      {
+        run: { ...runStub(), strategyId: 'giveaway-discovery', profileId: 'profile-gw' },
+        now: () => '2026-09-02T12:00:00.000Z',
+      }
+    );
+
+    const body = JSON.parse(seen[0]!.body!);
+    expect(body.query).toBe('giveaway free gadgets DE');
+    expect(body.country).toBeUndefined();
+    expect(body.search_depth).toBeUndefined();
+    expect(body.include_answer).toBe(false);
+    expect(body.include_raw_content).toBe(false);
+    expect(body.include_images).toBe(false);
   });
 });
 

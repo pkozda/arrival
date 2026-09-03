@@ -193,13 +193,13 @@ async function searchOneQuery(input: {
 
   return executeWithTimeout(
     async (signal) => {
-      const body = JSON.stringify({
-        query: buildBraveQueryText(query),
-        max_results: maxResults,
-        include_answer: false,
-        include_raw_content: false,
-        include_images: false,
-      });
+      const body = JSON.stringify(
+        buildTavilySearchRequestBody({
+          query,
+          strategyId: context.run.strategyId,
+          maxResults,
+        })
+      );
 
       let response;
       try {
@@ -253,6 +253,34 @@ async function searchOneQuery(input: {
       runId: context.run.id,
     }
   );
+}
+
+/**
+ * E12.20 — German Jobs retrieval uses validated Tavily country + advanced depth.
+ * Shared adapter: only Jobs + DE geography get these params (not Giveaways / other strategies).
+ */
+export function buildTavilySearchRequestBody(input: {
+  query: DiscoveryQuery;
+  strategyId: string;
+  maxResults: number;
+}): Record<string, unknown> {
+  const body: Record<string, unknown> = {
+    query: buildBraveQueryText(input.query),
+    max_results: input.maxResults,
+    include_answer: false,
+    include_raw_content: false,
+    include_images: false,
+  };
+
+  if (
+    input.strategyId === 'job-discovery' &&
+    input.query.geography?.countryCode === 'DE'
+  ) {
+    body.country = 'germany';
+    body.search_depth = 'advanced';
+  }
+
+  return body;
 }
 
 function mapHttpStatusToFailure(status: number): void {
