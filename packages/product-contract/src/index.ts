@@ -241,6 +241,7 @@ export {
   type EconomicStateId,
   type EconomicEvaluationV1,
   type EconomicAxesV1,
+  type PlanConfidence,
   type EconomicRuleId,
   type AppliedRule,
   type EconomicSupportSystemId,

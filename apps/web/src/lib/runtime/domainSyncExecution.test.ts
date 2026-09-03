@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { EMPTY_ECONOMIC_REALITY_CLIENT_STATE } from '@/lib/economic-reality/economic-reality-client-state';
 import {
   buildAnnotatedSyncPlan,
   buildSyncPlan,
@@ -8,7 +9,9 @@ import {
 import {
   createFailedDomainResult,
   createSkippedDomainResult,
+  createSuccessfulDomainResult,
   evaluateConsistencyPolicy,
+  mergeSuccessfulDomainStates,
   resolveDomainExecutionDecision,
   type DomainSyncResults,
 } from './domainSyncExecution';
@@ -135,5 +138,110 @@ describe('domainSyncExecution', () => {
     expect(annotated[0]).toMatchObject({ domain: 'PROFILE', reasons: ['cascade'] });
     expect(annotated.find((step) => step.domain === 'ECONOMIC')?.reasons).toContain('dependency');
     expect(annotated.find((step) => step.domain === 'SNAPSHOT')?.reasons).toContain('recompute');
+  });
+
+  describe('mergeSuccessfulDomainStates', () => {
+    const plan = buildAnnotatedSyncPlan({ type: 'SESSION_SYNC_REQUESTED', scope: 'FULL' });
+
+    it('merges multiple successful domains into one DomainStateMap', () => {
+      const results: DomainSyncResults = {
+        plan,
+        results: [
+          createSuccessfulDomainResult('PROFILE', {
+            PROFILE: { userContext: null, profileInsights: null },
+          }),
+          createSuccessfulDomainResult('ECONOMIC', {
+            ECONOMIC: {
+              economicPlan: {
+                ...EMPTY_ECONOMIC_REALITY_CLIENT_STATE,
+                loading: false,
+                error: null,
+              },
+            },
+          }),
+          createSuccessfulDomainResult('SNAPSHOT', {
+            SNAPSHOT: { uiSnapshot: null },
+          }),
+        ],
+      };
+
+      expect(mergeSuccessfulDomainStates(results)).toEqual({
+        PROFILE: { userContext: null, profileInsights: null },
+        ECONOMIC: {
+          economicPlan: {
+            ...EMPTY_ECONOMIC_REALITY_CLIENT_STATE,
+            loading: false,
+            error: null,
+          },
+        },
+        SNAPSHOT: { uiSnapshot: null },
+      });
+    });
+
+    it('merges multiple patches for the same domain', () => {
+      const results: DomainSyncResults = {
+        plan,
+        results: [
+          createSuccessfulDomainResult('PROFILE', {
+            PROFILE: { userContext: null, profileInsights: null },
+          }),
+          createSuccessfulDomainResult('PROFILE', {
+            PROFILE: {
+              userContext: { profile: null },
+              profileInsights: null,
+            },
+          }),
+        ],
+      };
+
+      expect(mergeSuccessfulDomainStates(results)).toEqual({
+        PROFILE: {
+          userContext: { profile: null },
+          profileInsights: null,
+        },
+      });
+    });
+
+    it('skips non-success results', () => {
+      const results: DomainSyncResults = {
+        plan,
+        results: [
+          createFailedDomainResult('PROFILE', 'profile unavailable'),
+          createSkippedDomainResult(
+            'LIFE_EVENT',
+            'dependency_failed',
+            'Blocked LIFE_EVENT because PROFILE failed',
+            { LIFE_EVENT: { lifeEventPlan: null } }
+          ),
+          createSuccessfulDomainResult('SNAPSHOT', {
+            SNAPSHOT: { uiSnapshot: null },
+          }),
+        ],
+      };
+
+      expect(mergeSuccessfulDomainStates(results)).toEqual({
+        SNAPSHOT: { uiSnapshot: null },
+      });
+    });
+
+    it('skips success results without domains', () => {
+      const results: DomainSyncResults = {
+        plan,
+        results: [
+          {
+            domain: 'PROFILE',
+            status: 'success',
+            error: null,
+          },
+          createSuccessfulDomainResult('SNAPSHOT', {
+            SNAPSHOT: { uiSnapshot: null },
+          }),
+        ],
+      };
+
+      expect(mergeSuccessfulDomainStates(results)).toEqual({
+        SNAPSHOT: { uiSnapshot: null },
+      });
+    });
   });
 });

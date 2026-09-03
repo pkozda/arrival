@@ -26,15 +26,15 @@ RUN npm run build -w @arrival-atlas/ui-contract \
   && npm run build -w @arrival-atlas/core \
   && npm run build -w @arrival-atlas/profile \
   && npm run build -w @arrival-atlas/shared-services \
-  && npm run build -w @arrival-atlas/mbde \
-  && npm run build -w @arrival-atlas/module-runtime \
   && npm run build -w @arrival-atlas/module-sdk \
+  && npm run build -w @arrival-atlas/module-runtime \
   && npm run build -w @arrival-atlas/product-contract \
+  && npm run build -w @arrival-atlas/mbde \
   && npm run build -w @arrival-atlas/profile-engine \
   && npm run build -w @arrival-atlas/profile-intelligence \
-  && npm run build -w @arrival-atlas/life-event-demo \
   && npm run build -w @arrival-atlas/observability \
   && npm run build -w @arrival-atlas/modules \
+  && npm run build -w @arrival-atlas/life-event-demo \
   && npm run build -w @arrival-atlas/ux \
   && npm run build -w @arrival-atlas/web
 

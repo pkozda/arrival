@@ -2,13 +2,9 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
-import { buildArrivalContext } from '@/lib/celestial/arrival-routes';
 import { spatialNavigationInterceptor } from '@/lib/atlas-runtime/spatial-navigation-interceptor';
-import { spatialMemoryStore } from '@/lib/atlas-runtime/spatial-memory-store';
-import { getSpatialTransitionContext } from '@/lib/atlas-runtime/spatial-transition-context';
 import { normalizeNavigationPath } from '@/lib/atlas-runtime/spatial-navigation';
 import { useArrival } from '@/components/celestial/ArrivalProvider';
-import { useAtlasRuntime } from './AtlasRuntimeProvider';
 
 type NavigateOptions = {
   replace?: boolean;
@@ -21,7 +17,6 @@ type NavigateOptions = {
 export function useAtlasNavigation() {
   const router = useRouter();
   const pathname = usePathname();
-  const { motionEngine } = useAtlasRuntime();
   const { recordArrivalIntent, spatialPhase } = useArrival();
 
   const navigate = useCallback(
@@ -37,17 +32,6 @@ export function useAtlasNavigation() {
         spatialNavigationInterceptor.markExplicitNavigation();
       }
 
-      const arrival = buildArrivalContext(departedFromPath, destinationPath);
-      const spatialTransitionContext = getSpatialTransitionContext(
-        departedFromPath,
-        destinationPath,
-        spatialMemoryStore,
-        'explicit'
-      );
-      motionEngine.buildSpatialTransition(
-        { ...arrival, spatialTransitionContext },
-        spatialTransitionContext
-      );
       recordArrivalIntent(destinationPath);
 
       if (options?.replace) {
@@ -57,7 +41,7 @@ export function useAtlasNavigation() {
 
       router.push(href);
     },
-    [motionEngine, pathname, recordArrivalIntent, router]
+    [pathname, recordArrivalIntent, router]
   );
 
   const guardedRouter = useMemo(

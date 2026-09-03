@@ -5,10 +5,10 @@ export {
   SECTION_TYPE_COPY_KEYS,
   EconomicRealityCopyKeyV1Schema,
   EconomicRealityCopySemanticTypeSchema,
+  ECONOMIC_REALITY_COPY_EN,
+  ECONOMIC_REALITY_COPY_DE,
+  ECONOMIC_REALITY_COPY_RU,
   type EconomicRealityCopyKey,
   type EconomicRealityCopyKeyV1,
   type EconomicRealityCopySemanticType,
-} from './economic-reality-copy.js';
-export { ECONOMIC_REALITY_COPY_EN } from './economic-reality-strings.en.js';
-export { ECONOMIC_REALITY_COPY_DE } from './economic-reality-strings.de.js';
-export { ECONOMIC_REALITY_COPY_RU } from './economic-reality-strings.ru.js';
+} from '@arrival-atlas/core';
