@@ -18,6 +18,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@arrival-atlas/core": "*",
     "@arrival-atlas/module-runtime": "*",
     "@arrival-atlas/ui-contract": "*",
     "zod": "^3.24.1",
@@ -25,7 +26,6 @@
   },
   "devDependencies": {
     "@arrival-atlas/modules": "*",
-    "@arrival-atlas/core": "*",
     "@types/node": "^22.10.5",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"

@@ -1,6 +1,6 @@
 import type { Domain, AnnotatedSyncPlan, EdgeSemantics, SyncGraph } from './domainSyncGraph';
 import { incomingEdgesForDomain } from './domainSyncGraph';
-import type { DomainStateMap } from './stateTransaction';
+import { mergeDomainPatches, type DomainStateMap } from './stateTransaction';
 
 export type DomainSyncResultStatus = 'success' | 'failed' | 'skipped';
 
@@ -113,16 +113,13 @@ export function createSuccessfulDomainResult(
 }
 
 export function mergeSuccessfulDomainStates(results: DomainSyncResults): DomainStateMap {
-  const merged: DomainStateMap = {};
+  let merged: DomainStateMap = {};
 
   for (const result of results.results) {
     if (result.status !== 'success' || !result.domains) {
       continue;
     }
-    for (const [domain, state] of Object.entries(result.domains)) {
-      const key = domain as Domain;
-      merged[key] = { ...merged[key], ...state } as DomainStateMap[typeof key];
-    }
+    merged = mergeDomainPatches(merged, result.domains);
   }
 
   return merged;

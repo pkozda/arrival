@@ -15,6 +15,20 @@ export {
   ECONOMIC_REALITY_I18N,
   ECONOMIC_REALITY_I18N_KEYS,
 } from './economic-reality-translations.js';
+export {
+  ER_COPY_KEYS,
+  ECONOMIC_REALITY_COPY_KEY_LIST,
+  SYSTEM_INTENT_COPY_KEYS,
+  SECTION_TYPE_COPY_KEYS,
+  EconomicRealityCopyKeyV1Schema,
+  EconomicRealityCopySemanticTypeSchema,
+  type EconomicRealityCopyKey,
+  type EconomicRealityCopyKeyV1,
+  type EconomicRealityCopySemanticType,
+} from './economic-reality-copy.js';
+export { ECONOMIC_REALITY_COPY_EN, type EconomicRealityCopyEnKey } from './economic-reality-strings.en.js';
+export { ECONOMIC_REALITY_COPY_DE } from './economic-reality-strings.de.js';
+export { ECONOMIC_REALITY_COPY_RU } from './economic-reality-strings.ru.js';
 export { SHELL_HOME_I18N, SHELL_HOME_I18N_KEYS } from './shell-home-translations.js';
 export { GUIDE_I18N, GUIDE_I18N_KEYS } from './guide-translations.js';
 export { CERTAINTY_I18N, CERTAINTY_I18N_KEYS } from './certainty-translations.js';
