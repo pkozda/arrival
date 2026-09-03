@@ -226,6 +226,7 @@ export {
   createBraveSearchAdapter,
   createProductionSearchAdapter,
   TAVILY_SEARCH_PROVIDER_ID,
+  buildTavilySearchRequestBody,
   createTavilySearchAdapter,
   DISCOVERY_SEARCH_PROVIDERS,
   resolveDiscoverySearchProvider,

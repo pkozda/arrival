@@ -14,6 +14,7 @@ export {
 export type { TavilySearchAdapterConfig } from './search/tavily-search-adapter.js';
 export {
   TAVILY_SEARCH_PROVIDER_ID,
+  buildTavilySearchRequestBody,
   createTavilySearchAdapter,
 } from './search/tavily-search-adapter.js';
 export type { DiscoverySearchProviderId } from './search/resolve-discovery-search-provider.js';
