@@ -7,6 +7,7 @@ import {
   parseUpdateProfileBody,
   type ResultState,
 } from '@arrival-atlas/discovery';
+import { z } from 'zod';
 import { securedRoute } from '../routing/apply-route-security.js';
 import { requireRouteSecurityRule } from '../routing/route-security-map.js';
 import { isDevToolsEnabled } from '../dev/is-dev-tools-enabled.js';
@@ -16,7 +17,24 @@ import {
   getDiscoveryUserService,
   resolveDiscoveryUserId,
 } from '../discovery/discovery-user-runtime.js';
+import { isDiscoveryNotificationEmailConfigured } from '../discovery/resolve-discovery-notification-email.js';
+import { getDiscoveryUserNotificationEmailStore } from '../discovery/user-notification-email-runtime.js';
 import { seedDiscoveryE2eFixture } from '../discovery/seed-e2e-fixture.js';
+
+/** Max RFC length; trim only — do not lowercase. */
+const MAX_NOTIFICATION_EMAIL_LENGTH = 254;
+
+const NotificationEmailMutationSchema = z.object({
+  email: z.union([
+    z.null(),
+    z
+      .string()
+      .trim()
+      .min(1)
+      .max(MAX_NOTIFICATION_EMAIL_LENGTH)
+      .email(),
+  ]),
+});
 
 function mapDiscoveryError(error: unknown, reply: FastifyReply) {
   if (error instanceof DiscoveryUserNotFoundError) {
@@ -47,7 +65,54 @@ function discoveryUserId(request: { identity?: { sessionId: string; accountId: s
   });
 }
 
+/** API-only delivery status — not persisted on the profile document. */
+function emailRecipientConfiguredFor(userId: string): { emailRecipientConfigured: boolean } {
+  return {
+    emailRecipientConfigured: isDiscoveryNotificationEmailConfigured(userId),
+  };
+}
+
 export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<void> {
+  securedRoute(
+    app,
+    'get',
+    '/api/modules/discovery/notification-email',
+    requireRouteSecurityRule('GET', '/api/modules/discovery/notification-email'),
+    async (request) => {
+      const userId = discoveryUserId(request);
+      // Persist-only read — never resolve env/test fallback (E13.3.3).
+      const userNotificationEmail =
+        getDiscoveryUserNotificationEmailStore().getUserNotificationEmail(userId);
+      return { userNotificationEmail };
+    }
+  );
+
+  securedRoute(
+    app,
+    'patch',
+    '/api/modules/discovery/notification-email',
+    requireRouteSecurityRule('PATCH', '/api/modules/discovery/notification-email'),
+    async (request, reply) => {
+      const parsed = NotificationEmailMutationSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: 'Invalid notification email',
+          code: 'INVALID_REQUEST',
+        });
+      }
+
+      const userId = discoveryUserId(request);
+      const store = getDiscoveryUserNotificationEmailStore();
+      if (parsed.data.email === null) {
+        store.clearUserNotificationEmail(userId);
+        return { userNotificationEmail: null };
+      }
+
+      store.setUserNotificationEmail(userId, parsed.data.email);
+      return { userNotificationEmail: parsed.data.email };
+    }
+  );
+
   securedRoute(
     app,
     'get',
@@ -55,8 +120,9 @@ export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<voi
     requireRouteSecurityRule('GET', '/api/modules/discovery/profiles'),
     async (request, reply) => {
       try {
-        const profiles = await getDiscoveryUserService().listProfiles(discoveryUserId(request));
-        return { profiles };
+        const userId = discoveryUserId(request);
+        const profiles = await getDiscoveryUserService().listProfiles(userId);
+        return { profiles, ...emailRecipientConfiguredFor(userId) };
       } catch (error) {
         return mapDiscoveryError(error, reply);
       }
@@ -70,12 +136,13 @@ export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<voi
     requireRouteSecurityRule('POST', '/api/modules/discovery/profiles'),
     async (request, reply) => {
       try {
+        const userId = discoveryUserId(request);
         const input = parseCreateProfileBody(request.body, getDiscoveryStrategyRegistry());
-        const profile = await getDiscoveryUserService().createProfile(
-          discoveryUserId(request),
-          input
-        );
-        return reply.status(201).send({ profile });
+        const profile = await getDiscoveryUserService().createProfile(userId, input);
+        return reply.status(201).send({
+          profile,
+          ...emailRecipientConfiguredFor(userId),
+        });
       } catch (error) {
         return mapDiscoveryError(error, reply);
       }
@@ -90,11 +157,9 @@ export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<voi
     async (request, reply) => {
       const { profileId } = request.params as { profileId: string };
       try {
-        const profile = await getDiscoveryUserService().getProfile(
-          discoveryUserId(request),
-          profileId
-        );
-        return { profile };
+        const userId = discoveryUserId(request);
+        const profile = await getDiscoveryUserService().getProfile(userId, profileId);
+        return { profile, ...emailRecipientConfiguredFor(userId) };
       } catch (error) {
         return mapDiscoveryError(error, reply);
       }
@@ -109,17 +174,15 @@ export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<voi
     async (request, reply) => {
       const { profileId } = request.params as { profileId: string };
       try {
-        const existing = await getDiscoveryUserService().getProfile(
-          discoveryUserId(request),
-          profileId
-        );
+        const userId = discoveryUserId(request);
+        const existing = await getDiscoveryUserService().getProfile(userId, profileId);
         const input = parseUpdateProfileBody(request.body, existing);
         const profile = await getDiscoveryUserService().updateProfile(
-          discoveryUserId(request),
+          userId,
           profileId,
           input
         );
-        return { profile };
+        return { profile, ...emailRecipientConfiguredFor(userId) };
       } catch (error) {
         return mapDiscoveryError(error, reply);
       }

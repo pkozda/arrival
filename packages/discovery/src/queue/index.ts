@@ -13,6 +13,7 @@ export type {
 export type {
   DiscoveryExecutionQueue,
   QueueClaimOptions,
+  QueueAckOptions,
   QueueRetryOptions,
   RecoverExpiredClaimsResult,
 } from './execution-queue.js';

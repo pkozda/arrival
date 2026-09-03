@@ -2,8 +2,9 @@
 
 import { AtlasSecondaryButton } from '@/components/atlas-runtime';
 import { useApp } from '@/components/AppProvider';
-import type { DiscoveryProfile, ProfileRunSummary } from '@/lib/discovery';
+import { formatScheduleSummary, type DiscoveryProfile, type ProfileRunSummary } from '@/lib/discovery';
 import type { RunNowUiStatus } from '@/lib/discovery/useDiscoveryModule';
+import { DiscoveryNotificationField } from './DiscoveryNotificationField';
 
 type Props = {
   profile: DiscoveryProfile;
@@ -11,6 +12,15 @@ type Props = {
   resultsCount: number;
   runNowStatus: RunNowUiStatus;
   runNowError: string | null;
+  emailRecipientConfigured: boolean | null;
+  userNotificationEmail: string | null;
+  userNotificationEmailKnown: boolean;
+  userNotificationEmailLoading: boolean;
+  userNotificationEmailLoadError: string | null;
+  notificationEmailSaving: boolean;
+  notificationEmailError: string | null;
+  /** When create/edit form is open, avoid duplicating the full Delivery block. */
+  configurationOpen?: boolean;
   onToggleEnabled: (enabled: boolean) => void;
   onEdit: () => void;
   onRunNow: () => void;
@@ -41,6 +51,14 @@ export function DiscoveryProfilePanel({
   resultsCount,
   runNowStatus,
   runNowError,
+  emailRecipientConfigured,
+  userNotificationEmail,
+  userNotificationEmailKnown,
+  userNotificationEmailLoading,
+  userNotificationEmailLoadError,
+  notificationEmailSaving,
+  notificationEmailError,
+  configurationOpen = false,
   onToggleEnabled,
   onEdit,
   onRunNow,
@@ -49,6 +67,10 @@ export function DiscoveryProfilePanel({
   const lastRun = runSummary?.lastRun;
   const zeroNew =
     lastRun?.status === 'SUCCESS' && resultsCount === 0 && lastRun.finishedAt;
+  const scheduleSummary = formatScheduleSummary(profile.schedule, t);
+  const recipientConfigured = emailRecipientConfigured === true;
+  const recipientKnown = emailRecipientConfigured !== null;
+  const personalConfigured = userNotificationEmailKnown && userNotificationEmail != null;
 
   return (
     <section className="discovery-panel" aria-label={profile.name}>
@@ -103,6 +125,49 @@ export function DiscoveryProfilePanel({
           {criteriaBucket(t('discovery.criteria.flexible'), profile.criteria.flexible)}
         </div>
       </div>
+
+      <div className="discovery-schedule-summary" data-ui-surface="discovery-schedule-summary">
+        <h3 className="discovery-panel__title">{t('discovery.schedule.title')}</h3>
+        <p className="discovery-schedule-summary__value">{scheduleSummary}</p>
+      </div>
+
+      {configurationOpen ? (
+        <p
+          className="text-body text-body--muted discovery-notification__compact"
+          data-ui-surface="discovery-notification-compact"
+        >
+          {t('discovery.notification.compact.editing')}
+          {recipientKnown
+            ? ` · ${
+                recipientConfigured
+                  ? t('discovery.notification.compact.deliveryReady')
+                  : t('discovery.notification.recipient.notConfigured')
+              }`
+            : null}
+          {personalConfigured
+            ? ` · ${t('discovery.notification.compact.personalEmail')}`
+            : null}
+        </p>
+      ) : (
+        <div style={{ marginTop: '1rem' }}>
+          <DiscoveryNotificationField
+            idPrefix="discovery-panel-notification"
+            draft={profile.notification}
+            onChange={() => undefined}
+            emailRecipientConfigured={emailRecipientConfigured}
+            userNotificationEmail={userNotificationEmail}
+            userNotificationEmailKnown={userNotificationEmailKnown}
+            userNotificationEmailLoading={userNotificationEmailLoading}
+            userNotificationEmailLoadError={userNotificationEmailLoadError}
+            notificationEmailSaving={notificationEmailSaving}
+            notificationEmailError={notificationEmailError}
+            readOnly
+          />
+          <p className="text-body text-body--muted discovery-notification__edit-hint">
+            {t('discovery.notification.editHint')}
+          </p>
+        </div>
+      )}
 
       <div style={{ marginTop: '1rem' }}>
         <h3 className="discovery-panel__title">{t('discovery.runSummary.title')}</h3>

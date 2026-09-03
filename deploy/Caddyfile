@@ -1,0 +1,27 @@
+# Caddy reverse proxy for Arrival Atlas personal staging.
+#
+# ATLAS_SITE_ADDRESS examples:
+#   http://localhost          — local Compose smoke (HTTP only)
+#   atlas.example.com         — VPS with automatic HTTPS (DNS must point here)
+#
+# Same-origin routing: browser calls /api/* on the site origin; Caddy proxies to API.
+# Ops routes under /api/ops/* remain protected by ARRIVAL_ATLAS_OPS_TOKEN (H3).
+
+{$ATLAS_SITE_ADDRESS:http://localhost} {
+	encode gzip
+
+	# Public API liveness (no secrets).
+	handle /health {
+		reverse_proxy api:3001
+	}
+
+	# Fastify API (Discovery, sessions, modules, ops, …).
+	handle /api/* {
+		reverse_proxy api:3001
+	}
+
+	# Next.js Web UI.
+	handle {
+		reverse_proxy web:3000
+	}
+}

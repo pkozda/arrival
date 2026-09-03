@@ -57,6 +57,7 @@ export function createInMemoryScheduleStore(
       schedules.set(scheduleId, {
         ...current,
         runningRunId: runId,
+        nextRunAt: options?.nextRunAt ?? current.nextRunAt,
         updatedAt: now,
       });
       return true;

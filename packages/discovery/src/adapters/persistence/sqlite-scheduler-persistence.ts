@@ -167,6 +167,7 @@ export function createSqliteSchedulerPersistence(
 
     async tryClaim(scheduleId, runId, now, options) {
       const requireDue = options?.requireDue ?? true;
+      const nextRunAt = options?.nextRunAt;
       try {
         const claim = db.transaction(() => {
           const row = db
@@ -178,13 +179,22 @@ export function createSqliteSchedulerPersistence(
           const info = db
             .prepare(
               `UPDATE discovery_schedules
-               SET running_run_id = ?, updated_at = ?
+               SET running_run_id = ?,
+                   next_run_at = COALESCE(?, next_run_at),
+                   updated_at = ?
                WHERE schedule_id = ?
                  AND enabled = 1
                  AND (running_run_id IS NULL OR running_run_id = '')
                  AND (? = 0 OR next_run_at <= ?)`
             )
-            .run(runId, now, scheduleId, requireDue ? 1 : 0, now);
+            .run(
+              runId,
+              nextRunAt ?? null,
+              now,
+              scheduleId,
+              requireDue ? 1 : 0,
+              now
+            );
           return info.changes === 1;
         });
         return claim();

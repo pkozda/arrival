@@ -54,5 +54,25 @@ export {
   DiscoveryRuntimeConstructionError,
 } from './errors.js';
 
+export type {
+  DiscoveryRunDiagnostics,
+  RunPromotionSummary,
+  RunDiagnosticsNotification,
+  RunDiagnosticsError,
+  RunDiagnosticsAi,
+} from '../ops/run-diagnostics.js';
+export type { DiscoveryRunFunnelDiagnostics } from '../ops/run-funnel-diagnostics.js';
+export {
+  buildDiscoveryRunDiagnostics,
+  summarizeRunPromotions,
+} from '../ops/run-diagnostics.js';
+export {
+  buildDiscoveryRunFunnelDiagnostics,
+  parseDiscoveryRunFunnelDiagnostics,
+  serializeDiscoveryRunFunnelDiagnostics,
+  MAX_FUNNEL_CANDIDATES,
+  FUNNEL_METADATA_KEY,
+} from '../ops/run-funnel-diagnostics.js';
+
 export type { ChannelNotificationAdapters } from './channel-routing-notification-adapter.js';
 export { createChannelRoutingNotificationAdapter } from './channel-routing-notification-adapter.js';

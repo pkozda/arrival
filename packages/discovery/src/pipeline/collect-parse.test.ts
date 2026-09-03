@@ -384,10 +384,15 @@ describe('E2.2 Collect / Fetch / Parse', () => {
       registry,
       profileStore: store,
       adapters: {
+        // Jobs issues job-q1 + job-q2; attach the failing hit to q1 only so this
+        // case still asserts a single fetch rejection (not q1/q2 duplication).
         search: createFakeSearchAdapter({
-          defaultResults: [
-            hit('https://employer.example/jobs/only-fail', 'Frontend Engineer'),
-          ],
+          resultsByQueryId: {
+            'job-q1': [
+              hit('https://employer.example/jobs/only-fail', 'Frontend Engineer'),
+            ],
+            'job-q2': [],
+          },
         }),
         fetch,
         extract,
@@ -396,8 +401,10 @@ describe('E2.2 Collect / Fetch / Parse', () => {
       runId: 'run-no-continue',
     });
 
+    expect(result.queries.map((q) => q.id)).toEqual(['job-q1', 'job-q2']);
     expect(result.batch.active).toHaveLength(0);
     expect(result.batch.rejected).toHaveLength(1);
+    expect(result.batch.rejected[0]?.rejection.reasonCode).toBe('REJECTED_OTHER');
     // No per-candidate parse diagnostic for the rejected fetch candidate
     expect(
       result.stageDiagnostics.some(

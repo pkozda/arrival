@@ -385,6 +385,50 @@ describe('E9.1 DiscoveryUserHttpHandler', () => {
   });
 });
 
+describe('E10.4 notification preferences — user API', () => {
+  it('updates emailEnabled, skipEmptyDigest, and both with partial merge', async () => {
+    const profileStore = createInMemoryProfileStore([
+      jobProfile({
+        notification: { emailEnabled: true, skipEmptyDigest: true },
+      }),
+    ]);
+    const { service } = buildService({ profileStore });
+
+    const emailOff = await service.updateProfile(USER_A, 'profile-job', {
+      notification: { emailEnabled: false },
+    });
+    expect(emailOff.notification).toEqual({
+      emailEnabled: false,
+      skipEmptyDigest: true,
+    });
+
+    const skipOff = await service.updateProfile(USER_A, 'profile-job', {
+      notification: { skipEmptyDigest: false },
+    });
+    expect(skipOff.notification).toEqual({
+      emailEnabled: false,
+      skipEmptyDigest: false,
+    });
+
+    const both = await service.updateProfile(USER_A, 'profile-job', {
+      notification: { emailEnabled: true, skipEmptyDigest: true },
+    });
+    expect(both.notification).toEqual({
+      emailEnabled: true,
+      skipEmptyDigest: true,
+    });
+  });
+
+  it('rejects invalid notification payload', async () => {
+    const { service } = buildService();
+    await expect(
+      service.updateProfile(USER_A, 'profile-job', {
+        notification: { emailEnabled: 'yes' } as unknown as { emailEnabled: boolean },
+      })
+    ).rejects.toThrow(/emailEnabled must be boolean/i);
+  });
+});
+
 describe('E9.1 SQLite persistence', () => {
   it('profiles and results survive reopen via user API', async () => {
     const profilesDb = tempDb('e91-prof-');

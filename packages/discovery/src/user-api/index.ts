@@ -41,6 +41,12 @@ export {
   scheduleIdForProfile,
 } from './profile-run.js';
 export {
+  buildOperationalScheduleRegistration,
+  nextDailyRunAtUtc,
+  NON_AUTOMATIC_NEXT_RUN_AT,
+  syncProfileOperationalSchedule,
+} from './schedule-projection.js';
+export {
   validateProfileId,
   validateResultId,
   validateUserStateBody,

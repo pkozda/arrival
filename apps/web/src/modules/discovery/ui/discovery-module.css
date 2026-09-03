@@ -1,15 +1,33 @@
+/**
+ * E13.2a — Scroll boundary for Discovery inside GalaxyViewport.
+ * Parent `.le-galaxy-viewport__world` is absolute inset-0 with overflow:hidden.
+ *
+ * Use max-height (not height:100%) so the module sizes to its content and only
+ * becomes a scrollport when content exceeds the world. Forcing height:100% on a
+ * flex column made the layout fill leftover viewport space, so Results sat on
+ * the bottom edge of the screen instead of flowing below configuration content.
+ */
 .discovery-module {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   padding: 1rem;
+  width: 100%;
   max-width: 1200px;
+  max-height: 100%;
+  min-height: 0;
   margin: 0 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .discovery-module__header {
   display: flex;
   flex-direction: column;
+  flex: 0 0 auto;
   gap: 0.35rem;
 }
 
@@ -18,13 +36,18 @@
   grid-template-columns: minmax(220px, 280px) 1fr;
   gap: 1rem;
   align-items: start;
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 0;
 }
 
 .discovery-module__sidebar,
 .discovery-module__main {
   display: flex;
   flex-direction: column;
+  flex: 0 0 auto;
   gap: 1rem;
+  min-height: 0;
 }
 
 .discovery-panel {
@@ -194,6 +217,14 @@
   gap: 0.75rem;
 }
 
+/* E13.2c — extra breathing room only between major form sections */
+.discovery-create-form > .discovery-excluded-roles,
+.discovery-create-form > .discovery-schedule,
+.discovery-create-form > .discovery-notification,
+.discovery-create-form > .discovery-create-form__actions {
+  margin-top: 0.5rem;
+}
+
 .discovery-create-form label {
   display: flex;
   flex-direction: column;
@@ -214,6 +245,232 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.discovery-excluded-roles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.discovery-excluded-roles__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.discovery-excluded-roles__hint {
+  font-size: 0.8rem;
+}
+
+.discovery-excluded-roles__empty {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.discovery-excluded-roles__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.discovery-excluded-roles__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.35rem 0.2rem 0.65rem;
+  font-size: 0.82rem;
+  background: color-mix(in srgb, #64748b 22%, transparent);
+  color: #e2e8f0;
+}
+
+.discovery-excluded-roles__remove {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+}
+
+.discovery-excluded-roles__remove:hover,
+.discovery-excluded-roles__remove:focus-visible {
+  background: color-mix(in srgb, #f87171 25%, transparent);
+  outline: none;
+}
+
+.discovery-excluded-roles__add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.discovery-excluded-roles__add input {
+  flex: 1 1 10rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--color-border, #334155) 80%, transparent);
+  background: color-mix(in srgb, var(--color-surface-elevated, #1e293b) 80%, transparent);
+  color: inherit;
+  padding: 0.5rem 0.65rem;
+}
+
+.discovery-schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-inline-size: 0;
+}
+
+.discovery-schedule__title {
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.discovery-schedule__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.discovery-schedule__option {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.85rem;
+}
+
+.discovery-schedule__option input {
+  margin-top: 0.2rem;
+}
+
+.discovery-schedule__hint {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 0.15rem;
+}
+
+.discovery-schedule__hour {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.discovery-schedule__hour select {
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--color-border, #334155) 80%, transparent);
+  background: color-mix(in srgb, var(--color-surface-elevated, #1e293b) 80%, transparent);
+  color: inherit;
+  padding: 0.5rem 0.65rem;
+  max-width: 12rem;
+}
+
+.discovery-schedule__unsupported {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.discovery-schedule-summary {
+  margin-top: 1rem;
+}
+
+.discovery-schedule-summary__value {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.discovery-notification {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.discovery-notification__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.discovery-notification__option {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.85rem;
+}
+
+.discovery-notification__option input {
+  margin-top: 0.2rem;
+}
+
+.discovery-notification__hint {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 0.15rem;
+}
+
+.discovery-notification__recipient {
+  margin-top: 0.25rem;
+  padding-top: 0.35rem;
+}
+
+.discovery-notification__recipient-status {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.discovery-notification__address {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+  padding-top: 0.35rem;
+}
+
+.discovery-notification__address input[type='email'] {
+  width: 100%;
+  max-width: 28rem;
+  box-sizing: border-box;
+}
+
+.discovery-notification__address-value {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.discovery-notification__address-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+}
+
+.discovery-notification__error {
+  margin: 0;
+  color: var(--atlas-danger, #b42318);
+  font-size: 0.8rem;
+}
+
+.discovery-notification__edit-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+}
+
+.discovery-notification__compact {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
 }
 
 @media (max-width: 900px) {

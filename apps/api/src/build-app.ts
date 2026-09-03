@@ -42,6 +42,7 @@ import { registerEconomicRealityPlanRoutes } from './routes/economic-reality-pla
 import { registerEconomicRealityActionRoutes } from './routes/economic-reality-action.js';
 import { registerMbdeRoutes } from './routes/mbde.js';
 import { registerDiscoveryRoutes } from './routes/discovery.js';
+import { registerDiscoveryOpsRoutes } from './routes/discovery-ops.js';
 import { registerUiSnapshotRoutes } from './routes/ui-snapshot.js';
 import { randomUUID } from 'node:crypto';
 import { systemStateCoordinator } from './state/system-state-coordinator.js';
@@ -118,7 +119,12 @@ function listModuleDescriptors() {
   }));
 }
 
-export async function buildApp(options: { logger?: boolean } = {}) {
+/** Fastify app plus route manifest collected during registration (tests / security audits). */
+export type BuildAppInstance = Fastify.FastifyInstance & {
+  readonly registeredRouteManifest: readonly RegisteredRouteRef[];
+};
+
+export async function buildApp(options: { logger?: boolean } = {}): Promise<BuildAppInstance> {
   const runtimeRegistry = ensureGovernedRuntime();
   const contractStore = ensureContractSnapshotStore();
 
@@ -448,6 +454,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
   await registerEconomicRealityActionRoutes(app);
   await registerMbdeRoutes(app);
   await registerDiscoveryRoutes(app);
+  await registerDiscoveryOpsRoutes(app);
   await registerUiSnapshotRoutes(app);
   await registerAccountRoutes(app);
   await registerSessionLifecycleRoutes(app);
@@ -599,5 +606,7 @@ export async function buildApp(options: { logger?: boolean } = {}) {
 
   validateRouteSecurityMap(RouteSecurityMap, registeredRoutes);
 
-  return app;
+  const manifest = Object.freeze([...registeredRoutes]) as readonly RegisteredRouteRef[];
+
+  return Object.assign(app, { registeredRouteManifest: manifest }) as BuildAppInstance;
 }

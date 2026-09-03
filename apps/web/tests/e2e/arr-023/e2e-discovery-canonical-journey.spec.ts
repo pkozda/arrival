@@ -13,6 +13,9 @@ const SURFACES = {
   runNow: '[data-ui-surface="discovery-run-now"]',
   runNowSuccess: '[data-ui-surface="discovery-run-now-success"]',
   editProfile: '[data-ui-surface="discovery-edit-profile"]',
+  notificationPrefs: '[data-ui-surface="discovery-notification-prefs"]',
+  notificationSave: '[data-ui-surface="discovery-notification-save"]',
+  notificationSaved: '[data-ui-surface="discovery-notification-saved"]',
 } as const;
 
 test.describe('E9.3 Discovery canonical journey', () => {
@@ -42,6 +45,16 @@ test.describe('E9.3 Discovery canonical journey', () => {
     await page.getByLabel('Preferred role (optional)').fill('Senior Frontend Engineer');
     await page.getByRole('button', { name: 'Save changes' }).click();
     await expect(page.getByText('Senior Frontend Engineer')).toBeVisible();
+
+    await expect(page.locator(SURFACES.notificationPrefs)).toBeVisible();
+    await page.getByRole('checkbox', { name: /Skip empty digest/i }).uncheck();
+    await page.locator(SURFACES.notificationSave).click();
+    await expect(page.locator(SURFACES.notificationSaved)).toBeVisible();
+
+    await page.reload();
+    await waitForAppShell(page);
+    await expect(page.getByRole('heading', { name: 'Canonical Jobs' })).toBeVisible();
+    await expect(page.getByRole('checkbox', { name: /Skip empty digest/i })).not.toBeChecked();
 
     await page.locator(SURFACES.runNow).click();
     await expect(page.locator(SURFACES.runNowSuccess)).toBeVisible({ timeout: 60_000 });

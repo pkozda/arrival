@@ -10,6 +10,7 @@ describe('E9.2 discovery web client boundary', () => {
     );
     expect(source).toContain('/api/modules/discovery');
     expect(source).toContain("'/profiles'");
+    expect(source).toContain("'/notification-email'");
     expect(source).not.toContain('/user/profiles');
     expect(source).not.toContain('/schedules');
     expect(source).not.toContain('/worker/');

@@ -15,12 +15,14 @@ export interface ScheduleStore {
   /**
    * Atomically claim a schedule for execution.
    * When requireDue is true (scheduled tick), nextRunAt must be <= now.
+   * When `nextRunAt` is provided, advances the schedule slot in the same claim
+   * (prevents crash windows where a job is enqueued but nextRunAt is stale).
    */
   tryClaim(
     scheduleId: string,
     runId: string,
     now: string,
-    options?: { requireDue?: boolean }
+    options?: { requireDue?: boolean; nextRunAt?: string }
   ): Promise<boolean>;
   /**
    * Clear running lock after worker completes; does not change nextRunAt.

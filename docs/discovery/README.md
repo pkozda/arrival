@@ -14,7 +14,7 @@ tags:
   - pde
   - personal-discovery-engine
 created: 2026-08-30
-updated: 2026-09-01
+updated: 2026-09-02
 related:
   - personal-discovery-engine-architecture
   - personal-discovery-engine-domain-model
@@ -77,14 +77,44 @@ PDE complements existing engines:
 | [ADR-006 addendum — E7 persistence & history](../adr/adr-006-addendum-e7-persistence-and-history.md) | Canonical roadmap E7 persistence & history closure |
 | [ADR-006 addendum — E8 scheduler](../adr/adr-006-addendum-e8-scheduler.md) | Canonical roadmap E8 scheduler closure |
 | [ADR-006 addendum — E9 Discovery UI](../adr/adr-006-addendum-e9-discovery-ui.md) | Canonical roadmap E9 Discovery UI closure |
+| [ADR-006 addendum — E10 notifications](../adr/adr-006-addendum-e10-notifications.md) | Canonical roadmap E10 notifications & automated delivery closure |
 
 ## Package
 
 | Package | Status |
 |---------|--------|
-| `@arrival-atlas/discovery` | **E1–E9** canonical functional closure (engine + user API). |
-| `@arrival-atlas/web` | Discovery module at `/modules/discovery` (E9.2/E9.3). |
-| `@arrival-atlas/api` | Session-scoped gateway at `/api/modules/discovery/*` (E9.2/E9.3). |
+| `@arrival-atlas/discovery` | **E1–E10** canonical functional closure (engine + user API + notification delivery). |
+| `@arrival-atlas/web` | Discovery module at `/modules/discovery` (E9.2/E9.3 + E10.4 notification preferences). |
+| `@arrival-atlas/api` | Session-scoped gateway + ops host tick + notification wiring (E9.2/E10.1–E10.3). |
+
+## Canonical E10 status
+
+**Canonical E10 functional closure: COMPLETE**
+
+> Automated email delivery from NEW / UPDATED digests, default empty-email suppression, user notification preferences (`emailEnabled`, `skipEmptyDigest`), profile schedule projection for daily cadence, and Atlas host-triggered execution (`POST /api/ops/discovery/trigger-due-runs`) — reusing E8 scheduler and E4 notification stack without a second scheduler or DigestStore.
+
+See [ADR-006 addendum — E10 notifications](../adr/adr-006-addendum-e10-notifications.md).
+
+### E10 capabilities (summary)
+
+| Area | Delivered |
+|------|-----------|
+| **Notification wiring** | Composition-root recipient resolution → worker → `NotificationService` → email adapter → SENT → NOTIFIED |
+| **Schedule projection** | `DiscoveryProfile.schedule` → operational schedule; daily projected; manual/weekly non-automatic |
+| **Host tick** | `executeDiscoveryHostTick()`; external scheduler invokes ops HTTP with `ARRIVAL_ATLAS_OPS_TOKEN` |
+| **Ops auth (H3)** | Host-global health + trigger-due-runs require ops token; ordinary accounts rejected |
+| **Notification email** | Personal email preferred; `DISCOVERY_NOTIFICATION_EMAIL` is single-tenant fallback only (disabled when `ARRIVAL_ATLAS_MULTI_USER=true`) |
+| **Preferences** | Profile API partial patch + UI toggles for `emailEnabled` / `skipEmptyDigest` |
+| **Novelty** | E7 preserved — NEW/UPDATED notify; UNCHANGED suppressed even when `skipEmptyDigest=false` |
+
+### E10 explicit deferrals
+
+- Account-linked recipient email (env/test override at composition root today)
+- Unsubscribe / List-Unsubscribe infrastructure beyond `emailEnabled`
+- Localized email templates (web i18n localized; email English)
+- Self-serve schedule UI (projection via API; UI defaults to manual cadence)
+- Weekly operational recurrence
+- Production platform cron / Resend deployment (outside E10 code)
 
 ## Canonical E9 status
 
@@ -107,11 +137,8 @@ See [ADR-006 addendum — E9 Discovery UI](../adr/adr-006-addendum-e9-discovery-
 
 ### E9 explicit deferrals
 
-- Scheduler redesign, cron daemon, Redis
-- Automatic `DiscoveryProfile.schedule` → operational schedule projection
 - Rich/advanced criteria editor beyond current templates
 - CandidateStore, DigestStore, full DiscoveryRun archival
-- E10 notification/digest UI
 - Module catalog / home-card (HUD nav only)
 - Automatic applications or giveaway entries
 
@@ -149,19 +176,22 @@ ADR-006 (engine invariants; further ADRs as needed)
 
 ## Status
 
-**Active (E9)** — `@arrival-atlas/discovery` implements E1 through **canonical E9 functional closure** (Discovery UI):
+**Active (E10)** — `@arrival-atlas/discovery` implements E1 through **canonical E10 functional closure** (automated email delivery + notification preferences):
 
-* **E9.1** user-facing API (`packages/discovery/src/user-api/`)
-* **E9.2** gateway + web module (`/api/modules/discovery/*`, `/modules/discovery`)
-* **E9.3** Run now, profile edit, `changedFields` projection, score i18n, canonical Playwright
-* Pull-driven Run now via existing `DiscoveryService` / scheduler / queue (no cron daemon)
+* **E10.1** Atlas notification wiring (recipient resolution, worker delivery, NOTIFIED write-back)
+* **E10.2** Profile schedule projection (declarative schedule → operational scheduler record)
+* **E10.3** Atlas host tick (`executeDiscoveryHostTick`, ops HTTP endpoint)
+* **E10.4** Notification preferences UI/API (`emailEnabled`, `skipEmptyDigest`)
+* Pull-driven execution via existing E8 scheduler / E4 queue — no in-process cron daemon
 * CSR `Profile` separate from `DiscoveryProfile`; E6 admin API separate from user API
-* Deferred: E10 digest UI, advanced criteria editor, profile-schedule projection, cron/Redis
 
 Prior closures:
 
+* **E9** — Discovery UI (profiles, Run now, criteria edit, results, user state)
 * **E8** — operational scheduler, profile enabled gate, pull-driven `triggerDueRuns()`
 * **E7** — durable profiles/results, history-scoped novelty, `changedFields`, user-state transitions
+
+**Next epic:** E11 Production Hardening.
 
 ## Initial strategies
 

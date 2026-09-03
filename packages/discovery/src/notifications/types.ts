@@ -98,6 +98,8 @@ export type DeliverDigestInput = {
   digest: DiscoveryDigest;
   recipient: NotificationRecipient;
   channel: NotificationChannel;
+  /** Profile preference — when true (default), empty digests skip delivery. */
+  skipEmptyDigest?: boolean;
   signal?: AbortSignal;
   timeoutMs?: number;
 };

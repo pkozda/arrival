@@ -17,6 +17,11 @@ export type QueueRetryOptions = QueueClaimOptions & {
   metadata?: Record<string, string>;
 };
 
+export type QueueAckOptions = QueueClaimOptions & {
+  /** Safe string metadata merged into the job record on completion. */
+  metadata?: Record<string, string>;
+};
+
 export type RecoverExpiredClaimsResult = {
   recoveredJobIds: readonly string[];
 };
@@ -38,7 +43,7 @@ export interface DiscoveryExecutionQueue {
   ack(
     jobId: string,
     finishedAt: string,
-    options?: QueueClaimOptions
+    options?: QueueAckOptions
   ): Promise<void>;
   fail(
     jobId: string,

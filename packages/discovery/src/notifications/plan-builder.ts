@@ -11,6 +11,8 @@ export type BuildNotificationPlanInput = {
   digest: DiscoveryDigest;
   recipient: NotificationRecipient;
   channel: NotificationChannel;
+  /** When false, empty digests may produce a scan-summary notification (E10.4). Default: skip. */
+  skipEmptyDigest?: boolean;
 };
 
 /**
@@ -21,7 +23,13 @@ export function buildNotificationPlan(
   input: BuildNotificationPlanInput
 ): NotificationPlan | null {
   const { digest, recipient, channel } = input;
-  if (digest.entries.length === 0) return null;
+  const skipEmptyDigest = input.skipEmptyDigest !== false;
+
+  if (digest.entries.length === 0) {
+    if (skipEmptyDigest) return null;
+    if (shouldSuppressEmptyHistoryScan(digest)) return null;
+    return buildEmptyScanPlan(digest, recipient, channel);
+  }
 
   const payload = buildNotificationPayload(digest);
 
@@ -79,4 +87,35 @@ function buildTitle(digest: DiscoveryDigest): string {
 function buildSummaryText(digest: DiscoveryDigest): string {
   const { totalResults, newResults, updatedResults } = digest.summary;
   return `Discovery run completed with ${totalResults} notable result(s): ${newResults} new, ${updatedResults} updated.`;
+}
+
+/** Empty digest with only UNCHANGED history — not a zero-new scan (E7/E10.4). */
+function shouldSuppressEmptyHistoryScan(digest: DiscoveryDigest): boolean {
+  const { newResults, updatedResults, unchangedResults } = digest.summary;
+  return newResults === 0 && updatedResults === 0 && unchangedResults > 0;
+}
+
+function buildEmptyScanPlan(
+  digest: DiscoveryDigest,
+  recipient: NotificationRecipient,
+  channel: NotificationChannel
+): NotificationPlan {
+  return {
+    digestId: digest.id,
+    profileId: digest.profileId,
+    runId: digest.runId,
+    channel,
+    recipient,
+    payload: {
+      title: 'Discovery scan complete — no new updates',
+      summary:
+        'Your discovery run completed with no new or updated opportunities to notify you about.',
+      resultIds: [],
+      items: [],
+      runId: digest.runId,
+      strategyId: digest.strategyId,
+      strategyVersion: digest.strategyVersion,
+      period: { ...digest.period },
+    },
+  };
 }

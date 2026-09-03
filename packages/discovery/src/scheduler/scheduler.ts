@@ -185,7 +185,8 @@ export function createDiscoveryScheduler(
         initialNextRunAt(now, input.intervalSeconds),
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
-      runningRunId: null,
+      // Preserve an active run lock across re-projection (H1).
+      runningRunId: existing?.runningRunId ?? null,
       metadata: input.metadata ? { ...input.metadata } : existing?.metadata,
     };
     await scheduleStore.upsert(record);
@@ -289,14 +290,25 @@ export function createDiscoveryScheduler(
 
       const runId = runIdGenerator();
       const jobId = jobIdGenerator();
+      const scheduledAt = schedule.nextRunAt;
+      // Advance the due slot atomically with the claim for scheduled triggers so a
+      // crash between enqueue and a separate advanceNextRunAt cannot re-due the slot.
+      const advancedNextRunAt =
+        trigger === 'scheduled'
+          ? calculateNextRunAt(
+              scheduledAt,
+              schedule.interval.intervalSeconds,
+              now
+            )
+          : undefined;
       const claimed = await scheduleStore.tryClaim(scheduleId, runId, now, {
         requireDue: claim.requireDue,
+        nextRunAt: advancedNextRunAt,
       });
       if (!claimed) {
         return { kind: 'skipped', scheduleId, reason: 'claim_failed' };
       }
 
-      const scheduledAt = schedule.nextRunAt;
       const runRecord: ScheduledRunRecord = {
         runId,
         scheduleId,
@@ -332,15 +344,6 @@ export function createDiscoveryScheduler(
           scheduleId,
           reason: 'duplicate_enqueue',
         };
-      }
-
-      if (trigger === 'scheduled') {
-        const nextRunAt = calculateNextRunAt(
-          scheduledAt,
-          schedule.interval.intervalSeconds,
-          now
-        );
-        await scheduleStore.advanceNextRunAt(scheduleId, nextRunAt, now);
       }
 
       return {

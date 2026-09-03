@@ -17,6 +17,14 @@ export function createInMemoryNotificationStore(
       return found ? structuredClone(found) : null;
     },
 
+    async findByRunId(runId) {
+      const matches = [...records.values()]
+        .filter((record) => record.runId === runId)
+        .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+      const found = matches[0];
+      return found ? structuredClone(found) : null;
+    },
+
     async create(record) {
       if (records.has(record.id)) {
         throw new NotificationStoreError(`Notification already exists: ${record.id}`);

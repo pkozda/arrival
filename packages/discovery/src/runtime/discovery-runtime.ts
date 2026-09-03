@@ -29,7 +29,7 @@ import {
 import {
   createProductionTelegramNotificationAdapter,
 } from '../adapters/notifications/telegram/telegram-notification-adapter.js';
-import type { EnginePolicy } from '../engine-policy.js';
+import { DEFAULT_ENGINE_POLICY, type EnginePolicy } from '../engine-policy.js';
 import {
   createDiscoveryNotificationService,
   type DiscoveryNotificationService,
@@ -111,9 +111,18 @@ import {
 import { DEFAULT_QUEUE_VISIBILITY_TIMEOUT_MS } from '../adapters/persistence/sqlite-execution-queue.js';
 import { buildDiscoveryRuntimeHealth } from './build-health.js';
 import type { DiscoveryRuntimeHealth } from './health.js';
+import {
+  buildDiscoveryRunDiagnostics,
+  type DiscoveryRunDiagnostics,
+} from '../ops/run-diagnostics.js';
+import {
+  FUNNEL_METADATA_KEY,
+  parseDiscoveryRunFunnelDiagnostics,
+} from '../ops/run-funnel-diagnostics.js';
 
 export type { DiscoveryRuntimePersistencePaths } from './runtime-config.js';
 export type { DiscoveryRuntimeHealth } from './health.js';
+export type { DiscoveryRunDiagnostics } from '../ops/run-diagnostics.js';
 
 /**
  * Runtime composition config (E4.7 / E5.1 / E5.2 / E5.3).
@@ -148,7 +157,7 @@ export type DiscoveryRuntimeConfig = {
   resolveNotificationTarget?: (input: {
     profileId: string;
     runId: string;
-  }) => NotificationTarget | null;
+  }) => NotificationTarget | null | Promise<NotificationTarget | null>;
   /**
    * Override notification adapters. When omitted, adapters are built from
    * production.email / production.telegram when configured.
@@ -231,6 +240,11 @@ export type DiscoveryRuntime = {
    * Does not enqueue, recover, acquire locks, or execute work.
    */
   getHealth(): Promise<DiscoveryRuntimeHealth>;
+  /**
+   * Read-only operator run diagnostics (E11.2).
+   * Returns null when the run id is unknown. Does not expose secrets or raw content.
+   */
+  getRunDiagnostics(runId: string): Promise<DiscoveryRunDiagnostics | null>;
   /**
    * Close runtime-owned SQLite resources. Idempotent.
    * Does not close caller-owned injected transport / rateLimiter / rawContentStore / queue / lock.
@@ -430,6 +444,8 @@ export function createDiscoveryRuntime(
     );
   }
 
+  const enginePolicy = config.enginePolicy ?? DEFAULT_ENGINE_POLICY;
+
   const pipelineExecutor = createPipelineRunExecutor({
     registry: config.registry,
     profileStore,
@@ -440,7 +456,7 @@ export function createDiscoveryRuntime(
       verify: adapters.verify,
       ai: adapters.ai,
     },
-    enginePolicy: config.enginePolicy,
+    enginePolicy,
     resultStore: resultPersistence,
     resultWriter,
     now: () => clock.now().toISOString(),
@@ -629,6 +645,31 @@ export function createDiscoveryRuntime(
           persistenceClosed: false,
           persistenceError: true,
         });
+      }
+    },
+    async getRunDiagnostics(runId) {
+      if (closed) {
+        return null;
+      }
+      try {
+        const run = await schedulerPersistence.runStore.get(runId);
+        if (!run) {
+          return null;
+        }
+        const job = await queue.getByRunId(runId);
+        const funnel = parseDiscoveryRunFunnelDiagnostics(
+          job?.metadata?.[FUNNEL_METADATA_KEY]
+        );
+        return buildDiscoveryRunDiagnostics({
+          run,
+          resultStore: resultPersistence,
+          notificationStore: notificationPersistence,
+          enginePolicy,
+          errorSecrets: secrets,
+          funnel,
+        });
+      } catch {
+        return null;
       }
     },
     close() {

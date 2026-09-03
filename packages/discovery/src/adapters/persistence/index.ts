@@ -56,3 +56,13 @@ export type {
   SqliteProfilePersistence,
 } from './sqlite-profile-persistence.js';
 export { createSqliteProfilePersistence } from './sqlite-profile-persistence.js';
+
+export type {
+  UserNotificationEmailStore,
+  SqliteUserNotificationEmailStoreConfig,
+  SqliteUserNotificationEmailStore,
+} from './sqlite-user-notification-email-store.js';
+export {
+  DISCOVERY_USER_NOTIFICATION_EMAIL_SCHEMA_VERSION,
+  createSqliteUserNotificationEmailStore,
+} from './sqlite-user-notification-email-store.js';

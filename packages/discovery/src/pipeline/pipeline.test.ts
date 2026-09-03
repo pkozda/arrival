@@ -140,6 +140,8 @@ describe('E2.1 executeDiscoveryPipeline', () => {
       },
     ];
     const frozen = structuredClone(fixture);
+    // Jobs emits job-q1 + job-q2; defaultResults are returned for each query →
+    // intentional q1/q2 overlap that dedupe rejects before filter.
     const result = await executeDiscoveryPipeline({
       profileId: 'profile-1',
       registry,
@@ -149,13 +151,24 @@ describe('E2.1 executeDiscoveryPipeline', () => {
       runId: 'run-immut',
     });
     expect(fixture).toEqual(frozen);
-    expect(result.batch.rejected.length).toBeGreaterThanOrEqual(1);
-    const rejectedLead = result.batch.rejected.find((r) =>
-      String(r.candidate.extracted.fields.title).includes('Team Lead')
+    expect(result.queries.map((q) => q.id)).toEqual(['job-q1', 'job-q2']);
+
+    const duplicateLeads = result.batch.rejected.filter(
+      (r) =>
+        String(r.candidate.extracted.fields.title).includes('Team Lead') &&
+        r.rejection.reasonCode === 'REJECTED_DUPLICATE'
     );
-    expect(rejectedLead?.rejection.reasonCode).toBe('REJECTED_EXCLUDED_ROLE');
-    expect(rejectedLead?.rejection.atStage).toBe('FILTERED');
-    expect(rejectedLead?.rejection.at).toBeTruthy();
+    expect(duplicateLeads).toHaveLength(1);
+    expect(duplicateLeads[0]?.rejection.atStage).toBe('DEDUPLICATED');
+
+    const excludedLead = result.batch.rejected.find(
+      (r) =>
+        String(r.candidate.extracted.fields.title).includes('Team Lead') &&
+        r.rejection.reasonCode === 'REJECTED_EXCLUDED_ROLE'
+    );
+    expect(excludedLead).toBeDefined();
+    expect(excludedLead?.rejection.atStage).toBe('FILTERED');
+    expect(excludedLead?.rejection.at).toBeTruthy();
     expect(
       result.batch.active.some((c) =>
         String(c.extracted.fields.title).includes('Team Lead')

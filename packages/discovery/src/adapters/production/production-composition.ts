@@ -10,6 +10,11 @@ import {
   type HttpTransport,
 } from '../http-transport.js';
 import { createProductionSearchAdapter } from '../search/brave-search-adapter.js';
+import { createTavilySearchAdapter } from '../search/tavily-search-adapter.js';
+import {
+  resolveDiscoverySearchProvider,
+  type DiscoverySearchProviderId,
+} from '../search/resolve-discovery-search-provider.js';
 import { createProductionFetchAdapter } from '../fetch/http-fetch-adapter.js';
 import { createProductionContentExtractor } from '../extract/html-content-extractor.js';
 import { createProductionVerificationAdapter } from '../verify/http-verification-adapter.js';
@@ -20,7 +25,20 @@ import { createProductionAiAdapter } from '../ai/http-ai-adapter.js';
  * Adapters never read process.env.
  */
 export type DiscoveryProductionConfig = {
+  /**
+   * Explicit search provider selection (E12.3a).
+   * Default / omitted → brave (production).
+   * `tavily` is temporary validation only — never an automatic Brave fallback.
+   */
+  searchProvider?: DiscoverySearchProviderId;
   brave: {
+    apiKey: string;
+    baseUrl?: string;
+    timeoutMs?: number;
+    maxResults?: number;
+  };
+  /** Required when searchProvider === 'tavily' */
+  tavily?: {
     apiKey: string;
     baseUrl?: string;
     timeoutMs?: number;
@@ -104,7 +122,14 @@ export type DiscoveryProductionConfigValidation =
   | { ok: false; issues: string[] };
 
 export type RedactedDiscoveryProductionConfig = {
+  searchProvider: DiscoverySearchProviderId;
   brave: {
+    apiKey: '[redacted]';
+    baseUrl?: string;
+    timeoutMs?: number;
+    maxResults?: number;
+  };
+  tavily?: {
     apiKey: '[redacted]';
     baseUrl?: string;
     timeoutMs?: number;
@@ -145,9 +170,34 @@ export function validateDiscoveryProductionConfig(
 ): DiscoveryProductionConfigValidation {
   const issues: string[] = [];
 
-  if (!config.brave?.apiKey?.trim()) {
+  let searchProvider: DiscoverySearchProviderId = 'brave';
+  try {
+    searchProvider = resolveDiscoverySearchProvider(config.searchProvider);
+  } catch (err) {
+    issues.push(err instanceof Error ? err.message : 'Invalid searchProvider');
+  }
+
+  if (searchProvider === 'tavily') {
+    if (!config.tavily?.apiKey?.trim()) {
+      issues.push('tavily.apiKey is required when searchProvider is tavily');
+    }
+    if (
+      config.tavily?.baseUrl !== undefined &&
+      !isValidHttpUrl(config.tavily.baseUrl)
+    ) {
+      issues.push('tavily.baseUrl must be a valid http(s) URL');
+    }
+    assertPositiveMs(issues, 'tavily.timeoutMs', config.tavily?.timeoutMs);
+    if (
+      config.tavily?.maxResults !== undefined &&
+      (!Number.isFinite(config.tavily.maxResults) || config.tavily.maxResults < 1)
+    ) {
+      issues.push('tavily.maxResults must be a positive number');
+    }
+  } else if (!config.brave?.apiKey?.trim()) {
     issues.push('brave.apiKey is required');
   }
+
   if (!config.openai?.apiKey?.trim()) {
     issues.push('openai.apiKey is required');
   }
@@ -233,13 +283,23 @@ export function validateDiscoveryProductionConfig(
 export function redactDiscoveryProductionConfig(
   config: DiscoveryProductionConfig
 ): RedactedDiscoveryProductionConfig {
+  const searchProvider = resolveDiscoverySearchProvider(config.searchProvider);
   return {
+    searchProvider,
     brave: {
       apiKey: '[redacted]',
       baseUrl: config.brave.baseUrl,
       timeoutMs: config.brave.timeoutMs,
       maxResults: config.brave.maxResults,
     },
+    tavily: config.tavily
+      ? {
+          apiKey: '[redacted]',
+          baseUrl: config.tavily.baseUrl,
+          timeoutMs: config.tavily.timeoutMs,
+          maxResults: config.tavily.maxResults,
+        }
+      : undefined,
     openai: {
       apiKey: '[redacted]',
       model: config.openai.model,
@@ -280,6 +340,7 @@ export type LoadDiscoveryProductionConfigOptions = {
   extract?: DiscoveryProductionConfig['extract'];
   ai?: DiscoveryProductionConfig['ai'];
   brave?: Partial<Omit<DiscoveryProductionConfig['brave'], 'apiKey'>>;
+  tavily?: Partial<Omit<NonNullable<DiscoveryProductionConfig['tavily']>, 'apiKey'>>;
   openai?: Partial<Omit<DiscoveryProductionConfig['openai'], 'apiKey'>>;
   email?: Partial<Omit<NonNullable<DiscoveryProductionConfig['email']>, 'apiKey'>>;
   telegram?: Partial<
@@ -295,14 +356,20 @@ export function loadDiscoveryProductionConfig(
   env: Record<string, string | undefined>,
   options: LoadDiscoveryProductionConfigOptions = {}
 ): DiscoveryProductionConfig {
+  const searchProvider = resolveDiscoverySearchProvider(
+    env.DISCOVERY_SEARCH_PROVIDER
+  );
   const braveKey = env.BRAVE_SEARCH_API_KEY?.trim();
+  const tavilyKey = env.TAVILY_API_KEY?.trim();
   const openaiKey = env.OPENAI_API_KEY?.trim();
 
-  if (!braveKey) {
-    // Composition-boundary failure — never include secret material.
+  if (searchProvider === 'brave' && !braveKey) {
     throw new Error(
       'Missing required environment variable: BRAVE_SEARCH_API_KEY'
     );
+  }
+  if (searchProvider === 'tavily' && !tavilyKey) {
+    throw new Error('Missing required environment variable: TAVILY_API_KEY');
   }
   if (!openaiKey) {
     throw new Error('Missing required environment variable: OPENAI_API_KEY');
@@ -310,6 +377,7 @@ export function loadDiscoveryProductionConfig(
 
   const modelFromEnv = env.OPENAI_MODEL?.trim();
   const braveBase = env.BRAVE_SEARCH_BASE_URL?.trim();
+  const tavilyBase = env.TAVILY_SEARCH_BASE_URL?.trim();
   const openaiBase = env.OPENAI_BASE_URL?.trim();
 
   const resendKey = env.RESEND_API_KEY?.trim();
@@ -331,12 +399,30 @@ export function loadDiscoveryProductionConfig(
   const telegramBase = env.TELEGRAM_BASE_URL?.trim();
 
   const config: DiscoveryProductionConfig = {
+    searchProvider,
     brave: {
-      apiKey: braveKey,
+      // When Tavily is selected, Brave key may be absent — unused by search adapter.
+      apiKey: braveKey ?? '',
       baseUrl: options.brave?.baseUrl ?? (braveBase || undefined),
       timeoutMs: options.brave?.timeoutMs,
       maxResults: options.brave?.maxResults,
     },
+    tavily:
+      searchProvider === 'tavily'
+        ? {
+            apiKey: tavilyKey!,
+            baseUrl: options.tavily?.baseUrl ?? (tavilyBase || undefined),
+            timeoutMs: options.tavily?.timeoutMs,
+            maxResults: options.tavily?.maxResults,
+          }
+        : tavilyKey
+          ? {
+              apiKey: tavilyKey,
+              baseUrl: options.tavily?.baseUrl ?? (tavilyBase || undefined),
+              timeoutMs: options.tavily?.timeoutMs,
+              maxResults: options.tavily?.maxResults,
+            }
+          : undefined,
     openai: {
       apiKey: openaiKey,
       model: options.openai?.model ?? (modelFromEnv || undefined),
@@ -397,16 +483,29 @@ export function createProductionDiscoveryAdapters(
   const rateLimiter = config.rateLimiter ?? createInMemoryRateLimiter();
 
   const aiTimeoutMs = config.ai?.timeoutMs ?? config.openai.timeoutMs;
+  const searchProvider = resolveDiscoverySearchProvider(config.searchProvider);
+
+  const search =
+    searchProvider === 'tavily'
+      ? createTavilySearchAdapter({
+          apiKey: config.tavily!.apiKey,
+          baseUrl: config.tavily?.baseUrl,
+          timeoutMs: config.tavily?.timeoutMs,
+          maxResults: config.tavily?.maxResults,
+          transport,
+          rateLimiter,
+        })
+      : createProductionSearchAdapter({
+          apiKey: config.brave.apiKey,
+          baseUrl: config.brave.baseUrl,
+          timeoutMs: config.brave.timeoutMs,
+          maxResults: config.brave.maxResults,
+          transport,
+          rateLimiter,
+        });
 
   return {
-    search: createProductionSearchAdapter({
-      apiKey: config.brave.apiKey,
-      baseUrl: config.brave.baseUrl,
-      timeoutMs: config.brave.timeoutMs,
-      maxResults: config.brave.maxResults,
-      transport,
-      rateLimiter,
-    }),
+    search,
     fetch: createProductionFetchAdapter({
       rawContentStore,
       transport,

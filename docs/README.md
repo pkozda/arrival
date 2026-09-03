@@ -37,6 +37,7 @@ docs/
 ├── migration/             Relocation logic, cross-country transitions
 ├── identity/              Profiles, merging, verification, profile UX
 ├── discovery/             Personal Discovery Engine (jobs, giveaways, …)
+├── deployment.md          Docker Compose + Caddy personal staging
 ├── benefits/              Jobcenter, Bürgergeld, benefit simulations
 ├── housing/               Accommodation, rent support
 ├── legal/                 Legal status, compliance, official procedures

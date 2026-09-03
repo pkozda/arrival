@@ -21,11 +21,35 @@ import {
   executeWithTimeout,
   type RateLimiter,
 } from '../../adapter-infra/index.js';
+import { createHash } from 'node:crypto';
 import {
   type HttpTransport,
 } from '../http-transport.js';
+import {
+  employerAttributionMatches,
+  isEmployerControlledDiscoveryHost,
+  isNonEmployerHost,
+  resolveExpectedEmployer,
+  selectOfficialEmployerCandidateUrls,
+} from './official-employer-resolution.js';
 
 export const VERIFY_HTTP_PROVIDER_ID = 'http' as const;
+
+type OfficialEmployerBridge =
+  | {
+      status: 'resolved';
+      employerUrl: string;
+      body: string;
+      contentRef: string;
+      httpStatus?: number;
+      attributionDetail: string;
+      /** E12.10: discovery URL itself vs off-domain bridge fetch. */
+      via: 'direct_discovery' | 'off_domain_bridge';
+    }
+  | {
+      status: 'unresolved';
+      detail: string;
+    };
 
 export type ProductionVerificationAdapterConfig = {
   rawContentStore: RawContentStore;
@@ -87,13 +111,30 @@ export function createHttpVerificationAdapter(
         const bodyLower = (page?.body ?? '').toLowerCase();
         const visible = page?.body ?? '';
 
+        // E12.2 / E12.10: aggregator/third-party → direct discovery URL or off-domain employer page
+        const employerBridge = await attemptOfficialEmployerBridge(
+          request,
+          {
+            store,
+            transport,
+            rateLimiter,
+            timeoutMs: request.timeoutMs ?? config.timeoutMs,
+            userAgent,
+          },
+          page
+        );
+
         const freshness = deriveFreshness({
-          body: visible,
+          body:
+            employerBridge?.status === 'resolved' ? employerBridge.body : visible,
           extracted: request.extracted,
           freshnessPolicy: request.freshnessPolicy,
           capturedAt: request.raw.capturedAt,
           now: verifiedAt,
-          httpStatus: page?.httpStatus,
+          httpStatus:
+            employerBridge?.status === 'resolved'
+              ? employerBridge.httpStatus
+              : page?.httpStatus,
         });
 
         // Build checks declared by policy (+ official_source when required)
@@ -104,38 +145,85 @@ export function createHttpVerificationAdapter(
           checkIds.add('official_source');
         }
 
+        // Preserve discovery source evidence separately from official verification
+        if (
+          employerBridge?.status === 'resolved' &&
+          attributableUrl &&
+          request.source.trust !== 'OFFICIAL'
+        ) {
+          try {
+            assertAttributableSourceUrl(attributableUrl, {
+              adapter: 'verify',
+              operation: 'discovery_evidence',
+            });
+            evidence.push({
+              id: nextId('discovery'),
+              type: 'OTHER',
+              sourceUrl: attributableUrl,
+              statement: `Discovered via ${request.source.trust} source; official verification uses employer-controlled page.`,
+              capturedAt: verifiedAt,
+              contentRef: request.raw.ref || page?.contentRef,
+            });
+          } catch {
+            /* discovery evidence optional — do not fail closed here */
+          }
+        }
+
         for (const checkId of checkIds) {
           const required =
             request.verificationPolicy.requiredChecks.some((c) => c.id === checkId) ||
             (checkId === 'official_source' &&
               request.verificationPolicy.requireOfficialSource);
 
+          const evidenceUrl =
+            checkId === 'official_source' && employerBridge?.status === 'resolved'
+              ? employerBridge.employerUrl
+              : attributableUrl;
+          const evidenceContentRef =
+            checkId === 'official_source' && employerBridge?.status === 'resolved'
+              ? employerBridge.contentRef
+              : request.raw.ref || page?.contentRef;
+
           const evaluated = evaluateCheck({
             checkId,
             request,
-            attributableUrl,
-            body: visible,
-            bodyLower,
+            attributableUrl: evidenceUrl,
+            body:
+              checkId === 'official_source' && employerBridge?.status === 'resolved'
+                ? employerBridge.body
+                : visible,
+            bodyLower:
+              checkId === 'official_source' && employerBridge?.status === 'resolved'
+                ? employerBridge.body.toLowerCase()
+                : bodyLower,
             freshness,
-            pageAvailable: Boolean(page?.body),
-            httpStatus: page?.httpStatus,
+            pageAvailable: Boolean(
+              checkId === 'official_source' && employerBridge?.status === 'resolved'
+                ? employerBridge.body
+                : page?.body
+            ),
+            httpStatus:
+              checkId === 'official_source' && employerBridge?.status === 'resolved'
+                ? employerBridge.httpStatus
+                : page?.httpStatus,
             now: verifiedAt,
+            employerBridge,
           });
 
           let evidenceIds: string[] | undefined;
-          if (evaluated.outcome === 'TRUE' && evaluated.evidenceDraft && attributableUrl) {
+          if (evaluated.outcome === 'TRUE' && evaluated.evidenceDraft && evidenceUrl) {
             try {
-              assertAttributableSourceUrl(attributableUrl, {
+              assertAttributableSourceUrl(evidenceUrl, {
                 adapter: 'verify',
                 operation: 'evidence',
               });
               const ev: Evidence = {
                 id: nextId(checkId),
                 type: evaluated.evidenceDraft.type,
-                sourceUrl: attributableUrl,
+                sourceUrl: evidenceUrl,
                 statement: evaluated.evidenceDraft.statement,
                 capturedAt: verifiedAt,
-                contentRef: request.raw.ref || page?.contentRef,
+                contentRef: evidenceContentRef,
               };
               evidence.push(ev);
               evidenceIds = [ev.id];
@@ -156,8 +244,8 @@ export function createHttpVerificationAdapter(
           });
         }
 
-        // sourceTrust: never upgrade aggregator to OFFICIAL without verified official check
-        let sourceTrust = resolveSourceTrust(request, checks);
+        // sourceTrust: OFFICIAL only when already OFFICIAL or employer bridge resolved
+        let sourceTrust = resolveSourceTrust(request, checks, employerBridge);
 
         const validated = validateEvidenceList(evidence);
         if (!validated.ok) {
@@ -186,7 +274,8 @@ export function createHttpVerificationAdapter(
         // Recompute trust after possible downgrades
         sourceTrust = resolveSourceTrust(
           { ...request, source: { ...request.source, trust: sourceTrust } },
-          cleanedChecks
+          cleanedChecks,
+          employerBridge
         );
 
         const status = deriveVerificationStatus(cleanedChecks);
@@ -388,6 +477,7 @@ function evaluateCheck(input: {
   pageAvailable: boolean;
   httpStatus?: number;
   now: string;
+  employerBridge?: OfficialEmployerBridge | null;
 }): {
   outcome: TriState;
   detail?: string;
@@ -399,7 +489,12 @@ function evaluateCheck(input: {
 
   switch (checkId) {
     case 'official_source':
-      return evaluateOfficialSource(request, attributableUrl, body);
+      return evaluateOfficialSource(
+        request,
+        attributableUrl,
+        body,
+        input.employerBridge
+      );
 
     case 'current_page':
     case 'page_exists':
@@ -459,7 +554,8 @@ function evaluateCheck(input: {
 function evaluateOfficialSource(
   request: VerificationRequest,
   attributableUrl: string | undefined,
-  body: string
+  body: string,
+  employerBridge?: OfficialEmployerBridge | null
 ): {
   outcome: TriState;
   detail?: string;
@@ -467,12 +563,50 @@ function evaluateOfficialSource(
 } {
   const trust = request.source.trust;
 
-  // Aggregator / community / third-party cannot be upgraded without separate official discovery (deferred)
+  // E12.2 bridge: aggregator/third-party may reach OFFICIAL only via fetched employer page
+  if (employerBridge?.status === 'resolved') {
+    if (CLOSED_PATTERNS.test(employerBridge.body)) {
+      return {
+        outcome: 'FALSE',
+        detail: 'Official employer page indicates opportunity closed/expired',
+        evidenceDraft: {
+          type: 'OFFICIAL_SOURCE',
+          statement: 'Official employer page indicates the opportunity is closed or expired.',
+        },
+      };
+    }
+    if (!employerBridge.body.trim()) {
+      return {
+        outcome: 'UNKNOWN',
+        detail: 'Official employer page fetched but empty',
+      };
+    }
+    return {
+      outcome: 'TRUE',
+      detail: `Official employer page verified after ${trust} discovery (${employerBridge.attributionDetail})`,
+      evidenceDraft: {
+        type: 'OFFICIAL_SOURCE',
+        statement:
+          employerBridge.via === 'direct_discovery'
+            ? 'Employer-controlled discovery URL attributed under E12.5; search provenance alone is insufficient.'
+            : 'Employer-controlled job page fetched and attributed; aggregator discovery alone is insufficient.',
+      },
+    };
+  }
+
+  if (employerBridge?.status === 'unresolved' && trust !== 'OFFICIAL') {
+    return {
+      outcome: 'UNKNOWN',
+      detail: employerBridge.detail,
+    };
+  }
+
+  // Aggregator / community / third-party cannot be upgraded without separate official discovery
   if (trust === 'AGGREGATOR' || trust === 'COMMUNITY') {
     return {
       outcome: 'UNKNOWN',
       detail:
-        'Candidate source is not OFFICIAL; official-site discovery is not available in E3.5',
+        'Candidate source is not OFFICIAL; official-site discovery did not resolve an attributable employer page',
     };
   }
 
@@ -480,7 +614,7 @@ function evaluateOfficialSource(
     return {
       outcome: 'UNKNOWN',
       detail:
-        'ESTABLISHED_THIRD_PARTY is not OFFICIAL; cannot satisfy requireOfficialSource',
+        'ESTABLISHED_THIRD_PARTY is not OFFICIAL; official-site discovery did not resolve an attributable employer page',
     };
   }
 
@@ -818,15 +952,377 @@ function deriveFreshness(input: {
 
 function resolveSourceTrust(
   request: VerificationRequest,
-  checks: VerificationCheck[]
+  checks: VerificationCheck[],
+  employerBridge?: OfficialEmployerBridge | null
 ): SourceTrust {
   const official = checks.find((c) => c.id === 'official_source');
+  // Bridge path: official TRUE only after employer page fetch + attribution
+  if (
+    official?.outcome === 'TRUE' &&
+    employerBridge?.status === 'resolved'
+  ) {
+    return 'OFFICIAL';
+  }
   // Never claim OFFICIAL unless check is TRUE and original trust was already OFFICIAL
   // (finalizeVerificationResult also enforces this)
   if (official?.outcome === 'TRUE' && request.source.trust === 'OFFICIAL') {
     return 'OFFICIAL';
   }
   return request.source.trust;
+}
+
+/**
+ * E12.2 / E12.10 — When discovery trust is not OFFICIAL and strategy requires
+ * official source, resolve an attributable employer-controlled job page.
+ *
+ * Path A (E12.10): discovery URL itself when hostname authority matches employer
+ * and E12.5 attribution succeeds.
+ * Path B (E12.2): off-domain employer URL from aggregator page facts.
+ *
+ * Fail closed. Never upgrades a third-party aggregator host via body mention alone.
+ */
+async function attemptOfficialEmployerBridge(
+  request: VerificationRequest,
+  deps: {
+    store: RawContentStore;
+    transport?: HttpTransport;
+    rateLimiter: RateLimiter;
+    timeoutMs?: number;
+    userAgent: string;
+  },
+  discoveryPage?: PageContent | null
+): Promise<OfficialEmployerBridge | null> {
+  if (!request.verificationPolicy.requireOfficialSource) {
+    return null;
+  }
+  if (request.source.trust === 'OFFICIAL') {
+    return null;
+  }
+
+  const discoveryUrl =
+    request.canonicalUrl ?? request.source.url ?? request.raw.sourceUrl;
+  if (!discoveryUrl) {
+    return {
+      status: 'unresolved',
+      detail:
+        'Candidate source is not OFFICIAL; no discovery URL available for official-site attribution',
+    };
+  }
+
+  const expectedEmployer = resolveExpectedEmployer(request.extracted, {
+    discoveryUrl,
+  });
+  if (!expectedEmployer) {
+    return {
+      status: 'unresolved',
+      detail:
+        'Candidate source is not OFFICIAL; no employer name available for official-site attribution',
+    };
+  }
+
+  const expectedTitle =
+    typeof request.extracted.fields.title === 'string'
+      ? request.extracted.fields.title
+      : typeof request.identity.fingerprintMaterial.title === 'string'
+        ? String(request.identity.fingerprintMaterial.title)
+        : undefined;
+
+  let lastDetail =
+    'Candidate source is not OFFICIAL; official-site discovery did not resolve an attributable employer page';
+
+  // Path A — direct employer-controlled discovery URL (E12.10)
+  if (
+    isEmployerControlledDiscoveryHost({
+      discoveryUrl,
+      expectedEmployer,
+    })
+  ) {
+    const direct = await resolveDirectDiscoveryEmployerPage({
+      discoveryUrl,
+      discoveryPage,
+      request,
+      deps,
+      expectedEmployer,
+      expectedTitle,
+    });
+    if (direct.status === 'resolved') {
+      return direct;
+    }
+    lastDetail = direct.detail;
+  }
+
+  // Path B — off-domain employer bridge (E12.2)
+  const candidates = selectOfficialEmployerCandidateUrls({
+    discoveryUrl,
+    extracted: request.extracted,
+  });
+  if (candidates.length === 0) {
+    return {
+      status: 'unresolved',
+      detail:
+        lastDetail ===
+        'Candidate source is not OFFICIAL; official-site discovery did not resolve an attributable employer page'
+          ? 'Candidate source is not OFFICIAL; no off-domain employer job URL found on discovery page'
+          : lastDetail,
+    };
+  }
+
+  if (!deps.transport) {
+    return {
+      status: 'unresolved',
+      detail:
+        'Candidate source is not OFFICIAL; official employer fetch transport unavailable',
+    };
+  }
+
+  for (const candidate of candidates) {
+    const fetched = await fetchOfficialEmployerPage(candidate.url, request, deps);
+    if (!fetched.ok) {
+      lastDetail = fetched.detail;
+      continue;
+    }
+
+    const attribution = employerAttributionMatches({
+      expectedEmployer,
+      pageUrl: fetched.finalUrl,
+      pageBody: fetched.body,
+      expectedTitle,
+    });
+    if (!attribution.ok) {
+      lastDetail = attribution.detail;
+      continue;
+    }
+
+    const contentHash = createHash('sha256')
+      .update(fetched.body, 'utf8')
+      .digest('hex');
+    const contentRef = `raw:official:${contentHash}`;
+    deps.store.put(contentRef, {
+      body: fetched.body,
+      contentType: fetched.contentType ?? 'text/html',
+    });
+
+    return {
+      status: 'resolved',
+      employerUrl: fetched.finalUrl,
+      body: fetched.body,
+      contentRef,
+      httpStatus: fetched.httpStatus,
+      attributionDetail: attribution.detail,
+      via: 'off_domain_bridge',
+    };
+  }
+
+  return {
+    status: 'unresolved',
+    detail: lastDetail,
+  };
+}
+
+async function resolveDirectDiscoveryEmployerPage(input: {
+  discoveryUrl: string;
+  discoveryPage?: PageContent | null;
+  request: VerificationRequest;
+  deps: {
+    store: RawContentStore;
+    transport?: HttpTransport;
+    rateLimiter: RateLimiter;
+    timeoutMs?: number;
+    userAgent: string;
+  };
+  expectedEmployer: string;
+  expectedTitle?: string;
+}): Promise<OfficialEmployerBridge> {
+  const { discoveryUrl, discoveryPage, request, deps, expectedEmployer, expectedTitle } =
+    input;
+
+  let body = discoveryPage?.body?.trim() ? discoveryPage.body : '';
+  let finalUrl = discoveryUrl;
+  let httpStatus = discoveryPage?.httpStatus;
+  let contentType = 'text/html';
+
+  if (!body) {
+    if (!deps.transport) {
+      return {
+        status: 'unresolved',
+        detail:
+          'Candidate source is not OFFICIAL; discovery page content unavailable for direct employer attribution',
+      };
+    }
+    const fetched = await fetchOfficialEmployerPage(discoveryUrl, request, deps);
+    if (!fetched.ok) {
+      return { status: 'unresolved', detail: fetched.detail };
+    }
+    body = fetched.body;
+    finalUrl = fetched.finalUrl;
+    httpStatus = fetched.httpStatus;
+    contentType = fetched.contentType ?? 'text/html';
+  }
+
+  // Redirect / final URL must still look employer-controlled
+  if (
+    !isEmployerControlledDiscoveryHost({
+      discoveryUrl: finalUrl,
+      expectedEmployer,
+    })
+  ) {
+    return {
+      status: 'unresolved',
+      detail:
+        'Discovery URL is not an employer-controlled host for the expected employer',
+    };
+  }
+
+  const attribution = employerAttributionMatches({
+    expectedEmployer,
+    pageUrl: finalUrl,
+    pageBody: body,
+    expectedTitle,
+  });
+  if (!attribution.ok) {
+    return { status: 'unresolved', detail: attribution.detail };
+  }
+
+  const contentHash = createHash('sha256').update(body, 'utf8').digest('hex');
+  const contentRef =
+    discoveryPage?.contentRef && body === discoveryPage.body
+      ? discoveryPage.contentRef
+      : `raw:official:${contentHash}`;
+  if (contentRef.startsWith('raw:official:')) {
+    deps.store.put(contentRef, {
+      body,
+      contentType,
+    });
+  }
+
+  return {
+    status: 'resolved',
+    employerUrl: finalUrl,
+    body,
+    contentRef,
+    httpStatus,
+    attributionDetail: attribution.detail,
+    via: 'direct_discovery',
+  };
+}
+
+async function fetchOfficialEmployerPage(
+  url: string,
+  request: VerificationRequest,
+  deps: {
+    transport?: HttpTransport;
+    rateLimiter: RateLimiter;
+    timeoutMs?: number;
+    userAgent: string;
+  }
+): Promise<
+  | {
+      ok: true;
+      body: string;
+      finalUrl: string;
+      httpStatus: number;
+      contentType?: string;
+    }
+  | { ok: false; detail: string }
+> {
+  if (!deps.transport) {
+    return { ok: false, detail: 'Official employer fetch transport unavailable' };
+  }
+
+  try {
+    await deps.rateLimiter.acquire(`verify:${VERIFY_HTTP_PROVIDER_ID}`, {
+      runId: request.run.id,
+      signal: request.signal,
+      timeoutMs: deps.timeoutMs,
+    });
+
+    const response = await executeWithTimeout(
+      async (signal) => {
+        try {
+          return await deps.transport!.request({
+            url,
+            method: 'GET',
+            headers: {
+              Accept:
+                'text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.1',
+              'User-Agent': deps.userAgent,
+            },
+            signal,
+            maxBytes: 1_500_000,
+          });
+        } catch (err) {
+          if (AdapterFailureError.isAdapterFailure(err)) throw err;
+          throw new AdapterFailureError({
+            code: 'NETWORK_ERROR',
+            message: 'Official employer fetch network failure',
+            adapter: 'verify',
+            operation: 'official_employer_get',
+            retryable: true,
+          });
+        }
+      },
+      {
+        adapter: 'verify',
+        operation: 'official_employer_get',
+        timeoutMs: deps.timeoutMs,
+        signal: request.signal,
+        runId: request.run.id,
+      }
+    );
+
+    if (response.status >= 400) {
+      return {
+        ok: false,
+        detail: `Official employer page fetch failed (HTTP ${response.status})`,
+      };
+    }
+    if (response.truncated) {
+      return {
+        ok: false,
+        detail: 'Official employer page response oversized',
+      };
+    }
+    const body = response.bodyText ?? '';
+    if (!body.trim()) {
+      return {
+        ok: false,
+        detail: 'Official employer page empty',
+      };
+    }
+
+    const finalUrl = response.finalUrl ?? url;
+    // Redirect into a known non-employer host must not become OFFICIAL
+    try {
+      const host = new URL(finalUrl).hostname.toLowerCase();
+      if (isNonEmployerHost(host)) {
+        return {
+          ok: false,
+          detail: 'Official employer fetch redirected to a non-employer host',
+        };
+      }
+    } catch {
+      return { ok: false, detail: 'Official employer final URL invalid' };
+    }
+
+    return {
+      ok: true,
+      body,
+      finalUrl,
+      httpStatus: response.status,
+      contentType: response.headers?.['content-type'],
+    };
+  } catch (err) {
+    if (AdapterFailureError.isTimeout(err)) {
+      return { ok: false, detail: 'Official employer page fetch timed out' };
+    }
+    if (AdapterFailureError.isCancelled(err)) {
+      return { ok: false, detail: 'Official employer page fetch cancelled' };
+    }
+    return {
+      ok: false,
+      detail: 'Official employer page fetch failed',
+    };
+  }
 }
 
 function needsEvidence(checkId: string): boolean {

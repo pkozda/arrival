@@ -38,6 +38,8 @@ CREATE INDEX IF NOT EXISTS idx_discovery_notifications_profile
   ON discovery_notifications (profile_id);
 CREATE INDEX IF NOT EXISTS idx_discovery_notifications_digest
   ON discovery_notifications (digest_id);
+CREATE INDEX IF NOT EXISTS idx_discovery_notifications_run
+  ON discovery_notifications (run_id);
 `;
 
 function serializePayload(record: NotificationRecord): string {
@@ -123,6 +125,18 @@ export function createSqliteNotificationPersistence(
       const row = db
         .prepare(`SELECT * FROM discovery_notifications WHERE id = ?`)
         .get(id) as Row | undefined;
+      return row ? fromRow(row) : null;
+    },
+
+    async findByRunId(runId) {
+      const row = db
+        .prepare(
+          `SELECT * FROM discovery_notifications
+           WHERE run_id = ?
+           ORDER BY created_at DESC
+           LIMIT 1`
+        )
+        .get(runId) as Row | undefined;
       return row ? fromRow(row) : null;
     },
 
