@@ -2,7 +2,8 @@ export type RouteSecurityTier =
   | 'public'
   | 'anonymous-create'
   | 'credential-required'
-  | 'account-required';
+  | 'account-required'
+  | 'ops-token-required';
 
 export type RouteSecurityRule = {
   method: string;

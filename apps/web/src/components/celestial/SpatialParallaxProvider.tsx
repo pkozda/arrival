@@ -11,6 +11,8 @@ import {
   type ReactNode,
 } from 'react';
 import type { SpatialParallaxOffset } from '@/lib/celestial/spatial-types';
+import { useAtlasRuntime } from '@/components/atlas-runtime/AtlasRuntimeProvider';
+import { isSpatialCursorParallaxEnabled } from './spatial-parallax-scope';
 
 type SpatialParallaxContextValue = {
   offset: SpatialParallaxOffset;
@@ -30,6 +32,8 @@ const MIDGROUND_GAIN = 0.32;
 const BACKGROUND_GAIN = 0.14;
 
 export function SpatialParallaxProvider({ children }: { children: ReactNode }) {
+  const { shellMode } = useAtlasRuntime();
+  const enabled = isSpatialCursorParallaxEnabled(shellMode);
   const [offset, setOffset] = useState<SpatialParallaxOffset>(ZERO);
   const targetRef = useRef({ x: 0, y: 0 });
   const currentRef = useRef({ x: 0, y: 0 });
@@ -52,6 +56,13 @@ export function SpatialParallaxProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (!enabled) {
+      targetRef.current = { x: 0, y: 0 };
+      currentRef.current = { x: 0, y: 0 };
+      setOffset(ZERO);
+      return;
+    }
+
     const onPointerMove = (event: PointerEvent) => {
       const nx = (event.clientX / window.innerWidth - 0.5) * 2;
       const ny = (event.clientY / window.innerHeight - 0.5) * 2;
@@ -71,11 +82,12 @@ export function SpatialParallaxProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('pointerleave', onPointerLeave);
       if (frameRef.current != null) {
         window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
       }
     };
-  }, [tick]);
+  }, [tick, enabled]);
 
-  const value = useMemo(() => ({ offset }), [offset]);
+  const value = useMemo(() => ({ offset: enabled ? offset : ZERO }), [offset, enabled]);
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }

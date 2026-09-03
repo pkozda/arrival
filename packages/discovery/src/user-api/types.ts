@@ -77,6 +77,14 @@ export type UpdateDiscoveryProfileInput = {
   name?: string;
   criteria?: DiscoveryProfile['criteria'];
   schedule?: DiscoveryProfile['schedule'];
+  notification?: Partial<DiscoveryProfile['notification']>;
+};
+
+/** Validated profile patch — notification is complete when present. */
+export type ValidatedUpdateDiscoveryProfileInput = {
+  name?: string;
+  criteria?: DiscoveryProfile['criteria'];
+  schedule?: DiscoveryProfile['schedule'];
   notification?: DiscoveryProfile['notification'];
 };
 

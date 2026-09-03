@@ -6,6 +6,7 @@ import { clockIso } from '../../scheduler/clock.js';
 import { QueueError } from '../../queue/errors.js';
 import type {
   DiscoveryExecutionQueue,
+  QueueAckOptions,
   QueueClaimOptions,
   RecoverExpiredClaimsResult,
 } from '../../queue/execution-queue.js';
@@ -337,7 +338,7 @@ export function createSqliteExecutionQueue(
       return tx();
     },
 
-    async ack(jobId, finishedAt, options?: QueueClaimOptions) {
+    async ack(jobId, finishedAt, options?: QueueAckOptions) {
       const tx = db.transaction(() => {
         const row = selectById.get(jobId) as JobRow | undefined;
         if (!row) throw new QueueError(`Job not found: ${jobId}`);
@@ -346,15 +347,28 @@ export function createSqliteExecutionQueue(
           throw new QueueError(`Cannot ack job ${jobId} in status ${row.status}`);
         }
         assertClaimOwner(row, options, 'ack');
+        const meta =
+          options?.metadata && Object.keys(options.metadata).length > 0
+            ? {
+                ...deserializeMetadata(row.metadata),
+                ...options.metadata,
+              }
+            : deserializeMetadata(row.metadata);
         db.prepare(
           `UPDATE discovery_execution_jobs
            SET status = 'COMPLETED',
                finished_at = ?,
+               metadata = ?,
                claimed_at = NULL,
                claim_owner = NULL,
                updated_at = ?
            WHERE job_id = ? AND status = 'RUNNING'`
-        ).run(finishedAt, finishedAt, jobId);
+        ).run(
+          finishedAt,
+          serializeMetadata(meta),
+          finishedAt,
+          jobId
+        );
       });
       tx();
     },

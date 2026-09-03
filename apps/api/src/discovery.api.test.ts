@@ -12,6 +12,7 @@ describe('Discovery user API (E9.2 gateway)', () => {
   const dirs: string[] = [];
 
   beforeEach(() => {
+    process.env.DISCOVERY_USE_SMOKE_TRANSPORT = 'true';
     resetDiscoveryRuntimeForTests();
     resetDiscoveryExecutionForTests();
   });
@@ -24,6 +25,7 @@ describe('Discovery user API (E9.2 gateway)', () => {
         /* ignore */
       }
     }
+    delete process.env.DISCOVERY_USE_SMOKE_TRANSPORT;
   });
 
   async function startApp() {
@@ -127,5 +129,54 @@ describe('Discovery user API (E9.2 gateway)', () => {
     expect(results.length).toBeGreaterThan(0);
 
     await app.close();
+  });
+
+  it('exposes emailRecipientConfigured without revealing the address', async () => {
+    const previous = process.env.DISCOVERY_NOTIFICATION_EMAIL;
+    delete process.env.DISCOVERY_NOTIFICATION_EMAIL;
+
+    const app = await startApp();
+    const sessionRes = await app.inject({
+      method: 'POST',
+      url: '/api/sessions',
+      payload: { context: { userProfile: { language: 'en' } } },
+    });
+    const { sessionId } = sessionRes.json() as { sessionId: string };
+
+    await app.inject({
+      method: 'POST',
+      url: '/api/dev/discovery/seed-fixture',
+      headers: { 'x-session-id': sessionId },
+    });
+
+    const unsetRes = await app.inject({
+      method: 'GET',
+      url: '/api/modules/discovery/profiles',
+      headers: { 'x-session-id': sessionId },
+    });
+    expect(unsetRes.statusCode).toBe(200);
+    const unsetBody = unsetRes.json() as {
+      profiles: unknown[];
+      emailRecipientConfigured: boolean;
+    };
+    expect(unsetBody.emailRecipientConfigured).toBe(false);
+    expect(JSON.stringify(unsetBody)).not.toMatch(/DISCOVERY_NOTIFICATION_EMAIL/);
+
+    process.env.DISCOVERY_NOTIFICATION_EMAIL = 'ops@example.com';
+    const setRes = await app.inject({
+      method: 'GET',
+      url: '/api/modules/discovery/profiles',
+      headers: { 'x-session-id': sessionId },
+    });
+    const setBody = setRes.json() as { emailRecipientConfigured: boolean };
+    expect(setBody.emailRecipientConfigured).toBe(true);
+    expect(JSON.stringify(setBody)).not.toContain('ops@example.com');
+
+    await app.close();
+    if (previous === undefined) {
+      delete process.env.DISCOVERY_NOTIFICATION_EMAIL;
+    } else {
+      process.env.DISCOVERY_NOTIFICATION_EMAIL = previous;
+    }
   });
 });

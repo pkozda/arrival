@@ -1,0 +1,95 @@
+# Arrival Atlas — Docker Compose personal staging (single-tenant).
+#
+# Exactly one web, one api, one caddy. Do not scale the API service.
+# Copy deploy/env.example → .env and fill secrets before `docker compose up`.
+
+services:
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      ATLAS_SITE_ADDRESS: ${ATLAS_SITE_ADDRESS:-http://localhost}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        # Same-origin via Caddy `/api/*`. Always empty in this Compose file so a
+        # local-dev `.env` value like http://localhost:3001 is never baked in.
+        NEXT_PUBLIC_API_URL: ""
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    expose:
+      - "3001"
+    environment:
+      NODE_ENV: production
+      HOST: "0.0.0.0"
+      PORT: "3001"
+
+      # Production-mode Discovery safety (H3 / launch gate).
+      ARRIVAL_ATLAS_DEV_TOOLS: "false"
+      # Omit DISCOVERY_USE_SMOKE_TRANSPORT — only "true" enables smoke transport.
+
+      ARRIVAL_ATLAS_STATE_DIR: /data/state
+      ARRIVAL_ATLAS_ACCOUNTS_DIR: /data/accounts
+      ARRIVAL_ATLAS_SESSIONS_DIR: /data/sessions
+      ARRIVAL_ATLAS_ENTITLEMENTS_DIR: /data/entitlements
+
+      # Browser origin as seen through Caddy (not the Next.js :3000 dev origin).
+      CORS_ORIGIN: ${ATLAS_PUBLIC_ORIGIN:-http://localhost}
+      ARRIVAL_ATLAS_AUTH_SECRET: ${ARRIVAL_ATLAS_AUTH_SECRET:?set ARRIVAL_ATLAS_AUTH_SECRET in .env}
+      ARRIVAL_ATLAS_OPS_TOKEN: ${ARRIVAL_ATLAS_OPS_TOKEN:?set ARRIVAL_ATLAS_OPS_TOKEN in .env}
+
+      DISCOVERY_SEARCH_PROVIDER: ${DISCOVERY_SEARCH_PROVIDER:-brave}
+      BRAVE_SEARCH_API_KEY: ${BRAVE_SEARCH_API_KEY:-}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+      BRAVE_SEARCH_BASE_URL: ${BRAVE_SEARCH_BASE_URL:-}
+      TAVILY_SEARCH_BASE_URL: ${TAVILY_SEARCH_BASE_URL:-}
+
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
+
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      DISCOVERY_EMAIL_FROM: ${DISCOVERY_EMAIL_FROM:-}
+      RESEND_BASE_URL: ${RESEND_BASE_URL:-}
+      DISCOVERY_NOTIFICATION_EMAIL: ${DISCOVERY_NOTIFICATION_EMAIL:-}
+
+      ARRIVAL_ATLAS_MULTI_USER: ${ARRIVAL_ATLAS_MULTI_USER:-}
+
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_BASE_URL: ${TELEGRAM_BASE_URL:-}
+    volumes:
+      - atlas_api_data:/data
+    # Single instance only — do not use deploy.replicas > 1 (SQLite + in-process worker).
+
+volumes:
+  atlas_api_data:
+  caddy_data:
+  caddy_config:

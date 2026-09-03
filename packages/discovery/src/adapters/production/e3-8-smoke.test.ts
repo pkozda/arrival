@@ -420,7 +420,9 @@ describe('E3.8 production smoke — failure / cancel / timeout', () => {
       runId: 'run-e38-timeout',
     });
 
-    expect(searchCalls).toBe(1);
+    // Jobs issues job-q1 + job-q2 → exactly two timed-out search HTTP calls (no retry storm)
+    expect(searchCalls).toBe(2);
+    expect(result.queries.map((q) => q.id)).toEqual(['job-q1', 'job-q2']);
     expect(result.batch.active).toHaveLength(0);
     expect(result.run.stats.resultsCreated).toBe(0);
     expect(

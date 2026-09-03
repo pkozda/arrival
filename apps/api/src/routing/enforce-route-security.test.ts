@@ -48,8 +48,22 @@ describe('validateRouteSecurityMap', () => {
 });
 
 describe('RouteSecurityMap', () => {
-  it('classifies every known API route pattern', () => {
-    const routes = [
+  it('classifies every registered API route pattern', async () => {
+    const app = await buildApp();
+    const registeredRoutes = app.registeredRouteManifest;
+
+    for (const route of registeredRoutes) {
+      expect(findMatchingRouteRule(route.method, route.path)).not.toBeNull();
+    }
+
+    expect(RouteSecurityMap.length).toBe(registeredRoutes.length);
+    validateRouteSecurityMap(RouteSecurityMap, [...registeredRoutes]);
+
+    await app.close();
+  });
+
+  it('classifies representative concrete paths for parameterized routes', () => {
+    const samplePaths = [
       ['GET', '/health'],
       ['GET', '/api/health/governance'],
       ['GET', '/api/health/modules'],
@@ -87,13 +101,19 @@ describe('RouteSecurityMap', () => {
       ['POST', '/api/dev/reset-all-state'],
       ['GET', '/api/dev/demo/presets'],
       ['POST', '/api/dev/demo/load-preset'],
+      ['GET', '/api/benefits/max'],
+      ['GET', '/api/modules/discovery/profiles'],
+      ['GET', '/api/modules/discovery/notification-email'],
+      ['PATCH', '/api/modules/discovery/notification-email'],
+      ['GET', '/api/modules/discovery/profiles/profile-1/run-summary'],
+      ['GET', '/api/ops/discovery/health'],
+      ['GET', '/api/ops/discovery/runs/run-1/diagnostics'],
+      ['POST', '/api/ops/discovery/trigger-due-runs'],
     ] as const;
 
-    for (const [method, path] of routes) {
+    for (const [method, path] of samplePaths) {
       expect(findMatchingRouteRule(method, path)).not.toBeNull();
     }
-
-    expect(RouteSecurityMap.length).toBe(routes.length);
   });
 
   it('locks bootstrap contract for all registered Fastify routes', async () => {
@@ -171,6 +191,36 @@ describe('evaluateRouteAccess', () => {
       status: 403,
       error: 'Account access forbidden',
     });
+  });
+
+  it('recognizes ops-token-required without requiring session identity', () => {
+    const result = evaluateRouteAccess(undefined, {
+      method: 'POST',
+      path: '/api/ops/discovery/trigger-due-runs',
+      tier: 'ops-token-required',
+    });
+    expect(result).toEqual({
+      ok: true,
+      rule: {
+        method: 'POST',
+        path: '/api/ops/discovery/trigger-due-runs',
+        tier: 'ops-token-required',
+      },
+    });
+  });
+});
+
+describe('ops-token route map (H3)', () => {
+  it('maps host-global Discovery ops to ops-token-required', () => {
+    expect(findMatchingRouteRule('GET', '/api/ops/discovery/health')?.tier).toBe(
+      'ops-token-required'
+    );
+    expect(
+      findMatchingRouteRule('POST', '/api/ops/discovery/trigger-due-runs')?.tier
+    ).toBe('ops-token-required');
+    expect(
+      findMatchingRouteRule('GET', '/api/ops/discovery/runs/run-1/diagnostics')?.tier
+    ).toBe('account-required');
   });
 });
 

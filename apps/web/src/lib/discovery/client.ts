@@ -3,6 +3,9 @@ import { DiscoveryApiError, isDiscoveryApiErrorCode } from './errors';
 import type {
   CreateDiscoveryProfileInput,
   DiscoveryProfile,
+  DiscoveryProfileResponse,
+  DiscoveryProfilesListResponse,
+  DiscoveryNotificationEmailResponse,
   DiscoveryResultUserView,
   ProfileRunNowResult,
   ProfileRunSummary,
@@ -52,34 +55,30 @@ async function discoveryFetch<T>(
   return (await res.json()) as T;
 }
 
-export async function fetchDiscoveryProfiles(sessionId: string): Promise<DiscoveryProfile[]> {
-  const body = await discoveryFetch<{ profiles: DiscoveryProfile[] }>(
-    '/profiles',
-    sessionId
-  );
-  return body.profiles;
+export async function fetchDiscoveryProfiles(
+  sessionId: string
+): Promise<DiscoveryProfilesListResponse> {
+  return discoveryFetch<DiscoveryProfilesListResponse>('/profiles', sessionId);
 }
 
 export async function fetchDiscoveryProfile(
   sessionId: string,
   profileId: string
-): Promise<DiscoveryProfile> {
-  const body = await discoveryFetch<{ profile: DiscoveryProfile }>(
+): Promise<DiscoveryProfileResponse> {
+  return discoveryFetch<DiscoveryProfileResponse>(
     `/profiles/${encodeURIComponent(profileId)}`,
     sessionId
   );
-  return body.profile;
 }
 
 export async function createDiscoveryProfile(
   sessionId: string,
   input: CreateDiscoveryProfileInput
-): Promise<DiscoveryProfile> {
-  const body = await discoveryFetch<{ profile: DiscoveryProfile }>('/profiles', sessionId, {
+): Promise<DiscoveryProfileResponse> {
+  return discoveryFetch<DiscoveryProfileResponse>('/profiles', sessionId, {
     method: 'POST',
     body: JSON.stringify(input),
   });
-  return body.profile;
 }
 
 export async function enableDiscoveryProfile(
@@ -150,8 +149,8 @@ export async function updateDiscoveryProfile(
   sessionId: string,
   profileId: string,
   input: UpdateDiscoveryProfileInput
-): Promise<DiscoveryProfile> {
-  const body = await discoveryFetch<{ profile: DiscoveryProfile }>(
+): Promise<DiscoveryProfileResponse> {
+  return discoveryFetch<DiscoveryProfileResponse>(
     `/profiles/${encodeURIComponent(profileId)}`,
     sessionId,
     {
@@ -159,7 +158,6 @@ export async function updateDiscoveryProfile(
       body: JSON.stringify(input),
     }
   );
-  return body.profile;
 }
 
 export async function triggerDiscoveryRunNow(
@@ -180,5 +178,28 @@ export async function fetchDiscoveryRunSummary(
   return discoveryFetch<ProfileRunSummary>(
     `/profiles/${encodeURIComponent(profileId)}/run-summary`,
     sessionId
+  );
+}
+
+export async function fetchDiscoveryNotificationEmail(
+  sessionId: string
+): Promise<DiscoveryNotificationEmailResponse> {
+  return discoveryFetch<DiscoveryNotificationEmailResponse>(
+    '/notification-email',
+    sessionId
+  );
+}
+
+export async function updateDiscoveryNotificationEmail(
+  sessionId: string,
+  email: string | null
+): Promise<DiscoveryNotificationEmailResponse> {
+  return discoveryFetch<DiscoveryNotificationEmailResponse>(
+    '/notification-email',
+    sessionId,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ email }),
+    }
   );
 }

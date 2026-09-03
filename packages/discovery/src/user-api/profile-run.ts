@@ -2,6 +2,7 @@ import type { DiscoveryService } from '../service/discovery-service.js';
 import type { DiscoveryProfile } from '../types/profile.js';
 import type { DiscoveryRunStatus } from '../types/run.js';
 import type { ScheduledRunRecord } from '../scheduler/types.js';
+import { syncProfileOperationalSchedule } from './schedule-projection.js';
 
 export type ProfileRunNowStatus =
   | 'skipped'
@@ -27,19 +28,13 @@ export function scheduleIdForProfile(profileId: string): string {
 
 export async function ensureProfileSchedule(
   profile: DiscoveryProfile,
-  discoveryService: DiscoveryService
+  discoveryService: DiscoveryService,
+  now: string = new Date().toISOString()
 ): Promise<string> {
   const scheduleId = scheduleIdForProfile(profile.id);
   const existing = await discoveryService.getSchedule(scheduleId);
   if (!existing) {
-    await discoveryService.registerSchedule({
-      scheduleId,
-      profileId: profile.id,
-      strategyId: profile.strategyId,
-      strategyVersion: profile.strategyVersion,
-      intervalSeconds: 86_400,
-      enabled: true,
-    });
+    await syncProfileOperationalSchedule({ profile, discoveryService, now });
   }
   return scheduleId;
 }

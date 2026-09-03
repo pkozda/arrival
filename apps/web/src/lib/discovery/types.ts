@@ -123,7 +123,25 @@ export type UpdateDiscoveryProfileInput = {
   name?: string;
   criteria?: DiscoveryCriteria;
   schedule?: DiscoveryProfile['schedule'];
-  notification?: DiscoveryProfile['notification'];
+  notification?: Partial<DiscoveryProfile['notification']>;
+};
+
+/** API-only delivery status (not stored on the profile document). */
+export type DiscoveryNotificationDeliveryStatus = {
+  emailRecipientConfigured: boolean;
+};
+
+export type DiscoveryProfilesListResponse = {
+  profiles: DiscoveryProfile[];
+} & DiscoveryNotificationDeliveryStatus;
+
+export type DiscoveryProfileResponse = {
+  profile: DiscoveryProfile;
+} & DiscoveryNotificationDeliveryStatus;
+
+/** Persisted user notification email only — never the infrastructure fallback. */
+export type DiscoveryNotificationEmailResponse = {
+  userNotificationEmail: string | null;
 };
 
 export type CreateDiscoveryProfileInput = {

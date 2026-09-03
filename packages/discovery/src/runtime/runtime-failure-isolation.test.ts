@@ -169,7 +169,9 @@ describe('E4.7 runtime failure isolation', () => {
     const transport = happyPathTransport({
       onSearch: () => {
         searchCalls += 1;
-        if (searchCalls === 1) {
+        // Jobs issues job-q1 then job-q2 per run (2 HTTP searches).
+        // Fail both queries of the first job; succeed both for the second.
+        if (searchCalls <= 2) {
           return { status: 503, bodyText: 'fail' };
         }
         return {
@@ -214,7 +216,8 @@ describe('E4.7 runtime failure isolation', () => {
       await runtime.worker.processNext();
       await runtime.worker.processNext();
 
-      expect(searchCalls).toBe(2);
+      // 2 jobs × 2 Jobs queries = 4 search HTTP calls (no retry storm)
+      expect(searchCalls).toBe(4);
       expect(
         (await runtime.scheduleStore.get('sched-a'))?.runningRunId
       ).toBeNull();

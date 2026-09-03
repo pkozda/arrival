@@ -3,6 +3,7 @@ import { clockIso } from '../../scheduler/clock.js';
 import { QueueError } from '../errors.js';
 import type {
   DiscoveryExecutionQueue,
+  QueueAckOptions,
   QueueClaimOptions,
   QueueRetryOptions,
   RecoverExpiredClaimsResult,
@@ -97,7 +98,7 @@ export function createInMemoryExecutionQueue(
       return clone(running);
     },
 
-    async ack(jobId, finishedAt, _options?: QueueClaimOptions) {
+    async ack(jobId, finishedAt, options?: QueueAckOptions) {
       const job = jobs.get(jobId);
       if (!job) throw new QueueError(`Job not found: ${jobId}`);
       if (job.status === 'COMPLETED') return;
@@ -105,6 +106,10 @@ export function createInMemoryExecutionQueue(
         ...job,
         status: 'COMPLETED',
         finishedAt,
+        metadata: {
+          ...job.metadata,
+          ...options?.metadata,
+        },
       });
       activeRunIds.delete(job.runId);
     },

@@ -5,7 +5,7 @@ import type {
   DiscoveryCriteria,
 } from '../types/criteria.js';
 import type { DiscoveryProfile } from '../types/profile.js';
-import type { CreateDiscoveryProfileInput, UpdateDiscoveryProfileInput } from './types.js';
+import type { CreateDiscoveryProfileInput, ValidatedUpdateDiscoveryProfileInput } from './types.js';
 import { emptyCriteria } from '../types/criteria.js';
 import { DiscoveryUserValidationError } from './errors.js';
 
@@ -114,6 +114,35 @@ function parseNotification(
   };
 }
 
+/** Merge partial notification updates onto existing profile preferences (E10.4). */
+export function parseNotificationPatch(
+  value: unknown,
+  existing: DiscoveryProfile['notification']
+): DiscoveryProfile['notification'] {
+  if (value === undefined) {
+    return { ...existing };
+  }
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new DiscoveryUserValidationError('notification must be an object');
+  }
+  const o = value as Record<string, unknown>;
+  let emailEnabled = existing.emailEnabled;
+  let skipEmptyDigest = existing.skipEmptyDigest;
+  if (o.emailEnabled !== undefined) {
+    if (typeof o.emailEnabled !== 'boolean') {
+      throw new DiscoveryUserValidationError('notification.emailEnabled must be boolean');
+    }
+    emailEnabled = o.emailEnabled;
+  }
+  if (o.skipEmptyDigest !== undefined) {
+    if (typeof o.skipEmptyDigest !== 'boolean') {
+      throw new DiscoveryUserValidationError('notification.skipEmptyDigest must be boolean');
+    }
+    skipEmptyDigest = o.skipEmptyDigest;
+  }
+  return { emailEnabled, skipEmptyDigest };
+}
+
 export function assertStrategyExists(
   registry: StrategyRegistry,
   strategyId: string,
@@ -168,7 +197,7 @@ export function buildCreateProfileInput(
 export function buildUpdateProfileInput(
   body: unknown,
   existing: DiscoveryProfile
-): UpdateDiscoveryProfileInput {
+): ValidatedUpdateDiscoveryProfileInput {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     throw new DiscoveryUserValidationError('Request body must be a JSON object');
   }
@@ -178,7 +207,7 @@ export function buildUpdateProfileInput(
       'strategyId and strategyVersion are immutable after create'
     );
   }
-  const input: UpdateDiscoveryProfileInput = {};
+  const input: ValidatedUpdateDiscoveryProfileInput = {};
   if (o.name !== undefined) {
     if (typeof o.name !== 'string' || !o.name.trim()) {
       throw new DiscoveryUserValidationError('name must be a non-empty string');
@@ -192,7 +221,7 @@ export function buildUpdateProfileInput(
     input.schedule = parseSchedule(o.schedule);
   }
   if (o.notification !== undefined) {
-    input.notification = parseNotification(o.notification);
+    input.notification = parseNotificationPatch(o.notification, existing.notification);
   }
   if (Object.keys(input).length === 0) {
     throw new DiscoveryUserValidationError('No updatable fields provided');

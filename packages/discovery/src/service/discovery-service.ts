@@ -4,6 +4,7 @@ import {
   type DiscoveryRuntimeConfig,
   type DiscoveryRuntimeHealth,
 } from '../runtime/discovery-runtime.js';
+import type { DiscoveryRunDiagnostics } from '../ops/run-diagnostics.js';
 import { DiscoveryRuntimeClosedError } from '../runtime/errors.js';
 import {
   collectConfigSecrets,
@@ -64,6 +65,11 @@ export type DiscoveryService = {
   runNow(input: RunNowInput): Promise<TriggerRunOutcome>;
   /** Read-only run metadata. */
   getRun(runId: string): Promise<ScheduledRunRecord | null>;
+  /**
+   * Operator-safe run diagnostics (E11.2) — durable metadata only.
+   * Returns null when the run is unknown.
+   */
+  getRunDiagnostics(runId: string): Promise<DiscoveryRunDiagnostics | null>;
   /**
    * Delegates to runtime.getHealth() when available.
    * Before start / after stop without runtime: structured UNAVAILABLE (no side effects).
@@ -233,6 +239,11 @@ export function createDiscoveryService(
     async getRun(runId) {
       const rt = assertReady();
       return rt.runStore.get(runId);
+    },
+
+    async getRunDiagnostics(runId) {
+      const rt = assertReady();
+      return rt.getRunDiagnostics(runId);
     },
 
     async getHealth() {

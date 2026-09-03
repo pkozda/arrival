@@ -11,6 +11,16 @@ export {
   createBraveSearchAdapter,
   createProductionSearchAdapter,
 } from './search/brave-search-adapter.js';
+export type { TavilySearchAdapterConfig } from './search/tavily-search-adapter.js';
+export {
+  TAVILY_SEARCH_PROVIDER_ID,
+  createTavilySearchAdapter,
+} from './search/tavily-search-adapter.js';
+export type { DiscoverySearchProviderId } from './search/resolve-discovery-search-provider.js';
+export {
+  DISCOVERY_SEARCH_PROVIDERS,
+  resolveDiscoverySearchProvider,
+} from './search/resolve-discovery-search-provider.js';
 
 export type { ProductionFetchAdapterConfig } from './fetch/http-fetch-adapter.js';
 export {
@@ -39,6 +49,22 @@ export {
   createHttpVerificationAdapter,
   createProductionVerificationAdapter,
 } from './verify/http-verification-adapter.js';
+export {
+  assessIndividualVacancyPage,
+  employerAttributionMatches,
+  employerNameMatchesHost,
+  isEmployerControlledDiscoveryHost,
+  isNonEmployerHost,
+  normalizeEmployerName,
+  resolveExpectedEmployer,
+  selectOfficialEmployerCandidateUrls,
+} from './verify/official-employer-resolution.js';
+export type {
+  EmployerAttributionInput,
+  EmployerAttributionResult,
+  EmployerLinkCandidate,
+  ResolveExpectedEmployerOptions,
+} from './verify/official-employer-resolution.js';
 
 export type { ProductionAiAdapterConfig } from './ai/http-ai-adapter.js';
 export {
@@ -127,6 +153,9 @@ export type {
   SqliteExecutionQueue,
   SqliteSchedulerLockConfig,
   SqliteSchedulerLock,
+  UserNotificationEmailStore,
+  SqliteUserNotificationEmailStoreConfig,
+  SqliteUserNotificationEmailStore,
 } from './persistence/index.js';
 export {
   DISCOVERY_SCHEDULER_SCHEMA_VERSION,
@@ -138,4 +167,6 @@ export {
   createSqliteExecutionQueue,
   DISCOVERY_SCHEDULER_LOCK_SCHEMA_VERSION,
   createSqliteSchedulerLock,
+  DISCOVERY_USER_NOTIFICATION_EMAIL_SCHEMA_VERSION,
+  createSqliteUserNotificationEmailStore,
 } from './persistence/index.js';

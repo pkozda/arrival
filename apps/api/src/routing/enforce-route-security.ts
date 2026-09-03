@@ -78,6 +78,11 @@ export function evaluateRouteAccess(
       }
       return { ok: true, rule };
 
+    case 'ops-token-required':
+      // Token validation is performed in applySecurityPipeline (request headers).
+      // evaluateRouteAccess only confirms the tier is recognized for map tests.
+      return { ok: true, rule };
+
     default: {
       const exhaustive: never = rule.tier;
       throw new Error(`Unknown route security tier: ${exhaustive}`);

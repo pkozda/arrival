@@ -10,6 +10,7 @@ export type AuthErrorKind =
   | 'account_forbidden'
   | 'authentication_required'
   | 'insufficient_account_scope'
+  | 'ops_forbidden'
   | 'unclassified_route';
 
 export type AuthErrorResponse = {
@@ -54,6 +55,11 @@ const AUTH_ERROR_MAP: Record<AuthErrorKind, AuthErrorResponse> = {
   insufficient_account_scope: {
     status: 403,
     error: 'Account access forbidden',
+  },
+  ops_forbidden: {
+    status: 403,
+    error: 'Ops access forbidden',
+    code: 'OPS_FORBIDDEN',
   },
   unclassified_route: {
     status: 500,

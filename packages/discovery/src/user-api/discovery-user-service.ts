@@ -29,6 +29,7 @@ import type {
 } from './types.js';
 import type { DiscoveryService } from '../service/discovery-service.js';
 import { executeProfileRunNow } from './profile-run.js';
+import { syncProfileOperationalSchedule } from './schedule-projection.js';
 
 export type DiscoveryUserServiceDeps = {
   profileStore: ProfileStore;
@@ -90,6 +91,17 @@ export function createDiscoveryUserService(
     return profile;
   }
 
+  async function projectOperationalSchedule(profile: DiscoveryProfile): Promise<void> {
+    if (!deps.discoveryService) {
+      return;
+    }
+    await syncProfileOperationalSchedule({
+      profile,
+      discoveryService: deps.discoveryService,
+      now: clockIso(clock),
+    });
+  }
+
   return {
     async listProfiles(userId) {
       return deps.profileStore.listByUserId(userId);
@@ -124,6 +136,7 @@ export function createDiscoveryUserService(
         updatedAt: now,
       };
       await deps.profileStore.upsert(profile);
+      await projectOperationalSchedule(profile);
       return structuredClone(profile);
     },
 
@@ -146,6 +159,7 @@ export function createDiscoveryUserService(
         updatedAt: now,
       };
       await deps.profileStore.upsert(updated);
+      await projectOperationalSchedule(updated);
       return structuredClone(updated);
     },
 
@@ -160,6 +174,7 @@ export function createDiscoveryUserService(
         updatedAt: clockIso(clock),
       };
       await deps.profileStore.upsert(updated);
+      await projectOperationalSchedule(updated);
       return structuredClone(updated);
     },
 
@@ -174,6 +189,7 @@ export function createDiscoveryUserService(
         updatedAt: clockIso(clock),
       };
       await deps.profileStore.upsert(updated);
+      await projectOperationalSchedule(updated);
       return structuredClone(updated);
     },
 

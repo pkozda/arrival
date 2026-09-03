@@ -14,8 +14,13 @@ import {
 } from '@arrival-atlas/discovery';
 import { getDiscoveryExecutionService } from './discovery-execution-runtime.js';
 
-const DEFAULT_STATE_DIR =
-  process.env.ARRIVAL_ATLAS_STATE_DIR ?? path.join(process.cwd(), '.arrival-atlas-state');
+function resolveStateDir(): string {
+  return process.env.ARRIVAL_ATLAS_STATE_DIR ?? path.join(process.cwd(), '.arrival-atlas-state');
+}
+
+function discoveryDbPath(): string {
+  return path.join(resolveStateDir(), 'discovery.sqlite');
+}
 
 type DiscoveryRuntime = {
   service: DiscoveryUserService;
@@ -32,7 +37,7 @@ function ensureRuntime(): DiscoveryRuntime {
     return runtime;
   }
 
-  const dbPath = path.join(DEFAULT_STATE_DIR, 'discovery.sqlite');
+  const dbPath = discoveryDbPath();
   const profileStore = createSqliteProfilePersistence({ databasePath: dbPath });
   const resultStore = createSqliteResultPersistence({ databasePath: dbPath });
   const schedulerPersistence = createSqliteSchedulerPersistence({ databasePath: dbPath });
@@ -82,7 +87,11 @@ export function getDiscoveryPersistence(): {
   };
 }
 
-/** Session-scoped discovery ownership key (E9.2). */
+/**
+ * Session-scoped discovery ownership key (E9.2).
+ * Notification email settings (E13.3) are keyed by this userId only —
+ * there is no automatic session→account claim/migration.
+ */
 export function resolveDiscoveryUserId(identity: {
   sessionId: string;
   accountId: string | null;

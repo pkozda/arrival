@@ -5,6 +5,8 @@ import {
   createInMemoryExecutionQueue,
   createInMemoryRunStore,
   createInMemoryScheduleStore,
+  parseDiscoveryRunFunnelDiagnostics,
+  FUNNEL_METADATA_KEY,
   type DiscoveryRunExecutor,
   type PipelineExecuteResult,
 } from '../index.js';
@@ -69,7 +71,8 @@ describe('E4.3 discovery execution worker', () => {
     runStore: ReturnType<typeof createInMemoryRunStore>,
     scheduleStore: ReturnType<typeof createInMemoryScheduleStore>,
     runId: string,
-    jobId: string
+    jobId: string,
+    metadata?: Record<string, string>
   ) {
     await scheduleStore.upsert({
       scheduleId: 'sched-1',
@@ -101,6 +104,7 @@ describe('E4.3 discovery execution worker', () => {
       strategyVersion: '1',
       trigger: 'scheduled',
       requestedAt: '2026-08-31T10:00:00.000Z',
+      metadata,
     });
   }
 
@@ -235,6 +239,24 @@ describe('E4.3 discovery execution worker', () => {
     await seedJob(queue, runStore, scheduleStore, 'run-abc', 'job-xyz');
     const result = await worker.processNext();
     expect(result).toMatchObject({ jobId: 'job-xyz', runId: 'run-abc' });
+  });
+
+  it('stores funnel diagnostics in job metadata on completion', async () => {
+    const { queue, runStore, scheduleStore, worker } = harness({
+      executor: fakeExecutor((req) => ({
+        ...successPipeline(req.runId, 'profile-job'),
+        queries: [{ id: 'q1', intent: 'web_search', text: 'engineer hiring DE' }],
+      })),
+    });
+    await seedJob(queue, runStore, scheduleStore, 'run-funnel', 'job-funnel', {
+      existingKey: 'keep-me',
+    });
+    await worker.processNext();
+    const job = await queue.get('job-funnel');
+    expect(job?.metadata?.existingKey).toBe('keep-me');
+    const funnel = parseDiscoveryRunFunnelDiagnostics(job?.metadata?.[FUNNEL_METADATA_KEY]);
+    expect(funnel?.queries).toEqual([{ id: 'q1', text: 'engineer hiring DE' }]);
+    expect(funnel?.stats.candidatesFound).toBe(1);
   });
 
   it('does not re-execute already-finished run', async () => {

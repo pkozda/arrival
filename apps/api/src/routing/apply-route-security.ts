@@ -5,6 +5,7 @@ import { buildAuthContext } from '../auth/auth.context.js';
 import { hasLegacySessionCredential } from '../auth/legacy-auth-adapter.js';
 import type { AuthContext } from '../auth/auth.types.js';
 import type { ResolvedIdentity } from '../auth/resolved-identity.js';
+import { evaluateOpsTokenAccess } from '../auth/ops-token.js';
 import { evaluateTokenAccountSemantics } from '../auth/token-account-semantics.js';
 import { AccountAccessForbiddenError, validateAccountAccess } from '../authz/account-session.guard.js';
 import { emitIAMEvent, IAMEventType, type IAMEventLogger } from '../observability/iam-events.js';
@@ -91,6 +92,10 @@ export function sendRouteSecurityError(
   }
 
   if (denied.status === 403) {
+    if (denied.code === 'OPS_FORBIDDEN') {
+      sendAuthError(reply, 'ops_forbidden');
+      return;
+    }
     sendAuthError(reply, 'insufficient_account_scope');
     return;
   }
@@ -230,6 +235,20 @@ export async function applySecurityPipeline(
     const access = evaluateRouteAccess(undefined, activeRule);
     if (!access.ok) {
       sendRouteSecurityError(reply, access);
+      return false;
+    }
+    return true;
+  }
+
+  if (activeRule.tier === 'ops-token-required') {
+    const opsAccess = evaluateOpsTokenAccess(request);
+    if (!opsAccess.ok) {
+      sendRouteSecurityError(reply, {
+        ok: false,
+        status: 403,
+        error: 'Ops access forbidden',
+        code: 'OPS_FORBIDDEN',
+      });
       return false;
     }
     return true;

@@ -370,6 +370,20 @@ function applyStructuredHints(
         (types.has('Organization') ? asString(obj.name) : undefined);
       if (org && !fields.organization) fields.organization = org;
 
+      const jobPostingUrl =
+        asString(obj.url) || asString(obj.sameAs) || asString(obj.mainEntityOfPage);
+      if (jobPostingUrl && !fields.jobPostingUrl && types.has('JobPosting')) {
+        fields.jobPostingUrl = jobPostingUrl;
+      }
+
+      const hiringOrganizationUrl =
+        asString(nested(obj.hiringOrganization, 'url')) ||
+        asString(nested(obj.hiringOrganization, 'sameAs')) ||
+        asString(nested(obj.organizer, 'url'));
+      if (hiringOrganizationUrl && !fields.hiringOrganizationUrl) {
+        fields.hiringOrganizationUrl = hiringOrganizationUrl;
+      }
+
       const location =
         asString(nested(obj.jobLocation, 'address', 'addressLocality')) ||
         asString(nested(obj.jobLocation, 'name')) ||

@@ -18,6 +18,11 @@ import {
   type ExecutionRetryConfig,
 } from './execution-retry-policy.js';
 import type { TelemetryEmitter } from '../telemetry/emitter.js';
+import {
+  buildDiscoveryRunFunnelDiagnostics,
+  serializeDiscoveryRunFunnelDiagnostics,
+  FUNNEL_METADATA_KEY,
+} from '../ops/run-funnel-diagnostics.js';
 
 export type DiscoveryExecutionWorker = {
   processNext(): Promise<WorkerProcessResult>;
@@ -27,6 +32,8 @@ export type DiscoveryExecutionWorker = {
 export type NotificationTarget = {
   recipient: NotificationRecipient;
   channel: NotificationChannel;
+  /** Profile notification.skipEmptyDigest — forwarded to deliverDigest (E10.4). */
+  skipEmptyDigest?: boolean;
 };
 
 export type DiscoveryExecutionWorkerConfig = {
@@ -45,7 +52,7 @@ export type DiscoveryExecutionWorkerConfig = {
   resolveNotificationTarget?: (input: {
     profileId: string;
     runId: string;
-  }) => NotificationTarget | null;
+  }) => NotificationTarget | null | Promise<NotificationTarget | null>;
   /**
    * Durable execution retry policy (E5.4).
    * When omitted, uses default engine-wide policy.
@@ -103,13 +110,14 @@ export function createDiscoveryExecutionWorker(
     ) {
       return;
     }
-    const target = resolveNotificationTarget({ profileId, runId });
+    const target = await Promise.resolve(resolveNotificationTarget({ profileId, runId }));
     if (!target) return;
     try {
       await notificationService.deliverDigest({
         digest: pipelineResult.digest,
         recipient: target.recipient,
         channel: target.channel,
+        skipEmptyDigest: target.skipEmptyDigest,
       });
     } catch {
       // Notification failures must not corrupt discovery lifecycle.
@@ -196,7 +204,14 @@ export function createDiscoveryExecutionWorker(
 
       await tryDeliverNotifications(pipelineResult, job.profileId, job.runId);
 
-      await queue.ack(job.jobId, finishedAt, claim);
+      const funnel = buildDiscoveryRunFunnelDiagnostics(pipelineResult);
+      await queue.ack(job.jobId, finishedAt, {
+        ...claim,
+        metadata: {
+          ...job.metadata,
+          [FUNNEL_METADATA_KEY]: serializeDiscoveryRunFunnelDiagnostics(funnel),
+        },
+      });
       await clearLockForJob(job.scheduleId, job.runId, finishedAt);
 
       const durationMs = Math.max(0, clock.now().getTime() - workerStartedMs);

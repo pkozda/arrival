@@ -234,6 +234,206 @@ describe('E4.3 discovery scheduler (enqueue-only)', () => {
   });
 });
 
+describe('H1 scheduler lock & at-least-once hardening', () => {
+  function harness(start = '2026-08-31T10:00:00.000Z') {
+    const clock = createFakeClock(start);
+    const scheduleStore = createInMemoryScheduleStore();
+    const runStore = createInMemoryRunStore();
+    const queue = createInMemoryExecutionQueue();
+    const scheduler = createDiscoveryScheduler({
+      scheduleStore,
+      runStore,
+      queue,
+      clock,
+      runIdGenerator: createIncrementingRunIdGenerator('h1-run'),
+      jobIdGenerator: createIncrementingJobIdGenerator('h1-job'),
+    });
+    return { clock, scheduleStore, runStore, queue, scheduler };
+  }
+
+  it('registerSchedule re-projection preserves active runningRunId', async () => {
+    const { scheduleStore, scheduler } = harness();
+    await scheduler.registerSchedule({
+      scheduleId: 'sched-lock',
+      profileId: 'profile-job',
+      strategyId: 'job-discovery',
+      strategyVersion: '1',
+      intervalSeconds: 3600,
+      nextRunAt: '2026-08-31T10:00:00.000Z',
+    });
+    await scheduleStore.upsert({
+      ...(await scheduleStore.get('sched-lock'))!,
+      runningRunId: 'run-A',
+    });
+
+    const updated = await scheduler.registerSchedule({
+      scheduleId: 'sched-lock',
+      profileId: 'profile-job',
+      strategyId: 'job-discovery',
+      strategyVersion: '1',
+      intervalSeconds: 7200,
+      enabled: true,
+      nextRunAt: '2026-08-31T14:00:00.000Z',
+    });
+
+    expect(updated.runningRunId).toBe('run-A');
+    expect(updated.interval.intervalSeconds).toBe(7200);
+    expect(updated.nextRunAt).toBe('2026-08-31T14:00:00.000Z');
+    expect((await scheduleStore.get('sched-lock'))?.runningRunId).toBe('run-A');
+  });
+
+  it('active runningRunId prevents a second due enqueue', async () => {
+    const { scheduleStore, queue, runStore, scheduler } = harness();
+    await scheduler.registerSchedule({
+      scheduleId: 'sched-active',
+      profileId: 'profile-job',
+      strategyId: 'job-discovery',
+      strategyVersion: '1',
+      intervalSeconds: 3600,
+      nextRunAt: '2026-08-31T10:00:00.000Z',
+    });
+    await scheduleStore.upsert({
+      ...(await scheduleStore.get('sched-active'))!,
+      runningRunId: 'run-A',
+    });
+
+    const tick = await scheduler.triggerDueRuns();
+    expect(tick.outcomes).toHaveLength(0);
+    expect(queue.size()).toBe(0);
+    expect(runStore.snapshot()).toHaveLength(0);
+    expect((await scheduleStore.get('sched-active'))?.runningRunId).toBe('run-A');
+  });
+
+  it('scheduled claim advances nextRunAt atomically; manual does not', async () => {
+    const { scheduleStore, scheduler } = harness();
+    await scheduler.registerSchedule({
+      scheduleId: 'sched-daily',
+      profileId: 'profile-job',
+      strategyId: 'job-discovery',
+      strategyVersion: '1',
+      intervalSeconds: 86400,
+      nextRunAt: '2026-08-31T10:00:00.000Z',
+    });
+
+    const tick = await scheduler.triggerDueRuns();
+    expect(tick.outcomes[0]).toMatchObject({ kind: 'enqueued', trigger: 'scheduled' });
+    const afterDue = await scheduleStore.get('sched-daily');
+    expect(afterDue?.nextRunAt).toBe('2026-09-01T10:00:00.000Z');
+    expect(afterDue?.runningRunId).toBeTruthy();
+
+    await scheduleStore.clearRunningLock(
+      'sched-daily',
+      '2026-08-31T10:05:00.000Z',
+      afterDue!.runningRunId!
+    );
+
+    const manualNext = '2026-09-01T10:00:00.000Z';
+    const manual = await scheduler.triggerNow('sched-daily');
+    expect(manual).toMatchObject({ kind: 'enqueued', trigger: 'manual' });
+    expect((await scheduleStore.get('sched-daily'))?.nextRunAt).toBe(manualNext);
+  });
+
+  it('crash after claim+advance does not re-due the same slot once lock clears', async () => {
+    const { clock, scheduleStore, queue, runStore, scheduler } = harness();
+    await scheduler.registerSchedule({
+      scheduleId: 'sched-crash',
+      profileId: 'profile-job',
+      strategyId: 'job-discovery',
+      strategyVersion: '1',
+      intervalSeconds: 3600,
+      nextRunAt: '2026-08-31T10:00:00.000Z',
+    });
+
+    // Successful scheduled enqueue advances nextRunAt in the same claim.
+    const first = await scheduler.triggerDueRuns();
+    expect(first.outcomes[0]).toMatchObject({ kind: 'enqueued' });
+    const runId =
+      first.outcomes[0]?.kind === 'enqueued' ? first.outcomes[0].runId : '';
+    expect((await scheduleStore.get('sched-crash'))?.nextRunAt).toBe(
+      '2026-08-31T11:00:00.000Z'
+    );
+
+    // Simulate interruption after enqueue: drop the queued job (lost in-flight),
+    // then clear the lock as a completed/abandoned worker would.
+    // nextRunAt must remain advanced so the same slot is not claimed again.
+    while (queue.size() > 0) {
+      const job = await queue.dequeue({ workerId: 'crash-sim' });
+      if (!job) break;
+      await queue.ack(job.jobId, clock.now().toISOString());
+    }
+    await scheduleStore.clearRunningLock('sched-crash', clock.now().toISOString(), runId);
+
+    clock.set('2026-08-31T10:30:00.000Z');
+    const recovery = await scheduler.triggerDueRuns();
+    expect(recovery.outcomes).toHaveLength(0);
+    expect(runStore.snapshot()).toHaveLength(1);
+    expect((await scheduleStore.get('sched-crash'))?.nextRunAt).toBe(
+      '2026-08-31T11:00:00.000Z'
+    );
+    expect((await scheduleStore.get('sched-crash'))?.runningRunId).toBeNull();
+  });
+
+  it('completion clearRunningLock clears the active run lock', async () => {
+    const { scheduleStore, scheduler } = harness();
+    await scheduler.registerSchedule({
+      scheduleId: 'sched-done',
+      profileId: 'profile-job',
+      strategyId: 'job-discovery',
+      strategyVersion: '1',
+      intervalSeconds: 3600,
+      nextRunAt: '2026-08-31T10:00:00.000Z',
+    });
+    const tick = await scheduler.triggerDueRuns();
+    const runId =
+      tick.outcomes[0]?.kind === 'enqueued' ? tick.outcomes[0].runId : '';
+    expect((await scheduleStore.get('sched-done'))?.runningRunId).toBe(runId);
+
+    await scheduleStore.clearRunningLock('sched-done', '2026-08-31T10:05:00.000Z', runId);
+    expect((await scheduleStore.get('sched-done'))?.runningRunId).toBeNull();
+  });
+
+  it('tryClaim with nextRunAt atomically consumes the due slot before enqueue', async () => {
+    const { scheduleStore } = harness();
+    await scheduleStore.upsert({
+      scheduleId: 'sched-atomic',
+      profileId: 'profile-job',
+      strategyId: 'job-discovery',
+      strategyVersion: '1',
+      enabled: true,
+      interval: { kind: 'fixed_interval', intervalSeconds: 3600 },
+      timezone: 'UTC',
+      nextRunAt: '2026-08-31T10:00:00.000Z',
+      createdAt: '2026-08-31T09:00:00.000Z',
+      updatedAt: '2026-08-31T09:00:00.000Z',
+      runningRunId: null,
+    });
+
+    const claimed = await scheduleStore.tryClaim(
+      'sched-atomic',
+      'run-pre-enqueue',
+      '2026-08-31T10:00:00.000Z',
+      {
+        requireDue: true,
+        nextRunAt: '2026-08-31T11:00:00.000Z',
+      }
+    );
+    expect(claimed).toBe(true);
+    const mid = await scheduleStore.get('sched-atomic');
+    expect(mid?.runningRunId).toBe('run-pre-enqueue');
+    expect(mid?.nextRunAt).toBe('2026-08-31T11:00:00.000Z');
+
+    // Crash before enqueue: clear lock. Slot must not be due again.
+    await scheduleStore.clearRunningLock(
+      'sched-atomic',
+      '2026-08-31T10:01:00.000Z',
+      'run-pre-enqueue'
+    );
+    expect(await scheduleStore.getDueSchedules('2026-08-31T10:30:00.000Z')).toHaveLength(
+      0
+    );
+  });
+});
+
 function jobProfile(overrides?: Partial<DiscoveryProfile>): DiscoveryProfile {
   return {
     id: 'profile-job',

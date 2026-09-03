@@ -14,7 +14,7 @@ tags:
   - epic
   - roadmap
 created: 2026-08-30
-updated: 2026-09-01
+updated: 2026-09-02
 depends_on:
   - personal-discovery-engine-architecture
   - adr-006-personal-discovery-engine-boundaries
@@ -31,7 +31,7 @@ related:
 **Pipeline contract:** [personal-discovery-engine-pipeline.md](./personal-discovery-engine-pipeline.md)  
 **Strategy contract:** [personal-discovery-engine-strategy-contract.md](./personal-discovery-engine-strategy-contract.md)  
 **MVP slice:** [personal-discovery-engine-mvp.md](./personal-discovery-engine-mvp.md)  
-**Status:** Active — E1–E9 functionally closed; E10–E11 remain
+**Status:** Active — E1–E10 functionally closed; **E11** remains
 
 Effort scale: **S** ≤1 sprint · **M** 1–2 sprints · **L** 2–4 sprints  
 Risk: Low / Medium / High
@@ -224,7 +224,7 @@ MVP ships a vertical slice through **E1–E10** for Jobs + Giveaways (see MVP do
 
 **Architectural note:** `DiscoveryProfile.schedule` is declarative product intent. It does **not** directly drive the operational scheduler. Hosts/service may project profile intent into `DiscoveryScheduleRecord`.
 
-**Deferred by design:** cron daemon, automatic profile-schedule projection, timezone-aware daily slots, Redis/distributed scheduler redesign.
+**Deferred by design:** cron daemon, timezone-aware daily slots beyond UTC projection, Redis/distributed scheduler redesign. Automatic profile-schedule projection → **E10.2**.
 
 **Exit criteria:** Enabled profile runs on schedule; disabled profile skipped; overlapping run rejected or coalesced. **Met** — see `packages/discovery/src/scheduler/scheduler.test.ts` (`E8 profile enabled gate`) and existing E4.2/E5 scheduler tests.
 
@@ -263,27 +263,48 @@ MVP ships a vertical slice through **E1–E10** for Jobs + Giveaways (see MVP do
 - Run now reuses `DiscoveryService.runNow` + `processNext()` — no cron daemon or scheduler redesign.
 - `changedFields` are computed in E7 and projected through the user API; web does not recompute novelty.
 
-**Deferred by design:** automatic `DiscoveryProfile.schedule` projection; rich/advanced criteria editor; CandidateStore/DigestStore/full DiscoveryRun archival; E10 digest/notification UI; module catalog/home-card work; cron/Redis.
+**Deferred by design:** automatic `DiscoveryProfile.schedule` projection (→ **E10.2**); rich/advanced criteria editor; CandidateStore/DigestStore/full DiscoveryRun archival; module catalog/home-card work; cron/Redis.
 
 **Exit criteria:** User can create profile, edit criteria, trigger a run, inspect evidence and changed fields, update user state, and reload with persisted state — within Atlas chrome / i18n conventions. **Met** — see verification table in [E9 ADR](../adr/adr-006-addendum-e9-discovery-ui.md).
 
 ---
 
-## E10 — Daily Digest / Email
+## E10 — Notification & Automated Delivery
 
 **Objective:** First automated delivery channel; attention-optimized.  
 **Effort:** M · **Risk:** Medium  
 **Depends on:** E7, E8, digest domain (E1)  
+**Status:** **Functional closure complete** (see [ADR-006 addendum — E10](../adr/adr-006-addendum-e10-notifications.md))
 
 **Contains:**
 
 - digest builder from NEW / UPDATED results
 - email template (attention-first copy)
 - zero-result policy (skip empty emails by default)
-- unsubscribe / preference hooks
+- notification preference hooks (`emailEnabled`, `skipEmptyDigest`)
+- Atlas host-triggered daily execution path
 
-**Exit criteria:** Non-empty digest email only when warrants attention; UI still shows last scan stats when email skipped.
+**Implemented (functional closure):**
 
+| Slice | Delivered |
+|-------|-----------|
+| **E10.1** | Atlas notification wiring — composition-root recipient resolution, worker → `NotificationService` → email adapter, NOTIFIED write-back, idempotent delivery |
+| **E10.2** | Profile schedule projection — `DiscoveryProfile.schedule` → operational `DiscoveryScheduleRecord`; daily cadence projected; manual/weekly non-automatic |
+| **E10.3** | Atlas host tick — `executeDiscoveryHostTick()`, `POST /api/ops/discovery/trigger-due-runs`; reuses E8 `triggerDueRuns()` + queue/worker; no in-process cron |
+| **E10.4** | Notification preferences — partial profile API patch + Discovery UI toggles; `skipEmptyDigest` wired to plan-builder; E7 UNCHANGED suppression preserved |
+
+**Architectural notes:**
+
+- Single delivery path: Profile → schedule → host tick → pipeline → digest → `NotificationService` → email → SENT → NOTIFIED.
+- No second scheduler, DigestStore, or notification redesign.
+- Recipient resolution at Atlas composition root (env/test override today; account email deferred).
+- UI still shows last-scan / zero-new summary when email is skipped (E9 run summary surfaces).
+
+**Deferred by design:** account-linked recipient email; unsubscribe / List-Unsubscribe headers; localized email templates; self-serve daily/weekly schedule UI; weekly operational recurrence.
+
+**Outside E10:** production platform cron configuration; Resend/sender deployment.
+
+**Exit criteria:** Non-empty digest email only when warrants attention; UI still shows last scan stats when email skipped; user can persist notification preferences. **Met** — see verification table in [E10 ADR](../adr/adr-006-addendum-e10-notifications.md).
 ---
 
 ## E11 — Production Hardening
@@ -301,6 +322,24 @@ MVP ships a vertical slice through **E1–E10** for Jobs + Giveaways (see MVP do
 - strategy version migration notes
 
 **Exit criteria:** Run cost/latency/rejection reasons queryable; injection regression tests green; rate limits documented.
+
+### E11.1 — Atlas ops health (complete)
+
+- `GET /api/ops/discovery/health` — `ops-token-required` (`ARRIVAL_ATLAS_OPS_TOKEN`); exposes E5.6 `DiscoveryRuntimeHealth` via execution runtime (no SQLite reads in route). Host-global; ordinary accounts rejected.
+
+### H3 — Ops security & delivery boundary (complete)
+
+- Host-global ops (`trigger-due-runs`, `health`) require `ARRIVAL_ATLAS_OPS_TOKEN` (Bearer or `x-arrival-ops-token`); fail-closed when unset.
+- `DISCOVERY_NOTIFICATION_EMAIL` remains single-tenant / personal Atlas fallback only; disabled when `ARRIVAL_ATLAS_MULTI_USER=true`. Never exposed to clients.
+- Run diagnostics remain `account-required` + ownership-scoped.
+
+### E11.2 — Run diagnostics (complete — with deferred metrics)
+
+- `GET /api/ops/discovery/runs/:runId/diagnostics` — `account-required`; run ownership via profile → `userId`; foreign runs return **404**.
+- Reuses `DiscoveryService.getRunDiagnostics()` → durable `ScheduledRunRecord`, result promotion counts (`promotedFromRunId`), notification status (`findByRunId`).
+- **Exposed:** run identity, status, trigger, timestamps, skip/error, result novelty counts (new/updated from persisted results), notification status/channel/failure code, configured AI evaluation budget (`maxEvaluations`).
+- **Not exposed:** emails, tokens, API keys, raw discovery content, filesystem/DB paths, stack traces, notification payload/recipient.
+- **Deferred (not durably persisted today):** per-run pipeline stage counts (collected/validated/rejected), rejection-reason histograms, per-run AI evaluation usage, unchanged-result counts, notification SKIPPED when no notification record was written.
 
 ---
 

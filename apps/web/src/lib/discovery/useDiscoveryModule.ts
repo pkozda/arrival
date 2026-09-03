@@ -5,21 +5,25 @@ import {
   createDiscoveryProfile,
   disableDiscoveryProfile,
   enableDiscoveryProfile,
+  fetchDiscoveryNotificationEmail,
   fetchDiscoveryProfiles,
   fetchDiscoveryResult,
   fetchDiscoveryResults,
   fetchDiscoveryRunSummary,
   triggerDiscoveryRunNow,
+  updateDiscoveryNotificationEmail,
   updateDiscoveryProfile,
   updateDiscoveryResultUserState,
-  type CreateDiscoveryProfileInput,
-  type DiscoveryProfile,
-  type DiscoveryResultUserView,
-  type ProfileRunNowResult,
-  type ProfileRunSummary,
-  type ResultState,
-  type UpdateDiscoveryProfileInput,
 } from './client';
+import type {
+  CreateDiscoveryProfileInput,
+  DiscoveryProfile,
+  DiscoveryResultUserView,
+  ProfileRunNowResult,
+  ProfileRunSummary,
+  ResultState,
+  UpdateDiscoveryProfileInput,
+} from './types';
 import { DiscoveryApiError } from './errors';
 
 export type RunNowUiStatus = 'idle' | 'running' | 'success' | 'error';
@@ -40,12 +44,23 @@ export type DiscoveryModuleState = {
   runNowResult: ProfileRunNowResult | null;
   stateUpdateError: string | null;
   stateUpdating: boolean;
+  /** From API; whether an operational notification recipient is configured. */
+  emailRecipientConfigured: boolean | null;
+  /** Persisted user email only; null when unset or not yet successfully loaded. */
+  userNotificationEmail: string | null;
+  /** True after a successful GET of the user notification email resource. */
+  userNotificationEmailKnown: boolean;
+  userNotificationEmailLoading: boolean;
+  userNotificationEmailLoadError: string | null;
+  notificationEmailSaving: boolean;
+  notificationEmailError: string | null;
   refetch: () => Promise<void>;
   selectProfile: (profileId: string) => Promise<void>;
   selectResult: (resultId: string) => Promise<void>;
   createProfile: (input: CreateDiscoveryProfileInput) => Promise<void>;
   updateProfile: (profileId: string, input: UpdateDiscoveryProfileInput) => Promise<void>;
   setProfileEnabled: (profileId: string, enabled: boolean) => Promise<void>;
+  setUserNotificationEmail: (email: string | null) => Promise<void>;
   runNow: () => Promise<void>;
   updateUserState: (userState: ResultState) => Promise<void>;
 };
@@ -78,6 +93,17 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
   const [runNowResult, setRunNowResult] = useState<ProfileRunNowResult | null>(null);
   const [stateUpdateError, setStateUpdateError] = useState<string | null>(null);
   const [stateUpdating, setStateUpdating] = useState(false);
+  const [emailRecipientConfigured, setEmailRecipientConfigured] = useState<boolean | null>(
+    null
+  );
+  const [userNotificationEmail, setUserNotificationEmailState] = useState<string | null>(null);
+  const [userNotificationEmailKnown, setUserNotificationEmailKnown] = useState(false);
+  const [userNotificationEmailLoading, setUserNotificationEmailLoading] = useState(true);
+  const [userNotificationEmailLoadError, setUserNotificationEmailLoadError] = useState<
+    string | null
+  >(null);
+  const [notificationEmailSaving, setNotificationEmailSaving] = useState(false);
+  const [notificationEmailError, setNotificationEmailError] = useState<string | null>(null);
 
   const selectedProfile = useMemo(
     () => profiles.find((p) => p.id === selectedProfileId) ?? null,
@@ -103,18 +129,38 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
     if (!sessionId) {
       setLoading(false);
       setUnauthorized(true);
+      setUserNotificationEmailLoading(false);
       return;
     }
 
     setLoading(true);
     setError(null);
     setUnauthorized(false);
+    setUserNotificationEmailLoading(true);
+    setUserNotificationEmailLoadError(null);
 
     try {
-      const nextProfiles = await fetchDiscoveryProfiles(sessionId);
-      setProfiles(nextProfiles);
+      const [list, emailRes] = await Promise.all([
+        fetchDiscoveryProfiles(sessionId),
+        fetchDiscoveryNotificationEmail(sessionId).then(
+          (res) => ({ ok: true as const, res }),
+          (err: unknown) => ({ ok: false as const, err })
+        ),
+      ]);
+      setProfiles(list.profiles);
+      setEmailRecipientConfigured(list.emailRecipientConfigured);
 
-      const profileId = selectedProfileId ?? nextProfiles[0]?.id ?? null;
+      if (emailRes.ok) {
+        setUserNotificationEmailState(emailRes.res.userNotificationEmail);
+        setUserNotificationEmailKnown(true);
+        setUserNotificationEmailLoadError(null);
+      } else {
+        const mapped = mapError(emailRes.err);
+        setUserNotificationEmailLoadError(mapped.message);
+        // Do not overwrite a previously known email with null on GET failure.
+      }
+
+      const profileId = selectedProfileId ?? list.profiles[0]?.id ?? null;
       setSelectedProfileId(profileId);
 
       if (profileId) {
@@ -135,6 +181,7 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
       setUnauthorized(mapped.unauthorized);
     } finally {
       setLoading(false);
+      setUserNotificationEmailLoading(false);
     }
   }, [sessionId, selectedProfileId, selectedResultId, loadProfileDetail]);
 
@@ -182,10 +229,11 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
       setLoading(true);
       setError(null);
       try {
-        const profile = await createDiscoveryProfile(sessionId, input);
-        setProfiles((prev) => [...prev, profile]);
-        setSelectedProfileId(profile.id);
-        await loadProfileDetail(profile.id);
+        const created = await createDiscoveryProfile(sessionId, input);
+        setProfiles((prev) => [...prev, created.profile]);
+        setEmailRecipientConfigured(created.emailRecipientConfigured);
+        setSelectedProfileId(created.profile.id);
+        await loadProfileDetail(created.profile.id);
       } catch (err) {
         const mapped = mapError(err);
         setError(mapped.message);
@@ -219,12 +267,22 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
   const updateProfileAction = useCallback(
     async (profileId: string, input: UpdateDiscoveryProfileInput) => {
       if (!sessionId) return;
-      setLoading(true);
+      const quiet =
+        input.notification !== undefined &&
+        input.name === undefined &&
+        input.criteria === undefined &&
+        input.schedule === undefined;
+      if (!quiet) {
+        setLoading(true);
+      }
       setError(null);
       try {
-        const profile = await updateDiscoveryProfile(sessionId, profileId, input);
-        setProfiles((prev) => prev.map((p) => (p.id === profile.id ? profile : p)));
-        if (selectedProfileId === profileId) {
+        const updated = await updateDiscoveryProfile(sessionId, profileId, input);
+        setProfiles((prev) =>
+          prev.map((p) => (p.id === updated.profile.id ? updated.profile : p))
+        );
+        setEmailRecipientConfigured(updated.emailRecipientConfigured);
+        if (selectedProfileId === profileId && !quiet) {
           await loadProfileDetail(profileId);
         }
       } catch (err) {
@@ -232,7 +290,9 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
         setError(mapped.message);
         throw err;
       } finally {
-        setLoading(false);
+        if (!quiet) {
+          setLoading(false);
+        }
       }
     },
     [sessionId, selectedProfileId, loadProfileDetail]
@@ -284,6 +344,36 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
     [sessionId, selectedProfileId, selectedResultId]
   );
 
+  const setUserNotificationEmail = useCallback(
+    async (email: string | null) => {
+      if (!sessionId || notificationEmailSaving) return;
+      setNotificationEmailSaving(true);
+      setNotificationEmailError(null);
+      try {
+        const updated = await updateDiscoveryNotificationEmail(sessionId, email);
+        setUserNotificationEmailState(updated.userNotificationEmail);
+        setUserNotificationEmailKnown(true);
+        if (updated.userNotificationEmail) {
+          setEmailRecipientConfigured(true);
+        } else {
+          try {
+            const list = await fetchDiscoveryProfiles(sessionId);
+            setEmailRecipientConfigured(list.emailRecipientConfigured);
+          } catch {
+            /* leave prior delivery flag */
+          }
+        }
+      } catch (err) {
+        const mapped = mapError(err);
+        setNotificationEmailError(mapped.message);
+        throw err;
+      } finally {
+        setNotificationEmailSaving(false);
+      }
+    },
+    [sessionId, notificationEmailSaving]
+  );
+
   return {
     loading,
     error,
@@ -300,12 +390,20 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
     runNowResult,
     stateUpdateError,
     stateUpdating,
+    emailRecipientConfigured,
+    userNotificationEmail,
+    userNotificationEmailKnown,
+    userNotificationEmailLoading,
+    userNotificationEmailLoadError,
+    notificationEmailSaving,
+    notificationEmailError,
     refetch,
     selectProfile,
     selectResult,
     createProfile: createProfileAction,
     updateProfile: updateProfileAction,
     setProfileEnabled,
+    setUserNotificationEmail,
     runNow,
     updateUserState,
   };

@@ -48,6 +48,7 @@ export function createDiscoveryNotificationService(
       digest: input.digest,
       recipient: input.recipient,
       channel: input.channel,
+      skipEmptyDigest: input.skipEmptyDigest,
     });
     if (!plan) {
       telemetry?.emit({

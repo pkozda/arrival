@@ -48,6 +48,7 @@ export function validateRouteSecurityMap(
   }
 }
 
+// One map entry per secured Fastify route — validated at bootstrap via validateRouteSecurityMap().
 const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
   {
     method: 'GET',
@@ -327,6 +328,18 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
   },
   {
     method: 'GET',
+    path: '/api/modules/discovery/notification-email',
+    tier: 'credential-required',
+    description: 'Discovery: get current user notification email',
+  },
+  {
+    method: 'PATCH',
+    path: '/api/modules/discovery/notification-email',
+    tier: 'credential-required',
+    description: 'Discovery: set or clear current user notification email',
+  },
+  {
+    method: 'GET',
     path: '/api/modules/discovery/profiles',
     tier: 'credential-required',
     description: 'Discovery: list user profiles',
@@ -396,6 +409,25 @@ const ROUTE_SECURITY_MAP_SOURCE: RouteSecurityRule[] = [
     path: '/api/dev/discovery/seed-fixture',
     tier: 'credential-required',
     description: 'Dev-only: seed discovery E2E fixture',
+  },
+  {
+    method: 'GET',
+    path: '/api/ops/discovery/health',
+    tier: 'ops-token-required',
+    description: 'Ops: Discovery runtime health snapshot (E5.6 getHealth) — host-global',
+  },
+  {
+    method: 'GET',
+    path: '/api/ops/discovery/runs/:runId/diagnostics',
+    tier: 'account-required',
+    description: 'Ops: Discovery run diagnostic summary (E11.2)',
+  },
+  {
+    method: 'POST',
+    path: '/api/ops/discovery/trigger-due-runs',
+    tier: 'ops-token-required',
+    description:
+      'Ops: pull-driven Discovery scheduler tick (triggerDueRuns + worker drain) — host-global',
   },
 ];
 

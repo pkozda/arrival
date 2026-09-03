@@ -10,11 +10,21 @@ import {
   buildCreateProfileInput,
   buildUpdateProfileInput,
   criteriaCountry,
+  criteriaExcludedRoles,
   criteriaRole,
+  defaultNotificationDraft,
+  defaultScheduleDraft,
+  notificationDraftFromProfile,
+  scheduleDraftFromProfile,
   strategyTemplateFromProfile,
   useDiscoveryModule,
   type DiscoveryStrategyTemplate,
+  type NotificationDraft,
+  type ScheduleDraft,
 } from '@/lib/discovery';
+import { DiscoveryExcludedRolesField } from './DiscoveryExcludedRolesField';
+import { DiscoveryNotificationField } from './DiscoveryNotificationField';
+import { DiscoveryScheduleField } from './DiscoveryScheduleField';
 import { DiscoveryProfilePanel } from './DiscoveryProfilePanel';
 import { DiscoveryProfileSidebar } from './DiscoveryProfileSidebar';
 import { DiscoveryResultDetail } from './DiscoveryResultDetail';
@@ -34,6 +44,11 @@ export function DiscoveryPage({ sessionId }: Props) {
   const [name, setName] = useState('');
   const [country, setCountry] = useState('DE');
   const [role, setRole] = useState('');
+  const [excludedRoles, setExcludedRoles] = useState<string[]>([]);
+  const [scheduleDraft, setScheduleDraft] = useState<ScheduleDraft>(defaultScheduleDraft);
+  const [notificationDraft, setNotificationDraft] = useState<NotificationDraft>(
+    defaultNotificationDraft
+  );
 
   if (!sessionId || state.unauthorized) {
     return (
@@ -73,11 +88,17 @@ export function DiscoveryPage({ sessionId }: Props) {
         name,
         country,
         role: template === 'jobs' ? role : undefined,
+        excludedRoles: template === 'jobs' ? excludedRoles : undefined,
+        scheduleDraft: template === 'jobs' ? scheduleDraft : undefined,
+        notificationDraft,
       })
     );
     setCreating(false);
     setName('');
     setRole('');
+    setExcludedRoles([]);
+    setScheduleDraft(defaultScheduleDraft());
+    setNotificationDraft(defaultNotificationDraft());
   };
 
   const openEditForm = () => {
@@ -87,19 +108,28 @@ export function DiscoveryPage({ sessionId }: Props) {
     setName(profile.name);
     setCountry(criteriaCountry(profile) || 'DE');
     setRole(criteriaRole(profile));
+    setExcludedRoles(criteriaExcludedRoles(profile));
+    setScheduleDraft(scheduleDraftFromProfile(profile.schedule));
+    setNotificationDraft(notificationDraftFromProfile(profile));
     setEditing(true);
     setCreating(false);
   };
 
   const handleUpdate = async () => {
     if (!state.selectedProfile || !name.trim()) return;
+    const templateForUpdate = strategyTemplateFromProfile(state.selectedProfile);
     await state.updateProfile(
       state.selectedProfile.id,
       buildUpdateProfileInput({
-        template: strategyTemplateFromProfile(state.selectedProfile),
+        template: templateForUpdate,
         name,
         country,
-        role: strategyTemplateFromProfile(state.selectedProfile) === 'jobs' ? role : undefined,
+        role: templateForUpdate === 'jobs' ? role : undefined,
+        excludedRoles: templateForUpdate === 'jobs' ? excludedRoles : undefined,
+        existingCriteria: state.selectedProfile.criteria,
+        scheduleDraft:
+          templateForUpdate === 'jobs' ? scheduleDraft : undefined,
+        notificationDraft,
       })
     );
     setEditing(false);
@@ -129,7 +159,12 @@ export function DiscoveryPage({ sessionId }: Props) {
             profiles={state.profiles}
             selectedProfileId={state.selectedProfileId}
             onSelect={(id) => void state.selectProfile(id)}
-            onCreateClick={() => setCreating((open) => !open)}
+            onCreateClick={() => {
+              setExcludedRoles([]);
+              setScheduleDraft(defaultScheduleDraft());
+              setNotificationDraft(defaultNotificationDraft());
+              setCreating((open) => !open);
+            }}
             creating={creating}
           />
 
@@ -169,16 +204,54 @@ export function DiscoveryPage({ sessionId }: Props) {
                   />
                 </label>
                 {template === 'jobs' ? (
-                  <label>
-                    {t('discovery.create.role')}
-                    <input value={role} onChange={(event) => setRole(event.target.value)} />
-                  </label>
+                  <>
+                    <label>
+                      {t('discovery.create.role')}
+                      <input value={role} onChange={(event) => setRole(event.target.value)} />
+                    </label>
+                    <DiscoveryExcludedRolesField
+                      idPrefix="discovery-create-excluded"
+                      roles={excludedRoles}
+                      onChange={setExcludedRoles}
+                    />
+                    <DiscoveryScheduleField
+                      idPrefix="discovery-create-schedule"
+                      draft={scheduleDraft}
+                      onChange={setScheduleDraft}
+                    />
+                  </>
                 ) : null}
+                <DiscoveryNotificationField
+                  idPrefix="discovery-create-notification"
+                  draft={notificationDraft}
+                  onChange={setNotificationDraft}
+                  emailRecipientConfigured={state.emailRecipientConfigured}
+                  userNotificationEmail={state.userNotificationEmail}
+                  userNotificationEmailKnown={state.userNotificationEmailKnown}
+                  userNotificationEmailLoading={state.userNotificationEmailLoading}
+                  userNotificationEmailLoadError={state.userNotificationEmailLoadError}
+                  notificationEmailSaving={state.notificationEmailSaving}
+                  notificationEmailError={state.notificationEmailError}
+                  onSaveNotificationEmail={async (email) => {
+                    await state.setUserNotificationEmail(email);
+                  }}
+                  onClearNotificationEmail={async () => {
+                    await state.setUserNotificationEmail(null);
+                  }}
+                />
                 <div className="discovery-create-form__actions">
                   <button type="submit" className="btn btn-primary">
                     {t('discovery.create.submit')}
                   </button>
-                  <AtlasSecondaryButton type="button" onClick={() => setCreating(false)}>
+                  <AtlasSecondaryButton
+                    type="button"
+                    onClick={() => {
+                      setCreating(false);
+                      setExcludedRoles([]);
+                      setScheduleDraft(defaultScheduleDraft());
+                      setNotificationDraft(defaultNotificationDraft());
+                    }}
+                  >
                     {t('discovery.create.cancel')}
                   </AtlasSecondaryButton>
                 </div>
@@ -214,16 +287,54 @@ export function DiscoveryPage({ sessionId }: Props) {
                   />
                 </label>
                 {strategyTemplateFromProfile(state.selectedProfile) === 'jobs' ? (
-                  <label>
-                    {t('discovery.create.role')}
-                    <input value={role} onChange={(event) => setRole(event.target.value)} />
-                  </label>
+                  <>
+                    <label>
+                      {t('discovery.create.role')}
+                      <input value={role} onChange={(event) => setRole(event.target.value)} />
+                    </label>
+                    <DiscoveryExcludedRolesField
+                      idPrefix="discovery-edit-excluded"
+                      roles={excludedRoles}
+                      onChange={setExcludedRoles}
+                    />
+                    <DiscoveryScheduleField
+                      idPrefix="discovery-edit-schedule"
+                      draft={scheduleDraft}
+                      onChange={setScheduleDraft}
+                    />
+                  </>
                 ) : null}
+                <DiscoveryNotificationField
+                  idPrefix="discovery-edit-notification"
+                  draft={notificationDraft}
+                  onChange={setNotificationDraft}
+                  emailRecipientConfigured={state.emailRecipientConfigured}
+                  userNotificationEmail={state.userNotificationEmail}
+                  userNotificationEmailKnown={state.userNotificationEmailKnown}
+                  userNotificationEmailLoading={state.userNotificationEmailLoading}
+                  userNotificationEmailLoadError={state.userNotificationEmailLoadError}
+                  notificationEmailSaving={state.notificationEmailSaving}
+                  notificationEmailError={state.notificationEmailError}
+                  onSaveNotificationEmail={async (email) => {
+                    await state.setUserNotificationEmail(email);
+                  }}
+                  onClearNotificationEmail={async () => {
+                    await state.setUserNotificationEmail(null);
+                  }}
+                />
                 <div className="discovery-create-form__actions">
                   <button type="submit" className="btn btn-primary">
                     {t('discovery.edit.submit')}
                   </button>
-                  <AtlasSecondaryButton type="button" onClick={() => setEditing(false)}>
+                  <AtlasSecondaryButton
+                    type="button"
+                    onClick={() => {
+                      setEditing(false);
+                      setExcludedRoles([]);
+                      setScheduleDraft(defaultScheduleDraft());
+                      setNotificationDraft(defaultNotificationDraft());
+                    }}
+                  >
                     {t('discovery.edit.cancel')}
                   </AtlasSecondaryButton>
                 </div>
@@ -241,6 +352,14 @@ export function DiscoveryPage({ sessionId }: Props) {
                 resultsCount={state.results.length}
                 runNowStatus={state.runNowStatus}
                 runNowError={state.runNowError}
+                emailRecipientConfigured={state.emailRecipientConfigured}
+                userNotificationEmail={state.userNotificationEmail}
+                userNotificationEmailKnown={state.userNotificationEmailKnown}
+                userNotificationEmailLoading={state.userNotificationEmailLoading}
+                userNotificationEmailLoadError={state.userNotificationEmailLoadError}
+                notificationEmailSaving={state.notificationEmailSaving}
+                notificationEmailError={state.notificationEmailError}
+                configurationOpen={creating || editing}
                 onToggleEnabled={(enabled) =>
                   void state.setProfileEnabled(state.selectedProfile!.id, enabled)
                 }
