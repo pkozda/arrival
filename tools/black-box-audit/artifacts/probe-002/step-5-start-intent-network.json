@@ -1,0 +1,30 @@
+[
+  {
+    "method": "POST",
+    "url": "https://arrival-atlas.pro/api/modules/economic-reality/action/execute",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestPayload": "{\"actionId\":\"g5-system-entry:intent-initiate-benefit-application\",\"deterministicHash\":\"6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8\"}",
+    "responseBody": {
+      "accepted": true,
+      "actionId": "g5-system-entry:intent-initiate-benefit-application",
+      "previousDeterministicHash": "6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8",
+      "deterministicHash": "521422bef36dfd5f2dcf50431d53a161229918a1a5013f2b88cc40243606fba0",
+      "planChanged": true
+    }
+  },
+  {
+    "method": "POST",
+    "url": "https://arrival-atlas.pro/api/modules/economic-reality/events",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestPayload": "{\"type\":\"MODULE_ENTERED\",\"deterministicHash\":\"521422bef36dfd5f2dcf50431d53a161229918a1a5013f2b88cc40243606fba0\"}",
+    "responseBody": {
+      "accepted": true,
+      "eventType": "MODULE_ENTERED",
+      "previousDeterministicHash": "521422bef36dfd5f2dcf50431d53a161229918a1a5013f2b88cc40243606fba0",
+      "deterministicHash": "521422bef36dfd5f2dcf50431d53a161229918a1a5013f2b88cc40243606fba0",
+      "planChanged": false
+    }
+  }
+]

@@ -13,11 +13,12 @@ tags:
   - domain-index
   - knowledge-base
 created: 2026-06-19
-updated: 2026-08-30
+updated: 2026-09-07
 related:
   - taxonomy
   - index-schema
   - personal-discovery-engine-architecture
+  - product-guide-v1
 ---
 
 # Arrival Atlas Documentation
@@ -73,6 +74,12 @@ docs/
 Reserved empty domains (`housing/`, `legal/`, `integrations/`) have stub indexes — add docs as those areas grow.
 
 ## Key documents (start here)
+
+### Product
+
+| Document | Path |
+|----------|------|
+| **Product Guide v1** (canonical behavioral / UX rules) | [product/product-guide-v1.md](./product/product-guide-v1.md) |
 
 ### Platform & core
 

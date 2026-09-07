@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-09-03T18:34:45.963Z",
+  "url": "https://arrival-atlas.pro/modules/life-event",
+  "title": "Arrival Atlas — Decision Support for Migrants in Germany",
+  "lang": "uk",
+  "buttons": [
+    "Вийти з демо",
+    "Your JourneyCurrent state",
+    "Забезпечити адресу для реєстрації★★★",
+    "Завершити AnmeldungBlocked state★★★",
+    "Зрозуміти обовʼязкове медичне страхування★★★",
+    "Налаштувати банк і податковий шлях★★★",
+    "Показати маршрут",
+    "×"
+  ],
+  "links": [
+    "Arrival Atlas",
+    "Досліджувати Atlas",
+    "Життєві події",
+    "Економічна реальність",
+    "Поиск",
+    "Профіль"
+  ],
+  "inputs": [
+    {
+      "tag": "select",
+      "type": null,
+      "name": "event",
+      "placeholder": null,
+      "ariaLabel": null
+    },
+    {
+      "tag": "select",
+      "type": null,
+      "name": "timeline",
+      "placeholder": null,
+      "ariaLabel": null
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "hasPartner",
+      "placeholder": null,
+      "ariaLabel": null
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "hasChildren",
+      "placeholder": null,
+      "ariaLabel": null
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "currentStatus.employed",
+      "placeholder": null,
+      "ariaLabel": null
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "currentStatus.insured",
+      "placeholder": null,
+      "ariaLabel": null
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "currentStatus.registered",
+      "placeholder": null,
+      "ariaLabel": null
+    }
+  ],
+  "snapshot": "- alert\n- banner:\n  - link \"Arrival Atlas\":\n    - /url: /\n  - navigation \"Основна навігація\":\n    - link \"Досліджувати Atlas\":\n      - /url: /\n    - link \"Життєві події\":\n      - /url: /modules/life-event\n    - link \"Економічна реальність\":\n      - /url: /modules/economic-reality\n    - link \"Поиск\":\n      - /url: /modules/discovery\n    - link \"Профіль\":\n      - /url: /profile\n  - button \"Вийти з демо Atlas і почати спочатку\": Вийти з демо\n- listbox \"Consequence graph nodes\":\n  - button \"Your Journey Current state\" [disabled]\n  - button \"Забезпечити адресу для реєстрації\" [disabled]\n  - button \"Завершити Anmeldung Blocked state\"\n  - button \"Зрозуміти обовʼязкове медичне страхування\"\n  - button \"Налаштувати банк і податковий шлях\"\n- complementary:\n  - heading \"Завершити Anmeldung\" [level=3]\n  - paragraph: Blocked\n  - heading \"Context\" [level=4]\n  - paragraph: Запишіться в Bürgeramt і зареєструйте адресу в установлений термін.\n  - heading \"Unlocks\" [level=4]\n  - paragraph: No direct unlocks.\n  - heading \"Blocked\" [level=4]\n  - paragraph: No direct constraints.\n  - heading \"Actions\" [level=4]\n  - text: Вивчити керівництво з прибуття Оновити дані про прибуття\n  - heading \"Recommendations\" [level=4]\n  - paragraph: Зрозуміти обовʼязкове медичне страхування\n- group: Scenarios\n- status:\n  - paragraph: Рекомендований наступний крок\n  - paragraph: Зрозуміти обовʼязкове медичне страхування\n  - paragraph: Це найпрактичніший крок на вашому поточному маршруті.\n  - button \"Показати маршрут\"\n  - button \"Закрити провідник\": ×"
+}

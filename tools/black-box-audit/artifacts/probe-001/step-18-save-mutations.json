@@ -1,0 +1,53 @@
+[
+  {
+    "method": "POST",
+    "url": "https://arrival-atlas.pro/api/mutations",
+    "status": 409,
+    "contentType": "application/json; charset=utf-8",
+    "requestPayload": "{\"id\":\"profile-healthInsurance_1788460648326_uw8wtp5di\",\"requestId\":\"profile-healthInsurance_1788460648326_uw8wtp5di\",\"timestamp\":\"2026-09-03T18:37:28.326Z\",\"type\":\"fact.correct\",\"intent\":\"correction\",\"domain\":\"healthInsurance\",\"source\":{\"kind\":\"profile_ui\",\"domain\":\"healthInsurance\"},\"payload\":{\"kind\":\"domain_facts\",\"domain\":\"healthInsurance\",\"fields\":{\"insuranceType\":\"public\"}},\"confidence\":1,\"userConfirmationRequired\":true,\"expectedHeadRevision\":1}",
+    "bodyJson": {
+      "success": false,
+      "code": "REVISION_CONFLICT",
+      "error": "Expected head revision 1, current is 4"
+    },
+    "bodyText": null
+  },
+  {
+    "method": "POST",
+    "url": "https://arrival-atlas.pro/api/mutations",
+    "status": 200,
+    "contentType": "application/json; charset=utf-8",
+    "requestPayload": "{\"id\":\"profile-healthInsurance_1788460648326_uw8wtp5di\",\"requestId\":\"profile-healthInsurance_1788460648326_uw8wtp5di\",\"timestamp\":\"2026-09-03T18:37:28.326Z\",\"type\":\"fact.correct\",\"intent\":\"correction\",\"domain\":\"healthInsurance\",\"source\":{\"kind\":\"profile_ui\",\"domain\":\"healthInsurance\"},\"payload\":{\"kind\":\"domain_facts\",\"domain\":\"healthInsurance\",\"fields\":{\"insuranceType\":\"public\"}},\"confidence\":1,\"userConfirmationRequired\":true,\"expectedHeadRevision\":4}",
+    "bodyJson": {
+      "success": true,
+      "revision": 5,
+      "userContext": {
+        "profile": {
+          "schemaVersion": "1.0.0",
+          "preferences": {
+            "preferredLanguage": "ua"
+          },
+          "completeness": {
+            "score": 14,
+            "missingDomains": [
+              "migration",
+              "housing",
+              "household",
+              "employment",
+              "income",
+              "benefits"
+            ]
+          },
+          "domains": {
+            "healthInsurance": {
+              "insuranceType": "public",
+              "hasCoverage": false
+            }
+          }
+        }
+      },
+      "appliedEventId": "evt_5_profile-healthInsurance_1788460648326_uw8wtp5di"
+    },
+    "bodyText": null
+  }
+]

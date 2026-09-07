@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-09-03T18:34:38.338Z",
+  "url": "https://arrival-atlas.pro/",
+  "title": "Arrival Atlas — Decision Support for Migrants in Germany",
+  "lang": "uk",
+  "buttons": [
+    "Увійти в Atlas",
+    "Увійти в Atlas→",
+    "Що далі протягом 7 днів→"
+  ],
+  "links": [
+    "Arrival Atlas"
+  ],
+  "inputs": [],
+  "snapshot": "- alert\n- banner:\n  - link \"Arrival Atlas\":\n    - /url: /\n  - button \"Увійти в демо Atlas\": Увійти в Atlas\n- main:\n  - paragraph: Особиста навігація життям\n  - heading \"Ваше нове життя. На карті.\" [level=1]\n  - paragraph: Arrival Atlas — ваш інтерактивний гід у всьому, що потрібно, щоб побудувати стабільне життя в новій країні.\n  - button \"Увійти в Atlas\"\n  - button \"Що далі протягом 7 днів\"\n  - img \"Life domain map\": YOU ARE HERE Registration Housing Healthcare Finance Work & Growth Community"
+}

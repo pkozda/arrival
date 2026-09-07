@@ -1,0 +1,145 @@
+{
+  "classification": "state preserved but recovery unclear",
+  "recovery": {
+    "explainsWhy": true,
+    "hasActions": false,
+    "actionable": [],
+    "actionLookingTextOnly": true,
+    "blockedContradiction": true,
+    "nextStepHint": true,
+    "clear": false
+  },
+  "actionModes": {
+    "action1Mode": "normal",
+    "action2Mode": "normal",
+    "action3Mode": "normal"
+  },
+  "beforeLeave": {
+    "url": "https://arrival-atlas.pro/modules/life-event",
+    "lang": "uk",
+    "selected": [
+      {
+        "tag": "A",
+        "text": "Життєві події",
+        "ariaCurrent": "page",
+        "ariaSelected": null
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Завершити AnmeldungBlocked state★★★",
+        "ariaCurrent": null,
+        "ariaSelected": "true"
+      }
+    ],
+    "anmeldung": {
+      "node": {
+        "index": 2,
+        "text": "Завершити AnmeldungBlocked state★★★",
+        "disabled": false,
+        "ariaDisabled": null,
+        "ariaSelected": "true",
+        "visible": true
+      },
+      "disabled": false,
+      "selected": true
+    },
+    "inspectorTitle": "Завершити Anmeldung",
+    "status": "Blocked",
+    "context": "Запишіться в Bürgeramt і зареєструйте адресу в установлений термін.",
+    "unlocks": "No direct unlocks.",
+    "blocked": "No direct constraints.",
+    "actions": [],
+    "recommendations": "Зрозуміти обовʼязкове медичне страхування",
+    "welcomeVisible": false,
+    "statusBanners": [],
+    "loading": 0
+  },
+  "atProfile": {
+    "url": "https://arrival-atlas.pro/profile",
+    "lang": "uk",
+    "selected": [
+      {
+        "tag": "A",
+        "text": "Профіль",
+        "ariaCurrent": "page",
+        "ariaSelected": null
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Language & displayComplete★★★",
+        "ariaCurrent": null,
+        "ariaSelected": "true"
+      }
+    ],
+    "anmeldung": {
+      "node": null,
+      "disabled": null,
+      "selected": false
+    },
+    "inspectorTitle": "Language & display",
+    "status": "Complete",
+    "context": "Ensures guidance appears in the language you read most comfortably.",
+    "unlocks": "No direct unlocks.",
+    "blocked": "No direct constraints.",
+    "actions": [
+      {
+        "tag": "A",
+        "role": null,
+        "text": "Редагувати розділ",
+        "href": "/profile/language-display/edit",
+        "disabled": false
+      },
+      {
+        "tag": "A",
+        "role": null,
+        "text": "Показати весь розділ",
+        "href": "/profile/language-display",
+        "disabled": false
+      }
+    ],
+    "recommendations": null,
+    "welcomeVisible": false,
+    "statusBanners": [],
+    "loading": 0
+  },
+  "afterReturn": {
+    "url": "https://arrival-atlas.pro/modules/life-event",
+    "lang": "uk",
+    "selected": [
+      {
+        "tag": "A",
+        "text": "Життєві події",
+        "ariaCurrent": "page",
+        "ariaSelected": null
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Завершити AnmeldungBlocked state★★★",
+        "ariaCurrent": null,
+        "ariaSelected": "true"
+      }
+    ],
+    "anmeldung": {
+      "node": {
+        "index": 2,
+        "text": "Завершити AnmeldungBlocked state★★★",
+        "disabled": false,
+        "ariaDisabled": null,
+        "ariaSelected": "true",
+        "visible": true
+      },
+      "disabled": false,
+      "selected": true
+    },
+    "inspectorTitle": "Завершити Anmeldung",
+    "status": "Blocked",
+    "context": "Запишіться в Bürgeramt і зареєструйте адресу в установлений термін.",
+    "unlocks": "No direct unlocks.",
+    "blocked": "No direct constraints.",
+    "actions": [],
+    "recommendations": "Зрозуміти обовʼязкове медичне страхування",
+    "welcomeVisible": false,
+    "statusBanners": [],
+    "loading": 0
+  }
+}

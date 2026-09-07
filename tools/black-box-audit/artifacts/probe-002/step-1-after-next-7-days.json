@@ -1,0 +1,90 @@
+{
+  "timestamp": "2026-09-03T19:06:48.885Z",
+  "url": "https://arrival-atlas.pro/",
+  "title": "Arrival Atlas — Decision Support for Migrants in Germany",
+  "lang": "uk",
+  "buttons": [
+    {
+      "text": "Вийти з демо",
+      "disabled": false,
+      "ariaLabel": "Вийти з демо Atlas і почати спочатку"
+    },
+    {
+      "text": "01",
+      "disabled": false,
+      "ariaLabel": "Slide 01: Orientation"
+    },
+    {
+      "text": "02",
+      "disabled": false,
+      "ariaLabel": "Slide 02: Registration"
+    },
+    {
+      "text": "03",
+      "disabled": false,
+      "ariaLabel": "Slide 03: Housing"
+    },
+    {
+      "text": "04",
+      "disabled": false,
+      "ariaLabel": "Slide 04: Healthcare"
+    },
+    {
+      "text": "05",
+      "disabled": false,
+      "ariaLabel": "Slide 05: Finance"
+    },
+    {
+      "text": "06",
+      "disabled": false,
+      "ariaLabel": "Slide 06: Work & Growth"
+    }
+  ],
+  "links": [
+    {
+      "text": "Arrival Atlas",
+      "href": "/"
+    },
+    {
+      "text": "Досліджувати Atlas",
+      "href": "/"
+    },
+    {
+      "text": "Життєві події",
+      "href": "/modules/life-event"
+    },
+    {
+      "text": "Економічна реальність",
+      "href": "/modules/economic-reality"
+    },
+    {
+      "text": "Поиск",
+      "href": "/modules/discovery"
+    },
+    {
+      "text": "Профіль",
+      "href": "/profile"
+    },
+    {
+      "text": "Enter Your Atlas→",
+      "href": "/modules/life-event"
+    },
+    {
+      "text": "See what's next→",
+      "href": "/modules/life-event"
+    }
+  ],
+  "fields": [],
+  "headings": [
+    {
+      "tag": "H1",
+      "text": "Your new life.Mapped."
+    },
+    {
+      "tag": "H3",
+      "text": "Orientation"
+    }
+  ],
+  "snapshot": "- alert\n- banner:\n  - link \"Arrival Atlas\":\n    - /url: /\n  - navigation \"Основна навігація\":\n    - link \"Досліджувати Atlas\":\n      - /url: /\n    - link \"Життєві події\":\n      - /url: /modules/life-event\n    - link \"Економічна реальність\":\n      - /url: /modules/economic-reality\n    - link \"Поиск\":\n      - /url: /modules/discovery\n    - link \"Профіль\":\n      - /url: /profile\n  - button \"Вийти з демо Atlas і почати спочатку\": Вийти з демо\n- main:\n  - img \"Life domain map\": YOU ARE HERE Berlin · Week 2 Registration Housing Healthcare Finance Work & Growth Community\n  - navigation \"Journey slides\":\n    - 'button \"Slide 01: Orientation\"': \"01\"\n    - 'button \"Slide 02: Registration\"': \"02\"\n    - 'button \"Slide 03: Housing\"': \"03\"\n    - 'button \"Slide 04: Healthcare\"': \"04\"\n    - 'button \"Slide 05: Finance\"': \"05\"\n    - 'button \"Slide 06: Work & Growth\"': \"06\"\n  - paragraph: Personal Life Navigation\n  - paragraph: \"01\"\n  - heading \"Your new life. Mapped.\" [level=1]\n  - paragraph: Arrival Atlas helps you understand everything you need to build a stable life in a new country.\n  - link \"Enter Your Atlas\":\n    - /url: /modules/life-event\n  - link \"See what's next\":\n    - /url: /modules/life-event\n  - complementary:\n    - paragraph: Focus Area\n    - heading \"Orientation\" [level=3]\n    - text: Current Goal\n    - paragraph: Overview\n    - paragraph: Remaining\n    - list:\n      - listitem: • Understand domains\n      - listitem: • Understand dependencies\n      - listitem: • Know your position\n  - text: Arrival Week 1 Setup Week 2–3 Stabilize Month 1–2 Build Long term",
+  "visibleText": "ARRIVAL ATLAS\nДосліджувати Atlas\nЖиттєві події\nЕкономічна реальність\nПоиск\nПрофіль\nВийти з демо\nYOU ARE HERE\nBerlin · Week 2\nREGISTRATION\nHOUSING\nHEALTHCARE\nFINANCE\nWORK & GROWTH\nCOMMUNITY\n01\n02\n03\n04\n05\n06\n\nPERSONAL LIFE NAVIGATION\n\n01\n\nYour new life.\nMapped.\n\nArrival Atlas helps you understand everything you need to build a stable life in a new country.\n\nEnter Your Atlas\n→\nSee what's next\n→\n\nFOCUS AREA\n\nOrientation\nCURRENT GOAL\n\nOverview\n\nREMAINING\n\nUnderstand domains\nUnderstand dependencies\nKnow your position\nArrival\nWeek 1\nSetup\nWeek 2–3\nStabilize\nMonth 1–2\nBuild\nLong term"
+}
