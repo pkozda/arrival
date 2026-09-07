@@ -1,0 +1,32 @@
+{
+  "probe": "PROBE-001",
+  "step": "initial",
+  "initial": {
+    "timestamp": "2026-09-03T18:34:37.143Z",
+    "url": "https://arrival-atlas.pro/",
+    "title": "Arrival Atlas — Decision Support for Migrants in Germany",
+    "lang": "en",
+    "buttons": [
+      "🇷🇺Русский",
+      "🇺🇦Українська",
+      "🇩🇪Deutsch",
+      "🇬🇧English✦",
+      "→"
+    ],
+    "links": [],
+    "inputs": [],
+    "snapshot": "- alert\n- region \"Arrival Atlas\":\n  - heading \"Arrival Atlas\" [level=1]\n  - text: Deutsch · Українська · Русский · English\n  - group \"Deutsch · Українська · Русский · English\":\n    - button \"Русский\"\n    - button \"Українська\"\n    - button \"Deutsch\"\n    - button \"English, suggested\": English\n  - button \"→\" [disabled]"
+  },
+  "welcomeVisible": false,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 409 ()"
+  ],
+  "pageErrors": [],
+  "requestFailures": [
+    {
+      "url": "https://arrival-atlas.pro/profile/health-insurance?updated=1&_rsc=X4zmduRswpJa_OfE",
+      "method": "GET",
+      "failure": "net::ERR_ABORTED"
+    }
+  ]
+}

@@ -1,0 +1,266 @@
+[
+  {
+    "nodeLabel": "Your situationNothing saved yet. Use tools to build your situation.",
+    "skipped": true,
+    "reason": "node disabled; force not used",
+    "disabled": true
+  },
+  {
+    "nodeLabel": "Work & income★★★",
+    "skipped": true,
+    "reason": "Work & income is disabled in STEP 47; do not click",
+    "disabled": true,
+    "workIncomeNode": {
+      "text": "Work & income★★★",
+      "disabled": false,
+      "ariaDisabled": "true",
+      "ariaSelected": "false",
+      "visible": true
+    }
+  },
+  {
+    "nodeLabel": "Language & displayComplete★★★",
+    "url": "https://arrival-atlas.pro/profile",
+    "selected": [
+      {
+        "tag": "A",
+        "text": "Профіль",
+        "ariaCurrent": "page",
+        "ariaSelected": null
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Language & displayComplete★★★",
+        "ariaCurrent": null,
+        "ariaSelected": "true"
+      }
+    ],
+    "inspectorTitle": "Language & display",
+    "status": "Complete",
+    "sections": {
+      "Context": "Ensures guidance appears in the language you read most comfortably.",
+      "Unlocks": "No direct unlocks.",
+      "Blocked": "No direct constraints.",
+      "Actions": "Редагувати розділПоказати весь розділ"
+    },
+    "terms": [],
+    "actions": [
+      {
+        "tag": "A",
+        "text": "Редагувати розділ",
+        "href": "/profile/language-display/edit",
+        "ariaLabel": null,
+        "disabled": false
+      },
+      {
+        "tag": "A",
+        "text": "Показати весь розділ",
+        "href": "/profile/language-display",
+        "ariaLabel": null,
+        "disabled": false
+      }
+    ],
+    "employmentMentions": [],
+    "employmentUnlockActions": [],
+    "workIncomeStillDisabled": true,
+    "workIncomeNode": {
+      "text": "Work & income★★★",
+      "disabled": false,
+      "ariaDisabled": "true",
+      "ariaSelected": "false",
+      "visible": true
+    }
+  },
+  {
+    "nodeLabel": "Your move to Germany★★★",
+    "url": "https://arrival-atlas.pro/profile",
+    "selected": [
+      {
+        "tag": "A",
+        "text": "Профіль",
+        "ariaCurrent": "page",
+        "ariaSelected": null
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Your move to GermanyNot added yet★★★",
+        "ariaCurrent": null,
+        "ariaSelected": "true"
+      }
+    ],
+    "inspectorTitle": "Your move to Germany",
+    "status": "Not added yet",
+    "sections": {
+      "Context": "Helps tools tailor guidance to your visa status and time in Germany.",
+      "Unlocks": "No direct unlocks.",
+      "Blocked": "No direct constraints.",
+      "Actions": "Відкрити Financial Reality ModuleРедагувати розділПоказати весь розділ"
+    },
+    "terms": [],
+    "actions": [
+      {
+        "tag": "A",
+        "text": "Відкрити Financial Reality Module",
+        "href": "/modules/financial-reality",
+        "ariaLabel": null,
+        "disabled": false
+      },
+      {
+        "tag": "A",
+        "text": "Редагувати розділ",
+        "href": "/profile/move-to-germany/edit",
+        "ariaLabel": null,
+        "disabled": false
+      },
+      {
+        "tag": "A",
+        "text": "Показати весь розділ",
+        "href": "/profile/move-to-germany",
+        "ariaLabel": null,
+        "disabled": false
+      }
+    ],
+    "employmentMentions": [],
+    "employmentUnlockActions": [],
+    "workIncomeStillDisabled": true,
+    "workIncomeNode": {
+      "text": "Work & income★★★",
+      "disabled": false,
+      "ariaDisabled": "true",
+      "ariaSelected": "false",
+      "visible": true
+    }
+  },
+  {
+    "nodeLabel": "Where you live★★★",
+    "url": "https://arrival-atlas.pro/profile",
+    "selected": [
+      {
+        "tag": "A",
+        "text": "Профіль",
+        "ariaCurrent": "page",
+        "ariaSelected": null
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Where you liveNot added yet★★★",
+        "ariaCurrent": null,
+        "ariaSelected": "true"
+      }
+    ],
+    "inspectorTitle": "Where you live",
+    "status": "Not added yet",
+    "sections": {
+      "Context": "Helps estimate rent-based support options and regional cost differences.",
+      "Unlocks": "No direct unlocks.",
+      "Blocked": "No direct constraints.",
+      "Actions": "Відкрити Financial Reality ModuleРедагувати розділПоказати весь розділ"
+    },
+    "terms": [],
+    "actions": [
+      {
+        "tag": "A",
+        "text": "Відкрити Financial Reality Module",
+        "href": "/modules/financial-reality",
+        "ariaLabel": null,
+        "disabled": false
+      },
+      {
+        "tag": "A",
+        "text": "Редагувати розділ",
+        "href": "/profile/where-you-live/edit",
+        "ariaLabel": null,
+        "disabled": false
+      },
+      {
+        "tag": "A",
+        "text": "Показати весь розділ",
+        "href": "/profile/where-you-live",
+        "ariaLabel": null,
+        "disabled": false
+      }
+    ],
+    "employmentMentions": [],
+    "employmentUnlockActions": [],
+    "workIncomeStillDisabled": true,
+    "workIncomeNode": {
+      "text": "Work & income★★★",
+      "disabled": false,
+      "ariaDisabled": "true",
+      "ariaSelected": "false",
+      "visible": true
+    }
+  },
+  {
+    "nodeLabel": "Household & family★★★",
+    "url": "https://arrival-atlas.pro/profile",
+    "selected": [
+      {
+        "tag": "A",
+        "text": "Профіль",
+        "ariaCurrent": "page",
+        "ariaSelected": null
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Household & familyNot added yet★★★",
+        "ariaCurrent": null,
+        "ariaSelected": "true"
+      }
+    ],
+    "inspectorTitle": "Household & family",
+    "status": "Not added yet",
+    "sections": {
+      "Context": "Household size affects benefits estimates and family-related guidance.",
+      "Unlocks": "No direct unlocks.",
+      "Blocked": "No direct constraints.",
+      "Actions": "Відкрити Benefits SimulatorРедагувати розділПоказати весь розділ"
+    },
+    "terms": [],
+    "actions": [
+      {
+        "tag": "A",
+        "text": "Відкрити Benefits Simulator",
+        "href": "/modules/benefits-simulator",
+        "ariaLabel": null,
+        "disabled": false
+      },
+      {
+        "tag": "A",
+        "text": "Редагувати розділ",
+        "href": "/profile/household-family/edit",
+        "ariaLabel": null,
+        "disabled": false
+      },
+      {
+        "tag": "A",
+        "text": "Показати весь розділ",
+        "href": "/profile/household-family",
+        "ariaLabel": null,
+        "disabled": false
+      }
+    ],
+    "employmentMentions": [],
+    "employmentUnlockActions": [],
+    "workIncomeStillDisabled": true,
+    "workIncomeNode": {
+      "text": "Work & income★★★",
+      "disabled": false,
+      "ariaDisabled": "true",
+      "ariaSelected": "false",
+      "visible": true
+    }
+  },
+  {
+    "nodeLabel": "Health insurance★★★",
+    "skipped": true,
+    "reason": "node disabled; force not used",
+    "disabled": true
+  },
+  {
+    "nodeLabel": "Benefits & support★★★",
+    "skipped": true,
+    "reason": "node disabled; force not used",
+    "disabled": true
+  }
+]

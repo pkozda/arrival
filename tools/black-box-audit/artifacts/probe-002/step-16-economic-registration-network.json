@@ -1,0 +1,386 @@
+[
+  {
+    "method": "GET",
+    "url": "https://arrival-atlas.pro/api/modules/life-event/schema",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestPayload": null,
+    "responseBody": {
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "enum": [
+              "arrival",
+              "job-change",
+              "job-loss",
+              "marriage",
+              "childbirth",
+              "move-city",
+              "visa-renewal",
+              "divorce"
+            ]
+          },
+          "timeline": {
+            "type": "string",
+            "enum": [
+              "immediate",
+              "within-month",
+              "within-3-months",
+              "planning"
+            ],
+            "default": "planning"
+          },
+          "hasPartner": {
+            "type": "boolean",
+            "default": false
+          },
+          "hasChildren": {
+            "type": "boolean",
+            "default": false
+          },
+          "currentStatus": {
+            "type": "object",
+            "properties": {
+              "employed": {
+                "type": "boolean",
+                "default": false
+              },
+              "insured": {
+                "type": "boolean",
+                "default": false
+              },
+              "registered": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "additionalProperties": false,
+            "default": {}
+          }
+        },
+        "required": [
+          "event"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string"
+          },
+          "timeline": {
+            "type": "string"
+          },
+          "phases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "phase": {
+                  "type": "string"
+                },
+                "timeframe": {
+                  "type": "string"
+                },
+                "actions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "institution": {
+                        "type": "string"
+                      },
+                      "deadline": {
+                        "type": "string"
+                      },
+                      "priority": {
+                        "type": "string",
+                        "enum": [
+                          "critical",
+                          "important",
+                          "recommended"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "title",
+                      "description",
+                      "priority"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "phase",
+                "timeframe",
+                "actions"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "scenarios": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "outcomes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "description",
+                "outcomes"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "checklist": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": "string"
+                },
+                "completed": {
+                  "type": "boolean"
+                },
+                "category": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "item",
+                "completed",
+                "category"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "event",
+          "timeline",
+          "phases",
+          "scenarios",
+          "checklist"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "https://arrival-atlas.pro/api/modules/life-event/schema",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestPayload": null,
+    "responseBody": {
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "enum": [
+              "arrival",
+              "job-change",
+              "job-loss",
+              "marriage",
+              "childbirth",
+              "move-city",
+              "visa-renewal",
+              "divorce"
+            ]
+          },
+          "timeline": {
+            "type": "string",
+            "enum": [
+              "immediate",
+              "within-month",
+              "within-3-months",
+              "planning"
+            ],
+            "default": "planning"
+          },
+          "hasPartner": {
+            "type": "boolean",
+            "default": false
+          },
+          "hasChildren": {
+            "type": "boolean",
+            "default": false
+          },
+          "currentStatus": {
+            "type": "object",
+            "properties": {
+              "employed": {
+                "type": "boolean",
+                "default": false
+              },
+              "insured": {
+                "type": "boolean",
+                "default": false
+              },
+              "registered": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "additionalProperties": false,
+            "default": {}
+          }
+        },
+        "required": [
+          "event"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string"
+          },
+          "timeline": {
+            "type": "string"
+          },
+          "phases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "phase": {
+                  "type": "string"
+                },
+                "timeframe": {
+                  "type": "string"
+                },
+                "actions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "institution": {
+                        "type": "string"
+                      },
+                      "deadline": {
+                        "type": "string"
+                      },
+                      "priority": {
+                        "type": "string",
+                        "enum": [
+                          "critical",
+                          "important",
+                          "recommended"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "title",
+                      "description",
+                      "priority"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "phase",
+                "timeframe",
+                "actions"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "scenarios": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "outcomes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "description",
+                "outcomes"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "checklist": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": "string"
+                },
+                "completed": {
+                  "type": "boolean"
+                },
+                "category": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "item",
+                "completed",
+                "category"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "event",
+          "timeline",
+          "phases",
+          "scenarios",
+          "checklist"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+    }
+  }
+]

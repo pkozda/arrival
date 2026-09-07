@@ -1,0 +1,61 @@
+{
+  "classification": "downstream consumption not confirmed",
+  "savedHouseholdAvailable": false,
+  "autoExecutionDetected": false,
+  "clickMode": "skipped",
+  "before": {
+    "url": "https://arrival-atlas.pro/profile",
+    "lang": "uk",
+    "householdComplete": false,
+    "householdSize3": false,
+    "maritalMarried": false,
+    "inspector": {
+      "title": "Household & family",
+      "statusParagraph": "Not added yet",
+      "paragraphs": [
+        "Not added yet",
+        "No household details yet.",
+        "Household size affects benefits estimates and family-related guidance.",
+        "No direct unlocks.",
+        "No direct constraints."
+      ],
+      "sections": {
+        "Context": "Household size affects benefits estimates and family-related guidance.",
+        "Unlocks": "No direct unlocks.",
+        "Blocked": "No direct constraints.",
+        "Actions": "Відкрити Benefits SimulatorРедагувати розділПоказати весь розділ"
+      },
+      "actions": [
+        {
+          "tag": "A",
+          "text": "Відкрити Benefits Simulator",
+          "href": "/modules/benefits-simulator",
+          "disabled": false
+        },
+        {
+          "tag": "A",
+          "text": "Редагувати розділ",
+          "href": "/profile/household-family/edit",
+          "disabled": false
+        },
+        {
+          "tag": "A",
+          "text": "Показати весь розділ",
+          "href": "/profile/household-family",
+          "disabled": false
+        }
+      ],
+      "terms": [],
+      "raw": "Household & familyNot added yetNo household details yet.ContextHousehold size affects benefits estimates and family-related guidance.UnlocksNo direct unlocks.BlockedNo direct constraints.ActionsВідкрити Benefits SimulatorРедагувати розділПоказати весь розділ"
+    },
+    "benefitsLinks": [
+      {
+        "text": "Відкрити Benefits Simulator",
+        "href": "/modules/benefits-simulator",
+        "ariaCurrent": null
+      }
+    ]
+  },
+  "after": null,
+  "stopReason": "STEP 51 could not verify Benefits Simulator downstream consumption because the previously saved Household & family state was not available through the normal user session."
+}

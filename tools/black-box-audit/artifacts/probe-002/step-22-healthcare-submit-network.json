@@ -1,0 +1,1346 @@
+[
+  {
+    "method": "POST",
+    "url": "https://arrival-atlas.pro/api/modules/healthcare-navigation/execute",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestHeaders": {
+      "sec-ch-ua-platform": "\"macOS\"",
+      "authorization": "Bearer eyJ2IjoxLCJhY2NvdW50SWQiOm51bGwsInNlc3Npb25JZCI6InNlc3NfMTc4ODUxNzU3OTc5MV9naG5tdHhjNTYiLCJhdXRoU3ViamVjdCI6bnVsbCwiaWF0IjoxNzg4NTE3NTc5LCJleHAiOjE3OTExMDk1Nzl9.IpTlEQpIzavrzWy9WSBtnleAL_4kC1qdq826KHVWE6k",
+      "referer": "https://arrival-atlas.pro/modules/healthcare-navigation",
+      "sec-ch-ua": "\"HeadlessChrome\";v=\"149\", \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+      "content-type": "application/json",
+      "x-session-id": "sess_1788517579791_ghnmtxc56"
+    },
+    "requestPayload": "{\"input\":{\"situation\":\"new-arrival\",\"hasInsurance\":false,\"insuranceType\":\"none\",\"urgency\":\"routine\"},\"context\":{\"userProfile\":{\"language\":\"ua\"}}}",
+    "responseHeaders": {
+      "access-control-allow-origin": "https://arrival-atlas.pro",
+      "alt-svc": "h3=\":443\"; ma=2592000",
+      "content-length": "218",
+      "date": "Fri, 04 Sep 2026 10:26:34 GMT",
+      "content-type": "application/json; charset=utf-8",
+      "server": "Caddy"
+    },
+    "responseBody": {
+      "projection": {
+        "moduleId": "healthcare-navigation",
+        "title": "Healthcare Navigation Module",
+        "status": "success",
+        "recommendations": [],
+        "actions": []
+      },
+      "meta": {
+        "executionId": "7cc0b2af-30fd-4bc1-aa6f-30a6dc8f93e0",
+        "duration": 1
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "https://arrival-atlas.pro/api/user-context",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestHeaders": {
+      "sec-ch-ua-platform": "\"macOS\"",
+      "authorization": "Bearer eyJ2IjoxLCJhY2NvdW50SWQiOm51bGwsInNlc3Npb25JZCI6InNlc3NfMTc4ODUxNzU3OTc5MV9naG5tdHhjNTYiLCJhdXRoU3ViamVjdCI6bnVsbCwiaWF0IjoxNzg4NTE3NTc5LCJleHAiOjE3OTExMDk1Nzl9.IpTlEQpIzavrzWy9WSBtnleAL_4kC1qdq826KHVWE6k",
+      "referer": "https://arrival-atlas.pro/modules/healthcare-navigation",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+      "sec-ch-ua": "\"HeadlessChrome\";v=\"149\", \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "x-session-id": "sess_1788517579791_ghnmtxc56",
+      "sec-ch-ua-mobile": "?0"
+    },
+    "requestPayload": null,
+    "responseHeaders": {
+      "x-read-model": "UserContextV1",
+      "x-user-context-authority": "authoritative",
+      "access-control-allow-origin": "https://arrival-atlas.pro",
+      "alt-svc": "h3=\":443\"; ma=2592000",
+      "content-length": "267",
+      "date": "Fri, 04 Sep 2026 10:26:34 GMT",
+      "content-type": "application/json; charset=utf-8",
+      "server": "Caddy"
+    },
+    "responseBody": {
+      "profile": {
+        "schemaVersion": "1.0.0",
+        "preferences": {
+          "preferredLanguage": "ua"
+        },
+        "completeness": {
+          "score": 14,
+          "missingDomains": [
+            "migration",
+            "housing",
+            "household",
+            "employment",
+            "income",
+            "benefits"
+          ]
+        },
+        "domains": {
+          "healthInsurance": {
+            "insuranceType": "none",
+            "hasCoverage": false
+          }
+        }
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "https://arrival-atlas.pro/api/profile-insights",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestHeaders": {
+      "sec-ch-ua-platform": "\"macOS\"",
+      "authorization": "Bearer eyJ2IjoxLCJhY2NvdW50SWQiOm51bGwsInNlc3Npb25JZCI6InNlc3NfMTc4ODUxNzU3OTc5MV9naG5tdHhjNTYiLCJhdXRoU3ViamVjdCI6bnVsbCwiaWF0IjoxNzg4NTE3NTc5LCJleHAiOjE3OTExMDk1Nzl9.IpTlEQpIzavrzWy9WSBtnleAL_4kC1qdq826KHVWE6k",
+      "referer": "https://arrival-atlas.pro/modules/healthcare-navigation",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+      "sec-ch-ua": "\"HeadlessChrome\";v=\"149\", \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "x-session-id": "sess_1788517579791_ghnmtxc56",
+      "sec-ch-ua-mobile": "?0"
+    },
+    "requestPayload": null,
+    "responseHeaders": {
+      "content-encoding": "gzip",
+      "x-read-model": "ProfileInsightViewV1",
+      "x-profile-insights-authority": "derived-non-authoritative",
+      "access-control-allow-origin": "https://arrival-atlas.pro",
+      "alt-svc": "h3=\":443\"; ma=2592000",
+      "content-length": "733",
+      "date": "Fri, 04 Sep 2026 10:26:34 GMT",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Accept-Encoding",
+      "server": "Caddy"
+    },
+    "responseBody": {
+      "schemaVersion": "1.0.0",
+      "generatedAt": "2026-09-04T10:26:34.856Z",
+      "globalConfidence": "medium",
+      "missingContext": [
+        {
+          "domain": "income",
+          "mirrorSlug": "work-income",
+          "message": "Income information is missing — this affects benefits and tax estimates.",
+          "suggestedAction": "correct_in_profile",
+          "ctaModuleId": "financial-reality",
+          "href": "/profile/work-income/edit"
+        },
+        {
+          "domain": "employment",
+          "mirrorSlug": "work-income",
+          "message": "Employment details are missing — some tools need this to give accurate guidance.",
+          "suggestedAction": "correct_in_profile",
+          "ctaModuleId": "financial-reality",
+          "href": "/profile/work-income/edit"
+        },
+        {
+          "domain": "housing",
+          "mirrorSlug": "where-you-live",
+          "message": "Housing information is missing — rent details help with benefits estimates.",
+          "suggestedAction": "correct_in_profile",
+          "ctaModuleId": "financial-reality",
+          "href": "/profile/where-you-live/edit"
+        }
+      ],
+      "domainInsights": [
+        {
+          "domain": "migration",
+          "mirrorSlug": "move-to-germany",
+          "confidence": {
+            "level": "none",
+            "reasons": [
+              "No information saved in this area yet"
+            ]
+          },
+          "suggestions": [
+            {
+              "message": "This section is incomplete — you can add information manually or use a tool.",
+              "action": "correct_in_profile",
+              "href": "/profile/move-to-germany/edit"
+            }
+          ]
+        },
+        {
+          "domain": "housing",
+          "mirrorSlug": "where-you-live",
+          "confidence": {
+            "level": "none",
+            "reasons": [
+              "No information saved in this area yet"
+            ]
+          },
+          "suggestions": [
+            {
+              "message": "This section is incomplete — you can add information manually or use a tool.",
+              "action": "correct_in_profile",
+              "href": "/profile/where-you-live/edit"
+            }
+          ]
+        },
+        {
+          "domain": "household",
+          "mirrorSlug": "household-family",
+          "confidence": {
+            "level": "none",
+            "reasons": [
+              "No information saved in this area yet"
+            ]
+          },
+          "suggestions": [
+            {
+              "message": "This section is incomplete — you can add information manually or use a tool.",
+              "action": "correct_in_profile",
+              "href": "/profile/household-family/edit"
+            }
+          ]
+        },
+        {
+          "domain": "employment",
+          "mirrorSlug": "work-income",
+          "confidence": {
+            "level": "none",
+            "reasons": [
+              "No information saved in this area yet"
+            ]
+          },
+          "suggestions": [
+            {
+              "message": "This section is incomplete — you can add information manually or use a tool.",
+              "action": "correct_in_profile",
+              "href": "/profile/work-income/edit"
+            }
+          ]
+        },
+        {
+          "domain": "healthInsurance",
+          "mirrorSlug": "health-insurance",
+          "confidence": {
+            "level": "medium",
+            "reasons": [
+              "Based on a single update so far"
+            ]
+          },
+          "provenanceNarrative": "We know this because you used Healthcare Navigation Module in September 2026.",
+          "suggestions": []
+        },
+        {
+          "domain": "benefits",
+          "mirrorSlug": "benefits-support",
+          "confidence": {
+            "level": "none",
+            "reasons": [
+              "No information saved in this area yet"
+            ]
+          },
+          "suggestions": [
+            {
+              "message": "This section is incomplete — you can add information manually or use a tool.",
+              "action": "correct_in_profile",
+              "href": "/profile/benefits-support/edit"
+            }
+          ]
+        },
+        {
+          "domain": "preferences",
+          "mirrorSlug": "language-display",
+          "confidence": {
+            "level": "medium",
+            "reasons": [
+              "Based on your saved situation"
+            ]
+          },
+          "provenanceNarrative": "Based on your previous module usage.",
+          "suggestions": []
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "https://arrival-atlas.pro/api/modules/life-event/plan",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestHeaders": {
+      "sec-ch-ua-platform": "\"macOS\"",
+      "authorization": "Bearer eyJ2IjoxLCJhY2NvdW50SWQiOm51bGwsInNlc3Npb25JZCI6InNlc3NfMTc4ODUxNzU3OTc5MV9naG5tdHhjNTYiLCJhdXRoU3ViamVjdCI6bnVsbCwiaWF0IjoxNzg4NTE3NTc5LCJleHAiOjE3OTExMDk1Nzl9.IpTlEQpIzavrzWy9WSBtnleAL_4kC1qdq826KHVWE6k",
+      "referer": "https://arrival-atlas.pro/modules/healthcare-navigation",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+      "sec-ch-ua": "\"HeadlessChrome\";v=\"149\", \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "x-session-id": "sess_1788517579791_ghnmtxc56",
+      "sec-ch-ua-mobile": "?0"
+    },
+    "requestPayload": null,
+    "responseHeaders": {
+      "content-encoding": "gzip",
+      "x-plan-authority": "derived-deterministic",
+      "x-read-model": "LifeEventPlanV1",
+      "x-module-version": "v2",
+      "access-control-allow-origin": "https://arrival-atlas.pro",
+      "alt-svc": "h3=\":443\"; ma=2592000",
+      "content-length": "1196",
+      "date": "Fri, 04 Sep 2026 10:26:35 GMT",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Accept-Encoding",
+      "server": "Caddy",
+      "x-module-id": "life-event"
+    },
+    "responseBody": {
+      "schemaVersion": "1.0.0",
+      "generatedAt": "2026-09-04T10:26:34.856Z",
+      "moduleId": "life-event",
+      "moduleVersion": "2.0.0",
+      "currentLifeState": "arrival_unregistered",
+      "secondaryConditions": [
+        "insurance_gap",
+        "employment_data_missing",
+        "income_data_missing"
+      ],
+      "planningSeverity": "critical",
+      "currentFocus": {
+        "id": "g1-secure-address",
+        "title": "Secure a registrable address",
+        "category": "legal",
+        "description": "Confirm where you can legally register and obtain landlord confirmation if required.",
+        "priority": "critical",
+        "phase": 1,
+        "actions": [
+          {
+            "kind": "correct_in_profile",
+            "profileMirrorSlug": "where-you-live",
+            "href": "/profile/where-you-live/edit",
+            "label": "Update housing details"
+          },
+          {
+            "kind": "explore_scenario",
+            "scenarioEvent": "move-city",
+            "href": "/modules/life-event?event=move-city",
+            "label": "Explore moving cities"
+          },
+          {
+            "kind": "open_module",
+            "moduleId": "economic-reality",
+            "href": "/modules/economic-reality",
+            "label": "Open Economic Reality plan"
+          }
+        ],
+        "satisfied": false,
+        "blocked": false
+      },
+      "nextBestActions": [
+        {
+          "id": "g1-secure-address",
+          "title": "Secure a registrable address",
+          "category": "legal",
+          "description": "Confirm where you can legally register and obtain landlord confirmation if required.",
+          "priority": "critical",
+          "phase": 1,
+          "actions": [
+            {
+              "kind": "correct_in_profile",
+              "profileMirrorSlug": "where-you-live",
+              "href": "/profile/where-you-live/edit",
+              "label": "Update housing details"
+            },
+            {
+              "kind": "explore_scenario",
+              "scenarioEvent": "move-city",
+              "href": "/modules/life-event?event=move-city",
+              "label": "Explore moving cities"
+            },
+            {
+              "kind": "open_module",
+              "moduleId": "economic-reality",
+              "href": "/modules/economic-reality",
+              "label": "Open Economic Reality plan"
+            }
+          ],
+          "satisfied": false,
+          "blocked": false
+        },
+        {
+          "id": "g1-insurance-awareness",
+          "title": "Understand mandatory health insurance",
+          "category": "survival",
+          "description": "Learn your insurance obligation and begin enrollment if employment is not imminent.",
+          "priority": "high",
+          "phase": 3,
+          "actions": [
+            {
+              "kind": "open_module",
+              "moduleId": "healthcare-navigation",
+              "href": "/modules/healthcare-navigation",
+              "label": "Explore health insurance options"
+            },
+            {
+              "kind": "correct_in_profile",
+              "profileMirrorSlug": "health-insurance",
+              "href": "/profile/health-insurance/edit",
+              "label": "Update health insurance"
+            }
+          ],
+          "satisfied": false,
+          "blocked": false
+        },
+        {
+          "id": "g1-complete-anmeldung",
+          "title": "Complete Anmeldung",
+          "category": "legal",
+          "description": "Book a Bürgeramt appointment and register your address within the legal deadline.",
+          "priority": "critical",
+          "phase": 2,
+          "actions": [
+            {
+              "kind": "explore_scenario",
+              "scenarioEvent": "arrival",
+              "href": "/modules/life-event?event=arrival",
+              "label": "Explore arrival guidance"
+            },
+            {
+              "kind": "correct_in_profile",
+              "profileMirrorSlug": "move-to-germany",
+              "href": "/profile/move-to-germany/edit",
+              "label": "Update arrival details"
+            }
+          ],
+          "satisfied": false,
+          "blocked": true
+        },
+        {
+          "id": "g1-banking-tax",
+          "title": "Set up banking and tax path",
+          "category": "stabilization",
+          "description": "Open a bank account for rent and salary; expect your tax ID after registration.",
+          "priority": "medium",
+          "phase": 4,
+          "actions": [
+            {
+              "kind": "open_module",
+              "moduleId": "economic-reality",
+              "href": "/modules/economic-reality",
+              "label": "Open Economic Reality plan"
+            },
+            {
+              "kind": "correct_in_profile",
+              "profileMirrorSlug": "where-you-live",
+              "href": "/profile/where-you-live/edit",
+              "label": "Update housing details"
+            }
+          ],
+          "satisfied": false,
+          "blocked": true
+        }
+      ],
+      "activeBlocks": [
+        {
+          "id": "g1-complete-anmeldung",
+          "title": "Complete Anmeldung",
+          "category": "legal",
+          "description": "Book a Bürgeramt appointment and register your address within the legal deadline.",
+          "priority": "critical",
+          "phase": 2,
+          "actions": [
+            {
+              "kind": "explore_scenario",
+              "scenarioEvent": "arrival",
+              "href": "/modules/life-event?event=arrival",
+              "label": "Explore arrival guidance"
+            },
+            {
+              "kind": "correct_in_profile",
+              "profileMirrorSlug": "move-to-germany",
+              "href": "/profile/move-to-germany/edit",
+              "label": "Update arrival details"
+            }
+          ],
+          "satisfied": false,
+          "blocked": true
+        },
+        {
+          "id": "g1-banking-tax",
+          "title": "Set up banking and tax path",
+          "category": "stabilization",
+          "description": "Open a bank account for rent and salary; expect your tax ID after registration.",
+          "priority": "medium",
+          "phase": 4,
+          "actions": [
+            {
+              "kind": "open_module",
+              "moduleId": "economic-reality",
+              "href": "/modules/economic-reality",
+              "label": "Open Economic Reality plan"
+            },
+            {
+              "kind": "correct_in_profile",
+              "profileMirrorSlug": "where-you-live",
+              "href": "/profile/where-you-live/edit",
+              "label": "Update housing details"
+            }
+          ],
+          "satisfied": false,
+          "blocked": true
+        }
+      ],
+      "timeline": [
+        {
+          "id": "g1-secure-address",
+          "title": "Secure a registrable address",
+          "category": "legal",
+          "description": "Confirm where you can legally register and obtain landlord confirmation if required.",
+          "priority": "critical",
+          "phase": 1,
+          "actions": [
+            {
+              "kind": "correct_in_profile",
+              "profileMirrorSlug": "where-you-live",
+              "href": "/profile/where-you-live/edit",
+              "label": "Update housing details"
+            },
+            {
+              "kind": "explore_scenario",
+              "scenarioEvent": "move-city",
+              "href": "/modules/life-event?event=move-city",
+              "label": "Explore moving cities"
+            },
+            {
+              "kind": "open_module",
+              "moduleId": "economic-reality",
+              "href": "/modules/economic-reality",
+              "label": "Open Economic Reality plan"
+            }
+          ],
+          "satisfied": false,
+          "blocked": false
+        },
+        {
+          "id": "g1-complete-anmeldung",
+          "title": "Complete Anmeldung",
+          "category": "legal",
+          "description": "Book a Bürgeramt appointment and register your address within the legal deadline.",
+          "priority": "critical",
+          "phase": 2,
+          "actions": [
+            {
+              "kind": "explore_scenario",
+              "scenarioEvent": "arrival",
+              "href": "/modules/life-event?event=arrival",
+              "label": "Explore arrival guidance"
+            },
+            {
+              "kind": "correct_in_profile",
+              "profileMirrorSlug": "move-to-germany",
+              "href": "/profile/move-to-germany/edit",
+              "label": "Update arrival details"
+            }
+          ],
+          "satisfied": false,
+          "blocked": true
+        },
+        {
+          "id": "g1-insurance-awareness",
+          "title": "Understand mandatory health insurance",
+          "category": "survival",
+          "description": "Learn your insurance obligation and begin enrollment if employment is not imminent.",
+          "priority": "high",
+          "phase": 3,
+          "actions": [
+            {
+              "kind": "open_module",
+              "moduleId": "healthcare-navigation",
+              "href": "/modules/healthcare-navigation",
+              "label": "Explore health insurance options"
+            },
+            {
+              "kind": "correct_in_profile",
+              "profileMirrorSlug": "health-insurance",
+              "href": "/profile/health-insurance/edit",
+              "label": "Update health insurance"
+            }
+          ],
+          "satisfied": false,
+          "blocked": false
+        },
+        {
+          "id": "g1-banking-tax",
+          "title": "Set up banking and tax path",
+          "category": "stabilization",
+          "description": "Open a bank account for rent and salary; expect your tax ID after registration.",
+          "priority": "medium",
+          "phase": 4,
+          "actions": [
+            {
+              "kind": "open_module",
+              "moduleId": "economic-reality",
+              "href": "/modules/economic-reality",
+              "label": "Open Economic Reality plan"
+            },
+            {
+              "kind": "correct_in_profile",
+              "profileMirrorSlug": "where-you-live",
+              "href": "/profile/where-you-live/edit",
+              "label": "Update housing details"
+            }
+          ],
+          "satisfied": false,
+          "blocked": true
+        }
+      ],
+      "reasoning": {
+        "whyThisNow": [
+          "Establish legal presence through registration",
+          "Anmeldung requires a valid address — housing and registration are coupled."
+        ],
+        "whatIsBlocking": [
+          "Complete Anmeldung is waiting on earlier steps.",
+          "Set up banking and tax path is waiting on earlier steps.",
+          "Health insurance coverage needs attention.",
+          "Employment information is missing.",
+          "Income details are not recorded yet."
+        ],
+        "planConfidence": "medium"
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "https://arrival-atlas.pro/api/modules/economic-reality/plan",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestHeaders": {
+      "sec-ch-ua-platform": "\"macOS\"",
+      "authorization": "Bearer eyJ2IjoxLCJhY2NvdW50SWQiOm51bGwsInNlc3Npb25JZCI6InNlc3NfMTc4ODUxNzU3OTc5MV9naG5tdHhjNTYiLCJhdXRoU3ViamVjdCI6bnVsbCwiaWF0IjoxNzg4NTE3NTc5LCJleHAiOjE3OTExMDk1Nzl9.IpTlEQpIzavrzWy9WSBtnleAL_4kC1qdq826KHVWE6k",
+      "referer": "https://arrival-atlas.pro/modules/healthcare-navigation",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+      "sec-ch-ua": "\"HeadlessChrome\";v=\"149\", \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "x-session-id": "sess_1788517579791_ghnmtxc56",
+      "sec-ch-ua-mobile": "?0"
+    },
+    "requestPayload": null,
+    "responseHeaders": {
+      "content-encoding": "gzip",
+      "x-plan-authority": "derived-deterministic",
+      "x-read-model": "EconomicRealityPlanResponseV1",
+      "x-module-version": "v1",
+      "access-control-allow-origin": "https://arrival-atlas.pro",
+      "alt-svc": "h3=\":443\"; ma=2592000",
+      "content-length": "1798",
+      "date": "Fri, 04 Sep 2026 10:26:35 GMT",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Accept-Encoding",
+      "server": "Caddy",
+      "x-module-id": "economic-reality",
+      "x-pipeline-version": "ep1-ep6-v1"
+    },
+    "responseBody": {
+      "version": "1.0",
+      "evaluation": {
+        "schemaVersion": "1.0.0",
+        "economicState": "financial_crisis",
+        "supportSystem": "none",
+        "axes": {
+          "incomeAxis": "none",
+          "employmentAxis": "unemployed",
+          "institutionAxis": "none"
+        },
+        "confidenceScore": 0.4,
+        "planConfidence": "low",
+        "blockers": [
+          "SC-REG",
+          "SC-ADDR",
+          "SC-INS",
+          "SC-DOC",
+          "SC-STATUS"
+        ],
+        "appliedRules": [
+          {
+            "id": "R1",
+            "matched": true,
+            "weight": 1,
+            "output": {
+              "economicState": "financial_crisis",
+              "supportSystem": "none"
+            },
+            "debugReason": "No income, no support, survival crisis indicators"
+          }
+        ]
+      },
+      "graph": {
+        "schemaVersion": "1.0.0",
+        "graphId": "G5",
+        "entryNodeId": "g5-immediate-needs",
+        "reasoning": {
+          "primarySelector": "economicState:E7",
+          "ruleTrace": [
+            "STATE_MAP:E7→G5",
+            "RULE:R1",
+            "ENTRY_NODE:g5-immediate-needs"
+          ]
+        }
+      },
+      "execution": {
+        "schemaVersion": "1.0.0",
+        "graphId": "G5",
+        "entryNodeId": "g5-immediate-needs",
+        "nodes": {
+          "g5-immediate-needs": {
+            "nodeId": "g5-immediate-needs",
+            "status": "active",
+            "progress": 0,
+            "satisfaction": {
+              "met": false,
+              "keys": []
+            },
+            "blockedBy": []
+          },
+          "g5-system-entry": {
+            "nodeId": "g5-system-entry",
+            "status": "active",
+            "progress": 0,
+            "satisfaction": {
+              "met": false,
+              "keys": [
+                "jobcenter_case_open"
+              ]
+            },
+            "blockedBy": []
+          },
+          "g5-registration": {
+            "nodeId": "g5-registration",
+            "status": "active",
+            "progress": 0,
+            "satisfaction": {
+              "met": false,
+              "keys": [
+                "registration_confirmed"
+              ]
+            },
+            "blockedBy": []
+          },
+          "g5-appointment": {
+            "nodeId": "g5-appointment",
+            "status": "locked",
+            "progress": 0,
+            "satisfaction": {
+              "met": false,
+              "keys": [
+                "jobcenter_case_open"
+              ]
+            },
+            "blockedBy": [
+              "g5-system-entry"
+            ]
+          },
+          "g5-bridge-income": {
+            "nodeId": "g5-bridge-income",
+            "status": "locked",
+            "progress": 0,
+            "satisfaction": {
+              "met": false,
+              "keys": [
+                "benefits_active_jobcenter"
+              ]
+            },
+            "blockedBy": [
+              "g5-appointment"
+            ]
+          }
+        },
+        "activeNodeIds": [
+          "g5-immediate-needs",
+          "g5-registration",
+          "g5-system-entry"
+        ],
+        "completedNodeIds": [],
+        "derivedState": {
+          "progressRatio": 0,
+          "blockedNodeIds": [
+            "g5-appointment",
+            "g5-bridge-income"
+          ],
+          "readyNodeIds": [
+            "g5-immediate-needs",
+            "g5-registration",
+            "g5-system-entry"
+          ]
+        },
+        "reasoning": {
+          "initializedFrom": "G5:-:g5-immediate-needs:economicState:E7",
+          "appliedRules": [
+            "NODE_INIT:G5",
+            "SAT_KEYS_APPLIED:0",
+            "NODE_STATE_DERIVED:deterministic"
+          ]
+        }
+      },
+      "actionSet": {
+        "schemaVersion": "1.0.0",
+        "graphId": "G5",
+        "actions": [
+          {
+            "id": "g5-system-entry:intent-initiate-benefit-application",
+            "sourceNodeId": "g5-system-entry",
+            "labelKey": "ER.INTENT.INITIATE_BENEFIT_APPLICATION",
+            "type": "system_intent",
+            "payload": {
+              "systemIntent": "initiate_benefit_application",
+              "intentKey": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+            },
+            "constraints": {
+              "requiresConfirmation": true
+            },
+            "origin": {
+              "graphId": "G5",
+              "nodeId": "g5-system-entry"
+            }
+          },
+          {
+            "id": "g5-registration:profile-housing",
+            "sourceNodeId": "g5-registration",
+            "labelKey": "ER.ACTION.UPDATE_HOUSING",
+            "type": "update_profile",
+            "payload": {
+              "href": "/profile/where-you-live/edit",
+              "profileKey": "where-you-live"
+            },
+            "constraints": {},
+            "origin": {
+              "graphId": "G5",
+              "nodeId": "g5-registration"
+            }
+          },
+          {
+            "id": "g5-system-entry:module-economic-reality",
+            "sourceNodeId": "g5-system-entry",
+            "labelKey": "ER.ACTION.OPEN_ECONOMIC_REALITY",
+            "type": "open_module",
+            "payload": {
+              "href": "/modules/economic-reality",
+              "moduleId": "economic-reality",
+              "entrypoint": "auto"
+            },
+            "constraints": {},
+            "origin": {
+              "graphId": "G5",
+              "nodeId": "g5-system-entry"
+            }
+          },
+          {
+            "id": "g5-immediate-needs:external-crisis-resources",
+            "sourceNodeId": "g5-immediate-needs",
+            "labelKey": "ER.ACTION.CRISIS_RESOURCES",
+            "type": "external_resource",
+            "payload": {
+              "href": "/resources/crisis/local-support"
+            },
+            "constraints": {},
+            "origin": {
+              "graphId": "G5",
+              "nodeId": "g5-immediate-needs"
+            }
+          }
+        ],
+        "metadata": {
+          "sourceExecutionId": "G5:-:g5-immediate-needs:economicState:E7",
+          "derivedFromNodes": [
+            "g5-immediate-needs",
+            "g5-registration",
+            "g5-system-entry"
+          ]
+        }
+      },
+      "plan": {
+        "schemaVersion": "1.0.0",
+        "planId": "G5:-:g5-immediate-needs:economicState:E7|G5:-:g5-immediate-needs:economicState:E7",
+        "graphId": "G5",
+        "primaryTrack": {
+          "trackId": "primary",
+          "actions": [
+            {
+              "id": "g5-system-entry:intent-initiate-benefit-application",
+              "sourceNodeId": "g5-system-entry",
+              "labelKey": "ER.INTENT.INITIATE_BENEFIT_APPLICATION",
+              "type": "system_intent",
+              "payload": {
+                "systemIntent": "initiate_benefit_application",
+                "intentKey": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+              },
+              "constraints": {
+                "requiresConfirmation": true
+              },
+              "origin": {
+                "graphId": "G5",
+                "nodeId": "g5-system-entry"
+              }
+            },
+            {
+              "id": "g5-system-entry:module-economic-reality",
+              "sourceNodeId": "g5-system-entry",
+              "labelKey": "ER.ACTION.OPEN_ECONOMIC_REALITY",
+              "type": "open_module",
+              "payload": {
+                "href": "/modules/economic-reality?entry=CRISIS",
+                "moduleId": "economic-reality",
+                "entrypoint": "CRISIS"
+              },
+              "constraints": {},
+              "origin": {
+                "graphId": "G5",
+                "nodeId": "g5-system-entry"
+              }
+            },
+            {
+              "id": "g5-registration:profile-housing",
+              "sourceNodeId": "g5-registration",
+              "labelKey": "ER.ACTION.UPDATE_HOUSING",
+              "type": "update_profile",
+              "payload": {
+                "href": "/profile/where-you-live/edit",
+                "profileKey": "where-you-live"
+              },
+              "constraints": {},
+              "origin": {
+                "graphId": "G5",
+                "nodeId": "g5-registration"
+              }
+            }
+          ],
+          "priority": 100
+        },
+        "systemTrack": {
+          "trackId": "system",
+          "actions": [
+            {
+              "id": "g5-immediate-needs:external-crisis-resources",
+              "sourceNodeId": "g5-immediate-needs",
+              "labelKey": "ER.ACTION.CRISIS_RESOURCES",
+              "type": "external_resource",
+              "payload": {
+                "href": "/resources/crisis/local-support"
+              },
+              "constraints": {},
+              "origin": {
+                "graphId": "G5",
+                "nodeId": "g5-immediate-needs"
+              }
+            }
+          ],
+          "priority": 20
+        },
+        "orderingStrategy": "CRISIS_FIRST",
+        "reasoning": {
+          "appliedRules": [
+            "RULE_P0:crisis_override",
+            "RULE_P3:action_type_priority",
+            "RULE_P4:dependency_preservation",
+            "RULE_P5:no_duplication"
+          ],
+          "prioritizationPath": [
+            "graphId:G5→CRISIS_FIRST"
+          ]
+        }
+      },
+      "presentation": {
+        "schemaVersion": "1.0.0",
+        "presentationId": "G5:-:g5-immediate-needs:economicState:E7|G5:-:g5-immediate-needs:economicState:E7::presentation",
+        "graphId": "G5",
+        "sections": [
+          {
+            "sectionId": "primary",
+            "titleKey": "ER.SECTION.PRIMARY",
+            "type": "PRIMARY",
+            "cards": [
+              {
+                "cardId": "primary:g5-system-entry:INTENT_CARD",
+                "titleKey": "ER.INTENT.INITIATE_BENEFIT_APPLICATION",
+                "actionRefIds": [
+                  "g5-system-entry:intent-initiate-benefit-application"
+                ],
+                "uiType": "INTENT_CARD",
+                "severity": "high",
+                "sourceTrack": "primary"
+              },
+              {
+                "cardId": "primary:g5-system-entry:ACTION_CARD",
+                "titleKey": "ER.ACTION.OPEN_ECONOMIC_REALITY",
+                "actionRefIds": [
+                  "g5-system-entry:module-economic-reality"
+                ],
+                "uiType": "ACTION_CARD",
+                "severity": "medium",
+                "sourceTrack": "primary"
+              },
+              {
+                "cardId": "primary:g5-registration:PROFILE_CARD",
+                "titleKey": "ER.ACTION.UPDATE_HOUSING",
+                "actionRefIds": [
+                  "g5-registration:profile-housing"
+                ],
+                "uiType": "PROFILE_CARD",
+                "severity": "medium",
+                "sourceTrack": "primary"
+              }
+            ],
+            "priority": 100
+          },
+          {
+            "sectionId": "system",
+            "titleKey": "ER.SECTION.SYSTEM",
+            "type": "SYSTEM",
+            "cards": [
+              {
+                "cardId": "system:g5-immediate-needs:RESOURCE_CARD",
+                "titleKey": "ER.ACTION.CRISIS_RESOURCES",
+                "actionRefIds": [
+                  "g5-immediate-needs:external-crisis-resources"
+                ],
+                "uiType": "RESOURCE_CARD",
+                "severity": "low",
+                "sourceTrack": "system"
+              }
+            ],
+            "priority": 20
+          }
+        ],
+        "primaryHighlight": {
+          "labelKey": "ER.INTENT.INITIATE_BENEFIT_APPLICATION",
+          "dominantActionRefIds": [
+            "g5-system-entry:intent-initiate-benefit-application"
+          ]
+        },
+        "systemHighlights": [
+          {
+            "labelKey": "ER.ACTION.CRISIS_RESOURCES",
+            "dominantActionRefIds": [
+              "g5-immediate-needs:external-crisis-resources"
+            ]
+          }
+        ],
+        "uiStrategy": "CRISIS_UI",
+        "metadata": {
+          "generatedFromPlanId": "G5:-:g5-immediate-needs:economicState:E7|G5:-:g5-immediate-needs:economicState:E7"
+        }
+      },
+      "meta": {
+        "requestId": "req-33y",
+        "generatedAt": "2026-09-04T10:26:34.856Z",
+        "pipelineVersion": "ep1-ep6-v1",
+        "deterministicHash": "6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8"
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "https://arrival-atlas.pro/api/ui-snapshot",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestHeaders": {
+      "sec-ch-ua-platform": "\"macOS\"",
+      "authorization": "Bearer eyJ2IjoxLCJhY2NvdW50SWQiOm51bGwsInNlc3Npb25JZCI6InNlc3NfMTc4ODUxNzU3OTc5MV9naG5tdHhjNTYiLCJhdXRoU3ViamVjdCI6bnVsbCwiaWF0IjoxNzg4NTE3NTc5LCJleHAiOjE3OTExMDk1Nzl9.IpTlEQpIzavrzWy9WSBtnleAL_4kC1qdq826KHVWE6k",
+      "referer": "https://arrival-atlas.pro/modules/healthcare-navigation",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+      "sec-ch-ua": "\"HeadlessChrome\";v=\"149\", \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "x-session-id": "sess_1788517579791_ghnmtxc56",
+      "sec-ch-ua-mobile": "?0"
+    },
+    "requestPayload": null,
+    "responseHeaders": {
+      "content-encoding": "gzip",
+      "x-read-model": "UiSnapshot",
+      "x-user-context-authority": "derived-non-authoritative",
+      "access-control-allow-origin": "https://arrival-atlas.pro",
+      "alt-svc": "h3=\":443\"; ma=2592000",
+      "content-length": "926",
+      "date": "Fri, 04 Sep 2026 10:26:35 GMT",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Accept-Encoding",
+      "server": "Caddy",
+      "x-snapshot-layer": "execution-ui-transport"
+    },
+    "responseBody": {
+      "schemaVersion": 1,
+      "snapshotVersion": 3246752512,
+      "lastMutationId": "7cc0b2af-30fd-4bc1-aa6f-30a6dc8f93e0",
+      "generatedAt": "2026-09-04T10:26:34.856Z",
+      "session": {
+        "sessionId": "sess_1788517579791_ghnmtxc56",
+        "language": "ua",
+        "uiPreferences": {
+          "theme": "dark"
+        }
+      },
+      "modules": [
+        {
+          "id": "benefits-simulator",
+          "name": "Benefits Simulator",
+          "description": "Life transition scenario simulator — unemployment, employment types, children, rent, and household changes"
+        },
+        {
+          "id": "financial-reality",
+          "name": "Financial Reality Module",
+          "description": "Household financial decision engine — Brutto/Netto, Bürgergeld, scenario comparison"
+        },
+        {
+          "id": "grocery-optimization",
+          "name": "Grocery Optimization Module",
+          "description": "Optimizes food budget with store strategies and shopping plans for migrant households"
+        },
+        {
+          "id": "healthcare-navigation",
+          "name": "Healthcare Navigation Module",
+          "description": "Guides migrants through Krankenkasse, medical access, and healthcare decisions in Germany"
+        },
+        {
+          "id": "life-event",
+          "name": "Life Event Module",
+          "description": "Scenario-based guidance and action plans for major life changes in Germany"
+        },
+        {
+          "id": "system-translation",
+          "name": "System Translation Module",
+          "description": "Translates German administrative, financial, and healthcare terms into plain language"
+        }
+      ],
+      "executions": [
+        {
+          "executionId": "7cc0b2af-30fd-4bc1-aa6f-30a6dc8f93e0",
+          "moduleId": "healthcare-navigation",
+          "projection": {
+            "moduleId": "healthcare-navigation",
+            "title": "Healthcare Navigation Module",
+            "status": "success",
+            "recommendations": [],
+            "actions": []
+          },
+          "createdAt": "2026-09-04T10:26:34.856Z"
+        }
+      ],
+      "executionsByModuleId": {
+        "healthcare-navigation": [
+          {
+            "executionId": "7cc0b2af-30fd-4bc1-aa6f-30a6dc8f93e0",
+            "moduleId": "healthcare-navigation",
+            "projection": {
+              "moduleId": "healthcare-navigation",
+              "title": "Healthcare Navigation Module",
+              "status": "success",
+              "recommendations": [],
+              "actions": []
+            },
+            "createdAt": "2026-09-04T10:26:34.856Z"
+          }
+        ]
+      },
+      "actionCards": [],
+      "recommendations": [],
+      "summaries": [
+        {
+          "moduleId": "healthcare-navigation",
+          "status": "success",
+          "recommendationCount": 0,
+          "actionCount": 0
+        }
+      ],
+      "userContext": {
+        "profile": {
+          "schemaVersion": "1.0.0",
+          "preferences": {
+            "preferredLanguage": "ua"
+          },
+          "completeness": {
+            "score": 14,
+            "missingDomains": [
+              "migration",
+              "housing",
+              "household",
+              "employment",
+              "income",
+              "benefits"
+            ]
+          },
+          "domains": {
+            "healthInsurance": {
+              "insuranceType": "none",
+              "hasCoverage": false
+            }
+          }
+        }
+      },
+      "ftu": {
+        "isFirstTimeUser": false
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "https://arrival-atlas.pro/api/modules/healthcare-navigation/schema",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestHeaders": {
+      "sec-ch-ua-platform": "\"macOS\"",
+      "referer": "https://arrival-atlas.pro/modules/healthcare-navigation",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+      "sec-ch-ua": "\"HeadlessChrome\";v=\"149\", \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0"
+    },
+    "requestPayload": null,
+    "responseHeaders": {
+      "content-encoding": "gzip",
+      "access-control-allow-origin": "https://arrival-atlas.pro",
+      "alt-svc": "h3=\":443\"; ma=2592000",
+      "content-length": "442",
+      "date": "Fri, 04 Sep 2026 10:26:35 GMT",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Accept-Encoding",
+      "server": "Caddy"
+    },
+    "responseBody": {
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "situation": {
+            "type": "string",
+            "enum": [
+              "new-arrival",
+              "need-doctor",
+              "need-specialist",
+              "insurance-choice",
+              "emergency",
+              "prescription"
+            ]
+          },
+          "hasInsurance": {
+            "type": "boolean",
+            "default": false
+          },
+          "insuranceType": {
+            "type": "string",
+            "enum": [
+              "public",
+              "private",
+              "none"
+            ],
+            "default": "none"
+          },
+          "urgency": {
+            "type": "string",
+            "enum": [
+              "routine",
+              "soon",
+              "urgent"
+            ],
+            "default": "routine"
+          },
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "situation"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "scenario": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "order": {
+                  "type": "number"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "institution": {
+                  "type": "string"
+                },
+                "documents": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "order",
+                "title",
+                "description"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "decisions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "pros": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "cons": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "pros",
+                      "cons"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "title",
+                "options"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "scenario",
+          "steps",
+          "decisions",
+          "warnings"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+    }
+  }
+]

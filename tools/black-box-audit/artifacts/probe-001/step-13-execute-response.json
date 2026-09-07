@@ -1,0 +1,22 @@
+{
+  "captured": true,
+  "url": "https://arrival-atlas.pro/api/modules/healthcare-navigation/execute",
+  "method": "POST",
+  "status": 200,
+  "contentType": "application/json; charset=utf-8",
+  "requestPayload": "{\"input\":{\"situation\":\"new-arrival\",\"hasInsurance\":false,\"insuranceType\":\"none\",\"urgency\":\"routine\",\"city\":\"Bremen\"},\"context\":{\"userProfile\":{\"language\":\"ua\"}}}",
+  "bodyText": null,
+  "bodyJson": {
+    "projection": {
+      "moduleId": "healthcare-navigation",
+      "title": "Healthcare Navigation Module",
+      "status": "success",
+      "recommendations": [],
+      "actions": []
+    },
+    "meta": {
+      "executionId": "bf75dd2b-3525-42e3-a897-b0d41f2e1678",
+      "duration": 0
+    }
+  }
+}

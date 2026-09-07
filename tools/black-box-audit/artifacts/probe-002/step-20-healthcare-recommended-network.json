@@ -1,0 +1,18 @@
+[
+  {
+    "method": "GET",
+    "url": "https://arrival-atlas.pro/modules/healthcare-navigation?_rsc=NtjETZO2aiE405ih",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestPayload": null,
+    "responseBody": "0:{\"b\":\"0oNBPSCrE96rlZipXg2D7\",\"f\":[[\"children\",\"(destinations)\",\"children\",\"modules\",\"children\",[\"moduleId\",\"healthcare-navigation\",\"d\"],[[\"moduleId\",\"healthcare-navigation\",\"d\"],{\"children\":[\"__PAGE__\",{}]}],null,[null,null],true]],\"S\":false}\n"
+  },
+  {
+    "method": "GET",
+    "url": "https://arrival-atlas.pro/profile/health-insurance/edit?_rsc=NtjETZO2aiE405ih",
+    "status": 200,
+    "resourceType": "fetch",
+    "requestPayload": null,
+    "responseBody": "0:{\"b\":\"0oNBPSCrE96rlZipXg2D7\",\"f\":[[\"children\",\"(destinations)\",\"children\",\"profile\",[\"profile\",{\"children\":[[\"domainSlug\",\"health-insurance\",\"d\"],{\"children\":[\"edit\",{\"children\":[\"__PAGE__\",{}]}]}]}],null,[null,null],true]],\"S\":false}\n"
+  }
+]
