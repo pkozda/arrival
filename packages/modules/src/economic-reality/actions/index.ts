@@ -4,7 +4,9 @@ export { SYSTEM_INTENT_LABELS, systemIntentLabel } from './intent-mapper.js';
 export { NODE_ACTION_CATALOG, lookupNodeActionTemplates } from './node-action-catalog.js';
 export {
   filterTemplatesForNodeState,
+  filterRegistrationTemplates,
   mapNodeToActions,
   mapTemplateToAction,
+  REGISTRATION_ACTION_NODE_IDS,
 } from './action-mapper.js';
 export { buildActionSet } from './build-action-set.js';

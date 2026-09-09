@@ -3,20 +3,19 @@
 import { useApp } from '@/components/AppProvider';
 import { selectUserContextProfile } from '@/lib/user-context';
 
-const DEFAULT_LOCATION = 'Berlin · Week 2';
-const LOADING_LOCATION = 'Locating · Week 2';
-
+/** Week suffix kept as intentional product framing; city is profile data. */
 export function useAtlasLocationLabel(): string {
-  const { userContext, userContextLoading, bootstrapLoading } = useApp();
+  const { t, userContext, userContextLoading, bootstrapLoading } = useApp();
   const city = selectUserContextProfile(userContext)?.domains?.housing?.city?.trim();
 
   if (city) {
-    return `${city} · Week 2`;
+    // Reuse berlinWeek2 pattern: "{city} · Week N" via replacing Berlin placeholder language-locally.
+    return t('home.atlas.location.berlinWeek2').replace(/^Berlin|^Берлин|^Берлін/, city);
   }
 
   if (userContextLoading || bootstrapLoading) {
-    return LOADING_LOCATION;
+    return t('home.atlas.location.locatingWeek2');
   }
 
-  return DEFAULT_LOCATION;
+  return t('home.atlas.location.berlinWeek2');
 }

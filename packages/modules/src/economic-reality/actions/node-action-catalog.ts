@@ -8,6 +8,13 @@ const profileHousing: ActionTemplate = {
   payload: { profileKey: 'where-you-live', href: '/profile/where-you-live/edit' },
 };
 
+const profileConfirmRegistration: ActionTemplate = {
+  templateId: 'profile-confirm-registration',
+  labelKey: ER_COPY_KEYS.ACTION_CONFIRM_REGISTRATION,
+  type: 'update_profile',
+  payload: { profileKey: 'move-to-germany', href: '/profile/move-to-germany/edit' },
+};
+
 const profileMigration: ActionTemplate = {
   templateId: 'profile-migration',
   labelKey: ER_COPY_KEYS.ACTION_UPDATE_MIGRATION,
@@ -157,7 +164,12 @@ export const NODE_ACTION_CATALOG: Record<string, ActionTemplate[]> = {
       true
     ),
   ],
-  'g2-registration': [profileHousing, jobcenterExternal, economicRealityModule],
+  'g2-registration': [
+    profileHousing,
+    profileConfirmRegistration,
+    jobcenterExternal,
+    economicRealityModule,
+  ],
   'g2-termination-docs': [profileWorkIncome],
   'g2-jobcenter-appointment': [
     jobcenterAppointmentExternal,
@@ -210,7 +222,7 @@ export const NODE_ACTION_CATALOG: Record<string, ActionTemplate[]> = {
     ),
     economicRealityModule,
   ],
-  'g5-registration': [profileHousing],
+  'g5-registration': [profileHousing, profileConfirmRegistration],
   'g5-appointment': [jobcenterAppointmentExternal],
   'g5-bridge-income': [financialModule],
   'g6-status-confirm': [profileMigration],
@@ -220,7 +232,7 @@ export const NODE_ACTION_CATALOG: Record<string, ActionTemplate[]> = {
     intent('intent-start-sozialamt', 'start_sozialamt_process', ER_COPY_KEYS.INTENT_START_SOZIALAMT),
     economicRealityModule,
   ],
-  'g6-arrival-proof': [profileHousing],
+  'g6-arrival-proof': [profileHousing, profileConfirmRegistration],
   'g6-payment-setup': [profileBenefits, profileWorkIncome],
   'g6-transition-awareness': [jobcenterExternal],
 };

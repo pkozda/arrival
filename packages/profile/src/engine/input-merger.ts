@@ -51,11 +51,12 @@ const MODULE_INPUT_CONFIG: Record<string, Record<string, ModuleInputFieldConfig>
     },
     hasInsurance: {
       profile: (p) => p?.insurance?.hasCoverage,
-      defaultValue: false,
+      // PD-003: missing coverage must stay unknown — never invent uninsured.
+      defaultValue: undefined,
     },
     insuranceType: {
       profile: (p) => p?.insurance?.type,
-      defaultValue: 'none',
+      defaultValue: undefined,
     },
   },
 };

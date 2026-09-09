@@ -11,6 +11,7 @@ import {
   BENEFITS_SIMULATOR_CONTRACT,
   DEFAULT_MODULE_CONTRACT,
   FINANCIAL_REALITY_CONTRACT,
+  HEALTHCARE_NAVIGATION_CONTRACT,
 } from './module-contracts.js';
 
 const modulesSourceRoot = join(dirname(fileURLToPath(import.meta.url)));
@@ -19,7 +20,7 @@ export const compiledModuleCatalog = registerModulesFromSDK(
   [
     defineModuleFromRegistration(financialRealityRegistration, FINANCIAL_REALITY_CONTRACT),
     defineModuleFromRegistration(systemTranslationRegistration, DEFAULT_MODULE_CONTRACT),
-    defineModuleFromRegistration(healthcareNavigationRegistration, DEFAULT_MODULE_CONTRACT),
+    defineModuleFromRegistration(healthcareNavigationRegistration, HEALTHCARE_NAVIGATION_CONTRACT),
     defineModuleFromRegistration(groceryOptimizationRegistration, DEFAULT_MODULE_CONTRACT),
     defineModuleFromRegistration(lifeEventRegistration, DEFAULT_MODULE_CONTRACT),
     defineModuleFromRegistration(benefitsSimulatorRegistration, BENEFITS_SIMULATOR_CONTRACT),

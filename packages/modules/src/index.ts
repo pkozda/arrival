@@ -44,6 +44,7 @@ export {
   FINANCIAL_REALITY_CONTRACT,
   BENEFITS_SIMULATOR_CONTRACT,
   DEFAULT_MODULE_CONTRACT,
+  HEALTHCARE_NAVIGATION_CONTRACT,
 } from './module-contracts.js';
 
 export { compiledModuleCatalog, allModuleRegistrations } from './catalog.js';

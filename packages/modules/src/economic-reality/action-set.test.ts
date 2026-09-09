@@ -81,21 +81,28 @@ describe('buildActionSet EP-4 action layer', () => {
     });
   }
 
-  it('EF03 → G2 Jobcenter onboarding actions from active nodes', () => {
-    const { actionSet } = buildPipeline('EF03');
+  it('EF03 → G2 registration emits confirm (not housing) when address present', () => {
+    const { actionSet, execution } = buildPipeline('EF03');
 
     expect(actionSet.graphId).toBe('G2');
+    expect(execution.nodes['g2-registration']?.status).toBe('active');
     expect(actionsForNode(actionSet.actions, 'g2-registration')).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ type: 'update_profile', payload: expect.objectContaining({ profileKey: 'where-you-live' }) }),
+        expect.objectContaining({
+          type: 'update_profile',
+          payload: expect.objectContaining({ profileKey: 'move-to-germany' }),
+          labelKey: expect.stringContaining('CONFIRM_REGISTRATION'),
+        }),
       ])
     );
-    expect(actionsForNode(actionSet.actions, 'g2-jobcenter-appointment')).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ type: 'system_intent', payload: expect.objectContaining({ systemIntent: 'start_jobcenter_process' }) }),
-        expect.objectContaining({ type: 'external_resource', payload: expect.objectContaining({ externalSystem: 'jobcenter' }) }),
-      ])
-    );
+    expect(
+      actionsForNode(actionSet.actions, 'g2-registration').some(
+        (action) => action.payload.profileKey === 'where-you-live'
+      )
+    ).toBe(false);
+    // Appointment stays locked until registration_confirmed (PD-001).
+    expect(execution.nodes['g2-jobcenter-appointment']?.status).toBe('locked');
+    expect(actionsForNode(actionSet.actions, 'g2-jobcenter-appointment')).toEqual([]);
   });
 
   it('EF05 → G3 reporting intent from active income-change node', () => {

@@ -1,0 +1,78 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "health": {
+        "status": "ok",
+        "service": "arrival-atlas-api",
+        "version": "0.1.0",
+        "timestamp": "2026-09-09T17:57:32.582Z"
+      }
+    },
+    {
+      "sessionId": true
+    },
+    {
+      "mutation": "e16-city",
+      "revision": 1,
+      "status": 200
+    },
+    {
+      "mutation": "e16-reg",
+      "revision": 2,
+      "status": 200
+    },
+    {
+      "mutation": "e16-wg",
+      "revision": 3,
+      "status": 200
+    },
+    {
+      "mutation": "e16-tax",
+      "revision": 4,
+      "status": 200
+    },
+    {
+      "beforeDomains": {
+        "migration": {
+          "municipalRegistrationConfirmed": true
+        },
+        "housing": {
+          "city": "Bremen",
+          "monthlyColdRent": 650
+        },
+        "employment": {
+          "taxClass": 3
+        },
+        "benefits": {
+          "receivingWohngeld": true
+        }
+      }
+    },
+    {
+      "afterDomains": {
+        "migration": {
+          "municipalRegistrationConfirmed": true
+        },
+        "housing": {
+          "city": "Bremen",
+          "monthlyColdRent": 650
+        },
+        "employment": {
+          "taxClass": 3
+        },
+        "benefits": {
+          "receivingWohngeld": true
+        }
+      }
+    },
+    {
+      "devToolsStatus": 404
+    },
+    {
+      "opsUnauthStatus": 403
+    }
+  ],
+  "devToolsClosed": true,
+  "opsFailClosed": true
+}

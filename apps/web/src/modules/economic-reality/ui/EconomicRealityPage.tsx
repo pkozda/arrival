@@ -11,6 +11,10 @@ import { SurfaceErrorPanel } from '@/components/surface/SurfaceErrorPanel';
 import { SurfaceLoadingSkeleton } from '@/components/surface/SurfaceLoadingSkeleton';
 import { useSurfaceRetry } from '@/components/surface/useSurfaceRetry';
 import { EconomicRealityGalaxyBridge } from './EconomicRealityGalaxyBridge';
+import { ActionPlannerPanel } from './components/ActionPlannerPanel';
+import { BenefitsAwarenessPanel } from './components/BenefitsAwarenessPanel';
+import { HousingSituationPanel } from './components/HousingSituationPanel';
+import { TaxAdministrationPanel } from './components/TaxAdministrationPanel';
 import { HighlightPanel } from './components/HighlightPanel';
 import { SystemBanner } from './components/SystemBanner';
 import {
@@ -98,6 +102,12 @@ export function EconomicRealityPage({ mode, state, showDebug = false, onRetry }:
   if (mode === 'full') {
     return (
       <div data-ui-surface="economic-reality-module-body">
+        <div className="le-galaxy-hud le-galaxy-hud--explorer" style={{ position: 'relative', zIndex: 2 }}>
+          <ActionPlannerPanel state={state} />
+          <HousingSituationPanel />
+          <TaxAdministrationPanel />
+          <BenefitsAwarenessPanel />
+        </div>
         <EconomicRealityGalaxyBridge presentation={state.presentation} sections={sections} />
 
         {showDebug && state.plan && (
@@ -124,6 +134,11 @@ export function EconomicRealityPage({ mode, state, showDebug = false, onRetry }:
 
   return (
     <div className="er-module-page" data-er-mode={mode} data-ui-surface="economic-reality-module-body">
+      <ActionPlannerPanel state={state} />
+      <HousingSituationPanel />
+      <TaxAdministrationPanel />
+      <BenefitsAwarenessPanel />
+
       {state.presentation.primaryHighlight && (
         <HighlightPanel highlight={state.presentation.primaryHighlight} />
       )}

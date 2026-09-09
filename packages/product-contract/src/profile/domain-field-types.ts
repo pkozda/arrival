@@ -49,6 +49,11 @@ export type MigrationDomainFields = {
   countryOfOrigin?: string;
   residencyStatus?: ResidencyStatus;
   arrivedAt?: string;
+  /**
+   * Explicit user confirmation that external Anmeldung was completed.
+   * Distinct from address / residency heuristics — PD-001 authoritative fact.
+   */
+  municipalRegistrationConfirmed?: boolean;
 };
 
 export type HousingDomainFields = {
@@ -87,6 +92,7 @@ export type BenefitsDomainFields = {
   receivingBuergergeld?: boolean;
   receivingAlg1?: boolean;
   receivingWohngeld?: boolean;
+  receivingKindergeld?: boolean;
   receivingSozialamtSupport?: boolean;
   supportApplicationPending?: SupportApplicationPending;
   savingsDepleted?: boolean;
@@ -117,6 +123,7 @@ export const MigrationDomainFieldsSchema = z
     countryOfOrigin: z.string().length(2).optional(),
     residencyStatus: ResidencyStatusSchema.optional(),
     arrivedAt: z.string().datetime().optional(),
+    municipalRegistrationConfirmed: z.boolean().optional(),
   })
   .strict();
 
@@ -163,6 +170,7 @@ export const BenefitsDomainFieldsSchema = z
     receivingBuergergeld: z.boolean().optional(),
     receivingAlg1: z.boolean().optional(),
     receivingWohngeld: z.boolean().optional(),
+    receivingKindergeld: z.boolean().optional(),
     receivingSozialamtSupport: z.boolean().optional(),
     supportApplicationPending: SupportApplicationPendingSchema.optional(),
     savingsDepleted: z.boolean().optional(),
@@ -209,10 +217,17 @@ export const PrefMutationPayloadSchema = z.discriminatedUnion('field', [
   }),
 ]);
 
+/**
+ * Domain fact payloads may carry typed values (set/correct) or explicit nulls
+ * (fact.invalidate clear markers). Engine normalize ignores values for invalidate
+ * and clears by field key presence.
+ */
 export type DomainFactPayload<D extends keyof ProfileDomainFieldsMap = keyof ProfileDomainFieldsMap> = {
   kind: 'domain_facts';
   domain: D;
-  fields: Partial<ProfileDomainFieldsMap[D]>;
+  fields: Partial<{
+    [K in keyof ProfileDomainFieldsMap[D]]: ProfileDomainFieldsMap[D][K] | null;
+  }>;
 };
 
 export type MutationRequestPayload =
@@ -270,8 +285,103 @@ export const DomainFactPayloadSchema = z.discriminatedUnion('domain', [
   }),
 ]);
 
+/** fact.invalidate payloads: field keys present with null = clear (not typed domain values). */
+export const InvalidateDomainFactPayloadSchema = z.discriminatedUnion('domain', [
+  z.object({
+    kind: z.literal('domain_facts'),
+    domain: z.literal('migration'),
+    fields: z
+      .object({
+        countryOfOrigin: z.null().optional(),
+        residencyStatus: z.null().optional(),
+        arrivedAt: z.null().optional(),
+        municipalRegistrationConfirmed: z.null().optional(),
+      })
+      .strict(),
+  }),
+  z.object({
+    kind: z.literal('domain_facts'),
+    domain: z.literal('housing'),
+    fields: z
+      .object({
+        bundesland: z.null().optional(),
+        city: z.null().optional(),
+        monthlyColdRent: z.null().optional(),
+        monthlyUtilities: z.null().optional(),
+      })
+      .strict(),
+  }),
+  z.object({
+    kind: z.literal('domain_facts'),
+    domain: z.literal('household'),
+    fields: z
+      .object({
+        householdSize: z.null().optional(),
+        maritalStatus: z.null().optional(),
+        children: z.null().optional(),
+      })
+      .strict(),
+  }),
+  z.object({
+    kind: z.literal('domain_facts'),
+    domain: z.literal('employment'),
+    fields: z
+      .object({
+        employmentStatus: z.null().optional(),
+        taxClass: z.null().optional(),
+        churchTax: z.null().optional(),
+      })
+      .strict(),
+  }),
+  z.object({
+    kind: z.literal('domain_facts'),
+    domain: z.literal('income'),
+    fields: z.object({ grossMonthlyIncome: z.null().optional() }).strict(),
+  }),
+  z.object({
+    kind: z.literal('domain_facts'),
+    domain: z.literal('healthInsurance'),
+    fields: z
+      .object({
+        insuranceType: z.null().optional(),
+        hasCoverage: z.null().optional(),
+      })
+      .strict(),
+  }),
+  z.object({
+    kind: z.literal('domain_facts'),
+    domain: z.literal('benefits'),
+    fields: z
+      .object({
+        receivingBuergergeld: z.null().optional(),
+        receivingAlg1: z.null().optional(),
+        receivingWohngeld: z.null().optional(),
+        receivingKindergeld: z.null().optional(),
+        receivingSozialamtSupport: z.null().optional(),
+        supportApplicationPending: z.null().optional(),
+        savingsDepleted: z.null().optional(),
+        benefitReportingOverdue: z.null().optional(),
+        benefitApplicationIntent: z.null().optional(),
+        daysInGermany: z.null().optional(),
+      })
+      .strict(),
+  }),
+  z.object({
+    kind: z.literal('domain_facts'),
+    domain: z.literal('preferences'),
+    fields: z
+      .object({
+        preferredLanguage: z.null().optional(),
+        theme: z.null().optional(),
+        uiDensity: z.null().optional(),
+      })
+      .strict(),
+  }),
+]);
+
 export const MutationRequestPayloadSchema = z.union([
   DomainFactPayloadSchema,
+  InvalidateDomainFactPayloadSchema,
   PrefMutationPayloadSchema,
   z.object({ kind: z.literal('empty') }),
 ]);

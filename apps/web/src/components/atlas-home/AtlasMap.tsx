@@ -1,5 +1,6 @@
 'use client';
 
+import { useApp } from '@/components/AppProvider';
 import { motion } from 'framer-motion';
 import { ATLAS_CONNECTIONS, ATLAS_NODES } from './atlas-data';
 import { AtlasConnection } from './AtlasConnection';
@@ -70,6 +71,7 @@ export function AtlasMap({
   interactive,
   onNodeSelect,
 }: Props) {
+  const { t } = useApp();
   const zoom = interactive ? (slide.mapZoom ?? 1) : 1;
   const focusNode =
     interactive && slide.focusNode
@@ -113,7 +115,7 @@ export function AtlasMap({
           className="atlas-map__svg"
           preserveAspectRatio="xMidYMid meet"
           role="img"
-          aria-label="Life domain map"
+          aria-label={t('home.atlas.aria.map')}
         >
           <defs>
             <radialGradient id="atlas-map-vignette" cx="50%" cy="48%" r="55%">
@@ -163,7 +165,7 @@ export function AtlasMap({
               <AtlasNode
                 key={node.id}
                 id={node.id}
-                label={node.label}
+                label={t(node.label)}
                 x={node.x}
                 y={node.y}
                 isCenter={node.isCenter}

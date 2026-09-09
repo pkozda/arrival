@@ -36,7 +36,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
     userContext: profile({
       domains: {
         housing: { city: 'Berlin', bundesland: 'BE' },
-        migration: { residencyStatus: 'eu-citizen', arrivedAt: daysAgoIso(14) },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'eu-citizen', arrivedAt: daysAgoIso(14) },
         benefits: { daysInGermany: 14 },
       },
       completeness: { score: 30, missingDomains: ['employment', 'healthInsurance'] },
@@ -49,7 +50,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
     userContext: profile({
       domains: {
         housing: { city: 'Munich' },
-        migration: { residencyStatus: 'work-visa' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'work-visa' },
         employment: { employmentStatus: 'employed' },
         income: { grossMonthlyIncome: 3200 },
       },
@@ -62,7 +64,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
     userContext: profile({
       domains: {
         housing: { city: 'Munich', monthlyColdRent: 1200 },
-        migration: { residencyStatus: 'permanent-resident' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'permanent-resident' },
         employment: { employmentStatus: 'unemployed' },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         benefits: { daysInGermany: 800 },
@@ -76,7 +79,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
     userContext: profile({
       domains: {
         housing: { city: 'Hamburg', monthlyColdRent: 900 },
-        migration: { residencyStatus: 'eu-citizen' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'eu-citizen' },
         employment: { employmentStatus: 'unemployed' },
         healthInsurance: { insuranceType: 'none', hasCoverage: false },
         benefits: { daysInGermany: 500 },
@@ -107,7 +111,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         income: { grossMonthlyIncome: 2200 },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         benefits: { daysInGermany: 600, receivingWohngeld: false },
-        migration: { residencyStatus: 'permanent-resident' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'permanent-resident' },
       },
     }),
     expectedPrimary: 'housing_instability',
@@ -122,7 +127,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         income: { grossMonthlyIncome: 1800 },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         benefits: { daysInGermany: 700, receivingWohngeld: false },
-        migration: { residencyStatus: 'eu-citizen' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'eu-citizen' },
       },
     }),
     expectedPrimary: 'benefits_exploration',
@@ -136,7 +142,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         income: { grossMonthlyIncome: 0 },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         benefits: { receivingBuergergeld: true, daysInGermany: 900 },
-        migration: { residencyStatus: 'permanent-resident' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'permanent-resident' },
       },
       completeness: { score: 85, missingDomains: [] },
     }),
@@ -151,7 +158,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         income: { grossMonthlyIncome: 4500 },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         benefits: { daysInGermany: 1400 },
-        migration: { residencyStatus: 'permanent-resident' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'permanent-resident' },
       },
       completeness: { score: 95, missingDomains: [] },
     }),
@@ -167,7 +175,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         household: { children: [{ age: 8 }, { age: 5 }] },
         benefits: { daysInGermany: 800, receivingWohngeld: false },
-        migration: { residencyStatus: 'permanent-resident' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'permanent-resident' },
       },
     }),
     expectedPrimary: 'benefits_exploration',
@@ -192,7 +201,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
     userContext: profile({
       domains: {
         housing: { city: 'Berlin' },
-        migration: { residencyStatus: 'student-visa' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'student-visa' },
         employment: { employmentStatus: 'student' },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         benefits: { daysInGermany: 400 },
@@ -206,7 +216,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
     userContext: profile({
       domains: {
         housing: { city: 'Berlin' },
-        migration: { residencyStatus: 'eu-citizen' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'eu-citizen' },
         employment: { employmentStatus: 'self-employed' },
         income: { grossMonthlyIncome: 3500 },
         benefits: { daysInGermany: 200 },
@@ -223,7 +234,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         income: { grossMonthlyIncome: 5000 },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         household: { children: [{ age: 0 }] },
-        migration: { residencyStatus: 'permanent-resident' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'permanent-resident' },
         benefits: { daysInGermany: 1000 },
       },
     }),
@@ -252,7 +264,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         employment: { employmentStatus: 'employed' },
         income: { grossMonthlyIncome: 4000 },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
-        migration: { residencyStatus: 'work-visa' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'work-visa' },
         benefits: { daysInGermany: 1100 },
       },
     }),
@@ -268,7 +281,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         income: { grossMonthlyIncome: 1200 },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         benefits: { daysInGermany: 500, receivingWohngeld: false },
-        migration: { residencyStatus: 'eu-citizen' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'eu-citizen' },
       },
     }),
     expectedPrimary: 'benefits_exploration',
@@ -281,7 +295,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         employment: { employmentStatus: 'unemployed' },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         benefits: { receivingAlg1: true, daysInGermany: 1200 },
-        migration: { residencyStatus: 'permanent-resident' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'permanent-resident' },
       },
     }),
     expectedPrimary: 'benefits_exploration',
@@ -306,7 +321,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         housing: { city: 'Hannover' },
         employment: { employmentStatus: 'employed' },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
-        migration: { residencyStatus: 'permanent-resident' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'permanent-resident' },
         benefits: { daysInGermany: 800 },
       },
       completeness: { score: 80, missingDomains: [] },
@@ -319,7 +335,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
     userContext: profile({
       domains: {
         housing: { city: 'Berlin', bundesland: 'BE' },
-        migration: { residencyStatus: 'eu-citizen', arrivedAt: daysAgoIso(14) },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'eu-citizen', arrivedAt: daysAgoIso(14) },
         benefits: { daysInGermany: 14 },
       },
     }),
@@ -331,7 +348,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
     userContext: profile({
       domains: {
         housing: { city: 'Munich', monthlyColdRent: 1300 },
-        migration: { residencyStatus: 'permanent-resident' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'permanent-resident' },
         employment: { employmentStatus: 'unemployed' },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
         benefits: { daysInGermany: 900 },
@@ -347,7 +365,8 @@ export const CLASSIFIER_FIXTURES: ClassifierFixture[] = [
         housing: { city: 'Hamburg', monthlyColdRent: 1100 },
         employment: { employmentStatus: 'employed' },
         healthInsurance: { insuranceType: 'public', hasCoverage: true },
-        migration: { residencyStatus: 'permanent-resident' },
+        migration: {
+          municipalRegistrationConfirmed: true, residencyStatus: 'permanent-resident' },
         benefits: { daysInGermany: 1000 },
       },
       completeness: { score: 78, missingDomains: [] },

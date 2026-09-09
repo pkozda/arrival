@@ -25,6 +25,12 @@ const sharedResolve = {
       __dirname,
       '../../packages/product-contract/src/index.ts'
     ),
+    // More specific subpath must precede package root alias.
+    '@arrival-atlas/mbde/awareness': path.resolve(
+      __dirname,
+      '../../packages/mbde/src/awareness/index.ts'
+    ),
+    '@arrival-atlas/mbde': path.resolve(__dirname, '../../packages/mbde/src/index.ts'),
   },
 };
 
@@ -34,6 +40,7 @@ export default defineConfig({
     projects: [
       {
         extends: true,
+        resolve: sharedResolve,
         test: {
           name: 'unit',
           include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],

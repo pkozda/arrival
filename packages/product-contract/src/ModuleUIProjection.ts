@@ -29,6 +29,19 @@ export type SanitizedExplanation = {
   reasons: readonly string[];
 };
 
+/** Product-level terminal outcomes for module execution (PD-003 Healthcare). */
+export type ModuleExecutionOutcome =
+  | 'RECOMMENDATIONS'
+  | 'MORE_INFO_REQUIRED'
+  | 'NO_APPLICABLE_RESULT'
+  | 'TECHNICAL_ERROR';
+
+export type ModuleMissingContext = {
+  field: string;
+  reasonKey: string;
+  profileHref?: string;
+};
+
 export type ModuleUIProjection = {
   moduleId: string;
   title: string;
@@ -37,6 +50,10 @@ export type ModuleUIProjection = {
   recommendations: readonly SanitizedRecommendation[];
   actions: readonly SanitizedAction[];
   explanation?: SanitizedExplanation;
+  /** Explicit terminal outcome — distinguishes intentional empties from projection gaps. */
+  outcome?: ModuleExecutionOutcome;
+  missingContext?: readonly ModuleMissingContext[];
+  insuranceAssumption?: 'insured' | 'uninsured' | 'unknown';
   error?: {
     message: string;
     code?: string;

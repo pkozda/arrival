@@ -72,10 +72,77 @@ const EN: Translations = {
   'discovery.runSummary.started': 'Started',
   'discovery.runSummary.finished': 'Finished',
   'discovery.runSummary.zeroNew': 'No new results in the last run',
+  'discovery.runSummary.resultsForRun': 'Results in this run',
   'discovery.runNow.button': 'Run now',
+  'discovery.runNow.queued': 'Queued…',
   'discovery.runNow.running': 'Running…',
   'discovery.runNow.success': 'Discovery run completed',
   'discovery.runNow.error': 'Discovery run failed:',
+  'discovery.execution.idle': 'No Discovery run is active. You can run a search when ready.',
+  'discovery.execution.queued': 'Discovery run accepted and waiting to start.',
+  'discovery.execution.running': 'Discovery is running.',
+  'discovery.execution.success': 'Discovery completed with matching opportunities.',
+  'discovery.execution.noResults': 'Search completed, but no matching opportunities were found.',
+  'discovery.execution.noResultsDetail':
+    'The run finished successfully. Try adjusting criteria, then run again.',
+  'discovery.execution.error': 'Discovery run failed.',
+  'discovery.execution.errorDetail': 'Something went wrong while running Discovery.',
+  'discovery.execution.retry': 'Try again',
+  'discovery.execution.resultsAvailable': 'Matching opportunities are listed below.',
+  'discovery.execution.adjustProfile': 'Adjust profile',
+  'discovery.execution.runAgain': 'Run again',
+  'discovery.results.count': '{count} from this run',
+  'discovery.results.inProgress': 'Discovery is still running. Opportunities will appear when the run finishes.',
+  'discovery.results.errorHint': 'This run failed. Opportunities below (if any) are from earlier runs.',
+  'discovery.results.previousHeading': 'Opportunities from earlier runs',
+  'discovery.results.currentRun': 'From this run',
+  'discovery.result.openSource': 'Open source',
+  'discovery.result.externalLink': 'opens in a new tab',
+  'discovery.result.sourceUnavailable':
+    'No verified source link is available for this opportunity.',
+  'discovery.result.salary': 'Salary',
+  'discovery.result.sourceNotVerified':
+    'This opportunity does not have a passed verification status, so no source action is offered.',
+  'discovery.result.sourceMissingUrl':
+    'Verification passed, but no source URL is stored for this opportunity.',
+  'discovery.trust.status.passed': 'Checks passed',
+  'discovery.trust.status.failed': 'Verification failed',
+  'discovery.trust.status.unknown': 'Verification unknown',
+  'discovery.trust.summary.jobsOfficialSource':
+    'An official source page was checked for this opportunity.',
+  'discovery.trust.summary.giveawaysFreeAndDeadline':
+    'Free-entry and deadline checks passed for this opportunity.',
+  'discovery.trust.summary.giveawaysFree': 'A free-entry check passed for this opportunity.',
+  'discovery.trust.summary.giveawaysDeadline': 'A deadline check passed for this opportunity.',
+  'discovery.trust.summary.checksPassed': 'Required verification checks passed.',
+  'discovery.trust.summary.failed': 'Required verification checks did not pass.',
+  'discovery.trust.summary.unknown':
+    'Arrival Atlas could not confirm the required verification checks.',
+  'discovery.trust.whyChecked': 'What was checked',
+  'discovery.trust.noChecks': 'No individual verification checks were stored for this result.',
+  'discovery.trust.required': 'required',
+  'discovery.trust.verifiedAt': 'Checked at',
+  'discovery.trust.boundary':
+    'This does not guarantee eligibility, ongoing availability, or that Arrival Atlas completed any application.',
+  'discovery.trust.relevanceNote': 'criteria match, not a trust guarantee',
+  'discovery.trust.check.officialSource': 'Official source page',
+  'discovery.trust.check.freeParticipation': 'Free participation',
+  'discovery.trust.check.deadlineValid': 'Valid deadline',
+  'discovery.trust.check.generic': 'Verification check',
+  'discovery.trust.outcome.true': 'passed',
+  'discovery.trust.outcome.false': 'failed',
+  'discovery.trust.outcome.unknown': 'unknown',
+  'discovery.trust.sourceTrust.label': 'Source classification',
+  'discovery.trust.sourceTrust.official': 'Official source',
+  'discovery.trust.sourceTrust.established': 'Established third party',
+  'discovery.trust.sourceTrust.aggregator': 'Aggregator',
+  'discovery.trust.sourceTrust.community': 'Community source',
+  'discovery.trust.sourceTrust.unknown': 'Unknown source class',
+  'discovery.trust.freshness.label': 'Page freshness signal',
+  'discovery.trust.freshness.current': 'Page content was reachable when checked',
+  'discovery.trust.freshness.expired': 'Page looked closed or expired when checked',
+  'discovery.trust.freshness.stale': 'Page freshness was marked stale when checked',
+  'discovery.trust.freshness.unknown': 'Page freshness was unknown when checked',
   'discovery.score.role': 'Role fit',
   'discovery.score.location': 'Location',
   'discovery.score.freshness': 'Freshness',
@@ -146,6 +213,100 @@ const EN: Translations = {
   'discovery.notification.address.loading': 'Loading notification email…',
   'discovery.notification.address.loadError':
     'Could not load your notification email. Try refreshing.',
+
+  'discovery.setup.title': 'Set up Discovery',
+  'discovery.setup.subtitle':
+    'Choose guided setup for a short wizard, or create a profile yourself.',
+  'discovery.setup.guided': 'Guided setup',
+  'discovery.setup.selfDirected': 'Create profile myself',
+  'discovery.setup.guidedHint':
+    'Guided setup creates a Discovery profile. It does not run a search by itself.',
+
+  'discovery.guided.title': 'Guided Discovery',
+  'discovery.guided.cancel': 'Cancel',
+  'discovery.guided.back': 'Back',
+  'discovery.guided.next': 'Next',
+  'discovery.guided.create': 'Create profile',
+  'discovery.guided.creating': 'Creating…',
+  'discovery.guided.createError': 'Could not create the Discovery profile. Try again.',
+  'discovery.guided.sidebarHint': 'Continue the guided steps in the sidebar.',
+  'discovery.guided.defaultName.jobs': 'My job search',
+  'discovery.guided.defaultName.giveaways': 'My giveaways search',
+  'discovery.guided.stepLabel.welcome': 'Step 1 of 5 — Welcome',
+  'discovery.guided.stepLabel.intent': 'Step 2 of 5 — What to discover',
+  'discovery.guided.stepLabel.criteria': 'Step 3 of 5 — Minimum criteria',
+  'discovery.guided.stepLabel.review': 'Step 4 of 5 — Review',
+  'discovery.guided.stepLabel.created': 'Step 5 of 5 — Profile created',
+  'discovery.guided.welcome.body':
+    'This short wizard helps you create your first Discovery profile with only the minimum needed details.',
+  'discovery.guided.welcome.boundary':
+    'Creating a profile does not run Discovery or invent results.',
+  'discovery.guided.welcome.start': 'Start guided setup',
+  'discovery.guided.intent.body': 'What do you want Discovery to look for?',
+  'discovery.guided.criteria.body':
+    'Add the minimum details for this profile. You can refine more later.',
+  'discovery.guided.review.body': 'Review what will be created.',
+  'discovery.guided.review.intent': 'Discovery type',
+  'discovery.guided.review.boundary':
+    'Next step creates the profile only. No search runs automatically.',
+  'discovery.guided.created.confirmation': 'Discovery profile created.',
+  'discovery.guided.created.next':
+    'Your profile is ready. You can explore it now. Running Discovery is a separate step.',
+  'discovery.guided.created.continue': 'Continue to Discovery',
+  'discovery.guided.validation.intent': 'Choose Jobs or Giveaways to continue.',
+  'discovery.guided.validation.name': 'Enter a profile name.',
+  'discovery.guided.validation.country': 'Enter a two-letter country code (for example DE).',
+
+  'discovery.persistence.account': 'Your Discovery profiles are saved to your account.',
+  'discovery.persistence.session':
+    'This is a demo session. Discovery profiles are available only in this session.',
+
+  'discovery.continuity.title': 'Discovery ownership',
+  'discovery.continuity.sessionExplain':
+    'Automatic search in this session is not the same as durable account ownership. Connect an account to keep these profiles with your account.',
+  'discovery.continuity.accountExplain':
+    'These Discovery profiles belong to your account and persist with account ownership.',
+  'discovery.continuity.claim': 'Continue with account',
+  'discovery.continuity.claiming': 'Connecting account…',
+  'discovery.continuity.claimSuccess':
+    'Account connected. Discovery profiles now use durable account ownership.',
+  'discovery.continuity.unavailable':
+    'Account connection is not available in this context.',
+  'discovery.continuity.retry': 'Retry',
+  'discovery.continuity.conflict':
+    'Could not transfer Discovery ownership. Your session profiles remain available in this session.',
+
+  'discovery.automation.title': 'Automatic search',
+  'discovery.automation.subtitle':
+    'Schedule recurring Discovery runs separately from email digests.',
+  'discovery.automation.sessionWarning':
+    'This is a demo session. Automatic search settings are saved for this session only and are not a durable account promise.',
+  'discovery.automation.accountNote':
+    'Automatic search is saved with your account. Host scheduling decides when due runs execute.',
+  'discovery.automation.status': 'Automatic search',
+  'discovery.automation.status.on': 'Enabled (daily)',
+  'discovery.automation.status.off': 'Off — manual Run now only',
+  'discovery.automation.cadence': 'Schedule',
+  'discovery.automation.nextRun': 'Next expected run',
+  'discovery.automation.nextRunNone': 'No upcoming automatic run',
+  'discovery.automation.lastTrigger': 'Last run started by',
+  'discovery.automation.trigger.manual': 'Manual Run now',
+  'discovery.automation.trigger.scheduled': 'Scheduled automatic search',
+  'discovery.automation.delivery': 'Email digest',
+  'discovery.automation.delivery.off': 'Email digests off',
+  'discovery.automation.delivery.onSkipEmpty':
+    'Email digests on — empty digests are not sent',
+  'discovery.automation.delivery.onIncludeEmpty':
+    'Email digests on — empty digests may be sent',
+  'discovery.automation.newnessNote':
+    '“New” on a result means first seen by Discovery for this profile — not that you have applied, and not that email was opened.',
+  'discovery.automation.enable': 'Enable daily automatic search',
+  'discovery.automation.disable': 'Disable automatic search',
+  'discovery.automation.editDelivery': 'Edit email digest settings',
+  'discovery.automation.jobsOnly':
+    'Automatic daily search is available for Jobs profiles in this version.',
+  'discovery.automation.deliveryFailureNote':
+    'If an email digest fails to send, Discovery run status is unchanged.',
 };
 
 const DE: Translations = {
@@ -221,10 +382,80 @@ const DE: Translations = {
   'discovery.runSummary.started': 'Gestartet',
   'discovery.runSummary.finished': 'Beendet',
   'discovery.runSummary.zeroNew': 'Keine neuen Treffer im letzten Lauf',
+  'discovery.runSummary.resultsForRun': 'Ergebnisse in diesem Lauf',
   'discovery.runNow.button': 'Jetzt ausführen',
+  'discovery.runNow.queued': 'In Warteschlange…',
   'discovery.runNow.running': 'Läuft…',
   'discovery.runNow.success': 'Entdeckungslauf abgeschlossen',
   'discovery.runNow.error': 'Entdeckungslauf fehlgeschlagen:',
+  'discovery.execution.idle': 'Kein Discovery-Lauf ist aktiv. Sie können die Suche starten, wenn Sie bereit sind.',
+  'discovery.execution.queued': 'Discovery-Lauf angenommen und wartet auf den Start.',
+  'discovery.execution.running': 'Discovery läuft.',
+  'discovery.execution.success': 'Discovery abgeschlossen — passende Angebote gefunden.',
+  'discovery.execution.noResults':
+    'Suche abgeschlossen, aber keine passenden Angebote gefunden.',
+  'discovery.execution.noResultsDetail':
+    'Der Lauf war erfolgreich. Passen Sie die Kriterien an und starten Sie erneut.',
+  'discovery.execution.error': 'Discovery-Lauf fehlgeschlagen.',
+  'discovery.execution.errorDetail': 'Beim Ausführen von Discovery ist etwas schiefgelaufen.',
+  'discovery.execution.retry': 'Erneut versuchen',
+  'discovery.execution.resultsAvailable': 'Passende Angebote sind unten aufgeführt.',
+  'discovery.execution.adjustProfile': 'Profil anpassen',
+  'discovery.execution.runAgain': 'Erneut ausführen',
+  'discovery.results.count': '{count} aus diesem Lauf',
+  'discovery.results.inProgress':
+    'Discovery läuft noch. Angebote erscheinen, wenn der Lauf abgeschlossen ist.',
+  'discovery.results.errorHint':
+    'Dieser Lauf ist fehlgeschlagen. Angebote unten (falls vorhanden) stammen von früheren Läufen.',
+  'discovery.results.previousHeading': 'Angebote aus früheren Läufen',
+  'discovery.results.currentRun': 'Aus diesem Lauf',
+  'discovery.result.openSource': 'Quelle öffnen',
+  'discovery.result.externalLink': 'öffnet in neuem Tab',
+  'discovery.result.sourceUnavailable':
+    'Für dieses Angebot ist kein verifizierter Quellenlink verfügbar.',
+  'discovery.result.salary': 'Gehalt',
+  'discovery.result.sourceNotVerified':
+    'Für dieses Angebot liegt kein bestandener Verifikationsstatus vor; daher wird keine Quellenaktion angeboten.',
+  'discovery.result.sourceMissingUrl':
+    'Die Verifikation ist bestanden, aber es ist keine Quellen-URL gespeichert.',
+  'discovery.trust.status.passed': 'Prüfungen bestanden',
+  'discovery.trust.status.failed': 'Verifikation fehlgeschlagen',
+  'discovery.trust.status.unknown': 'Verifikation unbekannt',
+  'discovery.trust.summary.jobsOfficialSource':
+    'Für dieses Angebot wurde eine offizielle Quellseite geprüft.',
+  'discovery.trust.summary.giveawaysFreeAndDeadline':
+    'Kostenlose Teilnahme und Frist wurden für dieses Angebot geprüft.',
+  'discovery.trust.summary.giveawaysFree': 'Die Prüfung auf kostenlose Teilnahme ist bestanden.',
+  'discovery.trust.summary.giveawaysDeadline': 'Die Fristprüfung ist bestanden.',
+  'discovery.trust.summary.checksPassed': 'Erforderliche Verifikationsprüfungen sind bestanden.',
+  'discovery.trust.summary.failed': 'Erforderliche Verifikationsprüfungen sind nicht bestanden.',
+  'discovery.trust.summary.unknown':
+    'Arrival Atlas konnte die erforderlichen Verifikationsprüfungen nicht bestätigen.',
+  'discovery.trust.whyChecked': 'Was geprüft wurde',
+  'discovery.trust.noChecks': 'Für dieses Ergebnis sind keine einzelnen Prüfungen gespeichert.',
+  'discovery.trust.required': 'erforderlich',
+  'discovery.trust.verifiedAt': 'Geprüft am',
+  'discovery.trust.boundary':
+    'Das garantiert keine Berechtigung, fortlaufende Verfügbarkeit und keine Bewerbung durch Arrival Atlas.',
+  'discovery.trust.relevanceNote': 'Kriterienpassung, keine Vertrauensgarantie',
+  'discovery.trust.check.officialSource': 'Offizielle Quellseite',
+  'discovery.trust.check.freeParticipation': 'Kostenlose Teilnahme',
+  'discovery.trust.check.deadlineValid': 'Gültige Frist',
+  'discovery.trust.check.generic': 'Verifikationsprüfung',
+  'discovery.trust.outcome.true': 'bestanden',
+  'discovery.trust.outcome.false': 'fehlgeschlagen',
+  'discovery.trust.outcome.unknown': 'unbekannt',
+  'discovery.trust.sourceTrust.label': 'Quellenklassifikation',
+  'discovery.trust.sourceTrust.official': 'Offizielle Quelle',
+  'discovery.trust.sourceTrust.established': 'Etabliertes Drittangebot',
+  'discovery.trust.sourceTrust.aggregator': 'Aggregator',
+  'discovery.trust.sourceTrust.community': 'Community-Quelle',
+  'discovery.trust.sourceTrust.unknown': 'Unbekannte Quellenklasse',
+  'discovery.trust.freshness.label': 'Aktualitätssignal der Seite',
+  'discovery.trust.freshness.current': 'Seiteninhalt war bei der Prüfung erreichbar',
+  'discovery.trust.freshness.expired': 'Seite wirkte bei der Prüfung geschlossen oder abgelaufen',
+  'discovery.trust.freshness.stale': 'Seitenaktualität war bei der Prüfung als veraltet markiert',
+  'discovery.trust.freshness.unknown': 'Seitenaktualität war bei der Prüfung unbekannt',
   'discovery.score.role': 'Rollenpassung',
   'discovery.score.location': 'Standort',
   'discovery.score.freshness': 'Aktualität',
@@ -296,6 +527,100 @@ const DE: Translations = {
   'discovery.notification.address.loading': 'Benachrichtigungs-E-Mail wird geladen…',
   'discovery.notification.address.loadError':
     'Benachrichtigungs-E-Mail konnte nicht geladen werden. Bitte aktualisieren.',
+
+  'discovery.setup.title': 'Discovery einrichten',
+  'discovery.setup.subtitle':
+    'Wählen Sie die geführte Einrichtung für einen kurzen Assistenten oder erstellen Sie ein Profil selbst.',
+  'discovery.setup.guided': 'Geführte Einrichtung',
+  'discovery.setup.selfDirected': 'Profil selbst erstellen',
+  'discovery.setup.guidedHint':
+    'Die geführte Einrichtung erstellt ein Discovery-Profil. Sie startet keine Suche von allein.',
+
+  'discovery.guided.title': 'Geführte Discovery',
+  'discovery.guided.cancel': 'Abbrechen',
+  'discovery.guided.back': 'Zurück',
+  'discovery.guided.next': 'Weiter',
+  'discovery.guided.create': 'Profil erstellen',
+  'discovery.guided.creating': 'Wird erstellt…',
+  'discovery.guided.createError': 'Discovery-Profil konnte nicht erstellt werden. Bitte erneut versuchen.',
+  'discovery.guided.sidebarHint': 'Setzen Sie die geführten Schritte in der Seitenleiste fort.',
+  'discovery.guided.defaultName.jobs': 'Meine Jobsuche',
+  'discovery.guided.defaultName.giveaways': 'Meine Gewinnspiel-Suche',
+  'discovery.guided.stepLabel.welcome': 'Schritt 1 von 5 — Willkommen',
+  'discovery.guided.stepLabel.intent': 'Schritt 2 von 5 — Was entdecken',
+  'discovery.guided.stepLabel.criteria': 'Schritt 3 von 5 — Mindestanforderungen',
+  'discovery.guided.stepLabel.review': 'Schritt 4 von 5 — Prüfen',
+  'discovery.guided.stepLabel.created': 'Schritt 5 von 5 — Profil erstellt',
+  'discovery.guided.welcome.body':
+    'Dieser kurze Assistent hilft Ihnen, Ihr erstes Discovery-Profil mit nur den nötigsten Angaben zu erstellen.',
+  'discovery.guided.welcome.boundary':
+    'Ein Profil zu erstellen startet keine Discovery und erzeugt keine Ergebnisse.',
+  'discovery.guided.welcome.start': 'Geführte Einrichtung starten',
+  'discovery.guided.intent.body': 'Wonach soll Discovery suchen?',
+  'discovery.guided.criteria.body':
+    'Ergänzen Sie die Mindestdaten für dieses Profil. Später können Sie mehr verfeinern.',
+  'discovery.guided.review.body': 'Prüfen Sie, was erstellt wird.',
+  'discovery.guided.review.intent': 'Discovery-Typ',
+  'discovery.guided.review.boundary':
+    'Als Nächstes wird nur das Profil erstellt. Es läuft keine automatische Suche.',
+  'discovery.guided.created.confirmation': 'Discovery-Profil erstellt.',
+  'discovery.guided.created.next':
+    'Ihr Profil ist bereit. Sie können es jetzt ansehen. Discovery auszuführen ist ein eigener Schritt.',
+  'discovery.guided.created.continue': 'Weiter zu Discovery',
+  'discovery.guided.validation.intent': 'Wählen Sie Jobs oder Gewinnspiele, um fortzufahren.',
+  'discovery.guided.validation.name': 'Geben Sie einen Profilnamen ein.',
+  'discovery.guided.validation.country': 'Geben Sie einen zweistelligen Ländercode ein (z. B. DE).',
+
+  'discovery.persistence.account': 'Ihre Discovery-Profile werden in Ihrem Konto gespeichert.',
+  'discovery.persistence.session':
+    'Dies ist eine Demo-Sitzung. Discovery-Profile sind nur in dieser Sitzung verfügbar.',
+
+  'discovery.continuity.title': 'Discovery-Eigentümerschaft',
+  'discovery.continuity.sessionExplain':
+    'Automatische Suche in dieser Sitzung ist nicht dasselbe wie dauerhafte Konto-Eigentümerschaft. Verbinden Sie ein Konto, um diese Profile mit Ihrem Konto zu behalten.',
+  'discovery.continuity.accountExplain':
+    'Diese Discovery-Profile gehören zu Ihrem Konto und bleiben mit der Konto-Eigentümerschaft erhalten.',
+  'discovery.continuity.claim': 'Mit Konto fortfahren',
+  'discovery.continuity.claiming': 'Konto wird verbunden…',
+  'discovery.continuity.claimSuccess':
+    'Konto verbunden. Discovery-Profile nutzen jetzt dauerhafte Konto-Eigentümerschaft.',
+  'discovery.continuity.unavailable':
+    'Kontoverbindung ist in diesem Kontext nicht verfügbar.',
+  'discovery.continuity.retry': 'Erneut versuchen',
+  'discovery.continuity.conflict':
+    'Discovery-Eigentümerschaft konnte nicht übertragen werden. Sitzungsprofile bleiben in dieser Sitzung verfügbar.',
+
+  'discovery.automation.title': 'Automatische Suche',
+  'discovery.automation.subtitle':
+    'Wiederkehrende Discovery-Läufe planen — getrennt von E-Mail-Digests.',
+  'discovery.automation.sessionWarning':
+    'Dies ist eine Demo-Sitzung. Einstellungen für automatische Suche gelten nur für diese Sitzung und sind kein dauerhaftes Kontoversprechen.',
+  'discovery.automation.accountNote':
+    'Automatische Suche wird mit Ihrem Konto gespeichert. Der Host-Zeitplan entscheidet, wann fällige Läufe starten.',
+  'discovery.automation.status': 'Automatische Suche',
+  'discovery.automation.status.on': 'Aktiv (täglich)',
+  'discovery.automation.status.off': 'Aus — nur manuelles Jetzt starten',
+  'discovery.automation.cadence': 'Zeitplan',
+  'discovery.automation.nextRun': 'Nächster erwarteter Lauf',
+  'discovery.automation.nextRunNone': 'Kein bevorstehender automatischer Lauf',
+  'discovery.automation.lastTrigger': 'Letzter Lauf gestartet durch',
+  'discovery.automation.trigger.manual': 'Manuelles Jetzt starten',
+  'discovery.automation.trigger.scheduled': 'Geplante automatische Suche',
+  'discovery.automation.delivery': 'E-Mail-Digest',
+  'discovery.automation.delivery.off': 'E-Mail-Digests aus',
+  'discovery.automation.delivery.onSkipEmpty':
+    'E-Mail-Digests an — leere Digests werden nicht gesendet',
+  'discovery.automation.delivery.onIncludeEmpty':
+    'E-Mail-Digests an — leere Digests können gesendet werden',
+  'discovery.automation.newnessNote':
+    '„Neu“ bei einem Ergebnis bedeutet erstmals von Discovery für dieses Profil gesehen — nicht, dass Sie sich beworben haben, und nicht, dass eine E-Mail geöffnet wurde.',
+  'discovery.automation.enable': 'Tägliche automatische Suche aktivieren',
+  'discovery.automation.disable': 'Automatische Suche deaktivieren',
+  'discovery.automation.editDelivery': 'E-Mail-Digest-Einstellungen bearbeiten',
+  'discovery.automation.jobsOnly':
+    'Automatische tägliche Suche ist in dieser Version für Jobs-Profile verfügbar.',
+  'discovery.automation.deliveryFailureNote':
+    'Wenn ein E-Mail-Digest nicht gesendet werden kann, ändert sich der Discovery-Laufstatus nicht.',
 };
 
 const RU: Translations = {
@@ -371,10 +696,80 @@ const RU: Translations = {
   'discovery.runSummary.started': 'Начало',
   'discovery.runSummary.finished': 'Окончание',
   'discovery.runSummary.zeroNew': 'В последнем запуске новых совпадений нет',
+  'discovery.runSummary.resultsForRun': 'Результаты этого запуска',
   'discovery.runNow.button': 'Запустить сейчас',
+  'discovery.runNow.queued': 'В очереди…',
   'discovery.runNow.running': 'Выполняется…',
   'discovery.runNow.success': 'Запуск поиска завершён',
   'discovery.runNow.error': 'Ошибка запуска поиска:',
+  'discovery.execution.idle': 'Активного запуска Discovery нет. Можно запустить поиск, когда будете готовы.',
+  'discovery.execution.queued': 'Запуск Discovery принят и ожидает начала.',
+  'discovery.execution.running': 'Discovery выполняется.',
+  'discovery.execution.success': 'Discovery завершён — найдены подходящие возможности.',
+  'discovery.execution.noResults':
+    'Поиск завершён, но подходящих возможностей не найдено.',
+  'discovery.execution.noResultsDetail':
+    'Запуск прошёл успешно. Измените критерии и запустите снова.',
+  'discovery.execution.error': 'Запуск Discovery не удался.',
+  'discovery.execution.errorDetail': 'При выполнении Discovery произошла ошибка.',
+  'discovery.execution.retry': 'Попробовать снова',
+  'discovery.execution.resultsAvailable': 'Подходящие возможности показаны ниже.',
+  'discovery.execution.adjustProfile': 'Изменить профиль',
+  'discovery.execution.runAgain': 'Запустить снова',
+  'discovery.results.count': '{count} из этого запуска',
+  'discovery.results.inProgress':
+    'Discovery ещё выполняется. Возможности появятся после завершения запуска.',
+  'discovery.results.errorHint':
+    'Этот запуск не удался. Возможности ниже (если есть) относятся к более ранним запускам.',
+  'discovery.results.previousHeading': 'Возможности из более ранних запусков',
+  'discovery.results.currentRun': 'Из этого запуска',
+  'discovery.result.openSource': 'Открыть источник',
+  'discovery.result.externalLink': 'открывается в новой вкладке',
+  'discovery.result.sourceUnavailable':
+    'Для этой возможности нет проверенной ссылки на источник.',
+  'discovery.result.salary': 'Зарплата',
+  'discovery.result.sourceNotVerified':
+    'У этой возможности нет успешного статуса проверки, поэтому действие с источником не предлагается.',
+  'discovery.result.sourceMissingUrl':
+    'Проверка пройдена, но URL источника для этой возможности не сохранён.',
+  'discovery.trust.status.passed': 'Проверки пройдены',
+  'discovery.trust.status.failed': 'Проверка не пройдена',
+  'discovery.trust.status.unknown': 'Статус проверки неизвестен',
+  'discovery.trust.summary.jobsOfficialSource':
+    'Для этой возможности была проверена официальная страница источника.',
+  'discovery.trust.summary.giveawaysFreeAndDeadline':
+    'Для этой возможности пройдены проверки бесплатного участия и срока.',
+  'discovery.trust.summary.giveawaysFree': 'Проверка бесплатного участия пройдена.',
+  'discovery.trust.summary.giveawaysDeadline': 'Проверка срока пройдена.',
+  'discovery.trust.summary.checksPassed': 'Обязательные проверки пройдены.',
+  'discovery.trust.summary.failed': 'Обязательные проверки не пройдены.',
+  'discovery.trust.summary.unknown':
+    'Arrival Atlas не смог подтвердить обязательные проверки.',
+  'discovery.trust.whyChecked': 'Что было проверено',
+  'discovery.trust.noChecks': 'Для этого результата не сохранены отдельные проверки.',
+  'discovery.trust.required': 'обязательно',
+  'discovery.trust.verifiedAt': 'Проверено',
+  'discovery.trust.boundary':
+    'Это не гарантирует право на участие, постоянную доступность и не означает, что Arrival Atlas подал заявку.',
+  'discovery.trust.relevanceNote': 'соответствие критериям, не гарантия доверия',
+  'discovery.trust.check.officialSource': 'Официальная страница источника',
+  'discovery.trust.check.freeParticipation': 'Бесплатное участие',
+  'discovery.trust.check.deadlineValid': 'Действующий срок',
+  'discovery.trust.check.generic': 'Проверка',
+  'discovery.trust.outcome.true': 'пройдено',
+  'discovery.trust.outcome.false': 'не пройдено',
+  'discovery.trust.outcome.unknown': 'неизвестно',
+  'discovery.trust.sourceTrust.label': 'Классификация источника',
+  'discovery.trust.sourceTrust.official': 'Официальный источник',
+  'discovery.trust.sourceTrust.established': 'Устоявшийся сторонний источник',
+  'discovery.trust.sourceTrust.aggregator': 'Агрегатор',
+  'discovery.trust.sourceTrust.community': 'Сообщество',
+  'discovery.trust.sourceTrust.unknown': 'Неизвестный класс источника',
+  'discovery.trust.freshness.label': 'Сигнал актуальности страницы',
+  'discovery.trust.freshness.current': 'Содержимое страницы было доступно при проверке',
+  'discovery.trust.freshness.expired': 'Страница выглядела закрытой или просроченной при проверке',
+  'discovery.trust.freshness.stale': 'Актуальность страницы была помечена как устаревшая при проверке',
+  'discovery.trust.freshness.unknown': 'Актуальность страницы при проверке была неизвестна',
   'discovery.score.role': 'Соответствие роли',
   'discovery.score.location': 'Локация',
   'discovery.score.freshness': 'Актуальность',
@@ -445,10 +840,140 @@ const RU: Translations = {
   'discovery.notification.address.loading': 'Загрузка email для уведомлений…',
   'discovery.notification.address.loadError':
     'Не удалось загрузить email для уведомлений. Обновите страницу.',
+
+  'discovery.setup.title': 'Настроить Discovery',
+  'discovery.setup.subtitle':
+    'Выберите пошаговую настройку или создайте профиль самостоятельно.',
+  'discovery.setup.guided': 'Пошаговая настройка',
+  'discovery.setup.selfDirected': 'Создать профиль самому',
+  'discovery.setup.guidedHint':
+    'Пошаговая настройка создаёт профиль Discovery. Она сама по себе не запускает поиск.',
+
+  'discovery.guided.title': 'Пошаговый Discovery',
+  'discovery.guided.cancel': 'Отмена',
+  'discovery.guided.back': 'Назад',
+  'discovery.guided.next': 'Далее',
+  'discovery.guided.create': 'Создать профиль',
+  'discovery.guided.creating': 'Создание…',
+  'discovery.guided.createError': 'Не удалось создать профиль Discovery. Попробуйте ещё раз.',
+  'discovery.guided.sidebarHint': 'Продолжите шаги в боковой панели.',
+  'discovery.guided.defaultName.jobs': 'Мой поиск работы',
+  'discovery.guided.defaultName.giveaways': 'Мой поиск раздач',
+  'discovery.guided.stepLabel.welcome': 'Шаг 1 из 5 — Приветствие',
+  'discovery.guided.stepLabel.intent': 'Шаг 2 из 5 — Что искать',
+  'discovery.guided.stepLabel.criteria': 'Шаг 3 из 5 — Минимум данных',
+  'discovery.guided.stepLabel.review': 'Шаг 4 из 5 — Проверка',
+  'discovery.guided.stepLabel.created': 'Шаг 5 из 5 — Профиль создан',
+  'discovery.guided.welcome.body':
+    'Этот короткий мастер поможет создать первый профиль Discovery только с необходимыми данными.',
+  'discovery.guided.welcome.boundary':
+    'Создание профиля не запускает Discovery и не создаёт результаты.',
+  'discovery.guided.welcome.start': 'Начать пошаговую настройку',
+  'discovery.guided.intent.body': 'Что должен искать Discovery?',
+  'discovery.guided.criteria.body':
+    'Укажите минимум данных для профиля. Позже можно уточнить детали.',
+  'discovery.guided.review.body': 'Проверьте, что будет создано.',
+  'discovery.guided.review.intent': 'Тип Discovery',
+  'discovery.guided.review.boundary':
+    'Дальше создаётся только профиль. Поиск сам не запускается.',
+  'discovery.guided.created.confirmation': 'Профиль Discovery создан.',
+  'discovery.guided.created.next':
+    'Профиль готов. Вы можете открыть его сейчас. Запуск Discovery — отдельный шаг.',
+  'discovery.guided.created.continue': 'Перейти к Discovery',
+  'discovery.guided.validation.intent': 'Выберите Jobs или Giveaways, чтобы продолжить.',
+  'discovery.guided.validation.name': 'Введите название профиля.',
+  'discovery.guided.validation.country': 'Введите двухбуквенный код страны (например DE).',
+
+  'discovery.persistence.account': 'Ваши профили Discovery сохраняются в вашем аккаунте.',
+  'discovery.persistence.session':
+    'Это демо-сессия. Профили Discovery доступны только в этой сессии.',
+
+  'discovery.continuity.title': 'Владение Discovery',
+  'discovery.continuity.sessionExplain':
+    'Автоматический поиск в этой сессии — это не то же самое, что устойчивое владение аккаунтом. Подключите аккаунт, чтобы сохранить эти профили в аккаунте.',
+  'discovery.continuity.accountExplain':
+    'Эти профили Discovery принадлежат вашему аккаунту и сохраняются с владением аккаунта.',
+  'discovery.continuity.claim': 'Продолжить с аккаунтом',
+  'discovery.continuity.claiming': 'Подключение аккаунта…',
+  'discovery.continuity.claimSuccess':
+    'Аккаунт подключён. Профили Discovery теперь используют устойчивое владение аккаунтом.',
+  'discovery.continuity.unavailable':
+    'Подключение аккаунта в этом контексте недоступно.',
+  'discovery.continuity.retry': 'Повторить',
+  'discovery.continuity.conflict':
+    'Не удалось передать владение Discovery. Профили сессии остаются доступны в этой сессии.',
+
+  'discovery.automation.title': 'Автоматический поиск',
+  'discovery.automation.subtitle':
+    'Планируйте повторные запуски Discovery отдельно от email-дайджестов.',
+  'discovery.automation.sessionWarning':
+    'Это демо-сессия. Настройки автоматического поиска сохраняются только для этой сессии и не являются обещанием на уровне аккаунта.',
+  'discovery.automation.accountNote':
+    'Автоматический поиск сохраняется в аккаунте. Хост-планировщик решает, когда запускать наступившие запуски.',
+  'discovery.automation.status': 'Автоматический поиск',
+  'discovery.automation.status.on': 'Включён (ежедневно)',
+  'discovery.automation.status.off': 'Выкл. — только ручной «Запустить сейчас»',
+  'discovery.automation.cadence': 'Расписание',
+  'discovery.automation.nextRun': 'Следующий ожидаемый запуск',
+  'discovery.automation.nextRunNone': 'Нет предстоящего автоматического запуска',
+  'discovery.automation.lastTrigger': 'Последний запуск начат',
+  'discovery.automation.trigger.manual': 'Вручную («Запустить сейчас»)',
+  'discovery.automation.trigger.scheduled': 'По расписанию (автопоиск)',
+  'discovery.automation.delivery': 'Email-дайджест',
+  'discovery.automation.delivery.off': 'Email-дайджесты выключены',
+  'discovery.automation.delivery.onSkipEmpty':
+    'Email-дайджесты включены — пустые не отправляются',
+  'discovery.automation.delivery.onIncludeEmpty':
+    'Email-дайджесты включены — пустые могут отправляться',
+  'discovery.automation.newnessNote':
+    '«Новое» у результата значит, что Discovery впервые увидел его для этого профиля — не то, что вы подали заявку, и не то, что письмо открыто.',
+  'discovery.automation.enable': 'Включить ежедневный автоматический поиск',
+  'discovery.automation.disable': 'Отключить автоматический поиск',
+  'discovery.automation.editDelivery': 'Изменить настройки email-дайджеста',
+  'discovery.automation.jobsOnly':
+    'Автоматический ежедневный поиск в этой версии доступен для профилей Jobs.',
+  'discovery.automation.deliveryFailureNote':
+    'Если email-дайджест не удалось отправить, статус запуска Discovery не меняется.',
 };
 
 const UA: Translations = {
-  ...RU,
+  ...EN,
+  'nav.discovery': 'Пошук',
+  'discovery.module.title': 'Пошук',
+  'discovery.module.subtitle': 'Особисті профілі пошуку та знайдені результати',
+  'discovery.loading': 'Завантаження пошуку…',
+  'discovery.error.title': 'Не вдалося завантажити пошук',
+  'discovery.error.unauthorized': 'Увійдіть, щоб побачити профілі пошуку.',
+  'discovery.error.stateUpdate': 'Не вдалося оновити статус результату.',
+  'discovery.empty.profiles': 'Профілів пошуку ще немає.',
+  'discovery.empty.profilesHint': 'Створіть профіль Jobs або Giveaways.',
+  'discovery.empty.results': 'Для цього профілю результатів ще немає.',
+  'discovery.empty.zeroNewRun': 'Останній запуск завершився без нових збігів.',
+  'discovery.profiles.title': 'Ваші профілі',
+  'discovery.profiles.create': 'Новий профіль',
+  'discovery.profiles.enabled': 'Увімкнено',
+  'discovery.profiles.disabled': 'Вимкнено',
+  'discovery.profiles.enable': 'Увімкнути',
+  'discovery.profiles.disable': 'Вимкнути',
+  'discovery.profiles.edit': 'Змінити критерії',
+  'discovery.strategy.jobs': 'Робота',
+  'discovery.strategy.giveaways': 'Розіграші',
+  'discovery.strategy.jobDiscovery': 'Пошук роботи',
+  'discovery.strategy.giveawayDiscovery': 'Пошук розіграшів',
+  'discovery.create.title': 'Створити профіль пошуку',
+  'discovery.create.name': 'Назва профілю',
+  'discovery.create.country': 'Код країни',
+  'discovery.create.role': 'Бажана роль (необов’язково)',
+  'discovery.create.submit': 'Створити профіль',
+  'discovery.create.cancel': 'Скасувати',
+  'discovery.edit.title': 'Змінити критерії профілю',
+  'discovery.edit.submit': 'Зберегти зміни',
+  'discovery.edit.cancel': 'Скасувати',
+  'discovery.criteria.title': 'Критерії',
+  'discovery.criteria.required': 'Обов’язкові',
+  'discovery.criteria.preferred': 'Бажані',
+  'discovery.criteria.excluded': 'Виключені',
+  'discovery.criteria.flexible': 'Гнучкі',
   'discovery.criteria.excludedRoles.label': 'Виключені ролі',
   'discovery.criteria.excludedRoles.description':
     'Ролі, які не повинні повертатися для цього профілю.',
@@ -509,6 +1034,224 @@ const UA: Translations = {
   'discovery.notification.address.loading': 'Завантаження email для сповіщень…',
   'discovery.notification.address.loadError':
     'Не вдалося завантажити email для сповіщень. Оновіть сторінку.',
+
+  'discovery.setup.title': 'Налаштувати Discovery',
+  'discovery.setup.subtitle':
+    'Оберіть покрокове налаштування або створіть профіль самостійно.',
+  'discovery.setup.guided': 'Покрокове налаштування',
+  'discovery.setup.selfDirected': 'Створити профіль самому',
+  'discovery.setup.guidedHint':
+    'Покрокове налаштування створює профіль Discovery. Воно саме по собі не запускає пошук.',
+
+  'discovery.guided.title': 'Покроковий Discovery',
+  'discovery.guided.cancel': 'Скасувати',
+  'discovery.guided.back': 'Назад',
+  'discovery.guided.next': 'Далі',
+  'discovery.guided.create': 'Створити профіль',
+  'discovery.guided.creating': 'Створення…',
+  'discovery.guided.createError': 'Не вдалося створити профіль Discovery. Спробуйте ще раз.',
+  'discovery.guided.sidebarHint': 'Продовжіть кроки в бічній панелі.',
+  'discovery.guided.defaultName.jobs': 'Мій пошук роботи',
+  'discovery.guided.defaultName.giveaways': 'Мій пошук розіграшів',
+  'discovery.guided.stepLabel.welcome': 'Крок 1 з 5 — Вітання',
+  'discovery.guided.stepLabel.intent': 'Крок 2 з 5 — Що шукати',
+  'discovery.guided.stepLabel.criteria': 'Крок 3 з 5 — Мінімум даних',
+  'discovery.guided.stepLabel.review': 'Крок 4 з 5 — Перевірка',
+  'discovery.guided.stepLabel.created': 'Крок 5 з 5 — Профіль створено',
+  'discovery.guided.welcome.body':
+    'Цей короткий майстер допоможе створити перший профіль Discovery лише з необхідними даними.',
+  'discovery.guided.welcome.boundary':
+    'Створення профілю не запускає Discovery і не створює результати.',
+  'discovery.guided.welcome.start': 'Почати покрокове налаштування',
+  'discovery.guided.intent.body': 'Що має шукати Discovery?',
+  'discovery.guided.criteria.body':
+    'Вкажіть мінімум даних для профілю. Пізніше можна уточнити деталі.',
+  'discovery.guided.review.body': 'Перевірте, що буде створено.',
+  'discovery.guided.review.intent': 'Тип Discovery',
+  'discovery.guided.review.boundary':
+    'Далі створюється лише профіль. Пошук сам не запускається.',
+  'discovery.guided.created.confirmation': 'Профіль Discovery створено.',
+  'discovery.guided.created.next':
+    'Профіль готовий. Ви можете відкрити його зараз. Запуск Discovery — окремий крок.',
+  'discovery.guided.created.continue': 'Перейти до Discovery',
+  'discovery.guided.validation.intent': 'Оберіть Jobs або Giveaways, щоб продовжити.',
+  'discovery.guided.validation.name': 'Введіть назву профілю.',
+  'discovery.guided.validation.country': 'Введіть дволітерний код країни (наприклад DE).',
+
+  'discovery.persistence.account': 'Ваші профілі Discovery зберігаються у вашому акаунті.',
+  'discovery.persistence.session':
+    'Це демо-сесія. Профілі Discovery доступні лише в цій сесії.',
+
+  'discovery.continuity.title': 'Володіння Discovery',
+  'discovery.continuity.sessionExplain':
+    'Автоматичний пошук у цій сесії — це не те саме, що стійке володіння акаунтом. Підключіть акаунт, щоб зберегти ці профілі в акаунті.',
+  'discovery.continuity.accountExplain':
+    'Ці профілі Discovery належать вашому акаунту й зберігаються з володінням акаунта.',
+  'discovery.continuity.claim': 'Продовжити з акаунтом',
+  'discovery.continuity.claiming': 'Підключення акаунта…',
+  'discovery.continuity.claimSuccess':
+    'Акаунт підключено. Профілі Discovery тепер використовують стійке володіння акаунтом.',
+  'discovery.continuity.unavailable':
+    'Підключення акаунта в цьому контексті недоступне.',
+  'discovery.continuity.retry': 'Повторити',
+  'discovery.continuity.conflict':
+    'Не вдалося передати володіння Discovery. Профілі сесії залишаються доступні в цій сесії.',
+
+  'discovery.automation.title': 'Автоматичний пошук',
+  'discovery.automation.subtitle':
+    'Плануйте повторні запуски Discovery окремо від email-дайджестів.',
+  'discovery.automation.sessionWarning':
+    'Це демо-сесія. Налаштування автоматичного пошуку зберігаються лише для цієї сесії й не є обіцянкою на рівні акаунта.',
+  'discovery.automation.accountNote':
+    'Автоматичний пошук зберігається в акаунті. Хост-планувальник вирішує, коли запускати насталі запуски.',
+  'discovery.automation.status': 'Автоматичний пошук',
+  'discovery.automation.status.on': 'Увімкнено (щодня)',
+  'discovery.automation.status.off': 'Вимк. — лише ручний «Запустити зараз»',
+  'discovery.automation.cadence': 'Розклад',
+  'discovery.automation.nextRun': 'Наступний очікуваний запуск',
+  'discovery.automation.lastTrigger': 'Останній запуск розпочато',
+  'discovery.automation.nextRunNone': 'Немає майбутнього автоматичного запуску',
+  'discovery.automation.trigger.manual': 'Вручну («Запустити зараз»)',
+  'discovery.automation.trigger.scheduled': 'За розкладом (автопошук)',
+  'discovery.automation.delivery': 'Email-дайджест',
+  'discovery.automation.delivery.off': 'Email-дайджести вимкнено',
+  'discovery.automation.delivery.onSkipEmpty':
+    'Email-дайджести увімкнено — порожні не надсилаються',
+  'discovery.automation.delivery.onIncludeEmpty':
+    'Email-дайджести увімкнено — порожні можуть надсилатися',
+  'discovery.automation.newnessNote':
+    '«Нове» у результаті означає, що Discovery вперше побачив його для цього профілю — не те, що ви подали заявку, і не те, що лист відкрито.',
+  'discovery.automation.enable': 'Увімкнути щоденний автоматичний пошук',
+  'discovery.automation.disable': 'Вимкнути автоматичний пошук',
+  'discovery.automation.editDelivery': 'Змінити налаштування email-дайджеста',
+  'discovery.automation.jobsOnly':
+    'Автоматичний щоденний пошук у цій версії доступний для профілів Jobs.',
+  'discovery.automation.deliveryFailureNote':
+    'Якщо email-дайджест не вдалося надіслати, статус запуску Discovery не змінюється.',
+
+  'discovery.execution.idle':
+    'Активного запуску Discovery немає. Можете запустити пошук, коли будете готові.',
+  'discovery.execution.queued': 'Запуск Discovery прийнято і очікує початку.',
+  'discovery.execution.running': 'Discovery виконується.',
+  'discovery.execution.success': 'Discovery завершено — знайдено відповідні можливості.',
+  'discovery.execution.noResults':
+    'Пошук завершено, але відповідних можливостей не знайдено.',
+  'discovery.execution.noResultsDetail':
+    'Запуск завершився успішно. Змініть критерії та запустіть знову.',
+  'discovery.execution.error': 'Запуск Discovery не вдався.',
+  'discovery.execution.errorDetail': 'Під час виконання Discovery сталася помилка.',
+  'discovery.execution.retry': 'Спробувати знову',
+  'discovery.execution.resultsAvailable': 'Відповідні можливості показано нижче.',
+  'discovery.execution.adjustProfile': 'Змінити профіль',
+  'discovery.execution.runAgain': 'Запустити знову',
+  'discovery.results.count': '{count} з цього запуску',
+  'discovery.results.inProgress':
+    'Discovery ще виконується. Можливості з’являться після завершення запуску.',
+  'discovery.results.errorHint':
+    'Цей запуск не вдався. Можливості нижче (якщо є) стосуються попередніх запусків.',
+  'discovery.results.previousHeading': 'Можливості з попередніх запусків',
+  'discovery.results.currentRun': 'З цього запуску',
+  'discovery.result.openSource': 'Відкрити джерело',
+  'discovery.result.externalLink': 'відкривається в новій вкладці',
+  'discovery.result.sourceUnavailable':
+    'Для цієї можливості немає перевіреного посилання на джерело.',
+  'discovery.result.salary': 'Зарплата',
+  'discovery.result.sourceNotVerified':
+    'У цієї можливості немає успішного статусу перевірки, тому дію з джерелом не запропоновано.',
+  'discovery.result.sourceMissingUrl':
+    'Перевірку пройдено, але URL джерела для цієї можливості не збережено.',
+  'discovery.trust.status.passed': 'Перевірки пройдено',
+  'discovery.trust.status.failed': 'Перевірку не пройдено',
+  'discovery.trust.status.unknown': 'Статус перевірки невідомий',
+  'discovery.trust.summary.jobsOfficialSource':
+    'Для цієї можливості перевірено офіційну сторінку джерела.',
+  'discovery.trust.summary.giveawaysFreeAndDeadline':
+    'Для цієї можливості пройдено перевірки безкоштовної участі та строку.',
+  'discovery.trust.summary.giveawaysFree': 'Перевірку безкоштовної участі пройдено.',
+  'discovery.trust.summary.giveawaysDeadline': 'Перевірку строку пройдено.',
+  'discovery.trust.summary.checksPassed': 'Обов’язкові перевірки пройдено.',
+  'discovery.trust.summary.failed': 'Обов’язкові перевірки не пройдено.',
+  'discovery.trust.summary.unknown':
+    'Arrival Atlas не зміг підтвердити обов’язкові перевірки.',
+  'discovery.trust.whyChecked': 'Що було перевірено',
+  'discovery.trust.noChecks': 'Для цього результату не збережено окремих перевірок.',
+  'discovery.trust.required': 'обов’язково',
+  'discovery.trust.verifiedAt': 'Перевірено',
+  'discovery.trust.boundary':
+    'Це не гарантує право на участь, постійну доступність і не означає, що Arrival Atlas подав заявку.',
+  'discovery.trust.relevanceNote': 'відповідність критеріям, не гарантія довіри',
+  'discovery.trust.check.officialSource': 'Офіційна сторінка джерела',
+  'discovery.trust.check.freeParticipation': 'Безкоштовна участь',
+  'discovery.trust.check.deadlineValid': 'Чинний строк',
+  'discovery.trust.check.generic': 'Перевірка',
+  'discovery.trust.outcome.true': 'пройдено',
+  'discovery.trust.outcome.false': 'не пройдено',
+  'discovery.trust.outcome.unknown': 'невідомо',
+  'discovery.trust.sourceTrust.label': 'Класифікація джерела',
+  'discovery.trust.sourceTrust.official': 'Офіційне джерело',
+  'discovery.trust.sourceTrust.established': 'Усталене стороннє джерело',
+  'discovery.trust.sourceTrust.aggregator': 'Агрегатор',
+  'discovery.trust.sourceTrust.community': 'Спільнота',
+  'discovery.trust.sourceTrust.unknown': 'Невідомий клас джерела',
+  'discovery.trust.freshness.label': 'Сигнал актуальності сторінки',
+  'discovery.trust.freshness.current': 'Вміст сторінки був доступний під час перевірки',
+  'discovery.trust.freshness.expired': 'Сторінка виглядала закритою або простроченою під час перевірки',
+  'discovery.trust.freshness.stale': 'Актуальність сторінки під час перевірки позначено як застарілу',
+  'discovery.trust.freshness.unknown': 'Актуальність сторінки під час перевірки була невідома',
+
+  // E2: explicit UA for keys previously leaked via ...RU inheritance
+  // (omit keys already set above in this UA object — duplicates break tsc)
+  'discovery.runSummary.title': 'Останній запуск',
+  'discovery.runSummary.none': 'Запусків ще немає',
+  'discovery.runSummary.status': 'Статус',
+  'discovery.runSummary.started': 'Початок',
+  'discovery.runSummary.finished': 'Завершення',
+  'discovery.runSummary.zeroNew': 'В останньому запуску немає нових збігів',
+  'discovery.runSummary.resultsForRun': 'Результати цього запуску',
+  'discovery.runNow.button': 'Запустити зараз',
+  'discovery.runNow.queued': 'У черзі…',
+  'discovery.runNow.running': 'Виконується…',
+  'discovery.runNow.success': 'Запуск Discovery завершено',
+  'discovery.runNow.error': 'Помилка запуску Discovery:',
+  'discovery.score.role': 'Відповідність ролі',
+  'discovery.score.location': 'Локація',
+  'discovery.score.freshness': 'Актуальність',
+  'discovery.score.source': 'Довіра до джерела',
+  'discovery.score.freeEntry': 'Безкоштовна участь',
+  'discovery.score.prizeValue': 'Цінність призу',
+  'discovery.score.deadline': 'Строк',
+  'discovery.score.trust': 'Довіра',
+  'discovery.results.title': 'Результати',
+  'discovery.results.select': 'Оберіть результат для перегляду',
+  'discovery.novelty.new': 'Нове',
+  'discovery.novelty.updated': 'Оновлено',
+  'discovery.novelty.unchanged': 'Історія',
+  'discovery.result.matchScore': 'Збіг',
+  'discovery.result.confidence': 'Впевненість',
+  'discovery.result.verification': 'Перевірка',
+  'discovery.result.evidence': 'Докази',
+  'discovery.result.userState': 'Ваш статус',
+  'discovery.result.lifecycle': 'Життєвий цикл',
+  'discovery.result.timestamps': 'Часові мітки',
+  'discovery.result.firstSeen': 'Вперше помічено',
+  'discovery.result.lastChanged': 'Остання зміна',
+  'discovery.result.lastVerified': 'Остання перевірка',
+  'discovery.result.changedFields': 'Що змінилося',
+  'discovery.result.changedFields.none': 'Зміни полів не зафіксовано',
+  'discovery.result.scoreBreakdown': 'Чому підійшло',
+  'discovery.result.source': 'Джерело',
+  'discovery.result.company': 'Компанія',
+  'discovery.userState.seen': 'Позначити переглянутим',
+  'discovery.userState.opened': 'Позначити відкритим',
+  'discovery.userState.saved': 'Зберегти',
+  'discovery.userState.dismissed': 'Сховати',
+  'discovery.userState.new': 'Нове',
+  'discovery.userState.notified': 'Сповіщено',
+  'discovery.userState.expired': 'Прострочено',
+  'discovery.verification.pass': 'Перевірено',
+  'discovery.verification.fail': 'Перевірку не пройдено',
+  'discovery.verification.partial': 'Частково перевірено',
+  'discovery.verification.unknown': 'Невідомо',
 };
 
 export const DISCOVERY_I18N: Record<SupportedLanguage, Translations> = {

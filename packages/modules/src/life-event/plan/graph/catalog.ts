@@ -12,7 +12,7 @@ const profileMigration: LifeActionRef = {
   kind: 'correct_in_profile',
   profileMirrorSlug: 'move-to-germany',
   href: '/profile/move-to-germany/edit',
-  label: 'Update arrival details',
+  label: 'Confirm Anmeldung or update arrival details',
 };
 
 const profileEmployment: LifeActionRef = {
@@ -69,6 +69,13 @@ const arrivalScenario: LifeActionRef = {
   scenarioEvent: 'arrival',
   href: '/modules/life-event?event=arrival',
   label: 'Explore arrival guidance',
+};
+
+const prepareAnmeldung: LifeActionRef = {
+  kind: 'open_module',
+  moduleId: 'anmeldung-preparation',
+  href: '/modules/life-event/prepare-anmeldung',
+  label: 'Prepare Anmeldung',
 };
 
 const jobLossScenario: LifeActionRef = {
@@ -129,7 +136,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Registration unlocks tax ID, insurance paths, and employment formalities.',
         satisfactionKey: 'municipal_registration',
         blockedByNodeIds: ['g1-secure-address'],
-        actions: [arrivalScenario, profileMigration],
+        actions: [prepareAnmeldung, profileMigration],
       },
       {
         id: 'g1-insurance-awareness',
@@ -174,7 +181,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Confirm foundation before stacking other settlement tasks.',
         satisfactionKey: 'municipal_registration',
         blockedByNodeIds: [],
-        actions: [profileMigration, profileHousing],
+        actions: [prepareAnmeldung, profileMigration, profileHousing],
       },
       {
         id: 'g2-enroll-insurance',
@@ -323,7 +330,7 @@ export const GRAPH_CATALOG_V1: LifeEventGraphDefinition[] = [
         rationale: 'Legal address is required for most downstream admin.',
         satisfactionKey: 'municipal_registration',
         blockedByNodeIds: ['g4-secure-housing'],
-        actions: [moveCityScenario, profileMigration],
+        actions: [prepareAnmeldung, profileMigration],
       },
       {
         id: 'g4-record-rent',

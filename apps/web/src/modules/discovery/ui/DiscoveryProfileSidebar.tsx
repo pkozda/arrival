@@ -10,6 +10,8 @@ type Props = {
   onSelect: (profileId: string) => void;
   onCreateClick: () => void;
   creating: boolean;
+  onGuidedClick?: () => void;
+  guidedActive?: boolean;
 };
 
 function strategyLabel(strategyId: string, t: (key: string) => string): string {
@@ -25,6 +27,8 @@ export function DiscoveryProfileSidebar({
   onSelect,
   onCreateClick,
   creating,
+  onGuidedClick,
+  guidedActive = false,
 }: Props) {
   const { t } = useApp();
 
@@ -32,9 +36,26 @@ export function DiscoveryProfileSidebar({
     <section className="discovery-panel" aria-label={t('discovery.profiles.title')}>
       <div className="discovery-results__row">
         <h2 className="discovery-panel__title">{t('discovery.profiles.title')}</h2>
-        <AtlasSecondaryButton type="button" onClick={onCreateClick} aria-pressed={creating}>
-          {t('discovery.profiles.create')}
-        </AtlasSecondaryButton>
+        <div className="discovery-guided-wizard__intents">
+          {onGuidedClick ? (
+            <AtlasSecondaryButton
+              type="button"
+              onClick={onGuidedClick}
+              aria-pressed={guidedActive}
+              data-discovery-setup="guided"
+            >
+              {t('discovery.setup.guided')}
+            </AtlasSecondaryButton>
+          ) : null}
+          <AtlasSecondaryButton
+            type="button"
+            onClick={onCreateClick}
+            aria-pressed={creating}
+            data-discovery-setup="self-directed"
+          >
+            {t('discovery.profiles.create')}
+          </AtlasSecondaryButton>
+        </div>
       </div>
 
       {profiles.length === 0 ? (

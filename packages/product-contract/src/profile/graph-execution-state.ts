@@ -11,6 +11,7 @@ export const EconomicGraphExecutionSchemaVersionSchema = z.literal(
 );
 
 export const EconomicSatisfactionKeySchema = z.enum([
+  'registrable_address',
   'registration_confirmed',
   'income_declared',
   'employment_status_known',

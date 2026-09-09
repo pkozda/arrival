@@ -3,6 +3,11 @@ import type { DiscoveryResult } from '../types/result.js';
 import type { NoveltyStatus } from '../types/novelty.js';
 import type { ScheduledRunRecord } from '../scheduler/types.js';
 import type { ResultState } from '../types/state.js';
+import type { DiscoveryExecutionLifecycle } from './execution-lifecycle.js';
+import type { ProfileAutomationSummary } from './automation-summary.js';
+
+export type { DiscoveryExecutionLifecycle } from './execution-lifecycle.js';
+export type { ProfileAutomationSummary, DiscoveryAutomationCadence } from './automation-summary.js';
 
 export type DiscoveryUserPrincipal = {
   userId: string;
@@ -42,6 +47,12 @@ export type DiscoveryResultUserView = DiscoveryResult & {
 export type ProfileRunSummary = {
   profileId: string;
   lastRun: ScheduledRunRecord | null;
+  /** PD-007 product lifecycle derived from lastRun + run-scoped results. */
+  lifecycle: DiscoveryExecutionLifecycle;
+  /** Results promoted from lastRun.runId (not profile-total). */
+  applicableResultCount: number;
+  /** PD-010 schedule + delivery summary. */
+  automation: ProfileAutomationSummary;
 };
 
 export type ProfileRunNowStatus =
@@ -60,6 +71,8 @@ export type ProfileRunNowResult = {
   skipReason?: string;
   errorMessage?: string;
   lastRun?: ScheduledRunRecord | null;
+  lifecycle: DiscoveryExecutionLifecycle;
+  applicableResultCount: number;
 };
 
 export type CreateDiscoveryProfileInput = {

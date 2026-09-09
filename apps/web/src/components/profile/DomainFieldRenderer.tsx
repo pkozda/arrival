@@ -44,7 +44,7 @@ export function DomainFieldRenderer({ field, value, onChange, disabled = false }
           onChange={(event) => onChange(field.formKey, event.target.value)}
           aria-label={label}
         >
-          <option value="">{t('profile.selectPlaceholder')}</option>
+          <option value="">{t(field.placeholderKey ?? 'profile.selectPlaceholder')}</option>
           {field.options.map((option) => (
             <option key={option.value} value={option.value}>
               {t(option.labelKey)}

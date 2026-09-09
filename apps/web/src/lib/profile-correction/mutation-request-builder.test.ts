@@ -22,7 +22,7 @@ describe('buildDomainCorrectionRequests', () => {
         employmentStatus: 'employed',
         grossMonthlyIncome: 3000,
         taxClass: '',
-        churchTax: false,
+        churchTax: '',
       },
       baseProfile,
       1
@@ -59,12 +59,91 @@ describe('buildDomainCorrectionRequests', () => {
         employmentStatus: 'employed',
         grossMonthlyIncome: 2500,
         taxClass: '',
-        churchTax: false,
+        churchTax: '',
       },
       baseProfile,
       1
     );
 
     expect(requests).toHaveLength(0);
+  });
+
+  it('builds fact.correct for explicit Anmeldung confirmation (PD-001)', () => {
+    const section = getDomainEditSection('move-to-germany');
+    const requests = buildDomainCorrectionRequests(
+      section,
+      {
+        countryOfOrigin: '',
+        residencyStatus: '',
+        arrivedAt: '',
+        municipalRegistrationConfirmed: true,
+      },
+      baseProfile,
+      3
+    );
+
+    expect(requests).toHaveLength(1);
+    expect(requests[0]?.type).toBe('fact.correct');
+    expect(requests[0]?.domain).toBe('migration');
+    expect(requests[0]?.userConfirmationRequired).toBe(true);
+    expect(requests[0]?.payload).toMatchObject({
+      kind: 'domain_facts',
+      domain: 'migration',
+      fields: { municipalRegistrationConfirmed: true },
+    });
+  });
+
+  it('builds fact.correct for dependentChildCount → children[]', () => {
+    const section = getDomainEditSection('household-family');
+    const requests = buildDomainCorrectionRequests(
+      section,
+      {
+        householdSize: '',
+        dependentChildCount: 2,
+        maritalStatus: '',
+      },
+      baseProfile,
+      1
+    );
+
+    const household = requests.find((request) => request.domain === 'household');
+    expect(household).toBeDefined();
+    expect(household?.payload).toMatchObject({
+      kind: 'domain_facts',
+      domain: 'household',
+      fields: {
+        children: [{ age: 0 }, { age: 0 }],
+      },
+    });
+  });
+
+  it('builds fact.correct for receivingKindergeld false (revoke completion)', () => {
+    const section = getDomainEditSection('benefits-support');
+    const profileWithKindergeld = {
+      ...baseProfile,
+      domains: {
+        ...baseProfile.domains,
+        benefits: { receivingKindergeld: true },
+      },
+    };
+    const requests = buildDomainCorrectionRequests(
+      section,
+      {
+        receivingBuergergeld: false,
+        receivingAlg1: false,
+        receivingWohngeld: false,
+        receivingKindergeld: false,
+        daysInGermany: '',
+      },
+      profileWithKindergeld,
+      2
+    );
+
+    const benefits = requests.find((request) => request.domain === 'benefits');
+    expect(benefits?.payload).toMatchObject({
+      kind: 'domain_facts',
+      domain: 'benefits',
+      fields: { receivingKindergeld: false },
+    });
   });
 });

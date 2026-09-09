@@ -271,14 +271,24 @@ export function criteriaRole(profile: DiscoveryProfile): string {
 
 export const USER_ACTIONABLE_STATES = ['SEEN', 'OPENED', 'SAVED', 'DISMISSED'] as const;
 
+/**
+ * Format engine match/confidence scores (0–100).
+ * Values in (0, 1] treated as fractions for legacy fixtures.
+ */
 export function formatMatchPercent(score: number): string {
-  return `${Math.round(score * 100)}%`;
+  if (!Number.isFinite(score)) return '—';
+  const percent = score > 0 && score <= 1 ? Math.round(score * 100) : Math.round(score);
+  return `${percent}%`;
 }
 
 export function companyFromResult(result: {
-  identity?: { fingerprintMaterial?: Record<string, string | null> };
+  identity?: { fingerprintMaterial?: Record<string, string | number | boolean | null> };
   canonicalPresentation: { title: string };
 }): string | null {
   const material = result.identity?.fingerprintMaterial;
-  return material?.company ?? material?.organizer ?? null;
+  const company = material?.company;
+  const organizer = material?.organizer;
+  if (typeof company === 'string' && company.trim()) return company.trim();
+  if (typeof organizer === 'string' && organizer.trim()) return organizer.trim();
+  return null;
 }

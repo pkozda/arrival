@@ -500,6 +500,8 @@ export type {
   ProfileRunSummary,
   ProfileRunNowResult,
   ProfileRunNowStatus,
+  DiscoveryExecutionLifecycle,
+  ProfileAutomationSummary,
   CreateDiscoveryProfileInput,
   UpdateDiscoveryProfileInput,
   UpdateResultUserStateInput,
@@ -508,6 +510,7 @@ export type {
   DiscoveryUserHttpHandler,
   DiscoveryUserHttpHandlerOptions,
   StaticUserTokenConfig,
+  DiscoveryOwnershipTransferResult,
 } from './user-api/index.js';
 export {
   DiscoveryUserNotFoundError,
@@ -527,10 +530,18 @@ export {
   validateUserStateBody,
   executeProfileRunNow,
   scheduleIdForProfile,
+  deriveDiscoveryExecutionLifecycle,
+  countApplicableResultsForRun,
+  buildProfileRunSummaryFields,
+  isActiveDiscoveryRunStatus,
+  isTerminalDiscoveryRunStatus,
+  buildProfileAutomationSummary,
+  buildProfileRunSummaryWithAutomation,
   buildOperationalScheduleRegistration,
   nextDailyRunAtUtc,
   NON_AUTOMATIC_NEXT_RUN_AT,
   syncProfileOperationalSchedule,
+  transferDiscoveryProfileOwnership,
 } from './user-api/index.js';
 export {
   happyPathTransport,

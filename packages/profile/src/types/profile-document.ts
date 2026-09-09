@@ -49,6 +49,8 @@ export const CoreProfileSchema = z.object({
     .object({
       status: ResidencyStatusSchema.optional(),
       arrivedAt: z.string().datetime().optional(),
+      /** Explicit user confirmation of external Anmeldung (PD-001). */
+      municipalRegistrationConfirmed: z.boolean().optional(),
     })
     .optional(),
   household: z
@@ -90,6 +92,7 @@ export const CoreProfileSchema = z.object({
       receivingBuergergeld: z.boolean().optional(),
       receivingAlg1: z.boolean().optional(),
       receivingWohngeld: z.boolean().optional(),
+      receivingKindergeld: z.boolean().optional(),
       daysInGermany: z.number().int().nonnegative().optional(),
     })
     .optional(),

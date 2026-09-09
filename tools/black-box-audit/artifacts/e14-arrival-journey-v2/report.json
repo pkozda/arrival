@@ -1,0 +1,552 @@
+{
+  "verdict": "ARRIVAL JOURNEY PASS",
+  "generatedAt": "2026-09-09T17:25:40.682Z",
+  "snapshot": {
+    "A": {
+      "lang": "uk",
+      "stored": "ua"
+    },
+    "E": {
+      "hcUrl": "http://localhost:3000/modules/healthcare-navigation",
+      "insOk": true
+    },
+    "F": {
+      "jobHref": "/modules/discovery",
+      "discUrl": "http://localhost:3000/modules/discovery",
+      "implies": "false",
+      "claims": "false"
+    },
+    "I": [
+      {
+        "route": "/modules/economic-reality",
+        "lang": "uk",
+        "stored": "ua"
+      },
+      {
+        "route": "/modules/life-event",
+        "lang": "uk",
+        "stored": "ua"
+      },
+      {
+        "route": "/modules/employment",
+        "lang": "uk",
+        "stored": "ua"
+      },
+      {
+        "route": "/modules/discovery",
+        "lang": "uk",
+        "stored": "ua"
+      },
+      {
+        "route": "/profile",
+        "lang": "uk",
+        "stored": "ua"
+      },
+      {
+        "route": "/modules/economic-reality",
+        "lang": "uk",
+        "stored": "ua"
+      }
+    ],
+    "L": {
+      "address": {
+        "profile": "Bremen",
+        "erHousing": "READY"
+      },
+      "registration": {
+        "profile": false,
+        "er": "pending"
+      },
+      "rent": {
+        "profile": "650",
+        "er": "READY"
+      },
+      "wohngeld": {
+        "er": "READY_TO_ACT"
+      },
+      "taxClass": {
+        "profile": "3",
+        "er": "READY"
+      },
+      "churchTax": {
+        "profile": "unknown",
+        "er": "UNKNOWN"
+      },
+      "discovery": {
+        "employmentClaimsRun": "false"
+      }
+    },
+    "EN": {
+      "en": {
+        "lang": "en",
+        "stored": "en"
+      },
+      "enLang": {
+        "lang": "en",
+        "stored": "en"
+      },
+      "enRaw": false
+    }
+  },
+  "consistency": {
+    "matrix": {
+      "address": {
+        "profile": "Bremen",
+        "erHousing": "READY"
+      },
+      "registration": {
+        "profile": false,
+        "er": "pending"
+      },
+      "rent": {
+        "profile": "650",
+        "er": "READY"
+      },
+      "wohngeld": {
+        "er": "READY_TO_ACT"
+      },
+      "taxClass": {
+        "profile": "3",
+        "er": "READY"
+      },
+      "churchTax": {
+        "profile": "unknown",
+        "er": "UNKNOWN"
+      },
+      "discovery": {
+        "employmentClaimsRun": "false"
+      }
+    }
+  },
+  "transitions": [
+    {
+      "phase": "B-address",
+      "before": {
+        "planner": "READY",
+        "plannerFocus": "registration_gate",
+        "housing": "NOT_ADDED",
+        "reg": "needs-address",
+        "tax": "NOT_ADDED",
+        "church": "UNKNOWN",
+        "wohngeld": "NOT_ENOUGH_INFORMATION",
+        "kindergeld": "NOT_ENOUGH_INFORMATION"
+      },
+      "after": {
+        "planner": "READY",
+        "plannerFocus": "registration_gate",
+        "housing": "INCOMPLETE",
+        "reg": "pending",
+        "tax": "NOT_ADDED",
+        "church": "UNKNOWN",
+        "wohngeld": "NOT_ENOUGH_INFORMATION",
+        "kindergeld": "NOT_ENOUGH_INFORMATION"
+      },
+      "detail": "cityOk=true",
+      "at": "2026-09-09T17:22:00.716Z"
+    },
+    {
+      "phase": "B-confirm",
+      "before": {
+        "planner": "READY",
+        "plannerFocus": "registration_gate",
+        "housing": "INCOMPLETE",
+        "reg": "pending",
+        "tax": "NOT_ADDED",
+        "church": "UNKNOWN",
+        "wohngeld": "NOT_ENOUGH_INFORMATION",
+        "kindergeld": "NOT_ENOUGH_INFORMATION"
+      },
+      "after": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "INCOMPLETE",
+        "reg": "confirmed",
+        "tax": "NOT_ADDED",
+        "church": "UNKNOWN",
+        "wohngeld": "NOT_ENOUGH_INFORMATION",
+        "kindergeld": "NOT_ENOUGH_INFORMATION"
+      },
+      "detail": "confirmOk=true",
+      "at": "2026-09-09T17:22:27.533Z"
+    },
+    {
+      "phase": "C-housing",
+      "before": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "INCOMPLETE",
+        "reg": "confirmed",
+        "tax": "NOT_ADDED",
+        "church": "UNKNOWN",
+        "wohngeld": "NOT_ENOUGH_INFORMATION",
+        "kindergeld": "NOT_ENOUGH_INFORMATION"
+      },
+      "after": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "READY",
+        "reg": "confirmed",
+        "tax": "NOT_ADDED",
+        "church": "UNKNOWN",
+        "wohngeld": "READY_TO_ACT",
+        "kindergeld": "NOT_ENOUGH_INFORMATION"
+      },
+      "detail": "rent=true income=true",
+      "at": "2026-09-09T17:22:55.091Z"
+    },
+    {
+      "phase": "D-wohngeld-complete",
+      "before": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "READY",
+        "reg": "confirmed",
+        "tax": "NOT_ADDED",
+        "church": "UNKNOWN",
+        "wohngeld": "READY_TO_ACT",
+        "kindergeld": "READY_TO_ACT"
+      },
+      "after": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "READY",
+        "reg": "confirmed",
+        "tax": "NOT_ADDED",
+        "church": "UNKNOWN",
+        "wohngeld": "COMPLETED",
+        "kindergeld": "READY_TO_ACT"
+      },
+      "detail": "wgSet=true",
+      "at": "2026-09-09T17:23:17.963Z"
+    },
+    {
+      "phase": "G-tax",
+      "before": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "READY",
+        "reg": "confirmed",
+        "tax": "NOT_ADDED",
+        "church": "UNKNOWN",
+        "wohngeld": "READY_TO_ACT",
+        "kindergeld": "NOT_ENOUGH_INFORMATION"
+      },
+      "after": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "READY",
+        "reg": "confirmed",
+        "tax": "READY",
+        "church": "UNKNOWN",
+        "wohngeld": "COMPLETED",
+        "kindergeld": "READY_TO_ACT"
+      },
+      "detail": "taxOk=true",
+      "at": "2026-09-09T17:23:55.536Z"
+    },
+    {
+      "phase": "J-reload",
+      "before": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "READY",
+        "reg": "confirmed",
+        "tax": "READY",
+        "church": "UNKNOWN",
+        "wohngeld": "COMPLETED",
+        "kindergeld": "READY_TO_ACT"
+      },
+      "after": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "READY",
+        "reg": "confirmed",
+        "tax": "READY",
+        "church": "UNKNOWN",
+        "wohngeld": "COMPLETED",
+        "kindergeld": "READY_TO_ACT"
+      },
+      "detail": "{\"lang\":\"uk\",\"stored\":\"ua\"}",
+      "at": "2026-09-09T17:24:26.757Z"
+    },
+    {
+      "phase": "K-wohngeld-revoke",
+      "before": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "READY",
+        "reg": "confirmed",
+        "tax": "READY",
+        "church": "UNKNOWN",
+        "wohngeld": "COMPLETED",
+        "kindergeld": "READY_TO_ACT"
+      },
+      "after": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "READY",
+        "reg": "confirmed",
+        "tax": "READY",
+        "church": "UNKNOWN",
+        "wohngeld": "READY_TO_ACT",
+        "kindergeld": "READY_TO_ACT"
+      },
+      "detail": "revoke=true",
+      "at": "2026-09-09T17:24:38.415Z"
+    },
+    {
+      "phase": "K-reg-revoke",
+      "before": {
+        "planner": "READY",
+        "plannerFocus": "primary_plan",
+        "housing": "READY",
+        "reg": "confirmed",
+        "tax": "READY",
+        "church": "UNKNOWN",
+        "wohngeld": "READY_TO_ACT",
+        "kindergeld": "READY_TO_ACT"
+      },
+      "after": {
+        "planner": "READY",
+        "plannerFocus": "registration_gate",
+        "housing": "READY",
+        "reg": "pending",
+        "tax": "READY",
+        "church": "UNKNOWN",
+        "wohngeld": "READY_TO_ACT",
+        "kindergeld": "READY_TO_ACT"
+      },
+      "detail": "regRevoke=true",
+      "at": "2026-09-09T17:24:49.770Z"
+    }
+  ],
+  "findings": [
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-A-LANG",
+      "detail": "{\"lang\":\"uk\",\"stored\":\"ua\"}"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-A-HOME",
+      "detail": "hud=true home=true url=http://localhost:3000/"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-A-LANG-NAV",
+      "detail": "{\"langLe\":{\"lang\":\"uk\",\"stored\":\"ua\"},\"langEr\":{\"lang\":\"uk\",\"stored\":\"ua\"}}"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-B-ADDRESS",
+      "detail": "{\"planner\":\"READY\",\"plannerFocus\":\"registration_gate\",\"housing\":\"INCOMPLETE\",\"reg\":\"pending\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"NOT_ENOUGH_INFORMATION\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"}"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-B-PREPARE",
+      "detail": "url=http://localhost:3000/modules/life-event/prepare-anmeldung surface=true"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-B-GUIDANCE-NOT-COMPLETE",
+      "detail": "pending"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-B-COMPLETE",
+      "detail": "{\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"INCOMPLETE\",\"reg\":\"confirmed\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"NOT_ENOUGH_INFORMATION\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"}"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-B-LE",
+      "detail": "LE after confirmation without raw keys"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-B-NO-BANK-PREREQ",
+      "detail": "No banking→registration blocker"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-C-HOUSING-READY",
+      "detail": "{\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"READY_TO_ACT\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"}"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-C-REG-INDEPENDENT",
+      "detail": "Registration stayed confirmed after rent"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-C-PLANNER",
+      "detail": "READY/primary_plan"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-D-WOHNGELD-AWARE",
+      "detail": "READY_TO_ACT"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-D-WOHNGELD-COMPLETE",
+      "detail": "COMPLETED"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-E-HEALTHCARE",
+      "detail": "http://localhost:3000/modules/healthcare-navigation"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-E-ENRICH",
+      "detail": "insuranceType=public persisted"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-F-EMPLOYMENT",
+      "detail": "implies=false claims=false"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-F-DISCOVERY",
+      "detail": "http://localhost:3000/modules/discovery"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-F-RETURN",
+      "detail": "Employment reachable after Discovery"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-G-TAX-READY",
+      "detail": "{\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"}"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-G-CHURCH-UNKNOWN",
+      "detail": "UNKNOWN"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-G-CHURCH-PRESERVED",
+      "detail": "UNKNOWN"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-G-NO-FINANCE-MODULE",
+      "detail": "http://localhost:3000/modules/finance"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-H-LE",
+      "detail": "LE projection loads without raw keys"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-I-LANG-STABLE",
+      "detail": "Language stable across module navigation"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-I-STATE",
+      "detail": "{\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"}"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-J-RELOAD",
+      "detail": "{\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"}"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-K-BENEFIT-REVERSE",
+      "detail": "READY_TO_ACT"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-K-REG-REVERSE",
+      "detail": "pending"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-K-NOOP",
+      "detail": "No-op save left ER derived state unchanged"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-L-ADDRESS",
+      "detail": "Bremen/READY"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-L-REG",
+      "detail": "{\"profile\":false,\"er\":\"pending\"}"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-L-DISC",
+      "detail": "Employment does not claim Discovery run"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-EN",
+      "detail": "EN first-contact + ER without raw keys"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-DE",
+      "detail": "{\"lang\":\"de\",\"stored\":\"de\"}"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E14-RU",
+      "detail": "{\"lang\":\"ru\",\"stored\":\"ru\"}"
+    }
+  ],
+  "observations": [
+    "=== E14 Arrival Journey v2 probe ===",
+    "[OBSERVED_PASS] E14-A-LANG: {\"lang\":\"uk\",\"stored\":\"ua\"}",
+    "[OBSERVED_PASS] E14-A-HOME: hud=true home=true url=http://localhost:3000/",
+    "[OBSERVED_PASS] E14-A-LANG-NAV: {\"langLe\":{\"lang\":\"uk\",\"stored\":\"ua\"},\"langEr\":{\"lang\":\"uk\",\"stored\":\"ua\"}}",
+    "transition B-address: {\"planner\":\"READY\",\"plannerFocus\":\"registration_gate\",\"housing\":\"NOT_ADDED\",\"reg\":\"needs-address\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"NOT_ENOUGH_INFORMATION\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"} → {\"planner\":\"READY\",\"plannerFocus\":\"registration_gate\",\"housing\":\"INCOMPLETE\",\"reg\":\"pending\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"NOT_ENOUGH_INFORMATION\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"} (cityOk=true)",
+    "[OBSERVED_PASS] E14-B-ADDRESS: {\"planner\":\"READY\",\"plannerFocus\":\"registration_gate\",\"housing\":\"INCOMPLETE\",\"reg\":\"pending\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"NOT_ENOUGH_INFORMATION\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"}",
+    "[OBSERVED_PASS] E14-B-PREPARE: url=http://localhost:3000/modules/life-event/prepare-anmeldung surface=true",
+    "[OBSERVED_PASS] E14-B-GUIDANCE-NOT-COMPLETE: pending",
+    "transition B-confirm: {\"planner\":\"READY\",\"plannerFocus\":\"registration_gate\",\"housing\":\"INCOMPLETE\",\"reg\":\"pending\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"NOT_ENOUGH_INFORMATION\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"} → {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"INCOMPLETE\",\"reg\":\"confirmed\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"NOT_ENOUGH_INFORMATION\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"} (confirmOk=true)",
+    "[OBSERVED_PASS] E14-B-COMPLETE: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"INCOMPLETE\",\"reg\":\"confirmed\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"NOT_ENOUGH_INFORMATION\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"}",
+    "[OBSERVED_PASS] E14-B-LE: LE after confirmation without raw keys",
+    "[OBSERVED_PASS] E14-B-NO-BANK-PREREQ: No banking→registration blocker",
+    "transition C-housing: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"INCOMPLETE\",\"reg\":\"confirmed\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"NOT_ENOUGH_INFORMATION\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"} → {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"READY_TO_ACT\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"} (rent=true income=true)",
+    "[OBSERVED_PASS] E14-C-HOUSING-READY: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"READY_TO_ACT\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"}",
+    "[OBSERVED_PASS] E14-C-REG-INDEPENDENT: Registration stayed confirmed after rent",
+    "[OBSERVED_PASS] E14-C-PLANNER: READY/primary_plan",
+    "[OBSERVED_PASS] E14-D-WOHNGELD-AWARE: READY_TO_ACT",
+    "transition D-wohngeld-complete: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"READY_TO_ACT\",\"kindergeld\":\"READY_TO_ACT\"} → {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"} (wgSet=true)",
+    "[OBSERVED_PASS] E14-D-WOHNGELD-COMPLETE: COMPLETED",
+    "[OBSERVED_PASS] E14-E-HEALTHCARE: http://localhost:3000/modules/healthcare-navigation",
+    "[OBSERVED_PASS] E14-E-ENRICH: insuranceType=public persisted",
+    "[OBSERVED_PASS] E14-F-EMPLOYMENT: implies=false claims=false",
+    "[OBSERVED_PASS] E14-F-DISCOVERY: http://localhost:3000/modules/discovery",
+    "[OBSERVED_PASS] E14-F-RETURN: Employment reachable after Discovery",
+    "transition G-tax: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"NOT_ADDED\",\"church\":\"UNKNOWN\",\"wohngeld\":\"READY_TO_ACT\",\"kindergeld\":\"NOT_ENOUGH_INFORMATION\"} → {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"} (taxOk=true)",
+    "[OBSERVED_PASS] E14-G-TAX-READY: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"}",
+    "[OBSERVED_PASS] E14-G-CHURCH-UNKNOWN: UNKNOWN",
+    "[OBSERVED_PASS] E14-G-CHURCH-PRESERVED: UNKNOWN",
+    "[OBSERVED_PASS] E14-G-NO-FINANCE-MODULE: http://localhost:3000/modules/finance",
+    "[OBSERVED_PASS] E14-H-LE: LE projection loads without raw keys",
+    "[OBSERVED_PASS] E14-I-LANG-STABLE: Language stable across module navigation",
+    "[OBSERVED_PASS] E14-I-STATE: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"}",
+    "transition J-reload: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"} → {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"} ({\"lang\":\"uk\",\"stored\":\"ua\"})",
+    "[OBSERVED_PASS] E14-J-RELOAD: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"}",
+    "transition K-wohngeld-revoke: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"COMPLETED\",\"kindergeld\":\"READY_TO_ACT\"} → {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"READY_TO_ACT\",\"kindergeld\":\"READY_TO_ACT\"} (revoke=true)",
+    "[OBSERVED_PASS] E14-K-BENEFIT-REVERSE: READY_TO_ACT",
+    "transition K-reg-revoke: {\"planner\":\"READY\",\"plannerFocus\":\"primary_plan\",\"housing\":\"READY\",\"reg\":\"confirmed\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"READY_TO_ACT\",\"kindergeld\":\"READY_TO_ACT\"} → {\"planner\":\"READY\",\"plannerFocus\":\"registration_gate\",\"housing\":\"READY\",\"reg\":\"pending\",\"tax\":\"READY\",\"church\":\"UNKNOWN\",\"wohngeld\":\"READY_TO_ACT\",\"kindergeld\":\"READY_TO_ACT\"} (regRevoke=true)",
+    "[OBSERVED_PASS] E14-K-REG-REVERSE: pending",
+    "[OBSERVED_PASS] E14-K-NOOP: No-op save left ER derived state unchanged",
+    "[OBSERVED_PASS] E14-L-ADDRESS: Bremen/READY",
+    "[OBSERVED_PASS] E14-L-REG: {\"profile\":false,\"er\":\"pending\"}",
+    "[OBSERVED_PASS] E14-L-DISC: Employment does not claim Discovery run",
+    "[OBSERVED_PASS] E14-EN: EN first-contact + ER without raw keys",
+    "[OBSERVED_PASS] E14-DE: {\"lang\":\"de\",\"stored\":\"de\"}",
+    "[OBSERVED_PASS] E14-RU: {\"lang\":\"ru\",\"stored\":\"ru\"}"
+  ]
+}

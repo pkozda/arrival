@@ -1,0 +1,143 @@
+{
+  "verdict": "PASS",
+  "phases": {
+    "A-arrival": {
+      "status": "PASS",
+      "detail": "hud=true"
+    },
+    "B-registration": {
+      "status": "PASS",
+      "detail": "completeVisible=true"
+    },
+    "C-economic-reality": {
+      "status": "PASS",
+      "detail": "planner=true"
+    },
+    "D-healthcare": {
+      "status": "PASS",
+      "detail": "url=http://localhost:3000/modules/healthcare-navigation"
+    },
+    "E-employment": {
+      "status": "PASS",
+      "detail": "dual=true jobSearch=true"
+    },
+    "F-discovery": {
+      "status": "PASS",
+      "detail": "scope=session"
+    },
+    "G-automation": {
+      "status": "PASS",
+      "detail": "automatic=true"
+    },
+    "H-claim": {
+      "status": "PASS",
+      "detail": "claim phase completed"
+    },
+    "I-recovery": {
+      "status": "PASS",
+      "detail": "scope=account"
+    }
+  },
+  "findings": [
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-LOC-001",
+      "detail": "UA Discovery nav localized: Пошук"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-REG-001",
+      "detail": "Registration COMPLETE visible after confirm"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-ER-001",
+      "detail": "Housing CTA not incorrectly dominant after registration path"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-HC-001",
+      "detail": "No invented insured claim observed on entry"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-EMP-001",
+      "detail": "Employment dual tracks visible"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-DISC-001",
+      "detail": "Ownership disclosure scope=session"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-DISC-002",
+      "detail": "Manual run terminal=NO_RESULTS"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-AUTO-001",
+      "detail": "automation state automatic=true cadence=daily"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-CLAIM-001",
+      "detail": "Account claim transition visible"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-CLAIM-002",
+      "detail": "reload scope=account cadence=daily"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-RET-001",
+      "detail": "return navigation scope=account lifecycle=NO_RESULTS"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E1-EXT-001",
+      "detail": "No false applied claim observed on Discovery return"
+    }
+  ],
+  "limitations": [],
+  "observations": [
+    "=== E1 Cross-module journey probe ===",
+    "document.lang after UA select: uk",
+    "Discovery HUD label: \"Пошук\"",
+    "[OBSERVED_PASS] E1-LOC-001: UA Discovery nav localized: Пошук",
+    "PHASE A-arrival: PASS — hud=true",
+    "Housing city save attempted",
+    "Registration confirmation save attempted",
+    "PHASE B-registration: PASS — completeVisible=true",
+    "[OBSERVED_PASS] E1-REG-001: Registration COMPLETE visible after confirm",
+    "ER planner=true housingCta=false confirmCta=false",
+    "[OBSERVED_PASS] E1-ER-001: Housing CTA not incorrectly dominant after registration path",
+    "PHASE C-economic-reality: PASS — planner=true",
+    "Healthcare surface visible=false",
+    "PHASE D-healthcare: PASS — url=http://localhost:3000/modules/healthcare-navigation",
+    "[OBSERVED_PASS] E1-HC-001: No invented insured claim observed on entry",
+    "PHASE E-employment: PASS — dual=true jobSearch=true",
+    "[OBSERVED_PASS] E1-EMP-001: Employment dual tracks visible",
+    "Discovery URL: http://localhost:3000/modules/discovery",
+    "Created Discovery profile: E1 Journey 1788877187487",
+    "Discovery ownership scope: session",
+    "[OBSERVED_PASS] E1-DISC-001: Ownership disclosure scope=session",
+    "Discovery terminal lifecycle: NO_RESULTS",
+    "[OBSERVED_PASS] E1-DISC-002: Manual run terminal=NO_RESULTS",
+    "PHASE F-discovery: PASS — scope=session",
+    "Automation automatic=true cadence=daily",
+    "[OBSERVED_PASS] E1-AUTO-001: automation state automatic=true cadence=daily",
+    "PHASE G-automation: PASS — automatic=true",
+    "Ownership after claim: account",
+    "[OBSERVED_PASS] E1-CLAIM-001: Account claim transition visible",
+    "After claim reload scope=account cadence=daily",
+    "[OBSERVED_PASS] E1-CLAIM-002: reload scope=account cadence=daily",
+    "PHASE H-claim: PASS — claim phase completed",
+    "Return to Discovery scope=account lifecycle=NO_RESULTS",
+    "[OBSERVED_PASS] E1-RET-001: return navigation scope=account lifecycle=NO_RESULTS",
+    "PHASE I-recovery: PASS — scope=account",
+    "[OBSERVED_PASS] E1-EXT-001: No false applied claim observed on Discovery return",
+    "Verdict: PASS"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "observations": [
+    "PD-005 browser validation @ http://localhost:3000",
+    "Case A chooser=true guided=true self=true journeyWelcome=false",
+    "Case B wizard=true journeyWelcome=false",
+    "Case C/D reviewOk=true review=\"Тип Discovery: Работа Название профиля: PD005 Jobs 1788869344539 Код страны: DE Желаемая роль (необязательно): Frontend Engineer\"",
+    "Case E createdStep=true confirmation=true createPosts=1 runPosts=0 claimsRun=false falselyClaimsRun=false",
+    "Case F profileVisible=true wizardClosed=true",
+    "Case G profileAfterReload=true fakeResultsClaim=false noRunsYet=false",
+    "Case H selfDirectedAvailable=true selfForm=true",
+    "VERDICT: BROWSER PASS"
+  ],
+  "pass": true,
+  "createPosts": [
+    "http://localhost:3001/api/modules/discovery/profiles"
+  ],
+  "runNowPosts": []
+}

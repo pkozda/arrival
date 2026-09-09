@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  claimDiscoveryAccountContinuity,
   createDiscoveryProfile,
   disableDiscoveryProfile,
   enableDiscoveryProfile,
@@ -17,7 +18,10 @@ import {
 } from './client';
 import type {
   CreateDiscoveryProfileInput,
+  DiscoveryExecutionLifecycle,
+  DiscoveryPersistenceScope,
   DiscoveryProfile,
+  DiscoveryProfileResponse,
   DiscoveryResultUserView,
   ProfileRunNowResult,
   ProfileRunSummary,
@@ -26,6 +30,7 @@ import type {
 } from './types';
 import { DiscoveryApiError } from './errors';
 
+/** @deprecated Prefer executionLifecycle (PD-007). Kept for panel compatibility. */
 export type RunNowUiStatus = 'idle' | 'running' | 'success' | 'error';
 
 export type DiscoveryModuleState = {
@@ -39,28 +44,32 @@ export type DiscoveryModuleState = {
   selectedResultId: string | null;
   selectedResult: DiscoveryResultUserView | null;
   runSummary: ProfileRunSummary | null;
+  /** Authoritative PD-007 lifecycle (server + in-flight overlay). */
+  executionLifecycle: DiscoveryExecutionLifecycle;
   runNowStatus: RunNowUiStatus;
   runNowError: string | null;
   runNowResult: ProfileRunNowResult | null;
   stateUpdateError: string | null;
   stateUpdating: boolean;
-  /** From API; whether an operational notification recipient is configured. */
   emailRecipientConfigured: boolean | null;
-  /** Persisted user email only; null when unset or not yet successfully loaded. */
+  persistenceScope: DiscoveryPersistenceScope | null;
   userNotificationEmail: string | null;
-  /** True after a successful GET of the user notification email resource. */
   userNotificationEmailKnown: boolean;
   userNotificationEmailLoading: boolean;
   userNotificationEmailLoadError: string | null;
   notificationEmailSaving: boolean;
   notificationEmailError: string | null;
+  continuityClaiming: boolean;
+  continuityClaimError: string | null;
+  continuityClaimSuccess: boolean;
   refetch: () => Promise<void>;
   selectProfile: (profileId: string) => Promise<void>;
   selectResult: (resultId: string) => Promise<void>;
-  createProfile: (input: CreateDiscoveryProfileInput) => Promise<void>;
+  createProfile: (input: CreateDiscoveryProfileInput) => Promise<DiscoveryProfileResponse>;
   updateProfile: (profileId: string, input: UpdateDiscoveryProfileInput) => Promise<void>;
   setProfileEnabled: (profileId: string, enabled: boolean) => Promise<void>;
   setUserNotificationEmail: (email: string | null) => Promise<void>;
+  claimAccountContinuity: () => Promise<void>;
   runNow: () => Promise<void>;
   updateUserState: (userState: ResultState) => Promise<void>;
 };
@@ -78,6 +87,25 @@ function mapError(error: unknown): { message: string; unauthorized: boolean } {
   return { message: 'Unknown error', unauthorized: false };
 }
 
+function isActiveLifecycle(lifecycle: DiscoveryExecutionLifecycle | undefined | null): boolean {
+  return lifecycle === 'QUEUED' || lifecycle === 'RUNNING';
+}
+
+function toLegacyRunNowStatus(lifecycle: DiscoveryExecutionLifecycle): RunNowUiStatus {
+  switch (lifecycle) {
+    case 'QUEUED':
+    case 'RUNNING':
+      return 'running';
+    case 'SUCCESS':
+    case 'NO_RESULTS':
+      return 'success';
+    case 'ERROR':
+      return 'error';
+    default:
+      return 'idle';
+  }
+}
+
 export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleState {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,12 +116,15 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
   const [selectedResultId, setSelectedResultId] = useState<string | null>(null);
   const [selectedResult, setSelectedResult] = useState<DiscoveryResultUserView | null>(null);
   const [runSummary, setRunSummary] = useState<ProfileRunSummary | null>(null);
-  const [runNowStatus, setRunNowStatus] = useState<RunNowUiStatus>('idle');
+  const [runInFlight, setRunInFlight] = useState(false);
   const [runNowError, setRunNowError] = useState<string | null>(null);
   const [runNowResult, setRunNowResult] = useState<ProfileRunNowResult | null>(null);
   const [stateUpdateError, setStateUpdateError] = useState<string | null>(null);
   const [stateUpdating, setStateUpdating] = useState(false);
   const [emailRecipientConfigured, setEmailRecipientConfigured] = useState<boolean | null>(
+    null
+  );
+  const [persistenceScope, setPersistenceScope] = useState<DiscoveryPersistenceScope | null>(
     null
   );
   const [userNotificationEmail, setUserNotificationEmailState] = useState<string | null>(null);
@@ -104,11 +135,37 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
   >(null);
   const [notificationEmailSaving, setNotificationEmailSaving] = useState(false);
   const [notificationEmailError, setNotificationEmailError] = useState<string | null>(null);
+  const [continuityClaiming, setContinuityClaiming] = useState(false);
+  const [continuityClaimError, setContinuityClaimError] = useState<string | null>(null);
+  const [continuityClaimSuccess, setContinuityClaimSuccess] = useState(false);
+
+  const observeGenRef = useRef(0);
+  const observeBusyRef = useRef(false);
 
   const selectedProfile = useMemo(
     () => profiles.find((p) => p.id === selectedProfileId) ?? null,
     [profiles, selectedProfileId]
   );
+
+  const executionLifecycle: DiscoveryExecutionLifecycle = useMemo(() => {
+    if (runInFlight) {
+      const server = runSummary?.lifecycle;
+      if (server === 'QUEUED') return 'QUEUED';
+      return 'RUNNING';
+    }
+    return runSummary?.lifecycle ?? 'IDLE';
+  }, [runInFlight, runSummary?.lifecycle]);
+
+  const runNowStatus = toLegacyRunNowStatus(executionLifecycle);
+
+  const applySummary = useCallback((summary: ProfileRunSummary) => {
+    setRunSummary(summary);
+    if (summary.lifecycle === 'ERROR' && summary.lastRun?.errorMessage) {
+      setRunNowError(summary.lastRun.errorMessage);
+    } else if (summary.lifecycle !== 'ERROR') {
+      setRunNowError(null);
+    }
+  }, []);
 
   const loadProfileDetail = useCallback(
     async (profileId: string) => {
@@ -118,11 +175,66 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
         fetchDiscoveryRunSummary(sessionId, profileId),
       ]);
       setResults(nextResults);
-      setRunSummary(summary);
+      applySummary(summary);
       setSelectedResultId(null);
       setSelectedResult(null);
+      return summary;
     },
-    [sessionId]
+    [sessionId, applySummary]
+  );
+
+  const observeUntilTerminal = useCallback(
+    async (profileId: string) => {
+      if (!sessionId) return;
+      const gen = ++observeGenRef.current;
+      // Cap observe iterations — do not invent ERROR on timeout; stop polling quietly.
+      for (let i = 0; i < 60; i++) {
+        if (observeGenRef.current !== gen) return;
+        if (observeBusyRef.current) {
+          await new Promise((r) => setTimeout(r, 500));
+          continue;
+        }
+        observeBusyRef.current = true;
+        try {
+          // Continue draining an active pull-driven run (no duplicate enqueue).
+          const continued = await triggerDiscoveryRunNow(sessionId, profileId);
+          setRunNowResult(continued);
+          const [nextResults, summary] = await Promise.all([
+            fetchDiscoveryResults(sessionId, profileId),
+            fetchDiscoveryRunSummary(sessionId, profileId),
+          ]);
+          if (observeGenRef.current !== gen) return;
+          setResults(nextResults);
+          applySummary(summary);
+          if (!isActiveLifecycle(summary.lifecycle)) {
+            setRunInFlight(false);
+            return;
+          }
+        } catch (err) {
+          if (observeGenRef.current !== gen) return;
+          const mapped = mapError(err);
+          setRunNowError(mapped.message);
+          // Refresh summary — may still be active or ERROR from server.
+          try {
+            const summary = await fetchDiscoveryRunSummary(sessionId, profileId);
+            if (observeGenRef.current !== gen) return;
+            applySummary(summary);
+            if (!isActiveLifecycle(summary.lifecycle)) {
+              setRunInFlight(false);
+              return;
+            }
+          } catch {
+            setRunInFlight(false);
+            return;
+          }
+        } finally {
+          observeBusyRef.current = false;
+        }
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+      setRunInFlight(false);
+    },
+    [sessionId, applySummary]
   );
 
   const refetch = useCallback(async () => {
@@ -149,6 +261,9 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
       ]);
       setProfiles(list.profiles);
       setEmailRecipientConfigured(list.emailRecipientConfigured);
+      if (list.persistenceScope === 'account' || list.persistenceScope === 'session') {
+        setPersistenceScope(list.persistenceScope);
+      }
 
       if (emailRes.ok) {
         setUserNotificationEmailState(emailRes.res.userNotificationEmail);
@@ -157,17 +272,20 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
       } else {
         const mapped = mapError(emailRes.err);
         setUserNotificationEmailLoadError(mapped.message);
-        // Do not overwrite a previously known email with null on GET failure.
       }
 
       const profileId = selectedProfileId ?? list.profiles[0]?.id ?? null;
       setSelectedProfileId(profileId);
 
       if (profileId) {
-        await loadProfileDetail(profileId);
+        const summary = await loadProfileDetail(profileId);
         if (selectedResultId) {
           const detail = await fetchDiscoveryResult(sessionId, profileId, selectedResultId);
           setSelectedResult(detail);
+        }
+        if (summary && isActiveLifecycle(summary.lifecycle)) {
+          setRunInFlight(true);
+          void observeUntilTerminal(profileId);
         }
       } else {
         setResults([]);
@@ -183,7 +301,7 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
       setLoading(false);
       setUserNotificationEmailLoading(false);
     }
-  }, [sessionId, selectedProfileId, selectedResultId, loadProfileDetail]);
+  }, [sessionId, selectedProfileId, selectedResultId, loadProfileDetail, observeUntilTerminal]);
 
   useEffect(() => {
     void refetch();
@@ -192,11 +310,17 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
   const selectProfile = useCallback(
     async (profileId: string) => {
       if (!sessionId) return;
+      observeGenRef.current += 1;
+      setRunInFlight(false);
       setLoading(true);
       setError(null);
       setSelectedProfileId(profileId);
       try {
-        await loadProfileDetail(profileId);
+        const summary = await loadProfileDetail(profileId);
+        if (summary && isActiveLifecycle(summary.lifecycle)) {
+          setRunInFlight(true);
+          void observeUntilTerminal(profileId);
+        }
       } catch (err) {
         const mapped = mapError(err);
         setError(mapped.message);
@@ -204,7 +328,7 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
         setLoading(false);
       }
     },
-    [sessionId, loadProfileDetail]
+    [sessionId, loadProfileDetail, observeUntilTerminal]
   );
 
   const selectResult = useCallback(
@@ -225,20 +349,24 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
 
   const createProfileAction = useCallback(
     async (input: CreateDiscoveryProfileInput) => {
-      if (!sessionId) return;
-      setLoading(true);
+      if (!sessionId) {
+        throw new Error('Discovery session is required');
+      }
       setError(null);
       try {
         const created = await createDiscoveryProfile(sessionId, input);
         setProfiles((prev) => [...prev, created.profile]);
         setEmailRecipientConfigured(created.emailRecipientConfigured);
+        if (created.persistenceScope === 'account' || created.persistenceScope === 'session') {
+          setPersistenceScope(created.persistenceScope);
+        }
         setSelectedProfileId(created.profile.id);
         await loadProfileDetail(created.profile.id);
+        return created;
       } catch (err) {
         const mapped = mapError(err);
         setError(mapped.message);
-      } finally {
-        setLoading(false);
+        throw err;
       }
     },
     [sessionId, loadProfileDetail]
@@ -282,6 +410,9 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
           prev.map((p) => (p.id === updated.profile.id ? updated.profile : p))
         );
         setEmailRecipientConfigured(updated.emailRecipientConfigured);
+        if (updated.persistenceScope === 'account' || updated.persistenceScope === 'session') {
+          setPersistenceScope(updated.persistenceScope);
+        }
         if (selectedProfileId === profileId && !quiet) {
           await loadProfileDetail(profileId);
         }
@@ -300,25 +431,53 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
 
   const runNow = useCallback(async () => {
     if (!sessionId || !selectedProfileId) return;
-    setRunNowStatus('running');
+    if (isActiveLifecycle(executionLifecycle) || runInFlight) {
+      return;
+    }
+    setRunInFlight(true);
     setRunNowError(null);
     setRunNowResult(null);
     try {
       const result = await triggerDiscoveryRunNow(sessionId, selectedProfileId);
       setRunNowResult(result);
-      if (result.status === 'failed' || result.status === 'skipped') {
-        setRunNowStatus('error');
-        setRunNowError(result.errorMessage ?? result.skipReason ?? 'Run failed');
-      } else {
-        setRunNowStatus('success');
+      const [nextResults, summary] = await Promise.all([
+        fetchDiscoveryResults(sessionId, selectedProfileId),
+        fetchDiscoveryRunSummary(sessionId, selectedProfileId),
+      ]);
+      setResults(nextResults);
+      applySummary(summary);
+
+      if (result.status === 'skipped' && summary.lifecycle === 'IDLE') {
+        setRunNowError(result.skipReason ?? result.errorMessage ?? 'Run skipped');
+        setRunInFlight(false);
+        return;
       }
-      await loadProfileDetail(selectedProfileId);
+
+      if (isActiveLifecycle(summary.lifecycle) || isActiveLifecycle(result.lifecycle)) {
+        void observeUntilTerminal(selectedProfileId);
+        return;
+      }
+
+      setRunInFlight(false);
     } catch (err) {
       const mapped = mapError(err);
-      setRunNowStatus('error');
       setRunNowError(mapped.message);
+      try {
+        const summary = await fetchDiscoveryRunSummary(sessionId, selectedProfileId);
+        applySummary(summary);
+      } catch {
+        /* keep error from request */
+      }
+      setRunInFlight(false);
     }
-  }, [sessionId, selectedProfileId, loadProfileDetail]);
+  }, [
+    sessionId,
+    selectedProfileId,
+    executionLifecycle,
+    runInFlight,
+    applySummary,
+    observeUntilTerminal,
+  ]);
 
   const updateUserState = useCallback(
     async (userState: ResultState) => {
@@ -374,6 +533,27 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
     [sessionId, notificationEmailSaving]
   );
 
+  const claimAccountContinuity = useCallback(async () => {
+    if (!sessionId || continuityClaiming) return;
+    setContinuityClaiming(true);
+    setContinuityClaimError(null);
+    try {
+      const claimed = await claimDiscoveryAccountContinuity(sessionId);
+      if (claimed.discoveryMigrationError) {
+        setContinuityClaimError(claimed.discoveryMigrationError);
+      } else {
+        setContinuityClaimSuccess(true);
+      }
+      await refetch();
+    } catch (err) {
+      const mapped = mapError(err);
+      setContinuityClaimError(mapped.message);
+      throw err;
+    } finally {
+      setContinuityClaiming(false);
+    }
+  }, [sessionId, continuityClaiming, refetch]);
+
   return {
     loading,
     error,
@@ -385,18 +565,23 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
     selectedResultId,
     selectedResult,
     runSummary,
+    executionLifecycle,
     runNowStatus,
     runNowError,
     runNowResult,
     stateUpdateError,
     stateUpdating,
     emailRecipientConfigured,
+    persistenceScope,
     userNotificationEmail,
     userNotificationEmailKnown,
     userNotificationEmailLoading,
     userNotificationEmailLoadError,
     notificationEmailSaving,
     notificationEmailError,
+    continuityClaiming,
+    continuityClaimError,
+    continuityClaimSuccess,
     refetch,
     selectProfile,
     selectResult,
@@ -404,6 +589,7 @@ export function useDiscoveryModule(sessionId?: string | null): DiscoveryModuleSt
     updateProfile: updateProfileAction,
     setProfileEnabled,
     setUserNotificationEmail,
+    claimAccountContinuity,
     runNow,
     updateUserState,
   };

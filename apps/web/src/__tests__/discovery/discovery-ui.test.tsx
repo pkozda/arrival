@@ -30,25 +30,31 @@ function baseState(overrides: Partial<DiscoveryModuleState> = {}): DiscoveryModu
     selectedResultId: null,
     selectedResult: null,
     runSummary: null,
+    executionLifecycle: 'IDLE',
     runNowStatus: 'idle',
     runNowError: null,
     runNowResult: null,
     stateUpdateError: null,
     stateUpdating: false,
     emailRecipientConfigured: null,
+    persistenceScope: null,
     userNotificationEmail: null,
     userNotificationEmailKnown: true,
     userNotificationEmailLoading: false,
     userNotificationEmailLoadError: null,
     notificationEmailSaving: false,
     notificationEmailError: null,
+    continuityClaiming: false,
+    continuityClaimError: null,
+    continuityClaimSuccess: false,
     refetch: vi.fn(async () => undefined),
     selectProfile: vi.fn(async () => undefined),
     selectResult: vi.fn(async () => undefined),
-    createProfile: vi.fn(async () => undefined),
+    createProfile: vi.fn(async () => undefined as never),
     updateProfile: vi.fn(async () => undefined),
     setProfileEnabled: vi.fn(async () => undefined),
     setUserNotificationEmail: vi.fn(async () => undefined),
+    claimAccountContinuity: vi.fn(async () => undefined),
     runNow: vi.fn(async () => undefined),
     updateUserState: vi.fn(async () => undefined),
     ...overrides,
@@ -65,6 +71,31 @@ describe('E9.2 Discovery UI', () => {
     render(<DiscoveryPage sessionId="sess_test" />);
     expect(screen.getByText('Discovery')).toBeTruthy();
     expect(document.querySelector('[data-ui-surface="discovery-module-body"]')).toBeTruthy();
+  });
+
+  it('renders session continuity claim control', async () => {
+    const claimAccountContinuity = vi.fn(async () => undefined);
+    mockState.mockReturnValue(
+      baseState({
+        persistenceScope: 'session',
+        claimAccountContinuity,
+      })
+    );
+    render(<DiscoveryPage sessionId="sess_test" />);
+    expect(
+      document
+        .querySelector('[data-ui-surface="discovery-persistence-disclosure"]')
+        ?.getAttribute('data-persistence-scope')
+    ).toBe('session');
+    expect(
+      document.querySelector('[data-ui-surface="discovery-continuity-claim"]')
+    ).toBeTruthy();
+    fireEvent.click(
+      document.querySelector('[data-ui-surface="discovery-continuity-claim"]')!
+    );
+    await waitFor(() => {
+      expect(claimAccountContinuity).toHaveBeenCalled();
+    });
   });
 
   it('renders profile list with enabled/disabled badges', () => {
@@ -259,14 +290,28 @@ describe('E9.2 Discovery UI', () => {
           strategyId: 'job-discovery',
           strategyVersion: '1',
           canonicalPresentation: { title: 'Frontend Engineer', summary: 'Great role' },
-          source: { trust: 'AGGREGATOR', url: 'https://example.com/job' },
-          verification: { status: 'PASS' },
+          source: { trust: 'OFFICIAL', url: 'https://example.com/job' },
+          verification: {
+            status: 'PASS',
+            sourceTrust: 'OFFICIAL',
+            freshness: 'CURRENT',
+            verifiedAt: '2026-01-01T00:00:00.000Z',
+            checks: [
+              {
+                id: 'official_source',
+                outcome: 'TRUE',
+                required: true,
+                detail: 'Official source URL with attributable page content',
+              },
+            ],
+          },
           evidence: [
             {
               id: 'ev-1',
               type: 'OFFICIAL_SOURCE',
               statement: 'Hiring now',
               capturedAt: '2026-01-01T00:00:00.000Z',
+              sourceUrl: 'https://example.com/job',
             },
           ],
           score: {
@@ -286,8 +331,19 @@ describe('E9.2 Discovery UI', () => {
     );
 
     render(<DiscoveryPage sessionId="sess_test" />);
-    expect(screen.getByText('Hiring now')).toBeTruthy();
-    expect(screen.getByText('Verified')).toBeTruthy();
+    const trustPanel = document.querySelector('[data-ui-surface="discovery-trust-panel"]');
+    expect(trustPanel).toBeTruthy();
+    expect(trustPanel?.getAttribute('data-trust-status')).toBe('passed');
+    expect(trustPanel?.getAttribute('data-strategy-kind')).toBe('jobs');
+    const summaryEl = document.querySelector('[data-ui-surface="discovery-trust-summary"]');
+    expect(summaryEl?.textContent).toMatch(/official source page was checked|Checks passed|discovery\.trust/i);
+    const details = document.querySelector(
+      '[data-ui-surface="discovery-trust-details"]'
+    ) as HTMLDetailsElement | null;
+    expect(details).toBeTruthy();
+    if (details) details.open = true;
+    expect(screen.getByText(/Hiring now/)).toBeTruthy();
+    expect(document.querySelector('[data-check-id="official_source"]')).toBeTruthy();
   });
 
   it('calls user-state update action from detail panel', async () => {
@@ -356,6 +412,79 @@ describe('E9.2 Discovery UI', () => {
     });
   });
 
+  it('renders automation panel with session warning and enable control', async () => {
+    const updateProfile = vi.fn(async () => undefined);
+    mockState.mockReturnValue(
+      baseState({
+        persistenceScope: 'session',
+        profiles: [
+          {
+            id: 'p1',
+            userId: 'sess_test',
+            name: 'Jobs DE',
+            strategyId: 'job-discovery',
+            strategyVersion: '1',
+            criteria: { required: [], preferred: [], excluded: [], flexible: [] },
+            schedule: { cadence: 'manual' },
+            notification: { emailEnabled: true, skipEmptyDigest: true },
+            enabled: true,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
+        ],
+        selectedProfileId: 'p1',
+        selectedProfile: {
+          id: 'p1',
+          userId: 'sess_test',
+          name: 'Jobs DE',
+          strategyId: 'job-discovery',
+          strategyVersion: '1',
+          criteria: { required: [], preferred: [], excluded: [], flexible: [] },
+          schedule: { cadence: 'manual' },
+          notification: { emailEnabled: true, skipEmptyDigest: true },
+          enabled: true,
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: '2026-01-01T00:00:00.000Z',
+        },
+        results: [],
+        executionLifecycle: 'IDLE',
+        runSummary: {
+          profileId: 'p1',
+          lastRun: null,
+          lifecycle: 'IDLE',
+          applicableResultCount: 0,
+          automation: {
+            cadence: 'manual',
+            automaticExecution: false,
+            nextRunAt: null,
+            hourUtc: null,
+            profileEnabled: true,
+            delivery: { emailEnabled: true, skipEmptyDigest: true },
+            lastRunTrigger: null,
+          },
+        },
+        updateProfile,
+      })
+    );
+
+    render(<DiscoveryPage sessionId="sess_test" />);
+    expect(document.querySelector('[data-ui-surface="discovery-automation"]')).toBeTruthy();
+    expect(
+      document.querySelector('[data-ui-surface="discovery-automation-session-warning"]')
+    ).toBeTruthy();
+    fireEvent.click(
+      document.querySelector('[data-ui-surface="discovery-automation-enable"]')!
+    );
+    await waitFor(() => {
+      expect(updateProfile).toHaveBeenCalledWith(
+        'p1',
+        expect.objectContaining({
+          schedule: { cadence: 'daily', hourUtc: 6 },
+        })
+      );
+    });
+  });
+
   it('renders empty results state', () => {
     mockState.mockReturnValue(
       baseState({
@@ -389,6 +518,7 @@ describe('E9.2 Discovery UI', () => {
           updatedAt: '2026-01-01T00:00:00.000Z',
         },
         results: [],
+        executionLifecycle: 'NO_RESULTS',
         runSummary: {
           profileId: 'p1',
           lastRun: {
@@ -400,13 +530,24 @@ describe('E9.2 Discovery UI', () => {
             finishedAt: '2026-01-01T00:05:00.000Z',
             status: 'SUCCESS',
           },
+          lifecycle: 'NO_RESULTS',
+          applicableResultCount: 0,
+          automation: {
+            cadence: 'manual',
+            automaticExecution: false,
+            nextRunAt: null,
+            hourUtc: null,
+            profileEnabled: true,
+            delivery: { emailEnabled: true, skipEmptyDigest: true },
+            lastRunTrigger: 'scheduled',
+          },
         },
       })
     );
 
     render(<DiscoveryPage sessionId="sess_test" />);
-    expect(document.querySelector('[data-ui-surface="discovery-empty-results"]')).toBeTruthy();
-    expect(document.querySelector('[data-ui-surface="discovery-zero-new-run"]')).toBeTruthy();
+    expect(document.querySelector('[data-ui-surface="discovery-results-no-results"]')).toBeTruthy();
+    expect(document.querySelector('[data-ui-surface="discovery-execution-no-results"]')).toBeTruthy();
   });
 
   it('renders API error state when profiles cannot load', () => {
@@ -521,10 +662,12 @@ describe('E9.3 Discovery UI', () => {
           updatedAt: '2026-01-01T00:00:00.000Z',
         },
         runNowStatus: 'running',
+        executionLifecycle: 'RUNNING',
       })
     );
     const { rerender } = render(<DiscoveryPage sessionId="sess_test" />);
     expect(screen.getByText('Running…')).toBeTruthy();
+    expect(document.querySelector('[data-ui-surface="discovery-results-in-progress"]')).toBeTruthy();
 
     mockState.mockReturnValue(
       baseState({
@@ -558,10 +701,15 @@ describe('E9.3 Discovery UI', () => {
           updatedAt: '2026-01-01T00:00:00.000Z',
         },
         runNowStatus: 'success',
+        executionLifecycle: 'SUCCESS',
       })
     );
     rerender(<DiscoveryPage sessionId="sess_test" />);
-    expect(document.querySelector('[data-ui-surface="discovery-run-now-success"]')).toBeTruthy();
+    expect(
+      document.querySelector(
+        '[data-ui-surface="discovery-execution-lifecycle"][data-lifecycle="SUCCESS"]'
+      )
+    ).toBeTruthy();
 
     mockState.mockReturnValue(
       baseState({
@@ -596,10 +744,12 @@ describe('E9.3 Discovery UI', () => {
         },
         runNowStatus: 'error',
         runNowError: 'Pipeline failed',
+        executionLifecycle: 'ERROR',
       })
     );
     rerender(<DiscoveryPage sessionId="sess_test" />);
-    expect(document.querySelector('[data-ui-surface="discovery-run-now-error"]')).toBeTruthy();
+    expect(document.querySelector('[data-ui-surface="discovery-execution-error"]')).toBeTruthy();
+    expect(document.querySelector('[data-ui-surface="discovery-results-error"]')).toBeTruthy();
     expect(screen.getByText(/Pipeline failed/)).toBeTruthy();
   });
 

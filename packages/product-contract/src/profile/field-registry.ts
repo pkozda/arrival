@@ -11,6 +11,7 @@ export const PERSISTENT_FACT_FIELD_IDS = [
   'countryOfOrigin',
   'residencyStatus',
   'arrivedAt',
+  'municipalRegistrationConfirmed',
   'bundesland',
   'city',
   'monthlyColdRent',
@@ -27,6 +28,7 @@ export const PERSISTENT_FACT_FIELD_IDS = [
   'receivingBuergergeld',
   'receivingAlg1',
   'receivingWohngeld',
+  'receivingKindergeld',
   'receivingSozialamtSupport',
   'supportApplicationPending',
   'savingsDepleted',
@@ -73,6 +75,13 @@ export const PERSISTENT_FACT_FIELD_REGISTRY: Readonly<
     domain: 'migration',
     sensitivity: 'low',
     confirmationRequired: false,
+    exposedInProfileView: true,
+  },
+  municipalRegistrationConfirmed: {
+    id: 'municipalRegistrationConfirmed',
+    domain: 'migration',
+    sensitivity: 'medium',
+    confirmationRequired: true,
     exposedInProfileView: true,
   },
   bundesland: {
@@ -182,6 +191,13 @@ export const PERSISTENT_FACT_FIELD_REGISTRY: Readonly<
   },
   receivingWohngeld: {
     id: 'receivingWohngeld',
+    domain: 'benefits',
+    sensitivity: 'high',
+    confirmationRequired: true,
+    exposedInProfileView: true,
+  },
+  receivingKindergeld: {
+    id: 'receivingKindergeld',
     domain: 'benefits',
     sensitivity: 'high',
     confirmationRequired: true,

@@ -106,6 +106,12 @@ export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSec
         contractDomain: 'migration',
         placeholderKey: 'profile.placeholders.arrivedAt',
       },
+      {
+        formKey: 'municipalRegistrationConfirmed',
+        labelKey: 'profile.fields.municipalRegistrationConfirmed',
+        type: 'boolean',
+        contractDomain: 'migration',
+      },
     ],
   },
   'where-you-live': {
@@ -156,6 +162,15 @@ export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSec
         max: 20,
       },
       {
+        /** Draft-only count mapped to domains.household.children on save. */
+        formKey: 'dependentChildCount',
+        labelKey: 'profile.fields.dependentChildCount',
+        type: 'number',
+        contractDomain: 'household',
+        min: 0,
+        max: 20,
+      },
+      {
         formKey: 'maritalStatus',
         labelKey: 'profile.fields.maritalStatus',
         type: 'select',
@@ -193,8 +208,15 @@ export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSec
       {
         formKey: 'churchTax',
         labelKey: 'profile.fields.churchTax',
-        type: 'boolean',
+        // Tri-state select: '' = unknown, 'true' / 'false' = explicit.
+        // Must not use boolean checkbox (unchecked ≡ unknown would invent false).
+        type: 'select',
         contractDomain: 'employment',
+        placeholderKey: 'profile.options.churchTax.unspecified',
+        options: [
+          { value: 'true', labelKey: 'profile.options.churchTax.yes' },
+          { value: 'false', labelKey: 'profile.options.churchTax.no' },
+        ],
       },
     ],
   },
@@ -238,6 +260,12 @@ export const DOMAIN_EDIT_SECTIONS: Record<ProfileMirrorDomainSlug, DomainEditSec
       {
         formKey: 'receivingWohngeld',
         labelKey: 'profile.fields.receivingWohngeld',
+        type: 'boolean',
+        contractDomain: 'benefits',
+      },
+      {
+        formKey: 'receivingKindergeld',
+        labelKey: 'profile.fields.receivingKindergeld',
         type: 'boolean',
         contractDomain: 'benefits',
       },
@@ -304,12 +332,23 @@ export function readDraftValueFromProfile(
     return undefined;
   }
 
+  if (formKey === 'dependentChildCount' && contractDomain === 'household') {
+    const children = domainSlice.children;
+    if (!Array.isArray(children)) {
+      return undefined;
+    }
+    return children.length;
+  }
+
   const value = domainSlice[formKey];
   if (formKey === 'arrivedAt' && typeof value === 'string') {
     return value.slice(0, 7);
   }
   if (formKey === 'taxClass' && typeof value === 'number') {
     return String(value);
+  }
+  if (formKey === 'churchTax' && typeof value === 'boolean') {
+    return value ? 'true' : 'false';
   }
   if (typeof value === 'string' || typeof value === 'boolean' || typeof value === 'number') {
     return value;
@@ -342,6 +381,17 @@ export function normalizeDraftFieldValue(
   field: DomainEditFieldDefinition,
   raw: string | boolean | number | undefined
 ): string | boolean | number | undefined {
+  if (field.formKey === 'churchTax') {
+    // Explicit tri-state: only true/false become authoritative; never coerce unknown → false.
+    if (raw === true || raw === 'true') {
+      return true;
+    }
+    if (raw === false || raw === 'false') {
+      return false;
+    }
+    return undefined;
+  }
+
   if (field.type === 'boolean') {
     return Boolean(raw);
   }

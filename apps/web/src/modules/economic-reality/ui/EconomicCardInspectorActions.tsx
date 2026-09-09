@@ -2,6 +2,7 @@
 
 import type { PresentationCardV1 } from '@/lib/product-contract';
 import { ER_COPY_KEYS } from '@/lib/product-contract';
+import { useEconomicCopy } from '@/lib/economic-reality';
 import { EconomicActionButton } from './components/EconomicActionButton';
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function EconomicCardInspectorActions({ card }: Props) {
+  useEconomicCopy();
   const actionId = card.actionRefIds[0];
 
   if (!actionId) {

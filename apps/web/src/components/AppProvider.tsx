@@ -170,11 +170,16 @@ function AppProviderSessionLayer({ children }: { children: ReactNode }) {
   const languageRef = useRef<SupportedLanguage>('en');
   const [clientLocaleReady, setClientLocaleReady] = useState(false);
   const language = useMemo(() => {
+    // Keep treating incomplete consistency payloads as bootstrapping.
+    // If both contexts are null while loading flags are already false (common on
+    // remount / claim→reload), derivedLanguage falls back to `en` and must NOT
+    // overwrite an explicit stored display language (E3 P1).
     const bootstrapping =
       !clientLocaleReady ||
-      (consistency.userContext === null &&
-        consistency.uiSnapshot === null &&
-        (consistency.userContextLoading || consistency.uiSnapshotLoading));
+      consistency.userContext === null ||
+      consistency.uiSnapshot === null ||
+      consistency.userContextLoading ||
+      consistency.uiSnapshotLoading;
 
     if (!bootstrapping) {
       languageRef.current = derivedLanguage;

@@ -57,7 +57,7 @@ export type DiscoveryResultUserView = {
     summary?: string;
     primaryUrl?: string;
   };
-  source: { trust: string; url?: string };
+  source: { trust: string; url?: string; label?: string };
   verification: {
     status: string;
     sourceTrust?: string;
@@ -84,9 +84,11 @@ export type DiscoveryResultUserView = {
   firstSeenAt: string;
   lastVerifiedAt: string;
   lastChangedAt: string;
-  materialFields?: Record<string, string>;
+  promotedFromRunId?: string;
+  materialFields?: Record<string, string | number | boolean | null>;
   identity?: {
-    fingerprintMaterial?: Record<string, string | null>;
+    canonicalUrl?: string;
+    fingerprintMaterial?: Record<string, string | number | boolean | null>;
   };
   changeMetadata: {
     inferredNovelty: NoveltyStatus;
@@ -107,6 +109,20 @@ export type ProfileRunSummary = {
     skipReason?: string;
     errorMessage?: string;
   } | null;
+  lifecycle: DiscoveryExecutionLifecycle;
+  applicableResultCount: number;
+  automation: {
+    cadence: 'manual' | 'daily' | 'weekly';
+    automaticExecution: boolean;
+    nextRunAt: string | null;
+    hourUtc: number | null;
+    profileEnabled: boolean;
+    delivery: {
+      emailEnabled: boolean;
+      skipEmptyDigest: boolean;
+    };
+    lastRunTrigger: 'manual' | 'scheduled' | null;
+  };
 };
 
 export type ProfileRunNowResult = {
@@ -117,6 +133,8 @@ export type ProfileRunNowResult = {
   skipReason?: string;
   errorMessage?: string;
   lastRun?: ProfileRunSummary['lastRun'];
+  lifecycle: DiscoveryExecutionLifecycle;
+  applicableResultCount: number;
 };
 
 export type UpdateDiscoveryProfileInput = {
@@ -131,13 +149,31 @@ export type DiscoveryNotificationDeliveryStatus = {
   emailRecipientConfigured: boolean;
 };
 
+/** PD-006: server-derived persistence honesty (never invent from profile.userId client-side). */
+export type DiscoveryPersistenceScope = 'account' | 'session';
+
+/** PD-007 product-facing Discovery execution lifecycle. */
+export type DiscoveryExecutionLifecycle =
+  | 'IDLE'
+  | 'QUEUED'
+  | 'RUNNING'
+  | 'SUCCESS'
+  | 'NO_RESULTS'
+  | 'ERROR';
+
+export type DiscoveryPersistenceMeta = {
+  persistenceScope: DiscoveryPersistenceScope;
+};
+
 export type DiscoveryProfilesListResponse = {
   profiles: DiscoveryProfile[];
-} & DiscoveryNotificationDeliveryStatus;
+} & DiscoveryNotificationDeliveryStatus &
+  Partial<DiscoveryPersistenceMeta>;
 
 export type DiscoveryProfileResponse = {
   profile: DiscoveryProfile;
-} & DiscoveryNotificationDeliveryStatus;
+} & DiscoveryNotificationDeliveryStatus &
+  Partial<DiscoveryPersistenceMeta>;
 
 /** Persisted user notification email only — never the infrastructure fallback. */
 export type DiscoveryNotificationEmailResponse = {

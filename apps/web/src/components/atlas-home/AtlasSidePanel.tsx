@@ -1,5 +1,6 @@
 'use client';
 
+import { useApp } from '@/components/AppProvider';
 import { motion } from 'framer-motion';
 import type { AtlasLoadPhase } from './useAtlasLoadSequence';
 import type { AtlasSlideDefinition } from './types';
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export function AtlasSidePanel({ slide, loadPhase }: Props) {
+  const { t } = useApp();
   const { sidePanel } = slide;
   const uiVisible = loadPhase >= 5;
 
@@ -27,31 +29,33 @@ export function AtlasSidePanel({ slide, loadPhase }: Props) {
       transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="atlas-side-panel__glow" aria-hidden="true" />
-      <p className="atlas-side-panel__eyebrow">Focus Area</p>
-      <h3 className="atlas-side-panel__title">{sidePanel.title}</h3>
+      <p className="atlas-side-panel__eyebrow">{t('home.atlas.panel.focusArea')}</p>
+      <h3 className="atlas-side-panel__title">{t(sidePanel.title)}</h3>
       {sidePanel.status && (
         <div className="atlas-side-panel__goal">
-          <span className="atlas-side-panel__goal-label">Current Goal</span>
+          <span className="atlas-side-panel__goal-label">{t('home.atlas.panel.currentGoal')}</span>
           <p className="atlas-side-panel__status">
             <span className="atlas-side-panel__status-dot" aria-hidden="true" />
-            {sidePanel.status}
+            {t(sidePanel.status)}
           </p>
         </div>
       )}
       <div className="atlas-side-panel__section">
         <p className="atlas-side-panel__section-label">
-          {sidePanel.tone === 'future' ? 'You can now' : 'Remaining'}
+          {sidePanel.tone === 'future'
+            ? t('home.atlas.panel.youCanNow')
+            : t('home.atlas.panel.remaining')}
         </p>
         <ul className="atlas-side-panel__list">
           {sidePanel.remaining.map((item) => (
-            <li key={item}>{item}</li>
+            <li key={item}>{t(item)}</li>
           ))}
         </ul>
       </div>
       {sidePanel.nextStep && (
         <div className="atlas-side-panel__next">
-          <span>Next Step</span>
-          <strong>{sidePanel.nextStep}</strong>
+          <span>{t('home.atlas.panel.nextStep')}</span>
+          <strong>{t(sidePanel.nextStep)}</strong>
         </div>
       )}
     </motion.aside>

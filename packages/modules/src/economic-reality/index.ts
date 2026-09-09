@@ -3,6 +3,12 @@ export { resolveGraphContext } from './graph/resolve-graph.js';
 export { buildExecutionState } from './execution/build-execution-state.js';
 export { buildActionSet } from './actions/build-action-set.js';
 export { buildPlan } from './planner/build-plan.js';
+export { buildActionPlannerViewModel } from './planner/action-planner.js';
+export type {
+  ActionPlannerStatusV1,
+  ActionPlannerFactV1,
+  ActionPlannerViewModelV1,
+} from './planner/action-planner.js';
 export { buildPresentation } from './presentation/build-presentation.js';
 export {
   buildEconomicRealityPlan,

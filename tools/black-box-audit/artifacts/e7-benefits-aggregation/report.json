@@ -1,0 +1,110 @@
+{
+  "verdict": "E7 BENEFITS AGGREGATION PASS WITH LIMITATIONS",
+  "generatedAt": "2026-09-08T19:04:06.469Z",
+  "findings": [
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-PANEL",
+      "detail": "visible"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-A-FOCUS",
+      "detail": "GATHER_INFORMATION"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-B-KINDERGELD",
+      "detail": "READY_TO_ACT"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-B-FOCUS",
+      "detail": "ACTIONABLE"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-C-ORDER",
+      "detail": "both READY_TO_ACT; Wohngeld then Kindergeld"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-C-COUNT",
+      "detail": "2"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-D-PRIMARY",
+      "detail": "Wohngeld remains first actionable"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-D-COMPLETED-LAST",
+      "detail": "Completed Kindergeld after actionable"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-D-FOCUS-ATTR",
+      "detail": "primary focus on actionable card"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-E-ALL-COMPLETED",
+      "detail": "REVIEW_COMPLETED"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-E-NO-FAKE-ACTION",
+      "detail": "Honest all-completed copy"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-F-RELOAD",
+      "detail": "aggregate reconstructed"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-G-LANG-EN",
+      "detail": "en"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-G-LANG-UA",
+      "detail": "uk"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-G-UA-COPY",
+      "detail": "UA without RU leakage"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E7-A11Y-HEADING",
+      "detail": "section labelled"
+    }
+  ],
+  "observations": [
+    "=== E7 Benefits aggregation probe ===",
+    "[OBSERVED_PASS] E7-PANEL: visible",
+    "Scenario A focus=GATHER_INFORMATION",
+    "[OBSERVED_PASS] E7-A-FOCUS: GATHER_INFORMATION",
+    "Scenario B order=[{\"id\":\"de_federal_kindergeld\",\"state\":\"READY_TO_ACT\",\"primary\":\"true\"},{\"id\":\"de_federal_wohngeld\",\"state\":\"NOT_ENOUGH_INFORMATION\",\"primary\":\"false\"}]",
+    "[OBSERVED_PASS] E7-B-KINDERGELD: READY_TO_ACT",
+    "[OBSERVED_PASS] E7-B-FOCUS: ACTIONABLE",
+    "Scenario C order=[{\"id\":\"de_federal_wohngeld\",\"state\":\"READY_TO_ACT\",\"primary\":\"true\"},{\"id\":\"de_federal_kindergeld\",\"state\":\"READY_TO_ACT\",\"primary\":\"false\"}]",
+    "[OBSERVED_PASS] E7-C-ORDER: both READY_TO_ACT; Wohngeld then Kindergeld",
+    "[OBSERVED_PASS] E7-C-COUNT: 2",
+    "Scenario D order=[{\"id\":\"de_federal_wohngeld\",\"state\":\"READY_TO_ACT\",\"primary\":\"true\"},{\"id\":\"de_federal_kindergeld\",\"state\":\"COMPLETED\",\"primary\":\"false\"}]",
+    "[OBSERVED_PASS] E7-D-PRIMARY: Wohngeld remains first actionable",
+    "[OBSERVED_PASS] E7-D-COMPLETED-LAST: Completed Kindergeld after actionable",
+    "[OBSERVED_PASS] E7-D-FOCUS-ATTR: primary focus on actionable card",
+    "Scenario E focus=REVIEW_COMPLETED order=[{\"id\":\"de_federal_wohngeld\",\"state\":\"COMPLETED\",\"primary\":\"false\"},{\"id\":\"de_federal_kindergeld\",\"state\":\"COMPLETED\",\"primary\":\"false\"}]",
+    "[OBSERVED_PASS] E7-E-ALL-COMPLETED: REVIEW_COMPLETED",
+    "[OBSERVED_PASS] E7-E-NO-FAKE-ACTION: Honest all-completed copy",
+    "[OBSERVED_PASS] E7-F-RELOAD: aggregate reconstructed",
+    "[OBSERVED_PASS] E7-G-LANG-EN: en",
+    "[OBSERVED_PASS] E7-G-LANG-UA: uk",
+    "[OBSERVED_PASS] E7-G-UA-COPY: UA without RU leakage",
+    "[OBSERVED_PASS] E7-A11Y-HEADING: section labelled"
+  ]
+}

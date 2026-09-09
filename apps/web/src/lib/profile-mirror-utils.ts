@@ -404,6 +404,15 @@ function buildBenefitsDomain(
     fields.push({ label: 'Wohngeld', value: wohngeld });
   }
 
+  const kindergeld = formatBoolean(
+    benefits?.receivingKindergeld,
+    'Receiving Kindergeld',
+    'Not receiving Kindergeld'
+  );
+  if (kindergeld) {
+    fields.push({ label: 'Kindergeld', value: kindergeld });
+  }
+
   if (typeof benefits?.daysInGermany === 'number') {
     fields.push({ label: 'Days in Germany', value: String(benefits.daysInGermany) });
   }

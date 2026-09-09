@@ -1,0 +1,21 @@
+{
+  "verdict": "PASS",
+  "branch": "session-claim",
+  "limitations": [],
+  "observations": [
+    "=== PD-011 Discovery account claim probe ===",
+    "Ownership scope before claim: session",
+    "Claim CTA visible: true",
+    "Enabled daily automation before claim",
+    "Scope after session reload (pre-claim): session",
+    "Ownership scope after claim: account",
+    "Claim branch: visible ownership transition to account",
+    "Account continuity panel: true",
+    "Scope after reload: account",
+    "Automation after claim data-automatic=true data-cadence=daily",
+    "Profile items after claim: 0",
+    "Profile name matches: 2",
+    "Branch exercised: session-claim",
+    "Verdict: PASS"
+  ]
+}

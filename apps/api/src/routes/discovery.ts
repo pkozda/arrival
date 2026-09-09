@@ -15,8 +15,11 @@ import {
   getDiscoveryPersistence,
   getDiscoveryStrategyRegistry,
   getDiscoveryUserService,
+  resolveDiscoveryPersistenceScope,
   resolveDiscoveryUserId,
+  type DiscoveryPersistenceScope,
 } from '../discovery/discovery-user-runtime.js';
+import { maybeHealDiscoveryOwnership } from '../discovery/discovery-continuity-migration.js';
 import { isDiscoveryNotificationEmailConfigured } from '../discovery/resolve-discovery-notification-email.js';
 import { getDiscoveryUserNotificationEmailStore } from '../discovery/user-notification-email-runtime.js';
 import { seedDiscoveryE2eFixture } from '../discovery/seed-e2e-fixture.js';
@@ -58,17 +61,32 @@ function mapDiscoveryError(error: unknown, reply: FastifyReply) {
   throw error;
 }
 
-function discoveryUserId(request: { identity?: { sessionId: string; accountId: string | null } }) {
-  return resolveDiscoveryUserId({
+function discoveryIdentity(request: {
+  identity?: { sessionId: string; accountId: string | null };
+}) {
+  return {
     sessionId: request.identity!.sessionId,
     accountId: request.identity!.accountId,
-  });
+  };
+}
+
+function discoveryUserId(request: { identity?: { sessionId: string; accountId: string | null } }) {
+  return resolveDiscoveryUserId(discoveryIdentity(request));
 }
 
 /** API-only delivery status — not persisted on the profile document. */
 function emailRecipientConfiguredFor(userId: string): { emailRecipientConfigured: boolean } {
   return {
     emailRecipientConfigured: isDiscoveryNotificationEmailConfigured(userId),
+  };
+}
+
+/** PD-006: honest persistence scope from trusted identity (never client-supplied). */
+function persistenceMetaFor(request: {
+  identity?: { sessionId: string; accountId: string | null };
+}): { persistenceScope: DiscoveryPersistenceScope } {
+  return {
+    persistenceScope: resolveDiscoveryPersistenceScope(discoveryIdentity(request)),
   };
 }
 
@@ -120,9 +138,15 @@ export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<voi
     requireRouteSecurityRule('GET', '/api/modules/discovery/profiles'),
     async (request, reply) => {
       try {
+        const identity = discoveryIdentity(request);
+        await maybeHealDiscoveryOwnership(identity);
         const userId = discoveryUserId(request);
         const profiles = await getDiscoveryUserService().listProfiles(userId);
-        return { profiles, ...emailRecipientConfiguredFor(userId) };
+        return {
+          profiles,
+          ...emailRecipientConfiguredFor(userId),
+          ...persistenceMetaFor(request),
+        };
       } catch (error) {
         return mapDiscoveryError(error, reply);
       }
@@ -142,6 +166,7 @@ export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<voi
         return reply.status(201).send({
           profile,
           ...emailRecipientConfiguredFor(userId),
+          ...persistenceMetaFor(request),
         });
       } catch (error) {
         return mapDiscoveryError(error, reply);
@@ -159,7 +184,11 @@ export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<voi
       try {
         const userId = discoveryUserId(request);
         const profile = await getDiscoveryUserService().getProfile(userId, profileId);
-        return { profile, ...emailRecipientConfiguredFor(userId) };
+        return {
+          profile,
+          ...emailRecipientConfiguredFor(userId),
+          ...persistenceMetaFor(request),
+        };
       } catch (error) {
         return mapDiscoveryError(error, reply);
       }
@@ -182,7 +211,11 @@ export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<voi
           profileId,
           input
         );
-        return { profile, ...emailRecipientConfiguredFor(userId) };
+        return {
+          profile,
+          ...emailRecipientConfiguredFor(userId),
+          ...persistenceMetaFor(request),
+        };
       } catch (error) {
         return mapDiscoveryError(error, reply);
       }
@@ -201,7 +234,7 @@ export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<voi
           discoveryUserId(request),
           profileId
         );
-        return { profile };
+        return { profile, ...persistenceMetaFor(request) };
       } catch (error) {
         return mapDiscoveryError(error, reply);
       }
@@ -220,7 +253,7 @@ export async function registerDiscoveryRoutes(app: FastifyInstance): Promise<voi
           discoveryUserId(request),
           profileId
         );
-        return { profile };
+        return { profile, ...persistenceMetaFor(request) };
       } catch (error) {
         return mapDiscoveryError(error, reply);
       }

@@ -1,0 +1,16 @@
+{
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "limitations": [
+    "Browser SUCCESS with trust panel not hit; covered by focused unit/UI tests."
+  ],
+  "observations": [
+    "=== PD-009 Discovery trust probe ===",
+    "Terminal lifecycle: NO_RESULTS",
+    "Case E NO_RESULTS panel: true",
+    "Case F reload lifecycle: NO_RESULTS",
+    "Case G: entered Atlas in UA; trust i18n covered by focused tests.",
+    "Ownership foreign status: 404",
+    "LIMITATIONS: Browser SUCCESS with trust panel not hit; covered by focused unit/UI tests.",
+    "VERDICT: PASS_WITH_LIMITATIONS"
+  ]
+}

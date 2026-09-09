@@ -1,0 +1,18 @@
+{
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "limitations": [
+    "Browser path did not hit SUCCESS; list/action covered by focused tests.",
+    "Browser ERROR path not hit; covered by focused tests."
+  ],
+  "observations": [
+    "=== PD-008 Discovery results probe ===",
+    "Case A lifecycle: IDLE",
+    "Case B/C terminal: NO_RESULTS",
+    "Case results panel lifecycle: NO_RESULTS",
+    "Case D NO_RESULTS panel: true",
+    "Case F reload lifecycle: NO_RESULTS",
+    "Case H foreign profiles status: 404",
+    "LIMITATIONS: Browser path did not hit SUCCESS; list/action covered by focused tests. | Browser ERROR path not hit; covered by focused tests.",
+    "VERDICT: PASS_WITH_LIMITATIONS"
+  ]
+}

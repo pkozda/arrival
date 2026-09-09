@@ -109,6 +109,7 @@ function sampleResult(overrides: Partial<DiscoveryResult> = {}): DiscoveryResult
     lastVerifiedAt: NOW,
     lastChangedAt: NOW,
     materialFields: { salary: '60000' },
+    promotedFromRunId: 'run-1',
     ...overrides,
   };
 }
@@ -259,6 +260,39 @@ describe('E9.1 DiscoveryUserService', () => {
     const summary = await service.getProfileRunSummary(USER_A, 'profile-job');
     expect(summary.lastRun?.runId).toBe('run-1');
     expect(summary.lastRun?.status).toBe('SUCCESS');
+    expect(summary.lifecycle).toBe('SUCCESS');
+    expect(summary.applicableResultCount).toBe(1);
+    expect(summary.automation.cadence).toBe('manual');
+    expect(summary.automation.automaticExecution).toBe(false);
+  });
+
+  it('PD-007: SUCCESS with zero applicable results is NO_RESULTS', async () => {
+    const { service } = buildService({
+      resultStore: createInMemoryResultStore([
+        sampleResult({ promotedFromRunId: 'other-run' }),
+      ]),
+    });
+    const summary = await service.getProfileRunSummary(USER_A, 'profile-job');
+    expect(summary.lifecycle).toBe('NO_RESULTS');
+    expect(summary.applicableResultCount).toBe(0);
+  });
+
+  it('PD-007: profile without runs is IDLE', async () => {
+    const { service } = buildService({
+      runStore: createInMemoryRunStore([]),
+      resultStore: createInMemoryResultStore([]),
+    });
+    const summary = await service.getProfileRunSummary(USER_A, 'profile-job');
+    expect(summary.lifecycle).toBe('IDLE');
+    expect(summary.lastRun).toBeNull();
+  });
+
+  it('PD-007: denies run-summary and run-now to another user', async () => {
+    const { service } = buildService();
+    await expect(service.getProfileRunSummary(USER_B, 'profile-job')).rejects.toThrow(
+      /not found/i
+    );
+    await expect(service.runProfileNow(USER_B, 'profile-job')).rejects.toThrow(/not found/i);
   });
 
   it('denies access to another user profile', async () => {

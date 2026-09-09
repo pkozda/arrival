@@ -9,3 +9,9 @@ export {
 } from './track-builder.js';
 export { pruneActionSetActions, assertNoCrossTrackDuplicates } from './rule-filter.js';
 export { buildPlan } from './build-plan.js';
+export {
+  buildActionPlannerViewModel,
+  type ActionPlannerStatusV1,
+  type ActionPlannerFactV1,
+  type ActionPlannerViewModelV1,
+} from './action-planner.js';

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useApp } from '@/components/AppProvider';
 import { ATLAS_SLIDES, getSlideIndexForNode } from './atlas-data';
 import { AtlasAmbientLayers } from './AtlasAmbientLayers';
 import { AtlasHUD } from './AtlasHUD';
@@ -16,6 +17,7 @@ import { useAtlasParallax } from './useAtlasParallax';
 import type { AtlasNodeId } from './types';
 
 export function AtlasMemberSlider() {
+  const { t } = useApp();
   const [activeIndex, setActiveIndex] = useState(0);
   const [loadEpoch, setLoadEpoch] = useState(0);
   const locationLabel = useAtlasLocationLabel();
@@ -89,9 +91,12 @@ export function AtlasMemberSlider() {
           </motion.div>
 
           <motion.div className="atlas-slider__ui-left">
-            <nav className="atlas-slider__rail" aria-label="Journey slides">
+            <nav className="atlas-slider__rail" aria-label={t('home.atlas.aria.slides')}>
               {ATLAS_SLIDES.map((slide, index) => {
                 const isActive = index === activeIndex;
+                const railLabel = t('home.atlas.aria.slideRail')
+                  .replace('{n}', slide.label)
+                  .replace('{title}', t(slide.sidePanel.title));
                 return (
                   <button
                     key={slide.id}
@@ -99,7 +104,7 @@ export function AtlasMemberSlider() {
                     className={`atlas-slider__rail-btn${isActive ? ' is-active' : ''}`}
                     onClick={() => goTo(index)}
                     aria-current={isActive ? 'step' : undefined}
-                    aria-label={`Slide ${slide.label}: ${slide.sidePanel.title}`}
+                    aria-label={railLabel}
                   >
                     <span className="atlas-slider__rail-num">{slide.label}</span>
                     <span className="atlas-slider__rail-line" aria-hidden="true" />

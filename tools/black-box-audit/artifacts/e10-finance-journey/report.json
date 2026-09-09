@@ -1,0 +1,205 @@
+{
+  "verdict": "TAX SEMANTIC HARDENING PASS WITH LIMITATIONS",
+  "selectedSlice": "Tax Administration churchTax tri-state hardening",
+  "generatedAt": "2026-09-09T14:09:59.086Z",
+  "findings": [
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-PANEL",
+      "detail": "visible on Economic Reality"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-SLICE",
+      "detail": "tax-administration"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-A-UNKNOWN",
+      "detail": "NOT_ADDED"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-A-NO-BANKING-CLAIM",
+      "detail": "banking deferred note present or no overclaim"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-A-BANKING-DEFERRED",
+      "detail": "explicit banking deferred note"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-A-CTA",
+      "detail": "update_tax_details"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-B-MUTATION",
+      "detail": "taxClass=3 saved"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-C-READY",
+      "detail": "READY"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-C-FACT",
+      "detail": "Податковий клас (Steuerklasse): 3"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-C-NEXT",
+      "detail": "review_tax_details"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-A-UNKNOWN",
+      "detail": "taxClass READY; churchTax UNKNOWN"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-A-EDITOR",
+      "detail": "select value=\"\""
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-B-INCOME",
+      "detail": "unrelated income saved"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-C-PRESERVED",
+      "detail": "churchTax still UNKNOWN after unrelated save"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-C-EDITOR",
+      "detail": "editor still Not specified"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-D-TRUE",
+      "detail": "churchTax=true saved"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-D-PANEL",
+      "detail": "KNOWN + READY"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-E-RELOAD-TRUE",
+      "detail": "true"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-F-FALSE",
+      "detail": "churchTax=false saved"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-F-PANEL",
+      "detail": "KNOWN + READY"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-G-RELOAD-FALSE",
+      "detail": "false"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-T-H-STATE",
+      "detail": "READY after false"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-E-PLANNER",
+      "detail": "still present"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-E-HOUSING",
+      "detail": "still present"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-E-BENEFITS",
+      "detail": "still present"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-D-RELOAD",
+      "detail": "READY"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-F-LANG-EN",
+      "detail": "en"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-F-LANG-UA",
+      "detail": "uk"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-F-UA-COPY",
+      "detail": "UA without RU leakage"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-A11Y",
+      "detail": "section labelled"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-G-NO-FAKE-BANKING",
+      "detail": "url=http://localhost:3000/modules/finance — no misleading banking product surface required"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E10-H-NOOP",
+      "detail": "No-change tax save completed without crash"
+    }
+  ],
+  "observations": [
+    "=== E10 Finance Tax Administration journey probe ===",
+    "[OBSERVED_PASS] E10-PANEL: visible on Economic Reality",
+    "[OBSERVED_PASS] E10-SLICE: tax-administration",
+    "Phase A state=NOT_ADDED",
+    "[OBSERVED_PASS] E10-A-UNKNOWN: NOT_ADDED",
+    "[OBSERVED_PASS] E10-A-NO-BANKING-CLAIM: banking deferred note present or no overclaim",
+    "[OBSERVED_PASS] E10-A-BANKING-DEFERRED: explicit banking deferred note",
+    "[OBSERVED_PASS] E10-A-CTA: update_tax_details",
+    "[OBSERVED_PASS] E10-B-MUTATION: taxClass=3 saved",
+    "Phase C state=READY",
+    "[OBSERVED_PASS] E10-C-READY: READY",
+    "[OBSERVED_PASS] E10-C-FACT: Податковий клас (Steuerklasse): 3",
+    "[OBSERVED_PASS] E10-C-NEXT: review_tax_details",
+    "=== churchTax tri-state hardening ===",
+    "[OBSERVED_PASS] E10-T-A-UNKNOWN: taxClass READY; churchTax UNKNOWN",
+    "[OBSERVED_PASS] E10-T-A-EDITOR: select value=\"\"",
+    "[OBSERVED_PASS] E10-T-B-INCOME: unrelated income saved",
+    "[OBSERVED_PASS] E10-T-C-PRESERVED: churchTax still UNKNOWN after unrelated save",
+    "[OBSERVED_PASS] E10-T-C-EDITOR: editor still Not specified",
+    "[OBSERVED_PASS] E10-T-D-TRUE: churchTax=true saved",
+    "[OBSERVED_PASS] E10-T-D-PANEL: KNOWN + READY",
+    "[OBSERVED_PASS] E10-T-E-RELOAD-TRUE: true",
+    "[OBSERVED_PASS] E10-T-F-FALSE: churchTax=false saved",
+    "[OBSERVED_PASS] E10-T-F-PANEL: KNOWN + READY",
+    "[OBSERVED_PASS] E10-T-G-RELOAD-FALSE: false",
+    "[OBSERVED_PASS] E10-T-H-STATE: READY after false",
+    "[OBSERVED_PASS] E10-E-PLANNER: still present",
+    "[OBSERVED_PASS] E10-E-HOUSING: still present",
+    "[OBSERVED_PASS] E10-E-BENEFITS: still present",
+    "[OBSERVED_PASS] E10-D-RELOAD: READY",
+    "[OBSERVED_PASS] E10-F-LANG-EN: en",
+    "[OBSERVED_PASS] E10-F-LANG-UA: uk",
+    "[OBSERVED_PASS] E10-F-UA-COPY: UA without RU leakage",
+    "[OBSERVED_PASS] E10-A11Y: section labelled",
+    "[OBSERVED_PASS] E10-G-NO-FAKE-BANKING: url=http://localhost:3000/modules/finance — no misleading banking product surface required",
+    "[OBSERVED_PASS] E10-H-NOOP: No-change tax save completed without crash"
+  ]
+}

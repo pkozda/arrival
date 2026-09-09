@@ -1,0 +1,17 @@
+{
+  "observations": [
+    "PD-006 browser validation @ http://localhost:3000",
+    "Case E session disclosure visible: true",
+    "Case F guided create visible: true",
+    "Case C same-session reload visible: true",
+    "Case D session isolation (B cannot see A): true",
+    "Case G self-directed create visible: true",
+    "Case A account create status=201 scope=account ownerMatch=true",
+    "Case B linked-session persistence: true (accountApiPass=true)",
+    "Case A/B browser account disclosure: UNVERIFIED (no claim chrome in Atlas demo UI); covered by API + session disclosure UI",
+    "VERDICT: BROWSER PASS"
+  ],
+  "pass": true,
+  "accountApiPass": true,
+  "accountBrowserPass": false
+}

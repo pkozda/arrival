@@ -1,0 +1,105 @@
+{
+  "observations": [
+    "PD-002 browser validation @ http://localhost:3000",
+    "planner visible status=READY",
+    "next CTA before housing: Update housing and registration details",
+    "plans: [{\"status\":200,\"hash\":\"6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8\",\"housing\":true,\"confirm\":false,\"primaryLabel\":\"ER.INTENT.INITIATE_BENEFIT_APPLICATION\"},{\"status\":200,\"hash\":\"6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8\",\"housing\":true,\"confirm\":false,\"primaryLabel\":\"ER.INTENT.INITIATE_BENEFIT_APPLICATION\"},{\"status\":200,\"hash\":\"6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8\",\"housing\":true,\"confirm\":false,\"primaryLabel\":\"ER.INTENT.INITIATE_BENEFIT_APPLICATION\"},{\"status\":200,\"hash\":\"6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8\",\"housing\":true,\"confirm\":false,\"primaryLabel\":\"ER.INTENT.INITIATE_BENEFIT_APPLICATION\"},{\"status\":200,\"hash\":\"6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8\",\"housing\":true,\"confirm\":false,\"primaryLabel\":\"ER.INTENT.INITIATE_BENEFIT_APPLICATION\"}]",
+    "housing city saved as Bremen",
+    "next CTA after housing: Confirm Anmeldung completion",
+    "ER-LOOP-001 housing still in action set: false",
+    "confirm action present: true",
+    "plans after housing: [{\"status\":200,\"hash\":\"a10417bf315c70f0e0e1e710a97c92004bcc986cb0f13b0d78302bf113a847eb\",\"housing\":false,\"confirm\":true,\"primaryLabel\":\"ER.INTENT.INITIATE_BENEFIT_APPLICATION\"},{\"status\":200,\"hash\":\"a10417bf315c70f0e0e1e710a97c92004bcc986cb0f13b0d78302bf113a847eb\",\"housing\":false,\"confirm\":true,\"primaryLabel\":\"ER.INTENT.INITIATE_BENEFIT_APPLICATION\"}]",
+    "recalculation confirmation visible: false",
+    "after reload housing=false confirm=true",
+    "VERDICT: BROWSER PASS"
+  ],
+  "pass": true,
+  "planResponses": [
+    {
+      "status": 200,
+      "hash": "6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8",
+      "housing": true,
+      "confirm": false,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8",
+      "housing": true,
+      "confirm": false,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8",
+      "housing": true,
+      "confirm": false,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8",
+      "housing": true,
+      "confirm": false,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8",
+      "housing": true,
+      "confirm": false,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "6c4274fddf3bcfbb06fb1a182a3d865ab09fbbbfa8f908e96cf38a833dfc76d8",
+      "housing": true,
+      "confirm": false,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "a10417bf315c70f0e0e1e710a97c92004bcc986cb0f13b0d78302bf113a847eb",
+      "housing": false,
+      "confirm": true,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "a10417bf315c70f0e0e1e710a97c92004bcc986cb0f13b0d78302bf113a847eb",
+      "housing": false,
+      "confirm": true,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "a10417bf315c70f0e0e1e710a97c92004bcc986cb0f13b0d78302bf113a847eb",
+      "housing": false,
+      "confirm": true,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "a10417bf315c70f0e0e1e710a97c92004bcc986cb0f13b0d78302bf113a847eb",
+      "housing": false,
+      "confirm": true,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "a10417bf315c70f0e0e1e710a97c92004bcc986cb0f13b0d78302bf113a847eb",
+      "housing": false,
+      "confirm": true,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    },
+    {
+      "status": 200,
+      "hash": "a10417bf315c70f0e0e1e710a97c92004bcc986cb0f13b0d78302bf113a847eb",
+      "housing": false,
+      "confirm": true,
+      "primaryLabel": "ER.INTENT.INITIATE_BENEFIT_APPLICATION"
+    }
+  ],
+  "nextLabel": "Update housing and registration details",
+  "afterLabel": "Confirm Anmeldung completion"
+}

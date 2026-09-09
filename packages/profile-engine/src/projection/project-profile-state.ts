@@ -69,6 +69,7 @@ export function projectProfileState(state: ProfileState): UserProfileViewV1 {
         'countryOfOrigin',
         'residencyStatus',
         'arrivedAt',
+        'municipalRegistrationConfirmed',
       ]),
       housing: buildDomainSlice(state, 'housing', [
         'bundesland',
@@ -95,6 +96,7 @@ export function projectProfileState(state: ProfileState): UserProfileViewV1 {
         'receivingBuergergeld',
         'receivingAlg1',
         'receivingWohngeld',
+        'receivingKindergeld',
         'daysInGermany',
       ]),
     },

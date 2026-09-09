@@ -1,6 +1,7 @@
 'use client';
 
 import { AtlasLink as Link } from '@/components/atlas-runtime';
+import { useApp } from '@/components/AppProvider';
 import { motion } from 'framer-motion';
 import type { AtlasLoadPhase } from './useAtlasLoadSequence';
 import type { AtlasSlideDefinition } from './types';
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function AtlasSlide({ slide, loadPhase }: Props) {
+  const { t } = useApp();
   const uiVisible = loadPhase >= 5;
 
   return (
@@ -25,29 +27,29 @@ export function AtlasSlide({ slide, loadPhase }: Props) {
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
     >
-      <p className="atlas-slide__eyebrow">Personal Life Navigation</p>
+      <p className="atlas-slide__eyebrow">{t('home.atlas.slide.eyebrow')}</p>
       <p className="atlas-slide__index">{slide.label}</p>
       <h1 className="atlas-slide__headline">
-        {slide.headline}
+        {t(slide.headline)}
         {slide.headlineAccent && (
           <>
             <br />
-            <span className="atlas-slide__accent">{slide.headlineAccent}</span>
+            <span className="atlas-slide__accent">{t(slide.headlineAccent)}</span>
           </>
         )}
       </h1>
-      <p className="atlas-slide__supporting">{slide.supporting}</p>
+      <p className="atlas-slide__supporting">{t(slide.supporting)}</p>
       <div className="atlas-slide__actions">
         <Link
           href={slide.ctaHref}
           className="atlas-slide__cta"
           data-ui-surface={slide.index === 0 ? 'home-atlas-entry' : undefined}
         >
-          {slide.cta}
+          {t(slide.cta)}
           <span aria-hidden="true">→</span>
         </Link>
         <Link href="/modules/life-event" className="atlas-slide__secondary">
-          See what&apos;s next
+          {t('home.atlas.slide.secondary')}
           <span aria-hidden="true">→</span>
         </Link>
       </div>

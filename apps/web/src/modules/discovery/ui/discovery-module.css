@@ -211,6 +211,46 @@
   font-size: 0.92rem;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.discovery-trust__summary {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.discovery-trust__status {
+  font-weight: 600;
+}
+
+.discovery-trust__details {
+  margin-top: 0.75rem;
+}
+
+.discovery-trust__details > summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.discovery-trust__details-body {
+  margin-top: 0.5rem;
+}
+
+.discovery-trust__list-line {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted, #94a3b8);
+}
+
 .discovery-create-form {
   display: flex;
   flex-direction: column;
@@ -392,6 +432,28 @@
   font-size: 0.92rem;
 }
 
+.discovery-persistence-disclosure {
+  margin-top: 0.5rem;
+}
+
+.discovery-continuity {
+  margin-top: 0.35rem;
+}
+
+.discovery-continuity .discovery-actions {
+  margin-top: 0.35rem;
+}
+
+.discovery-automation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.discovery-automation .discovery-detail-grid {
+  margin: 0;
+}
+
 .discovery-notification {
   display: flex;
   flex-direction: column;
@@ -471,6 +533,21 @@
 .discovery-notification__compact {
   margin: 1rem 0 0;
   font-size: 0.85rem;
+}
+
+.discovery-guided-wizard {
+  margin-top: 0.75rem;
+}
+
+.discovery-guided-wizard__intents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.discovery-persistence-disclosure {
+  margin: 0.25rem 0 0;
 }
 
 @media (max-width: 900px) {
