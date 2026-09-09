@@ -1,5 +1,6 @@
 'use client';
 
+import { useApp } from '@/components/AppProvider';
 import { motion } from 'framer-motion';
 import { JOURNEY_STAGES } from './atlas-data';
 import type { AtlasLoadPhase } from './useAtlasLoadSequence';
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function JourneyTimeline({ activeStage, loadPhase }: Props) {
+  const { t } = useApp();
   const activeIndex = JOURNEY_STAGES.findIndex((stage) => stage.id === activeStage);
   const progressPercent =
     activeIndex <= 0 ? 0 : (activeIndex / (JOURNEY_STAGES.length - 1)) * 100;
@@ -19,7 +21,7 @@ export function JourneyTimeline({ activeStage, loadPhase }: Props) {
   return (
     <footer
       className="atlas-journey"
-      aria-label="Journey timeline"
+      aria-label={t('home.atlas.aria.timeline')}
       style={{ opacity: uiVisible ? 1 : 0, transition: 'opacity 0.6s ease' }}
     >
       <div className="atlas-journey__route" aria-hidden="true">
@@ -51,8 +53,8 @@ export function JourneyTimeline({ activeStage, loadPhase }: Props) {
                 }
                 transition={{ duration: 2.8, repeat: isActive ? Infinity : 0, ease: 'easeInOut' }}
               />
-              <span className="atlas-journey__label">{stage.label}</span>
-              <span className="atlas-journey__subtitle">{stage.subtitle}</span>
+              <span className="atlas-journey__label">{t(stage.label)}</span>
+              <span className="atlas-journey__subtitle">{t(stage.subtitle)}</span>
             </div>
           );
         })}

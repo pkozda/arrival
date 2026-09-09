@@ -57,8 +57,24 @@ export function buildLifeEventGalaxyGraph({
     contextualActions.forEach((node) => {
       graphEdges.push({ id: `unlock-${focusId}-${node.id}`, from: focusId, to: node.id, type: 'unlock' });
     });
+    // Completed nodes are real prerequisites of the current focus.
+    completedNodes.forEach((node) => {
+      graphEdges.push({
+        id: `dep-${node.id}-${focusId}`,
+        from: node.id,
+        to: focusId,
+        type: 'dependency',
+      });
+    });
+    // Active blocks are downstream of the focus — not prerequisites of it.
+    // (Previously inverted: blocked → focus locked Anmeldung behind banking.)
     blockedActions.forEach((node) => {
-      graphEdges.push({ id: `dep-${node.id}-${focusId}`, from: node.id, to: focusId, type: 'dependency' });
+      graphEdges.push({
+        id: `dep-${focusId}-${node.id}`,
+        from: focusId,
+        to: node.id,
+        type: 'dependency',
+      });
     });
   } else {
     secondaryActions.forEach((node) => {

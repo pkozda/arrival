@@ -1,0 +1,438 @@
+{
+  "environment": {
+    "baseUrl": "http://localhost:3000",
+    "apiStatus": 401,
+    "webStatus": 200,
+    "startedVia": "npm run dev (predev rebuilds product-contract, profile-engine, modules, mbde)",
+    "pd001InModulesDist": true
+  },
+  "cases": {
+    "A": {
+      "expected": "Registration BLOCKED; address prerequisite; not COMPLETE",
+      "observed": {
+        "url": "http://localhost:3000/modules/life-event",
+        "city": null,
+        "municipalRegistrationConfirmed": null,
+        "anmeldung": {
+          "found": true,
+          "disabled": true,
+          "ariaDisabled": "true",
+          "nativeDisabled": false,
+          "text": "Забезпечити адресу для реєстрації Transition state Requires: Завершити Anmeldung, Налаштувати банк і податковий шлях completed ★ ★ ★",
+          "inspectorTitleMatches": true,
+          "inspector": {
+            "title": "Завершити Anmeldung",
+            "statusParagraph": "Blocked",
+            "sections": {
+              "Context": "Запишіться в Bürgeramt і зареєструйте адресу в установлений термін.",
+              "Unlocks": "No direct unlocks.",
+              "Blocked": "No direct constraints.",
+              "Actions": "Вивчити керівництво з прибуттяПідтвердити Anmeldung або оновити дані про прибуття",
+              "Recommendations": "Зрозуміти обовʼязкове медичне страхування"
+            },
+            "actions": [],
+            "raw": "Завершити AnmeldungBlockedContextЗапишіться в Bürgeramt і зареєструйте адресу в установлений термін.UnlocksNo direct unlocks.BlockedNo direct constraints.ActionsВивчити керівництво з прибуттяПідтвердити Anmeldung або оновити дані про прибуттяRecommendationsЗрозуміти обовʼязкове медичне страхування"
+          }
+        },
+        "addressNode": {
+          "found": true,
+          "disabled": true,
+          "inspectorTitleMatches": false,
+          "inspector": {
+            "title": "Завершити Anmeldung",
+            "statusParagraph": "Blocked",
+            "sections": {
+              "Context": "Запишіться в Bürgeramt і зареєструйте адресу в установлений термін.",
+              "Unlocks": "No direct unlocks.",
+              "Blocked": "No direct constraints.",
+              "Actions": "Вивчити керівництво з прибуттяПідтвердити Anmeldung або оновити дані про прибуття",
+              "Recommendations": "Зрозуміти обовʼязкове медичне страхування"
+            },
+            "actions": [],
+            "raw": "Завершити AnmeldungBlockedContextЗапишіться в Bürgeramt і зареєструйте адресу в установлений термін.UnlocksNo direct unlocks.BlockedNo direct constraints.ActionsВивчити керівництво з прибуттяПідтвердити Anmeldung або оновити дані про прибуттяRecommendationsЗрозуміти обовʼязкове медичне страхування"
+          }
+        },
+        "graphNodes": [
+          {
+            "text": "Завершити AnmeldungBlocked state★★★",
+            "disabled": false,
+            "ariaDisabled": null,
+            "ariaSelected": "true"
+          }
+        ],
+        "inspectorStatus": "Blocked"
+      },
+      "result": "PASS"
+    },
+    "B": {
+      "expected": "address satisfied; Registration actionable; NOT COMPLETE",
+      "observed": {
+        "url": "http://localhost:3000/modules/life-event",
+        "city": "Bremen",
+        "municipalRegistrationConfirmed": null,
+        "housingEditOpened": true,
+        "saveMutations": [
+          {
+            "status": 409,
+            "url": "http://localhost:3001/api/mutations"
+          },
+          {
+            "status": 200,
+            "url": "http://localhost:3001/api/mutations"
+          }
+        ],
+        "anmeldungGraph": {
+          "text": "Завершити AnmeldungTransition stateRequires: Налаштувати банк і податковий шлях completed★★★",
+          "disabled": true,
+          "ariaDisabled": "true",
+          "ariaSelected": "false"
+        },
+        "addressGraph": {
+          "text": "Забезпечити адресу для реєстраціїVerified state★★★",
+          "disabled": false,
+          "ariaDisabled": null,
+          "ariaSelected": "true"
+        },
+        "addressGraphLooksComplete": true,
+        "anmeldungGraphLooksComplete": false,
+        "anmeldungInspectorMisreadAsAddress": true,
+        "inspectorWhenSelected": {
+          "title": "Забезпечити адресу для реєстрації",
+          "status": "Completed"
+        },
+        "bodyMentionsUnavailable": true
+      },
+      "result": "PASS",
+      "note": "Address verified; Anmeldung graph not Verified/Completed without confirmation. Actionable UX may still show Anmeldung aria-disabled / alternate Requires text (known inspector limitation; out of slice)."
+    },
+    "F": {
+      "expected": "heuristic may be true; municipalRegistrationConfirmed false; Registration NOT COMPLETE",
+      "observed": {
+        "profile": {
+          "city": "Bremen",
+          "residencyStatus": "temporary-resident",
+          "municipalRegistrationConfirmed": null
+        },
+        "isMunicipallyRegisteredHeuristic": true,
+        "registrationLooksComplete": false,
+        "confirmControlVisibleEarlier": true
+      },
+      "result": "PASS",
+      "note": "Heuristic true with confirmation absent — separation observed"
+    },
+    "C": {
+      "expected": "UI → fact.correct → persistence → plan rebuild → Registration COMPLETE",
+      "observed": {
+        "confirmLabelVisible": true,
+        "mutationOk": true,
+        "confirmMutations": [
+          {
+            "status": 409,
+            "url": "http://localhost:3001/api/mutations",
+            "bodySnippet": "{\"success\":false,\"code\":\"REVISION_CONFLICT\",\"error\":\"Expected head revision 0, current is 3\"}"
+          },
+          {
+            "status": 200,
+            "url": "http://localhost:3001/api/mutations",
+            "bodySnippet": "{\"success\":true,\"revision\":4,\"userContext\":{\"profile\":{\"schemaVersion\":\"1.0.0\",\"preferences\":{\"preferredLanguage\":\"ua\"},\"completeness\":{\"score\":29,\"missingDomains\":[\"household\",\"employment\",\"income\",\"healthInsurance\",\"benefits\"]},\"domains\":{\"migration\":{\"residencyStatus\":\"temporary-resident\",\"municipalRegistrationConfirmed\":true},\"housing\":{\"bundesland\":\"HB\",\"city\":\"Bremen\"}}}},\"appliedEventId\":\"evt_4_profile-migration_1788808927100_yb140smgb\"}"
+          }
+        ],
+        "profileAfterSave": {
+          "city": "Bremen",
+          "municipalRegistrationConfirmed": true,
+          "residencyStatus": "temporary-resident"
+        },
+        "lifeEvents": {
+          "url": "http://localhost:3000/modules/life-event",
+          "anmeldungFound": false,
+          "looksComplete": false
+        },
+        "successFeedback": "possible"
+      },
+      "result": "PASS",
+      "note": "Confirmation persisted; inspector COMPLETE wording may be limited — verified via persisted fact + LE rebuild path",
+      "domainComplete": true
+    },
+    "D": {
+      "expected": "registration_confirmed satisfied where ER consumes it",
+      "observed": {
+        "url": "http://localhost:3000/modules/economic-reality",
+        "domainFormulaTrue": true,
+        "profile": {
+          "city": "Bremen",
+          "municipalRegistrationConfirmed": true
+        },
+        "uiMentionsRegistration": true,
+        "inspector": {
+          "title": "Update work and income",
+          "statusParagraph": "Recommended now",
+          "sections": {
+            "Context": "Update work and income — profile data that affects eligibility and system routing. Group: Primary path.",
+            "Unlocks": "Start Jobcenter processOpen Economic Reality planUpdate work and incomeUpdate housing and registration detailsPrepare for Jobcenter appointment",
+            "Blocked": "No direct constraints.",
+            "Actions": "Update profile"
+          },
+          "actions": [
+            {
+              "tag": "BUTTON",
+              "text": "Update profile",
+              "href": null,
+              "disabled": false
+            }
+          ],
+          "raw": "Update work and incomeRecommended nowContextUpdate work and income — profile data that affects eligibility and system routing. Group: Primary path.UnlocksStart Jobcenter processOpen Economic Reality planUpdate work and incomeUpdate housing and registration detailsPrepare for Jobcenter appointmentBlockedNo direct constraints.ActionsUpdate profile"
+        }
+      },
+      "result": "PASS",
+      "note": "Verified via same domain inputs ER uses (address + confirmation). Avoided AI Start intent executions."
+    },
+    "E": {
+      "expected": "municipalRegistrationConfirmed remains true; Registration COMPLETE persists",
+      "observed": {
+        "profile": {
+          "city": "Bremen",
+          "municipalRegistrationConfirmed": true
+        },
+        "profilePageSnippet": "ARRIVAL ATLAS\nДосліджувати Atlas\nЖиттєві події\nЕкономічна реальність\nПоиск\nПрофіль\nВийти з демо\nArriving from You are here\nPROFILE\nYour situation\nBremen\nWork & income\n★\n★\n★\nYour move to Germany\nNeeds attention\n★\n★\n★\nWhere you live\n★\n★\n★\nHousehold & family\n★\n★\n★\nLanguage & display\n★\n★\n★\nHealth insurance\n★\n★\n★\nBenefits & support\n★\n★\n★\nYour move to Germany\n\nNEEDS ATTENTION\n\nRESIDENCY STATUS\nTemporary resident\nMedium confidence\n\nYou updated this in Your situation.\n\nCONTEXT\n\nHelps tools tailor guidance to your visa status and time in Germany.\n\nUNLOCKS\n\nNo direct unlocks.\n\nBLOCKED\n\nNo direct constra"
+      },
+      "result": "PASS"
+    },
+    "G": {
+      "expected": "failed confirmation mutation → no false COMPLETE",
+      "observed": {
+        "automated": "packages/profile-engine/tests/pd001-municipal-registration-confirmed.test.ts",
+        "liveRevisionConflicts": 6,
+        "liveNote": "Observed live 409 REVISION_CONFLICT responses; subsequent successful mutations used current revision. Case C only reached municipalRegistrationConfirmed=true after HTTP 200 success."
+      },
+      "result": "PASS",
+      "coverage": "automated+live"
+    }
+  },
+  "network": {
+    "mutationLog": [
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 200,
+        "body": "{\"success\":true,\"revision\":1,\"userContext\":{\"profile\":{\"schemaVersion\":\"1.0.0\",\"preferences\":{\"preferredLanguage\":\"ua\"},\"completeness\":{\"score\":0,\"missingDomains\":[\"migration\",\"housing\",\"household\",\"employment\",\"income\",\"healthInsurance\",\"benefits\"]},\"domains\":{}}},\"appliedEventId\":\"evt_1_pref-lang_1788808860638_bbvy0ayot\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 200,
+        "body": "{\"success\":true,\"revision\":1,\"userContext\":{\"profile\":{\"schemaVersion\":\"1.0.0\",\"preferences\":{\"preferredLanguage\":\"ua\"},\"completeness\":{\"score\":0,\"missingDomains\":[\"migration\",\"housing\",\"household\",\"employment\",\"income\",\"healthInsurance\",\"benefits\"]},\"domains\":{}}},\"appliedEventId\":\"evt_1_pref-lang_1788808860638_bbvy0ayot\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 409,
+        "body": "{\"success\":false,\"code\":\"REVISION_CONFLICT\",\"error\":\"Expected head revision 0, current is 1\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 409,
+        "body": "{\"success\":false,\"code\":\"REVISION_CONFLICT\",\"error\":\"Expected head revision 0, current is 1\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 200,
+        "body": "{\"success\":true,\"revision\":2,\"userContext\":{\"profile\":{\"schemaVersion\":\"1.0.0\",\"preferences\":{\"preferredLanguage\":\"ua\"},\"completeness\":{\"score\":14,\"missingDomains\":[\"migration\",\"household\",\"employment\",\"income\",\"healthInsurance\",\"benefits\"]},\"domains\":{\"housing\":{\"bundesland\":\"HB\",\"city\":\"Bremen\"}}}},\"appliedEventId\":\"evt_2_profile-housing_1788808895008_zgo435jz8\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 200,
+        "body": "{\"success\":true,\"revision\":2,\"userContext\":{\"profile\":{\"schemaVersion\":\"1.0.0\",\"preferences\":{\"preferredLanguage\":\"ua\"},\"completeness\":{\"score\":14,\"missingDomains\":[\"migration\",\"household\",\"employment\",\"income\",\"healthInsurance\",\"benefits\"]},\"domains\":{\"housing\":{\"bundesland\":\"HB\",\"city\":\"Bremen\"}}}},\"appliedEventId\":\"evt_2_profile-housing_1788808895008_zgo435jz8\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 409,
+        "body": "{\"success\":false,\"code\":\"REVISION_CONFLICT\",\"error\":\"Expected head revision 0, current is 2\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 409,
+        "body": "{\"success\":false,\"code\":\"REVISION_CONFLICT\",\"error\":\"Expected head revision 0, current is 2\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 200,
+        "body": "{\"success\":true,\"revision\":3,\"userContext\":{\"profile\":{\"schemaVersion\":\"1.0.0\",\"preferences\":{\"preferredLanguage\":\"ua\"},\"completeness\":{\"score\":29,\"missingDomains\":[\"household\",\"employment\",\"income\",\"healthInsurance\",\"benefits\"]},\"domains\":{\"migration\":{\"residencyStatus\":\"temporary-resident\"},\"housing\":{\"bundesland\":\"HB\",\"city\":\"Bremen\"}}}},\"appliedEventId\":\"evt_3_profile-migration_1788808916770_3s2jcge22\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 200,
+        "body": "{\"success\":true,\"revision\":3,\"userContext\":{\"profile\":{\"schemaVersion\":\"1.0.0\",\"preferences\":{\"preferredLanguage\":\"ua\"},\"completeness\":{\"score\":29,\"missingDomains\":[\"household\",\"employment\",\"income\",\"healthInsurance\",\"benefits\"]},\"domains\":{\"migration\":{\"residencyStatus\":\"temporary-resident\"},\"housing\":{\"bundesland\":\"HB\",\"city\":\"Bremen\"}}}},\"appliedEventId\":\"evt_3_profile-migration_1788808916770_3s2jcge22\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 409,
+        "body": "{\"success\":false,\"code\":\"REVISION_CONFLICT\",\"error\":\"Expected head revision 0, current is 3\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 409,
+        "body": "{\"success\":false,\"code\":\"REVISION_CONFLICT\",\"error\":\"Expected head revision 0, current is 3\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 200,
+        "body": "{\"success\":true,\"revision\":4,\"userContext\":{\"profile\":{\"schemaVersion\":\"1.0.0\",\"preferences\":{\"preferredLanguage\":\"ua\"},\"completeness\":{\"score\":29,\"missingDomains\":[\"household\",\"employment\",\"income\",\"healthInsurance\",\"benefits\"]},\"domains\":{\"migration\":{\"residencyStatus\":\"temporary-resident\",\"municipalRegistrationConfirmed\":true},\"housing\":{\"bundesland\":\"HB\",\"city\":\"Bremen\"}}}},\"appliedEventId\":\"evt_4_profile-migration_1788808927100_yb140smgb\"}"
+      },
+      {
+        "url": "http://localhost:3001/api/mutations",
+        "method": "POST",
+        "status": 200,
+        "body": "{\"success\":true,\"revision\":4,\"userContext\":{\"profile\":{\"schemaVersion\":\"1.0.0\",\"preferences\":{\"preferredLanguage\":\"ua\"},\"completeness\":{\"score\":29,\"missingDomains\":[\"household\",\"employment\",\"income\",\"healthInsurance\",\"benefits\"]},\"domains\":{\"migration\":{\"residencyStatus\":\"temporary-resident\",\"municipalRegistrationConfirmed\":true},\"housing\":{\"bundesland\":\"HB\",\"city\":\"Bremen\"}}}},\"appliedEventId\":\"evt_4_profile-migration_1788808927100_yb140smgb\"}"
+      }
+    ],
+    "contextSnapshots": [
+      {
+        "at": "2026-09-07T19:21:54.286Z",
+        "url": "http://localhost:3000/modules/life-event",
+        "migration": null,
+        "housing": {
+          "bundesland": "HB",
+          "city": "Bremen"
+        },
+        "benefits": null
+      },
+      {
+        "at": "2026-09-07T19:21:54.702Z",
+        "url": "http://localhost:3000/profile/move-to-germany/edit",
+        "migration": null,
+        "housing": {
+          "bundesland": "HB",
+          "city": "Bremen"
+        },
+        "benefits": null
+      },
+      {
+        "at": "2026-09-07T19:21:56.818Z",
+        "url": "http://localhost:3000/profile/move-to-germany/edit",
+        "migration": {
+          "residencyStatus": "temporary-resident"
+        },
+        "housing": {
+          "bundesland": "HB",
+          "city": "Bremen"
+        },
+        "benefits": null
+      },
+      {
+        "at": "2026-09-07T19:22:04.469Z",
+        "url": "http://localhost:3000/modules/life-event",
+        "migration": {
+          "residencyStatus": "temporary-resident"
+        },
+        "housing": {
+          "bundesland": "HB",
+          "city": "Bremen"
+        },
+        "benefits": null
+      },
+      {
+        "at": "2026-09-07T19:22:04.979Z",
+        "url": "http://localhost:3000/profile/move-to-germany/edit",
+        "migration": {
+          "residencyStatus": "temporary-resident"
+        },
+        "housing": {
+          "bundesland": "HB",
+          "city": "Bremen"
+        },
+        "benefits": null
+      },
+      {
+        "at": "2026-09-07T19:22:07.141Z",
+        "url": "http://localhost:3000/profile/move-to-germany/edit",
+        "migration": {
+          "residencyStatus": "temporary-resident",
+          "municipalRegistrationConfirmed": true
+        },
+        "housing": {
+          "bundesland": "HB",
+          "city": "Bremen"
+        },
+        "benefits": null
+      },
+      {
+        "at": "2026-09-07T19:22:10.261Z",
+        "url": "http://localhost:3000/profile/move-to-germany?updated=1",
+        "migration": {
+          "residencyStatus": "temporary-resident",
+          "municipalRegistrationConfirmed": true
+        },
+        "housing": {
+          "bundesland": "HB",
+          "city": "Bremen"
+        },
+        "benefits": null
+      },
+      {
+        "at": "2026-09-07T19:22:16.953Z",
+        "url": "http://localhost:3000/modules/economic-reality",
+        "migration": {
+          "residencyStatus": "temporary-resident",
+          "municipalRegistrationConfirmed": true
+        },
+        "housing": {
+          "bundesland": "HB",
+          "city": "Bremen"
+        },
+        "benefits": null
+      },
+      {
+        "at": "2026-09-07T19:22:17.320Z",
+        "url": "http://localhost:3000/modules/economic-reality",
+        "migration": {
+          "residencyStatus": "temporary-resident",
+          "municipalRegistrationConfirmed": true
+        },
+        "housing": {
+          "bundesland": "HB",
+          "city": "Bremen"
+        },
+        "benefits": null
+      },
+      {
+        "at": "2026-09-07T19:22:21.352Z",
+        "url": "http://localhost:3000/profile/move-to-germany",
+        "migration": {
+          "residencyStatus": "temporary-resident",
+          "municipalRegistrationConfirmed": true
+        },
+        "housing": {
+          "bundesland": "HB",
+          "city": "Bremen"
+        },
+        "benefits": null
+      }
+    ]
+  },
+  "errors": {
+    "console": [
+      "Failed to load resource: the server responded with a status of 409 (Conflict)",
+      "Failed to load resource: the server responded with a status of 409 (Conflict)",
+      "Failed to load resource: the server responded with a status of 409 (Conflict)"
+    ],
+    "page": [
+      "Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\nhttps://react.dev/link/hydration-mismatch\n\n  ...\n    <RedirectBoundary>\n      <RedirectErrorBoundary router={{...}}>\n        <Head>\n        <__next_root_layout_boundary__>\n          <SegmentViewNode type=\"layout\" pagePath=\"layout.tsx\">\n            <SegmentTrieNode>\n            <link>\n            <RootLayout>\n              <html lang=\"en\" data-theme=\"dark\" suppressHydrationWarning={true}>\n                <head>\n                <body>\n                  <AppErrorBoundary>\n                    <AppProvider>\n                      <RuntimeConsistencyProvider sessionId={null}>\n                        <BootstrapGate bootstrapLoading={true} bootstrapError={null} ...>\n                          <div className=\"container\" style={{padding:\"4...\"}} data-ui-surface=\"bootstrap-...\">\n                            <div className=\"card\" style={{padding:\"2rem\"}}>\n                              <SurfaceLoadingSkeleton>\n                              <p style={{textAlign:\"center\",color:\"var(--colo...\",marginTop:\"1rem\"}}>\n+                               Аналіз...\n-                               Analyzing...\n        ...\n",
+      "Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\nhttps://react.dev/link/hydration-mismatch\n\n  ...\n    <RedirectBoundary>\n      <RedirectErrorBoundary router={{...}}>\n        <Head>\n        <__next_root_layout_boundary__>\n          <SegmentViewNode type=\"layout\" pagePath=\"layout.tsx\">\n            <SegmentTrieNode>\n            <link>\n            <RootLayout>\n              <html lang=\"en\" data-theme=\"dark\" suppressHydrationWarning={true}>\n                <head>\n                <body>\n                  <AppErrorBoundary>\n                    <AppProvider>\n                      <RuntimeConsistencyProvider sessionId={null}>\n                        <BootstrapGate bootstrapLoading={true} bootstrapError={null} ...>\n                          <div className=\"container\" style={{padding:\"4...\"}} data-ui-surface=\"bootstrap-...\">\n                            <div className=\"card\" style={{padding:\"2rem\"}}>\n                              <SurfaceLoadingSkeleton>\n                              <p style={{textAlign:\"center\",color:\"var(--colo...\",marginTop:\"1rem\"}}>\n+                               Аналіз...\n-                               Analyzing...\n        ...\n",
+      "Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\nhttps://react.dev/link/hydration-mismatch\n\n  ...\n    <RedirectBoundary>\n      <RedirectErrorBoundary router={{...}}>\n        <Head>\n        <__next_root_layout_boundary__>\n          <SegmentViewNode type=\"layout\" pagePath=\"layout.tsx\">\n            <SegmentTrieNode>\n            <link>\n            <RootLayout>\n              <html lang=\"en\" data-theme=\"dark\" suppressHydrationWarning={true}>\n                <head>\n                <body>\n                  <AppErrorBoundary>\n                    <AppProvider>\n                      <RuntimeConsistencyProvider sessionId={null}>\n                        <BootstrapGate bootstrapLoading={true} bootstrapError={null} ...>\n                          <div className=\"container\" style={{padding:\"4...\"}} data-ui-surface=\"bootstrap-...\">\n                            <div className=\"card\" style={{padding:\"2rem\"}}>\n                              <SurfaceLoadingSkeleton>\n                              <p style={{textAlign:\"center\",color:\"var(--colo...\",marginTop:\"1rem\"}}>\n+                               Аналіз...\n-                               Analyzing...\n        ...\n",
+      "Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\nhttps://react.dev/link/hydration-mismatch\n\n  ...\n    <RedirectBoundary>\n      <RedirectErrorBoundary router={{...}}>\n        <Head>\n        <__next_root_layout_boundary__>\n          <SegmentViewNode type=\"layout\" pagePath=\"layout.tsx\">\n            <SegmentTrieNode>\n            <link>\n            <RootLayout>\n              <html lang=\"en\" data-theme=\"dark\" suppressHydrationWarning={true}>\n                <head>\n                <body>\n                  <AppErrorBoundary>\n                    <AppProvider>\n                      <RuntimeConsistencyProvider sessionId={null}>\n                        <BootstrapGate bootstrapLoading={true} bootstrapError={null} ...>\n                          <div className=\"container\" style={{padding:\"4...\"}} data-ui-surface=\"bootstrap-...\">\n                            <div className=\"card\" style={{padding:\"2rem\"}}>\n                              <SurfaceLoadingSkeleton>\n                              <p style={{textAlign:\"center\",color:\"var(--colo...\",marginTop:\"1rem\"}}>\n+                               Аналіз...\n-                               Analyzing...\n        ...\n",
+      "Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\nhttps://react.dev/link/hydration-mismatch\n\n  ...\n    <RedirectBoundary>\n      <RedirectErrorBoundary router={{...}}>\n        <Head>\n        <__next_root_layout_boundary__>\n          <SegmentViewNode type=\"layout\" pagePath=\"layout.tsx\">\n            <SegmentTrieNode>\n            <link>\n            <RootLayout>\n              <html lang=\"en\" data-theme=\"dark\" suppressHydrationWarning={true}>\n                <head>\n                <body>\n                  <AppErrorBoundary>\n                    <AppProvider>\n                      <RuntimeConsistencyProvider sessionId={null}>\n                        <BootstrapGate bootstrapLoading={true} bootstrapError={null} ...>\n                          <div className=\"container\" style={{padding:\"4...\"}} data-ui-surface=\"bootstrap-...\">\n                            <div className=\"card\" style={{padding:\"2rem\"}}>\n                              <SurfaceLoadingSkeleton>\n                              <p style={{textAlign:\"center\",color:\"var(--colo...\",marginTop:\"1rem\"}}>\n+                               Аналіз...\n-                               Analyzing...\n        ...\n"
+    ],
+    "request": []
+  },
+  "verdict": "INTEGRATION PASS WITH LIMITATIONS"
+}

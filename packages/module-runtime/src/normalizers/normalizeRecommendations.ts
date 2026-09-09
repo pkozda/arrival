@@ -2,6 +2,7 @@ import type { ModuleRuntimeContext } from '../types/ModuleRuntimeContext.js';
 import type { Recommendation } from '../types/Recommendation.js';
 import { normalizeBenefitsSimulatorRecommendations } from './benefits-simulator.js';
 import { normalizeFinancialRealityRecommendations } from './financial-reality.js';
+import { normalizeHealthcareNavigationRecommendations } from './healthcare-navigation.js';
 
 export type NormalizeRecommendationsParams = {
   moduleId: string;
@@ -17,6 +18,8 @@ export function normalizeRecommendations(
       return normalizeFinancialRealityRecommendations(params.payload);
     case 'benefits-simulator':
       return normalizeBenefitsSimulatorRecommendations(params.payload);
+    case 'healthcare-navigation':
+      return normalizeHealthcareNavigationRecommendations(params.payload);
     default:
       return [];
   }

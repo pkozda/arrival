@@ -96,6 +96,11 @@ export function deriveDefaultValues(schema: JsonSchema): Record<string, unknown>
       continue;
     }
 
+    // Optional fields stay unset so unknown remains distinguishable (PD-003).
+    if (!field.required) {
+      continue;
+    }
+
     if (field.type === 'boolean') {
       defaults[field.name] = false;
       continue;

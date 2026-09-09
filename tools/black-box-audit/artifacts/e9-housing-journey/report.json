@@ -1,0 +1,97 @@
+{
+  "verdict": "E9 HOUSING JOURNEY PASS WITH LIMITATIONS",
+  "selectedSlice": "Housing Situation (Option A)",
+  "generatedAt": "2026-09-08T19:25:33.330Z",
+  "findings": [
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-PANEL",
+      "detail": "visible on Economic Reality"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-B-INCOMPLETE",
+      "detail": "NOT_ADDED"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-B-CTA",
+      "detail": "update_housing"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-C-READY",
+      "detail": "READY"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-D-REG-PENDING",
+      "detail": "city present; confirmation not inferred"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-C-NEXT",
+      "detail": "confirm_registration"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-E-PLANNER",
+      "detail": "Action Planner still present"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-F-WOHNGELD",
+      "detail": "READY_TO_ACT"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-G-RELOAD",
+      "detail": "READY"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-H-LANG-EN",
+      "detail": "en"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-H-LANG-UA",
+      "detail": "uk"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-H-UA-COPY",
+      "detail": "UA without RU leakage"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-A11Y",
+      "detail": "section labelled"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E9-I-NOOP",
+      "detail": "No-change housing save completed without crash"
+    }
+  ],
+  "observations": [
+    "=== E9 Housing Situation journey probe ===",
+    "[OBSERVED_PASS] E9-PANEL: visible on Economic Reality",
+    "Phase A/B state=NOT_ADDED",
+    "[OBSERVED_PASS] E9-B-INCOMPLETE: NOT_ADDED",
+    "[OBSERVED_PASS] E9-B-CTA: update_housing",
+    "Phase C state=READY",
+    "[OBSERVED_PASS] E9-C-READY: READY",
+    "[OBSERVED_PASS] E9-D-REG-PENDING: city present; confirmation not inferred",
+    "[OBSERVED_PASS] E9-C-NEXT: confirm_registration",
+    "[OBSERVED_PASS] E9-E-PLANNER: Action Planner still present",
+    "Phase F Wohngeld=READY_TO_ACT",
+    "[OBSERVED_PASS] E9-F-WOHNGELD: READY_TO_ACT",
+    "[OBSERVED_PASS] E9-G-RELOAD: READY",
+    "[OBSERVED_PASS] E9-H-LANG-EN: en",
+    "[OBSERVED_PASS] E9-H-LANG-UA: uk",
+    "[OBSERVED_PASS] E9-H-UA-COPY: UA without RU leakage",
+    "[OBSERVED_PASS] E9-A11Y: section labelled",
+    "[OBSERVED_PASS] E9-I-NOOP: No-change housing save completed without crash"
+  ]
+}

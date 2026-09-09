@@ -40,6 +40,7 @@ export interface UIProfileBenefits {
   receivingBuergergeld?: boolean;
   receivingAlg1?: boolean;
   receivingWohngeld?: boolean;
+  receivingKindergeld?: boolean;
   daysInGermany?: number;
 }
 

@@ -1,43 +1,92 @@
 import { z } from 'zod';
 import type { AppContext, Module, ModuleRegistration } from '@arrival-atlas/core';
 
+export const HealthcareSituationSchema = z.enum([
+  'new-arrival',
+  'need-doctor',
+  'need-specialist',
+  'insurance-choice',
+  'emergency',
+  'prescription',
+]);
+
+export const HealthcareInsuranceTypeSchema = z.enum(['public', 'private', 'none']);
+
+/**
+ * Insurance fields are optional with no silent uninsured defaults.
+ * Missing values mean UNKNOWN — not uninsured.
+ */
 export const HealthcareNavigationInputSchema = z.object({
-  situation: z.enum([
-    'new-arrival',
-    'need-doctor',
-    'need-specialist',
-    'insurance-choice',
-    'emergency',
-    'prescription',
-  ]),
-  hasInsurance: z.boolean().default(false),
-  insuranceType: z.enum(['public', 'private', 'none']).default('none'),
+  situation: HealthcareSituationSchema,
+  hasInsurance: z.boolean().optional(),
+  insuranceType: HealthcareInsuranceTypeSchema.optional(),
   urgency: z.enum(['routine', 'soon', 'urgent']).default('routine'),
   city: z.string().optional(),
 });
 
+export const HealthcareOutcomeSchema = z.enum([
+  'RECOMMENDATIONS',
+  'MORE_INFO_REQUIRED',
+  'NO_APPLICABLE_RESULT',
+]);
+
+export const HealthcareInsuranceAssumptionSchema = z.enum([
+  'insured',
+  'uninsured',
+  'unknown',
+]);
+
+export const HealthcareMissingContextSchema = z.object({
+  field: z.string().min(1),
+  reasonKey: z.string().min(1),
+  profileHref: z.string().optional(),
+});
+
 export const HealthcareNavigationOutputSchema = z.object({
+  outcome: HealthcareOutcomeSchema,
+  insuranceAssumption: HealthcareInsuranceAssumptionSchema,
   scenario: z.string(),
-  steps: z.array(z.object({
-    order: z.number(),
-    title: z.string(),
-    description: z.string(),
-    institution: z.string().optional(),
-    documents: z.array(z.string()).optional(),
-  })),
-  decisions: z.array(z.object({
-    title: z.string(),
-    options: z.array(z.object({
-      label: z.string(),
-      pros: z.array(z.string()),
-      cons: z.array(z.string()),
-    })),
-  })),
+  steps: z.array(
+    z.object({
+      order: z.number(),
+      title: z.string(),
+      description: z.string(),
+      institution: z.string().optional(),
+      documents: z.array(z.string()).optional(),
+    })
+  ),
+  decisions: z.array(
+    z.object({
+      title: z.string(),
+      options: z.array(
+        z.object({
+          label: z.string(),
+          pros: z.array(z.string()),
+          cons: z.array(z.string()),
+        })
+      ),
+    })
+  ),
   warnings: z.array(z.string()),
+  missing: z.array(HealthcareMissingContextSchema).default([]),
 });
 
 export type HealthcareNavigationInput = z.infer<typeof HealthcareNavigationInputSchema>;
 export type HealthcareNavigationOutput = z.infer<typeof HealthcareNavigationOutputSchema>;
+export type HealthcareOutcome = z.infer<typeof HealthcareOutcomeSchema>;
+export type HealthcareInsuranceAssumption = z.infer<typeof HealthcareInsuranceAssumptionSchema>;
+
+export const HEALTHCARE_COPY_KEYS = {
+  MISSING_INSURANCE_REASON: 'healthcare.missing.insurance',
+  OUTCOME_RECOMMENDATIONS: 'healthcare.outcome.recommendations',
+  OUTCOME_MORE_INFO: 'healthcare.outcome.moreInfo',
+  OUTCOME_NO_APPLICABLE: 'healthcare.outcome.noApplicable',
+  OUTCOME_TECHNICAL_ERROR: 'healthcare.outcome.technicalError',
+  INSURANCE_ASSUMPTION_INSURED: 'healthcare.insurance.insured',
+  INSURANCE_ASSUMPTION_UNINSURED: 'healthcare.insurance.uninsured',
+  INSURANCE_ASSUMPTION_UNKNOWN: 'healthcare.insurance.unknown',
+  PROVIDE_INSURANCE_CTA: 'healthcare.missing.provideInsurance',
+} as const;
 
 export function resolveHealthcareNavigationLanguage(context: AppContext): string {
   const preferredLanguage = (
@@ -47,9 +96,36 @@ export function resolveHealthcareNavigationLanguage(context: AppContext): string
   return preferredLanguage ?? context.userProfile?.language ?? 'en';
 }
 
+/**
+ * Derives insurance assumption without inventing facts.
+ * unknown ≠ uninsured ≠ insured.
+ */
+export function deriveHealthcareInsuranceAssumption(
+  input: Pick<HealthcareNavigationInput, 'hasInsurance' | 'insuranceType'>
+): HealthcareInsuranceAssumption {
+  if (input.hasInsurance === true) {
+    return 'insured';
+  }
+  if (input.hasInsurance === false) {
+    return 'uninsured';
+  }
+  if (input.insuranceType === 'public' || input.insuranceType === 'private') {
+    return 'insured';
+  }
+  if (input.insuranceType === 'none') {
+    return 'uninsured';
+  }
+  return 'unknown';
+}
+
+type ScenarioBody = Omit<
+  HealthcareNavigationOutput,
+  'outcome' | 'insuranceAssumption' | 'missing'
+>;
+
 const SCENARIOS: Record<
   HealthcareNavigationInput['situation'],
-  (input: HealthcareNavigationInput, lang: string) => HealthcareNavigationOutput
+  (input: HealthcareNavigationInput, lang: string) => ScenarioBody
 > = {
   'new-arrival': (_input, _lang) => ({
     scenario: 'New arrival — establishing healthcare access',
@@ -57,20 +133,23 @@ const SCENARIOS: Record<
       {
         order: 1,
         title: 'Choose a Krankenkasse',
-        description: 'Public health insurance (GKV) is mandatory. Compare funds like TK, AOK, Barmer.',
+        description:
+          'Public health insurance (GKV) is mandatory. Compare funds like TK, AOK, Barmer.',
         institution: 'Krankenkasse',
         documents: ['Passport', 'Anmeldung confirmation', 'Employment contract or enrollment letter'],
       },
       {
         order: 2,
         title: 'Register for insurance',
-        description: 'Apply online or in person. Coverage starts retroactively from your registration date.',
+        description:
+          'Apply online or in person. Coverage starts retroactively from your registration date.',
         institution: 'Krankenkasse',
       },
       {
         order: 3,
         title: 'Receive Gesundheitskarte',
-        description: 'Your health card arrives by mail within 2–4 weeks. You are covered immediately upon registration.',
+        description:
+          'Your health card arrives by mail within 2–4 weeks. You are covered immediately upon registration.',
       },
       {
         order: 4,
@@ -79,21 +158,31 @@ const SCENARIOS: Record<
         documents: ['Gesundheitskarte', 'Previous medical records (if available)'],
       },
     ],
-    decisions: [{
-      title: 'Public vs. Private insurance',
-      options: [
-        {
-          label: 'Public (GKV)',
-          pros: ['Family coverage included', 'No pre-existing condition exclusions', 'Predictable costs'],
-          cons: ['Higher contributions at higher income', 'Limited choice for some specialists'],
-        },
-        {
-          label: 'Private (PKV)',
-          pros: ['Potentially faster appointments', 'More specialist access'],
-          cons: ['Expensive', 'Difficult to switch back', 'Not available for most employees under €69,300/year'],
-        },
-      ],
-    }],
+    decisions: [
+      {
+        title: 'Public vs. Private insurance',
+        options: [
+          {
+            label: 'Public (GKV)',
+            pros: [
+              'Family coverage included',
+              'No pre-existing condition exclusions',
+              'Predictable costs',
+            ],
+            cons: ['Higher contributions at higher income', 'Limited choice for some specialists'],
+          },
+          {
+            label: 'Private (PKV)',
+            pros: ['Potentially faster appointments', 'More specialist access'],
+            cons: [
+              'Expensive',
+              'Difficult to switch back',
+              'Not available for most employees under €69,300/year',
+            ],
+          },
+        ],
+      },
+    ],
     warnings: ['Health insurance is legally mandatory — fines apply for gaps in coverage'],
   }),
 
@@ -103,18 +192,21 @@ const SCENARIOS: Record<
       {
         order: 1,
         title: 'Search for Hausarzt',
-        description: 'Use jameda.de or your Krankenkasse website to find doctors accepting new patients.',
+        description:
+          'Use jameda.de or your Krankenkasse website to find doctors accepting new patients.',
       },
       {
         order: 2,
         title: 'Call to book Termin',
-        description: 'Phone is preferred. Say: "Ich möchte einen Termin vereinbaren." Bring your Gesundheitskarte.',
+        description:
+          'Phone is preferred. Say: "Ich möchte einen Termin vereinbaren." Bring your Gesundheitskarte.',
         documents: ['Gesundheitskarte', 'Medication list', 'Previous test results'],
       },
       {
         order: 3,
         title: 'Attend appointment',
-        description: 'Arrive 10 minutes early. The Hausarzt can refer you to specialists (Facharzt) if needed.',
+        description:
+          'Arrive 10 minutes early. The Hausarzt can refer you to specialists (Facharzt) if needed.',
       },
     ],
     decisions: [],
@@ -127,13 +219,15 @@ const SCENARIOS: Record<
       {
         order: 1,
         title: 'Get Überweisung from Hausarzt',
-        description: 'Most specialists require a referral (Überweisung) from your general practitioner.',
+        description:
+          'Most specialists require a referral (Überweisung) from your general practitioner.',
         documents: ['Überweisung', 'Gesundheitskarte'],
       },
       {
         order: 2,
         title: 'Book specialist appointment',
-        description: 'Wait times vary (2 weeks to 3 months). For urgent cases, ask Hausarzt for "dringender Termin".',
+        description:
+          'Wait times vary (2 weeks to 3 months). For urgent cases, ask Hausarzt for "dringender Termin".',
       },
     ],
     decisions: [],
@@ -146,25 +240,41 @@ const SCENARIOS: Record<
       {
         order: 1,
         title: 'Check eligibility',
-        description: input.insuranceType === 'none'
-          ? 'As a resident, you must obtain insurance within 3 months of arrival.'
-          : 'Review if your current insurance meets your needs.',
+        description:
+          input.insuranceType === 'none'
+            ? 'As a resident, you must obtain insurance within 3 months of arrival.'
+            : 'Review if your current insurance meets your needs.',
       },
       {
         order: 2,
         title: 'Compare Krankenkassen',
-        description: 'All public funds offer the same medical coverage. Differences are in bonus programs and service.',
+        description:
+          'All public funds offer the same medical coverage. Differences are in bonus programs and service.',
         institution: 'Krankenkasse comparison portals',
       },
     ],
-    decisions: [{
-      title: 'Select Krankenkasse',
-      options: [
-        { label: 'Techniker Krankenkasse (TK)', pros: ['Popular with expats', 'Good app', 'English support'], cons: ['Large bureaucracy'] },
-        { label: 'AOK (regional)', pros: ['Local presence', 'Wide network'], cons: ['Less digital'] },
-        { label: 'Barmer', pros: ['Good preventive programs'], cons: ['Average digital tools'] },
-      ],
-    }],
+    decisions: [
+      {
+        title: 'Select Krankenkasse',
+        options: [
+          {
+            label: 'Techniker Krankenkasse (TK)',
+            pros: ['Popular with expats', 'Good app', 'English support'],
+            cons: ['Large bureaucracy'],
+          },
+          {
+            label: 'AOK (regional)',
+            pros: ['Local presence', 'Wide network'],
+            cons: ['Less digital'],
+          },
+          {
+            label: 'Barmer',
+            pros: ['Good preventive programs'],
+            cons: ['Average digital tools'],
+          },
+        ],
+      },
+    ],
     warnings: [],
   }),
 
@@ -174,17 +284,20 @@ const SCENARIOS: Record<
       {
         order: 1,
         title: 'Life-threatening: Call 112',
-        description: 'For heart attack, severe bleeding, unconsciousness — call 112 immediately.',
+        description:
+          'For heart attack, severe bleeding, unconsciousness — call 112 immediately.',
       },
       {
         order: 2,
         title: 'Non-life-threatening: Call 116 117',
-        description: 'Medical on-call service for evenings/weekends. They direct you to the nearest open practice.',
+        description:
+          'Medical on-call service for evenings/weekends. They direct you to the nearest open practice.',
       },
       {
         order: 3,
         title: 'Go to Notaufnahme (ER)',
-        description: 'Hospital emergency rooms handle urgent cases. Bring Gesundheitskarte if available.',
+        description:
+          'Hospital emergency rooms handle urgent cases. Bring Gesundheitskarte if available.',
         institution: 'Krankenhaus Notaufnahme',
       },
     ],
@@ -198,12 +311,14 @@ const SCENARIOS: Record<
       {
         order: 1,
         title: 'Get Rezept from doctor',
-        description: 'Doctor writes prescription (Rezept). Pink = statutory insurance, blue = private, green = OTC recommendation.',
+        description:
+          'Doctor writes prescription (Rezept). Pink = statutory insurance, blue = private, green = OTC recommendation.',
       },
       {
         order: 2,
         title: 'Fill at Apotheke',
-        description: 'Any pharmacy can fill your prescription. Standard co-payment (Zuzahlung) is €5–10 per item.',
+        description:
+          'Any pharmacy can fill your prescription. Standard co-payment (Zuzahlung) is €5–10 per item.',
         institution: 'Apotheke',
         documents: ['Rezept', 'Gesundheitskarte'],
       },
@@ -213,28 +328,102 @@ const SCENARIOS: Record<
   }),
 };
 
-export const healthcareNavigationModule: Module<HealthcareNavigationInput, HealthcareNavigationOutput> = {
+function buildMoreInfoRequired(
+  insuranceAssumption: HealthcareInsuranceAssumption
+): HealthcareNavigationOutput {
+  return {
+    outcome: 'MORE_INFO_REQUIRED',
+    insuranceAssumption,
+    scenario: 'Additional insurance context required',
+    steps: [],
+    decisions: [],
+    warnings: [],
+    missing: [
+      {
+        field: 'insurance',
+        reasonKey: HEALTHCARE_COPY_KEYS.MISSING_INSURANCE_REASON,
+        profileHref: '/profile/health-insurance/edit',
+      },
+    ],
+  };
+}
+
+/**
+ * Resolves terminal healthcare outcome from evaluated scenario body.
+ * Empty guidance after a successful evaluation → NO_APPLICABLE_RESULT (not ambiguous []).
+ */
+export function resolveHealthcareOutcomeFromBody(
+  body: ScenarioBody,
+  insuranceAssumption: HealthcareInsuranceAssumption
+): HealthcareNavigationOutput {
+  if (body.steps.length === 0 && body.decisions.length === 0) {
+    return {
+      outcome: 'NO_APPLICABLE_RESULT',
+      insuranceAssumption,
+      scenario: body.scenario,
+      steps: [],
+      decisions: [],
+      warnings: body.warnings,
+      missing: [],
+    };
+  }
+
+  return {
+    outcome: 'RECOMMENDATIONS',
+    insuranceAssumption,
+    scenario: body.scenario,
+    steps: body.steps,
+    decisions: body.decisions,
+    warnings: body.warnings,
+    missing: [],
+  };
+}
+
+export function evaluateHealthcareNavigation(
+  input: HealthcareNavigationInput,
+  lang: string
+): HealthcareNavigationOutput {
+  const insuranceAssumption = deriveHealthcareInsuranceAssumption(input);
+
+  // Progressive enrichment: situation alone is not enough when insurance is unknown
+  // (except emergency guidance, which must remain available without insurance facts).
+  if (insuranceAssumption === 'unknown' && input.situation !== 'emergency') {
+    return buildMoreInfoRequired(insuranceAssumption);
+  }
+
+  const handler = SCENARIOS[input.situation];
+  const body = handler(input, lang);
+
+  if (input.urgency === 'urgent' && input.situation !== 'emergency') {
+    body.warnings.unshift(
+      'Urgent medical need — consider calling 116 117 for immediate guidance'
+    );
+  }
+
+  if (insuranceAssumption === 'uninsured' && input.situation !== 'emergency') {
+    body.warnings.push(
+      'No active insurance detected — register with a Krankenkasse as soon as possible'
+    );
+  }
+
+  return resolveHealthcareOutcomeFromBody(body, insuranceAssumption);
+}
+
+export const healthcareNavigationModule: Module<
+  HealthcareNavigationInput,
+  HealthcareNavigationOutput
+> = {
   id: 'healthcare-navigation',
   name: 'Healthcare Navigation Module',
-  version: '1.0.0',
-  description: 'Guides migrants through Krankenkasse, medical access, and healthcare decisions in Germany',
+  version: '1.1.0',
+  description:
+    'Guides migrants through Krankenkasse, medical access, and healthcare decisions in Germany',
   inputSchema: HealthcareNavigationInputSchema,
   outputSchema: HealthcareNavigationOutputSchema,
 
   async execute(input, context: AppContext): Promise<HealthcareNavigationOutput> {
     const lang = resolveHealthcareNavigationLanguage(context);
-    const handler = SCENARIOS[input.situation];
-    const result = handler(input, lang);
-
-    if (input.urgency === 'urgent' && input.situation !== 'emergency') {
-      result.warnings.unshift('Urgent medical need — consider calling 116 117 for immediate guidance');
-    }
-
-    if (!input.hasInsurance && input.situation !== 'emergency') {
-      result.warnings.push('No active insurance detected — register with a Krankenkasse as soon as possible');
-    }
-
-    return result;
+    return evaluateHealthcareNavigation(input, lang);
   },
 };
 

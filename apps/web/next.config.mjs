@@ -2,6 +2,7 @@
 const nextConfig = {
   transpilePackages: [
     '@arrival-atlas/core',
+    '@arrival-atlas/mbde',
     '@arrival-atlas/life-event-demo',
     '@arrival-atlas/modules',
     '@arrival-atlas/product-contract',

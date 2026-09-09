@@ -2,6 +2,8 @@ export type {
   ModuleUIProjection,
   ModuleExecuteMeta,
   ModuleExecuteProjectionResponse,
+  ModuleExecutionOutcome,
+  ModuleMissingContext,
   SanitizedAction,
   SanitizedActionKind,
   SanitizedActionPriority,

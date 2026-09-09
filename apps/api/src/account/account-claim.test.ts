@@ -73,7 +73,7 @@ describe('POST /api/account/claim', () => {
       token: string;
       authSubject: string;
     };
-    expect(body).toEqual({
+    expect(body).toMatchObject({
       accountId: expect.stringMatching(
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
       ),
@@ -82,6 +82,7 @@ describe('POST /api/account/claim', () => {
       token: expect.any(String),
       authSubject: expect.stringMatching(/^account:/),
     });
+    expect(body).toHaveProperty('discoveryMigration');
 
     const state = await systemStateCoordinator.getState(sessionId);
     expect(state?.accountId).toBe(body.accountId);

@@ -35,7 +35,9 @@ export function evaluateEconomicSatisfactionKeys(
   const sozialamtCaseOpen = benefitsActiveSozialamt;
 
   return {
-    registration_confirmed: signals.isMunicipallyRegistered,
+    registrable_address: signals.hasRegistrableAddress,
+    registration_confirmed:
+      signals.hasRegistrableAddress && signals.hasMunicipalRegistrationConfirmation,
     income_declared: incomeDeclared,
     employment_status_known: employmentStatusKnown,
     benefits_active_jobcenter: benefitsActiveJobcenter,

@@ -1,0 +1,27 @@
+{
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "limitations": [
+    "QUEUED/RUNNING UI may have been too brief to observe (inline pull-process completed quickly).",
+    "Browser path did not hit ERROR; covered by focused unit/service tests."
+  ],
+  "observations": [
+    "=== PD-007 Discovery execution probe ===",
+    "Case A lifecycle after create: IDLE",
+    "Case A Run Now button lifecycle: IDLE",
+    "Case B fast terminal without catching active UI: NO_RESULTS",
+    "Case D terminal lifecycle: NO_RESULTS after 0ms",
+    "Case D PASS terminal=NO_RESULTS",
+    "Case F NO_RESULTS detail visible: true",
+    "Case H reload terminal lifecycle: NO_RESULTS",
+    "Case I run-now POST count: 1",
+    "Case J foreign session profiles status: 404",
+    "LIMITATIONS: QUEUED/RUNNING UI may have been too brief to observe (inline pull-process completed quickly). | Browser path did not hit ERROR; covered by focused unit/service tests.",
+    "VERDICT: PASS_WITH_LIMITATIONS"
+  ],
+  "runNowPosts": [
+    {
+      "url": "http://localhost:3001/api/modules/discovery/profiles/profile-jobs-1788871541455/run-now",
+      "at": 1788871544188
+    }
+  ]
+}

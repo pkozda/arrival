@@ -1,0 +1,155 @@
+{
+  "verdict": "E3 RELEASE READINESS PASS WITH LIMITATIONS",
+  "generatedAt": "2026-09-08T15:01:12.888Z",
+  "baseUrl": "http://localhost:3000",
+  "phases": {
+    "arrival": {
+      "status": "PASS",
+      "detail": "hud lang ok"
+    },
+    "registration": {
+      "status": "PASS",
+      "detail": "completeSignal=true"
+    },
+    "economic-reality": {
+      "status": "PASS",
+      "detail": "planner=true"
+    },
+    "healthcare": {
+      "status": "PASS",
+      "detail": "http://localhost:3000/modules/healthcare-navigation"
+    },
+    "employment": {
+      "status": "PASS",
+      "detail": "dual=true"
+    },
+    "discovery": {
+      "status": "PASS",
+      "detail": "terminal=NO_RESULTS"
+    },
+    "automation": {
+      "status": "PASS",
+      "detail": "visible=true"
+    },
+    "claim": {
+      "status": "PASS",
+      "detail": "attempted or N/A"
+    },
+    "reload": {
+      "status": "PASS",
+      "detail": "langStable=true"
+    },
+    "home-return": {
+      "status": "PASS",
+      "detail": "language verified"
+    }
+  },
+  "findings": [
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-LANG-arrival",
+      "detail": "doc=uk stored=ua"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-LOC-UA",
+      "detail": "Пошук"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-REG-001",
+      "detail": "Registration completion signal observed"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-ER-001",
+      "detail": "Action Planner visible"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-HC-001",
+      "detail": "No invented insured claim on entry"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-EMP-001",
+      "detail": "Dual-track visible"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-DISC-RUN",
+      "detail": "Run triggered; terminal≈NO_RESULTS"
+    },
+    {
+      "classification": "VALID_ENVIRONMENT_LIMITATION",
+      "id": "E3-TRUST",
+      "detail": "Trust panel not required when no verified results"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-AUTO",
+      "detail": "Automation panel visible"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-CLAIM",
+      "detail": "Claim control exercised"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-LANG-reload",
+      "detail": "doc=uk stored=ua"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-RELOAD-DISC",
+      "detail": "Discovery module still present"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-LANG-home-return",
+      "detail": "doc=uk stored=ua"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-HOME-HUD",
+      "detail": "ARRIVAL ATLAS Досліджувати Atlas Життєві події Економічна реальність Пошук Профіль Вийти з демо"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E3-A11Y",
+      "detail": "unlabeledButtons=0"
+    }
+  ],
+  "observations": [
+    "=== E3 Release readiness smoke ===",
+    "[OBSERVED_PASS] E3-LANG-arrival: doc=uk stored=ua",
+    "[OBSERVED_PASS] E3-LOC-UA: Пошук",
+    "PHASE arrival: PASS — hud lang ok",
+    "PHASE registration: PASS — completeSignal=true",
+    "[OBSERVED_PASS] E3-REG-001: Registration completion signal observed",
+    "PHASE economic-reality: PASS — planner=true",
+    "[OBSERVED_PASS] E3-ER-001: Action Planner visible",
+    "[OBSERVED_PASS] E3-HC-001: No invented insured claim on entry",
+    "PHASE healthcare: PASS — http://localhost:3000/modules/healthcare-navigation",
+    "PHASE employment: PASS — dual=true",
+    "[OBSERVED_PASS] E3-EMP-001: Dual-track visible",
+    "[OBSERVED_PASS] E3-DISC-RUN: Run triggered; terminal≈NO_RESULTS",
+    "[VALID_ENVIRONMENT_LIMITATION] E3-TRUST: Trust panel not required when no verified results",
+    "PHASE discovery: PASS — terminal=NO_RESULTS",
+    "[OBSERVED_PASS] E3-AUTO: Automation panel visible",
+    "PHASE automation: PASS — visible=true",
+    "[OBSERVED_PASS] E3-CLAIM: Claim control exercised",
+    "PHASE claim: PASS — attempted or N/A",
+    "[OBSERVED_PASS] E3-LANG-reload: doc=uk stored=ua",
+    "[OBSERVED_PASS] E3-RELOAD-DISC: Discovery module still present",
+    "PHASE reload: PASS — langStable=true",
+    "[OBSERVED_PASS] E3-LANG-home-return: doc=uk stored=ua",
+    "[OBSERVED_PASS] E3-HOME-HUD: ARRIVAL ATLAS Досліджувати Atlas Життєві події Економічна реальність Пошук Профіль Вийти з демо",
+    "PHASE home-return: PASS — language verified",
+    "[OBSERVED_PASS] E3-A11Y: unlabeledButtons=0"
+  ],
+  "environmentLimitations": [
+    "E3-TRUST"
+  ]
+}

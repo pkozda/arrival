@@ -90,6 +90,7 @@ export {
   PreferencesDomainFieldsSchema,
   ProfileDomainFieldsSchemaByDomain,
   DomainFactPayloadSchema,
+  InvalidateDomainFactPayloadSchema,
   PrefMutationPayloadSchema,
   MutationRequestPayloadSchema,
   type ResidencyStatus,

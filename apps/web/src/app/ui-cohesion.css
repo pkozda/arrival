@@ -430,6 +430,12 @@ a.btn-primary-link:hover {
     0 0 40px rgba(56, 189, 248, 0.05);
 }
 
+.celestial-destination-root .er-action-planner {
+  padding: 1rem 1.25rem;
+  max-width: 28rem;
+  border-color: rgba(56, 189, 248, 0.18);
+}
+
 .celestial-destination-root .er-module-page {
   display: flex;
   flex-direction: column;
@@ -995,4 +1001,16 @@ a.btn-primary-link:hover {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #38bdf8, #7dd3fc);
+}
+
+/* PD-004 Employment dual track */
+.employment-track {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1.25rem 0;
+}
+
+.employment-track + .employment-track {
+  border-top: 1px solid rgba(139, 156, 184, 0.18);
 }

@@ -26,10 +26,24 @@ export function adaptUserProfileView(profile: UserProfileViewV1 | null | undefin
   ];
 
   const benefitsAlreadyReceiving: string[] = [];
-  if (domains.benefits?.receivingBuergergeld) benefitsAlreadyReceiving.push('buergergeld');
-  if (domains.benefits?.receivingAlg1) benefitsAlreadyReceiving.push('alg1');
-  if (domains.benefits?.receivingWohngeld) benefitsAlreadyReceiving.push('wohngeld');
-  if (domains.benefits?.receivingSozialamtSupport) benefitsAlreadyReceiving.push('sozialamt');
+  if (domains.benefits?.receivingBuergergeld) {
+    benefitsAlreadyReceiving.push('de_federal_buergergeld', 'buergergeld');
+  }
+  if (domains.benefits?.receivingAlg1) {
+    benefitsAlreadyReceiving.push('alg1');
+  }
+  if (domains.benefits?.receivingWohngeld) {
+    benefitsAlreadyReceiving.push('de_federal_wohngeld', 'wohngeld');
+  }
+  if (domains.benefits?.receivingKindergeld) {
+    benefitsAlreadyReceiving.push('de_federal_kindergeld', 'kindergeld');
+  }
+  if (domains.benefits?.receivingSozialamtSupport) {
+    benefitsAlreadyReceiving.push('sozialamt');
+  }
+
+  // Income domain is the authoritative projection for gross monthly income.
+  const grossMonthlyIncome = domains.income?.grossMonthlyIncome;
 
   return MbdeUserProfileSchema.parse({
     household,
@@ -45,7 +59,7 @@ export function adaptUserProfileView(profile: UserProfileViewV1 | null | undefin
         : undefined,
     },
     financial: {
-      grossMonthlyIncome: domains.income?.grossMonthlyIncome,
+      grossMonthlyIncome,
       benefitsAlreadyReceiving,
       taxClass: domains.employment?.taxClass
         ? Number(domains.employment.taxClass)

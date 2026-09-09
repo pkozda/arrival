@@ -98,6 +98,7 @@ export function hasBenefitsData(profile: UserProfileViewV1 | null | undefined): 
     benefits.receivingBuergergeld !== undefined ||
     benefits.receivingAlg1 !== undefined ||
     benefits.receivingWohngeld !== undefined ||
+    benefits.receivingKindergeld !== undefined ||
     benefits.daysInGermany !== undefined
   );
 }

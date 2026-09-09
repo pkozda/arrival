@@ -1,4 +1,4 @@
-export { JourneyGuideProvider, useJourneyGuideContext, useOptionalJourneyGuideContext } from './JourneyGuideProvider';
+export { JourneyGuideProvider, useJourneyGuideContext, useOptionalJourneyGuideContext, shouldShowJourneyGuideWelcomeOnSurface } from './JourneyGuideProvider';
 export { useJourneyGuideReporter } from './useJourneyGuideReporter';
 export { JourneyGuideLayer } from './JourneyGuideLayer';
 export {

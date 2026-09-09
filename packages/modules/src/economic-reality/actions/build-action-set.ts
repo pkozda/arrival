@@ -6,6 +6,7 @@ import type {
 } from '@arrival-atlas/product-contract';
 
 const ECONOMIC_ACTION_SET_SCHEMA_VERSION = '1.0.0' as const;
+import { evaluateEconomicSatisfactionKeys } from '../execution/satisfaction-keys.js';
 import { mapNodeToActions } from './action-mapper.js';
 import { ACTION_TYPE_ORDER } from './types.js';
 
@@ -40,11 +41,12 @@ function collectEligibleNodes(execution: GraphExecutionStateV1) {
 
 export function buildActionSet(
   execution: GraphExecutionStateV1,
-  _userContext: UserContextV1
+  userContext: UserContextV1
 ): EconomicActionSetV1 {
+  const satisfaction = evaluateEconomicSatisfactionKeys(userContext);
   const eligibleNodes = collectEligibleNodes(execution);
   const actions = sortActions(
-    eligibleNodes.flatMap((node) => mapNodeToActions(execution.graphId, node))
+    eligibleNodes.flatMap((node) => mapNodeToActions(execution.graphId, node, satisfaction))
   );
 
   const derivedFromNodes = [...new Set(actions.map((action) => action.sourceNodeId))].sort();

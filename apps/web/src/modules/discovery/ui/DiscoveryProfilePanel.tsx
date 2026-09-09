@@ -2,15 +2,21 @@
 
 import { AtlasSecondaryButton } from '@/components/atlas-runtime';
 import { useApp } from '@/components/AppProvider';
-import { formatScheduleSummary, type DiscoveryProfile, type ProfileRunSummary } from '@/lib/discovery';
-import type { RunNowUiStatus } from '@/lib/discovery/useDiscoveryModule';
+import {
+  formatScheduleSummary,
+  type DiscoveryExecutionLifecycle,
+  type DiscoveryProfile,
+  type ProfileRunSummary,
+} from '@/lib/discovery';
 import { DiscoveryNotificationField } from './DiscoveryNotificationField';
+import { DiscoveryAutomationPanel } from './DiscoveryAutomationPanel';
+import type { DiscoveryPersistenceScope } from '@/lib/discovery';
 
 type Props = {
   profile: DiscoveryProfile;
   runSummary: ProfileRunSummary | null;
   resultsCount: number;
-  runNowStatus: RunNowUiStatus;
+  executionLifecycle: DiscoveryExecutionLifecycle;
   runNowError: string | null;
   emailRecipientConfigured: boolean | null;
   userNotificationEmail: string | null;
@@ -19,11 +25,14 @@ type Props = {
   userNotificationEmailLoadError: string | null;
   notificationEmailSaving: boolean;
   notificationEmailError: string | null;
+  persistenceScope: DiscoveryPersistenceScope | null;
+  automationUpdating?: boolean;
   /** When create/edit form is open, avoid duplicating the full Delivery block. */
   configurationOpen?: boolean;
   onToggleEnabled: (enabled: boolean) => void;
   onEdit: () => void;
   onRunNow: () => void;
+  onSetAutomaticExecution: (enabled: boolean) => void;
 };
 
 function criteriaBucket(
@@ -45,11 +54,28 @@ function criteriaBucket(
   );
 }
 
+function lifecycleLabelKey(lifecycle: DiscoveryExecutionLifecycle): string {
+  switch (lifecycle) {
+    case 'QUEUED':
+      return 'discovery.execution.queued';
+    case 'RUNNING':
+      return 'discovery.execution.running';
+    case 'SUCCESS':
+      return 'discovery.execution.success';
+    case 'NO_RESULTS':
+      return 'discovery.execution.noResults';
+    case 'ERROR':
+      return 'discovery.execution.error';
+    default:
+      return 'discovery.execution.idle';
+  }
+}
+
 export function DiscoveryProfilePanel({
   profile,
   runSummary,
   resultsCount,
-  runNowStatus,
+  executionLifecycle,
   runNowError,
   emailRecipientConfigured,
   userNotificationEmail,
@@ -58,19 +84,23 @@ export function DiscoveryProfilePanel({
   userNotificationEmailLoadError,
   notificationEmailSaving,
   notificationEmailError,
+  persistenceScope,
+  automationUpdating = false,
   configurationOpen = false,
   onToggleEnabled,
   onEdit,
   onRunNow,
+  onSetAutomaticExecution,
 }: Props) {
   const { t } = useApp();
   const lastRun = runSummary?.lastRun;
-  const zeroNew =
-    lastRun?.status === 'SUCCESS' && resultsCount === 0 && lastRun.finishedAt;
   const scheduleSummary = formatScheduleSummary(profile.schedule, t);
   const recipientConfigured = emailRecipientConfigured === true;
   const recipientKnown = emailRecipientConfigured !== null;
   const personalConfigured = userNotificationEmailKnown && userNotificationEmail != null;
+  const runActive =
+    executionLifecycle === 'QUEUED' || executionLifecycle === 'RUNNING';
+  const applicableCount = runSummary?.applicableResultCount ?? 0;
 
   return (
     <section className="discovery-panel" aria-label={profile.name}>
@@ -85,12 +115,17 @@ export function DiscoveryProfilePanel({
           <button
             type="button"
             className="btn btn-primary"
-            disabled={!profile.enabled || runNowStatus === 'running'}
+            disabled={!profile.enabled || runActive}
             data-ui-surface="discovery-run-now"
+            data-execution-lifecycle={executionLifecycle}
             onClick={onRunNow}
           >
-            {runNowStatus === 'running'
-              ? t('discovery.runNow.running')
+            {runActive
+              ? t(
+                  executionLifecycle === 'QUEUED'
+                    ? 'discovery.runNow.queued'
+                    : 'discovery.runNow.running'
+                )
               : t('discovery.runNow.button')}
           </button>
           {profile.enabled ? (
@@ -105,15 +140,53 @@ export function DiscoveryProfilePanel({
         </div>
       </div>
 
-      {runNowStatus === 'success' ? (
-        <p className="discovery-empty" data-ui-surface="discovery-run-now-success">
-          {t('discovery.runNow.success')}
-        </p>
+      <p
+        className="discovery-empty"
+        data-ui-surface="discovery-execution-lifecycle"
+        data-lifecycle={executionLifecycle}
+        role="status"
+      >
+        {t(lifecycleLabelKey(executionLifecycle))}
+        {executionLifecycle === 'SUCCESS' && applicableCount > 0
+          ? ` (${applicableCount})`
+          : null}
+      </p>
+
+      {executionLifecycle === 'NO_RESULTS' ? (
+        <div data-ui-surface="discovery-execution-no-results">
+          <p className="discovery-empty">{t('discovery.execution.noResultsDetail')}</p>
+          <div className="discovery-actions">
+            <AtlasSecondaryButton type="button" onClick={onEdit}>
+              {t('discovery.execution.adjustProfile')}
+            </AtlasSecondaryButton>
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={!profile.enabled || runActive}
+              onClick={onRunNow}
+              data-ui-surface="discovery-execution-run-again"
+            >
+              {t('discovery.execution.runAgain')}
+            </button>
+          </div>
+        </div>
       ) : null}
-      {runNowStatus === 'error' && runNowError ? (
-        <p className="discovery-empty" role="alert" data-ui-surface="discovery-run-now-error">
-          {t('discovery.runNow.error')} {runNowError}
-        </p>
+
+      {executionLifecycle === 'ERROR' ? (
+        <div data-ui-surface="discovery-execution-error">
+          <p className="discovery-empty" role="alert">
+            {t('discovery.execution.errorDetail')}
+            {runNowError ? ` ${runNowError}` : null}
+          </p>
+          <AtlasSecondaryButton
+            type="button"
+            disabled={!profile.enabled || runActive}
+            onClick={onRunNow}
+            data-ui-surface="discovery-execution-retry"
+          >
+            {t('discovery.execution.retry')}
+          </AtlasSecondaryButton>
+        </div>
       ) : null}
 
       <div className="discovery-detail-grid" style={{ marginTop: '1rem' }}>
@@ -129,6 +202,17 @@ export function DiscoveryProfilePanel({
       <div className="discovery-schedule-summary" data-ui-surface="discovery-schedule-summary">
         <h3 className="discovery-panel__title">{t('discovery.schedule.title')}</h3>
         <p className="discovery-schedule-summary__value">{scheduleSummary}</p>
+      </div>
+
+      <div style={{ marginTop: '1rem' }}>
+        <DiscoveryAutomationPanel
+          profile={profile}
+          runSummary={runSummary}
+          persistenceScope={persistenceScope}
+          automationUpdating={automationUpdating}
+          onSetAutomaticExecution={onSetAutomaticExecution}
+          onEditDelivery={onEdit}
+        />
       </div>
 
       {configurationOpen ? (
@@ -172,12 +256,14 @@ export function DiscoveryProfilePanel({
       <div style={{ marginTop: '1rem' }}>
         <h3 className="discovery-panel__title">{t('discovery.runSummary.title')}</h3>
         {!lastRun ? (
-          <p className="discovery-empty">{t('discovery.runSummary.none')}</p>
+          <p className="discovery-empty" data-ui-surface="discovery-run-summary-none">
+            {t('discovery.runSummary.none')}
+          </p>
         ) : (
-          <dl className="discovery-detail-grid">
+          <dl className="discovery-detail-grid" data-ui-surface="discovery-run-summary">
             <div>
               <dt>{t('discovery.runSummary.status')}</dt>
-              <dd>{lastRun.status}</dd>
+              <dd data-lifecycle={executionLifecycle}>{t(lifecycleLabelKey(executionLifecycle))}</dd>
             </div>
             <div>
               <dt>{t('discovery.runSummary.started')}</dt>
@@ -189,11 +275,15 @@ export function DiscoveryProfilePanel({
                 <dd>{new Date(lastRun.finishedAt).toLocaleString()}</dd>
               </div>
             ) : null}
+            <div>
+              <dt>{t('discovery.runSummary.resultsForRun')}</dt>
+              <dd>{applicableCount}</dd>
+            </div>
           </dl>
         )}
-        {zeroNew ? (
-          <p className="discovery-empty" data-ui-surface="discovery-zero-new-run">
-            {t('discovery.runSummary.zeroNew')}
+        {resultsCount > 0 && executionLifecycle === 'SUCCESS' ? (
+          <p className="text-body text-body--muted" data-ui-surface="discovery-results-hint">
+            {t('discovery.execution.resultsAvailable')}
           </p>
         ) : null}
       </div>

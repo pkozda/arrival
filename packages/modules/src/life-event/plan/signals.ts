@@ -2,7 +2,13 @@ import type { UserContextV1 } from '@arrival-atlas/product-contract';
 
 export type SituationSignals = {
   hasRegistrableAddress: boolean;
+  /** Derived heuristic — situation looks municipally registered. Not user confirmation. */
   isMunicipallyRegistered: boolean;
+  /**
+   * Authoritative PD-001 fact: user explicitly confirmed external Anmeldung completion.
+   * Distinct from {@link isMunicipallyRegistered}.
+   */
+  hasMunicipalRegistrationConfirmation: boolean;
   reRegistrationPending: boolean;
   hasInsurance: boolean;
   insuranceGapActive: boolean;
@@ -61,6 +67,9 @@ export function computeSituationSignals(userContext: UserContextV1): SituationSi
     hasResidencyStatus &&
     !reRegistrationPending &&
     !recentArrival;
+
+  const hasMunicipalRegistrationConfirmation =
+    migration?.municipalRegistrationConfirmed === true;
 
   const hasInsurance =
     healthInsurance?.insuranceType === 'public' ||
@@ -126,17 +135,24 @@ export function computeSituationSignals(userContext: UserContextV1): SituationSi
       household?.householdSize !== undefined ||
       benefits?.receivingWohngeld === false);
 
-  const bankingEstablished = hasEmployment && hasRegistrableAddress && isMunicipallyRegistered;
+  /**
+   * No authoritative bank-account / IBAN facts exist in the product contract.
+   * Never invent banking completion from employment + address + registration heuristics.
+   */
+  const bankingEstablished = false;
+
+  const registrationAuthoritativeComplete =
+    hasRegistrableAddress && hasMunicipalRegistrationConfirmation;
 
   const survivalFoundationComplete =
-    isMunicipallyRegistered &&
+    registrationAuthoritativeComplete &&
     hasInsurance &&
     hasStableHousing &&
     (hasEmployment || hasIncome || (isStudent && hasIncome)) &&
     !insuranceGapActive;
 
   const openSurvivalGapCount = [
-    !isMunicipallyRegistered,
+    !registrationAuthoritativeComplete,
     insuranceGapActive,
     !hasStableHousing,
     !hasEmployment && !hasIncome,
@@ -146,6 +162,7 @@ export function computeSituationSignals(userContext: UserContextV1): SituationSi
   return {
     hasRegistrableAddress,
     isMunicipallyRegistered,
+    hasMunicipalRegistrationConfirmation,
     reRegistrationPending,
     hasInsurance,
     insuranceGapActive,
@@ -204,7 +221,11 @@ export function isSatisfactionMet(key: SatisfactionKey, signals: SituationSignal
     case 'registrable_address':
       return signals.hasRegistrableAddress;
     case 'municipal_registration':
-      return signals.isMunicipallyRegistered;
+      // PD-001: COMPLETE requires explicit confirmation + address prerequisite.
+      // Heuristic isMunicipallyRegistered remains advisory elsewhere.
+      return (
+        signals.hasRegistrableAddress && signals.hasMunicipalRegistrationConfirmation
+      );
     case 'insurance_coverage':
       return signals.hasInsurance && !signals.insuranceGapActive;
     case 'stable_housing':
@@ -218,7 +239,8 @@ export function isSatisfactionMet(key: SatisfactionKey, signals: SituationSignal
     case 'benefits_assessed':
       return signals.benefitsAssessmentComplete;
     case 'banking_ready':
-      return signals.bankingEstablished;
+      // Intentionally never satisfied: no bank-account facts. Node remains informational.
+      return false;
     case 'foundation_reviewed':
     case 'transition_explored':
       return false;

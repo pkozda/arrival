@@ -17,6 +17,12 @@ function assignNested(
     case 'arrivedAt':
       target.residency = { ...target.residency, arrivedAt: String(value) };
       break;
+    case 'municipalRegistrationConfirmed':
+      target.residency = {
+        ...target.residency,
+        municipalRegistrationConfirmed: Boolean(value),
+      };
+      break;
     case 'bundesland':
       target.location = { ...target.location, bundesland: String(value) };
       break;
@@ -64,6 +70,9 @@ function assignNested(
       break;
     case 'receivingWohngeld':
       target.benefits = { ...target.benefits, receivingWohngeld: Boolean(value) };
+      break;
+    case 'receivingKindergeld':
+      target.benefits = { ...target.benefits, receivingKindergeld: Boolean(value) };
       break;
     case 'daysInGermany':
       target.benefits = { ...target.benefits, daysInGermany: Number(value) };

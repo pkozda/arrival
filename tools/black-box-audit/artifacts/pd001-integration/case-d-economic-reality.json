@@ -1,0 +1,69 @@
+{
+  "name": "case-d-economic-reality",
+  "url": "http://localhost:3000/modules/economic-reality",
+  "title": "Arrival Atlas — Decision Support for Migrants in Germany",
+  "inspector": {
+    "title": "Update work and income",
+    "statusParagraph": "Recommended now",
+    "sections": {
+      "Context": "Update work and income — profile data that affects eligibility and system routing. Group: Primary path.",
+      "Unlocks": "Start Jobcenter processOpen Economic Reality planUpdate work and incomeUpdate housing and registration detailsPrepare for Jobcenter appointment",
+      "Blocked": "No direct constraints.",
+      "Actions": "Update profile"
+    },
+    "actions": [
+      {
+        "tag": "BUTTON",
+        "text": "Update profile",
+        "href": null,
+        "disabled": false
+      }
+    ],
+    "raw": "Update work and incomeRecommended nowContextUpdate work and income — profile data that affects eligibility and system routing. Group: Primary path.UnlocksStart Jobcenter processOpen Economic Reality planUpdate work and incomeUpdate housing and registration detailsPrepare for Jobcenter appointmentBlockedNo direct constraints.ActionsUpdate profile"
+  },
+  "graphNodes": [
+    {
+      "text": "Update work and incomeEconomic state anchor",
+      "disabled": true,
+      "ariaDisabled": null,
+      "ariaSelected": "false"
+    },
+    {
+      "text": "Update work and incomePrimary path★★★",
+      "disabled": false,
+      "ariaDisabled": null,
+      "ariaSelected": "true"
+    },
+    {
+      "text": "Start Jobcenter process★★★",
+      "disabled": false,
+      "ariaDisabled": null,
+      "ariaSelected": "false"
+    },
+    {
+      "text": "Prepare for Jobcenter appointment★★★",
+      "disabled": false,
+      "ariaDisabled": null,
+      "ariaSelected": "false"
+    },
+    {
+      "text": "Open Economic Reality plan★★★",
+      "disabled": false,
+      "ariaDisabled": null,
+      "ariaSelected": "false"
+    },
+    {
+      "text": "Update work and income★★★",
+      "disabled": false,
+      "ariaDisabled": null,
+      "ariaSelected": "false"
+    },
+    {
+      "text": "Update housing and registration details★★★",
+      "disabled": false,
+      "ariaDisabled": null,
+      "ariaSelected": "false"
+    }
+  ],
+  "bodySnippet": "ARRIVAL ATLAS\nДосліджувати Atlas\nЖиттєві події\nЕкономічна реальність\nПоиск\nПрофіль\nВийти з демо\nArriving from Registration\nECONOMIC REALITY\nShow debug\nUpdate work and income\nEconomic state anchor\nUpdate work and income\nPrimary path\n★\n★\n★\nStart Jobcenter process\n★\n★\n★\nPrepare for Jobcenter appointment\n★\n★\n★\nOpen Economic Reality plan\n★\n★\n★\nUpdate work and income\n★\n★\n★\nUpdate housing and registration details\n★\n★\n★\nUpdate work and income\n\nRECOMMENDED NOW\n\nCONTEXT\n\nUpdate work and income — profile data that affects eligibility and system routing. Group: Primary path.\n\nUNLOCKS\n\nStart Jobcenter process\n\nOpen Economic Reality plan\n\nUpdate work and income\n\nUpdate housing and registration details\n\nPrepare for Jobcenter appointment\n\nBLOCKED\n\nNo direct constraints.\n\nACTIONS\nUpdate profile"
+}

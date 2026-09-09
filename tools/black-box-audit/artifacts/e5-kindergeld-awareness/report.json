@@ -1,0 +1,90 @@
+{
+  "verdict": "E5 KINDERGELD AWARENESS SLICE PASS WITH LIMITATIONS",
+  "generatedAt": "2026-09-08T18:28:46.100Z",
+  "findings": [
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-PANEL",
+      "detail": "BenefitsAwarenessPanel visible"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-A-STATE",
+      "detail": "NOT_ENOUGH_INFORMATION"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-A-NO-OVERCLAIM",
+      "detail": "No eligibility overclaim"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-A-CTA",
+      "detail": "Оновити дані про домогосподарство та сім’ю"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-B-MUTATION",
+      "detail": "Saved dependentChildCount=1"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-B-STATE",
+      "detail": "READY_TO_ACT"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-B-NO-OVERCLAIM",
+      "detail": "Conservative wording"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-C-RECALC",
+      "detail": "NOT_APPLICABLE after children=0"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-D-RELOAD",
+      "detail": "reconstructed: NOT_APPLICABLE"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-E-LANG-EN",
+      "detail": "en"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-E-LANG-UA",
+      "detail": "uk"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-E-UA-COPY",
+      "detail": "UA Kindergeld copy without RU leakage"
+    },
+    {
+      "classification": "OBSERVED_PASS",
+      "id": "E5-F-WOHNGELD",
+      "detail": "Wohngeld card visible state=NOT_ENOUGH_INFORMATION"
+    }
+  ],
+  "observations": [
+    "=== E5 Kindergeld awareness probe ===",
+    "[OBSERVED_PASS] E5-PANEL: BenefitsAwarenessPanel visible",
+    "Scenario A Kindergeld state=NOT_ENOUGH_INFORMATION",
+    "[OBSERVED_PASS] E5-A-STATE: NOT_ENOUGH_INFORMATION",
+    "[OBSERVED_PASS] E5-A-NO-OVERCLAIM: No eligibility overclaim",
+    "[OBSERVED_PASS] E5-A-CTA: Оновити дані про домогосподарство та сім’ю",
+    "[OBSERVED_PASS] E5-B-MUTATION: Saved dependentChildCount=1",
+    "Scenario B Kindergeld state=READY_TO_ACT",
+    "[OBSERVED_PASS] E5-B-STATE: READY_TO_ACT",
+    "[OBSERVED_PASS] E5-B-NO-OVERCLAIM: Conservative wording",
+    "Scenario C Kindergeld state=NOT_APPLICABLE",
+    "[OBSERVED_PASS] E5-C-RECALC: NOT_APPLICABLE after children=0",
+    "[OBSERVED_PASS] E5-D-RELOAD: reconstructed: NOT_APPLICABLE",
+    "[OBSERVED_PASS] E5-E-LANG-EN: en",
+    "[OBSERVED_PASS] E5-E-LANG-UA: uk",
+    "[OBSERVED_PASS] E5-E-UA-COPY: UA Kindergeld copy without RU leakage",
+    "[OBSERVED_PASS] E5-F-WOHNGELD: Wohngeld card visible state=NOT_ENOUGH_INFORMATION"
+  ]
+}

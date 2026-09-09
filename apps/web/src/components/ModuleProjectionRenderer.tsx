@@ -3,6 +3,8 @@
 import type { ModuleUIProjection, SanitizedRecommendation } from '@/lib/product-contract';
 import type { ModuleCapabilityVisibility } from '@/lib/module-catalog-utils';
 import { AtlasSurface } from '@/components/atlas-runtime/legacy';
+import { AtlasSecondaryLink } from '@/components/atlas-runtime';
+import { useApp } from '@/components/AppProvider';
 import { humanizeActionKind, humanizePriority } from '@/lib/ux-labels';
 
 type Props = {
@@ -55,15 +57,84 @@ function PanelSectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
+function insuranceAssumptionKey(
+  assumption: NonNullable<ModuleUIProjection['insuranceAssumption']>
+): string {
+  switch (assumption) {
+    case 'insured':
+      return 'healthcare.insurance.insured';
+    case 'uninsured':
+      return 'healthcare.insurance.uninsured';
+    case 'unknown':
+      return 'healthcare.insurance.unknown';
+  }
+}
+
 export function ModuleProjectionRenderer({ projection, visibility }: Props) {
+  const { t } = useApp();
+
   if (!projection) {
     return null;
   }
 
-  if (projection.status === 'error') {
+  if (projection.status === 'error' || projection.outcome === 'TECHNICAL_ERROR') {
     return (
-      <AtlasSurface className="text-danger">
-        {projection.error?.message ?? 'Something went wrong while running this tool'}
+      <AtlasSurface className="text-danger" data-module-outcome="TECHNICAL_ERROR">
+        <PanelSectionTitle>{t('healthcare.outcome.technicalError')}</PanelSectionTitle>
+        <p className="text-body">
+          {projection.error?.message ?? t('common.error')}
+        </p>
+      </AtlasSurface>
+    );
+  }
+
+  if (projection.outcome === 'MORE_INFO_REQUIRED') {
+    const missing = projection.missingContext ?? [];
+    return (
+      <AtlasSurface data-module-outcome="MORE_INFO_REQUIRED">
+        <PanelSectionTitle>{t('healthcare.outcome.moreInfo')}</PanelSectionTitle>
+        {projection.insuranceAssumption && (
+          <p className="text-meta" data-insurance-assumption={projection.insuranceAssumption}>
+            {t(insuranceAssumptionKey(projection.insuranceAssumption))}
+          </p>
+        )}
+        <div className="stack-sm" style={{ marginTop: '0.75rem' }}>
+          <p className="text-eyebrow">{t('healthcare.missing.why')}</p>
+          {missing.length === 0 ? (
+            <p className="text-body">{t('healthcare.missing.insurance')}</p>
+          ) : (
+            missing.map((item) => (
+              <div key={item.field} style={{ marginBottom: '0.75rem' }}>
+                <p className="text-body">{t(item.reasonKey)}</p>
+                {item.profileHref && (
+                  <div style={{ marginTop: '0.5rem' }}>
+                    <p className="text-eyebrow">{t('healthcare.missing.how')}</p>
+                    <AtlasSecondaryLink href={item.profileHref}>
+                      {t('healthcare.missing.provideInsurance')}
+                    </AtlasSecondaryLink>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </AtlasSurface>
+    );
+  }
+
+  if (projection.outcome === 'NO_APPLICABLE_RESULT') {
+    return (
+      <AtlasSurface data-module-outcome="NO_APPLICABLE_RESULT">
+        <PanelSectionTitle>{t('healthcare.outcome.noApplicable')}</PanelSectionTitle>
+        {projection.insuranceAssumption && (
+          <p className="text-meta" data-insurance-assumption={projection.insuranceAssumption}>
+            {t(insuranceAssumptionKey(projection.insuranceAssumption))}
+          </p>
+        )}
+        <p className="text-body" style={{ marginTop: '0.75rem' }}>
+          {t('healthcare.noApplicable.body')}
+        </p>
+        {projection.summary && <p className="text-meta mt-sm">{projection.summary}</p>}
       </AtlasSurface>
     );
   }
@@ -77,16 +148,35 @@ export function ModuleProjectionRenderer({ projection, visibility }: Props) {
     : [];
   const standardRecommendations = showRecommendations
     ? projection.recommendations.filter(
-        (recommendation) =>
-          !showRiskModel || recommendation.priority !== 'critical'
+        (recommendation) => !showRiskModel || recommendation.priority !== 'critical'
       )
     : [];
 
+  const hasVisibleContent =
+    Boolean(projection.summary) ||
+    riskRecommendations.length > 0 ||
+    standardRecommendations.length > 0 ||
+    (showActions && projection.actions.length > 0) ||
+    projection.outcome === 'RECOMMENDATIONS';
+
+  if (!hasVisibleContent) {
+    return null;
+  }
+
   return (
-    <div className="stack-md">
+    <div className="stack-md" data-module-outcome={projection.outcome ?? 'RECOMMENDATIONS'}>
       {projection.summary && (
         <AtlasSurface>
-          <PanelSectionTitle>Summary</PanelSectionTitle>
+          <PanelSectionTitle>
+            {projection.outcome === 'RECOMMENDATIONS'
+              ? t('healthcare.outcome.recommendations')
+              : 'Summary'}
+          </PanelSectionTitle>
+          {projection.insuranceAssumption && (
+            <p className="text-meta" data-insurance-assumption={projection.insuranceAssumption}>
+              {t(insuranceAssumptionKey(projection.insuranceAssumption))}
+            </p>
+          )}
           <p className="text-body">{projection.summary}</p>
         </AtlasSurface>
       )}

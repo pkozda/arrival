@@ -40,7 +40,9 @@ function isArrivalUnregistered(signals: SituationSignals): boolean {
     return true;
   }
 
-  if (signals.isMunicipallyRegistered) {
+  // PD-001 / E12: leave the arrival-registration graph only with authoritative confirmation.
+  // Heuristic isMunicipallyRegistered must not exit this graph.
+  if (signals.hasRegistrableAddress && signals.hasMunicipalRegistrationConfirmation) {
     return false;
   }
 
@@ -85,7 +87,8 @@ function isInsuranceGapPrimary(signals: SituationSignals): boolean {
   }
 
   if (
-    signals.isMunicipallyRegistered &&
+    signals.hasMunicipalRegistrationConfirmation &&
+    signals.hasRegistrableAddress &&
     signals.openSurvivalGapCount >= 2 &&
     signals.hasStableHousing &&
     !signals.insuranceLapseRisk
@@ -98,7 +101,8 @@ function isInsuranceGapPrimary(signals: SituationSignals): boolean {
 
 function isEconomicDominant(signals: SituationSignals): boolean {
   if (
-    signals.isMunicipallyRegistered &&
+    signals.hasMunicipalRegistrationConfirmation &&
+    signals.hasRegistrableAddress &&
     signals.openSurvivalGapCount >= 2 &&
     !signals.insuranceLapseRisk &&
     signals.insuranceGapActive &&
@@ -222,7 +226,7 @@ function isBenefitsExploration(
 }
 
 function isArrivalStabilizing(signals: SituationSignals): boolean {
-  if (!signals.isMunicipallyRegistered) {
+  if (!signals.hasRegistrableAddress || !signals.hasMunicipalRegistrationConfirmation) {
     return false;
   }
 

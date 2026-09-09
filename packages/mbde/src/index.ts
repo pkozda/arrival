@@ -18,5 +18,7 @@ export * from './ingestion/change-detection.js';
 export * from './ingestion/scheduler.js';
 export * from './ingestion/seeds/germany-seed-benefits.js';
 
+export * from './awareness/wohngeld-awareness.js';
+
 export * from './storage/benefit-graph-store.js';
 export * from './mbde-service.js';

@@ -38,6 +38,33 @@ const FINANCIAL_SAMPLE_PAYLOADS = [
   },
 ] as const;
 
+const HEALTHCARE_SAMPLE_PAYLOADS = [
+  {
+    outcome: 'RECOMMENDATIONS',
+    insuranceAssumption: 'insured',
+    scenario: 'Finding a doctor',
+    steps: [
+      {
+        order: 1,
+        title: 'Search for Hausarzt',
+        description: 'Find doctors accepting patients.',
+      },
+    ],
+    decisions: [],
+    warnings: [],
+    missing: [],
+  },
+  {
+    outcome: 'MORE_INFO_REQUIRED',
+    insuranceAssumption: 'unknown',
+    scenario: 'Additional insurance context required',
+    steps: [],
+    decisions: [],
+    warnings: [],
+    missing: [{ field: 'insurance', reasonKey: 'healthcare.missing.insurance' }],
+  },
+] as const;
+
 const BENEFITS_SAMPLE_PAYLOADS = [
   {},
   {
@@ -98,6 +125,8 @@ function registerBuiltInNormalizers(
     normalizeRecommendations({ moduleId: 'benefits-simulator', payload });
   const benefitsActionNormalizer: ActionNormalizer = (moduleId, payload) =>
     buildActionItems({ moduleId, payload });
+  const healthcareRecommendationNormalizer: RecommendationNormalizer = (payload) =>
+    normalizeRecommendations({ moduleId: 'healthcare-navigation', payload });
 
   const financialRecommendationValidation = validateRecommendationNormalizer(
     financialRecommendationNormalizer,
@@ -141,8 +170,19 @@ function registerBuiltInNormalizers(
     );
   }
 
+  const healthcareRecommendationValidation = validateRecommendationNormalizer(
+    healthcareRecommendationNormalizer,
+    HEALTHCARE_SAMPLE_PAYLOADS
+  );
+  if (!healthcareRecommendationValidation.valid) {
+    throw new Error(
+      `Healthcare recommendation normalizer invalid: ${healthcareRecommendationValidation.errors.join('; ')}`
+    );
+  }
+
   recommendationNormalizers['financial-reality'] = financialRecommendationNormalizer;
   recommendationNormalizers['benefits-simulator'] = benefitsRecommendationNormalizer;
+  recommendationNormalizers['healthcare-navigation'] = healthcareRecommendationNormalizer;
   actionNormalizers['financial-reality'] = financialActionNormalizer;
   actionNormalizers['benefits-simulator'] = benefitsActionNormalizer;
 

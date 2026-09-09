@@ -15,7 +15,10 @@ export function detectSecondaryConditions(
   const household = userContext.profile?.domains.household;
   const migration = userContext.profile?.domains.migration;
 
-  if (!signals.isMunicipallyRegistered && primary !== 'arrival_unregistered') {
+  if (
+    !signals.hasMunicipalRegistrationConfirmation &&
+    primary !== 'arrival_unregistered'
+  ) {
     conditions.add('registration_incomplete');
   }
 
@@ -102,7 +105,8 @@ function hasLifeTransitionPending(
 
   if (
     signals.isUnemployed &&
-    signals.isMunicipallyRegistered &&
+    signals.hasMunicipalRegistrationConfirmation &&
+    signals.hasRegistrableAddress &&
     signals.hasStableHousing &&
     primary === 'economic_setup_pending'
   ) {

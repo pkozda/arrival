@@ -106,6 +106,11 @@ type ProviderProps = {
   surfaceId: string;
 };
 
+/** Discovery Guided wizard owns Discovery onboarding — do not show Journey Guide welcome there. */
+export function shouldShowJourneyGuideWelcomeOnSurface(surfaceId: string): boolean {
+  return surfaceId !== 'discovery-galaxy';
+}
+
 function createCinematicState(
   sequence: ReturnType<typeof storedEventToSequence>,
   isReplay: boolean,
@@ -149,7 +154,9 @@ export function JourneyGuideProvider({ children, surfaceId }: ProviderProps) {
   const mode = persisted.hasChosenMode ? persisted.mode : null;
   const assistanceStage = deriveAssistanceStage(persisted);
   const showWelcome =
-    !persisted.dismissedWelcomeSurfaces.includes(surfaceId) && !persisted.hasChosenMode;
+    shouldShowJourneyGuideWelcomeOnSurface(surfaceId) &&
+    !persisted.dismissedWelcomeSurfaces.includes(surfaceId) &&
+    !persisted.hasChosenMode;
   const lastUnlockEvent = persisted.lastUnlockEvent;
   const canReplayUnlock = Boolean(
     lastUnlockEvent &&

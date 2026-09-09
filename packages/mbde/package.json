@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./awareness": {
+      "types": "./dist/awareness/index.d.ts",
+      "import": "./dist/awareness/index.js"
     }
   },
   "scripts": {

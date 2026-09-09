@@ -2,6 +2,7 @@
 
 import type { SchemaField } from '@/lib/product-contract';
 import { LegacyFormNode } from '@/components/atlas-runtime/legacy';
+import { useApp } from '@/components/AppProvider';
 import { getNestedValue, schemaEnumLabel, schemaFieldLabel } from '@/lib/schema-form-utils';
 
 export type SchemaLabelResolver = {
@@ -32,6 +33,7 @@ function SchemaFieldInput({
   disabled?: boolean;
   labelResolver?: SchemaLabelResolver;
 }) {
+  const { t } = useApp();
   const fieldName = prefix ? `${prefix}.${field.name}` : field.name;
   const label = labelResolver
     ? labelResolver.fieldLabel(field, fieldName)
@@ -63,7 +65,7 @@ function SchemaFieldInput({
           id={fieldName}
           name={fieldName}
           type="checkbox"
-          defaultChecked={Boolean(defaultValue)}
+          defaultChecked={defaultValue === true}
           disabled={disabled}
         />
         <label htmlFor={fieldName}>{label}</label>
@@ -72,10 +74,24 @@ function SchemaFieldInput({
   }
 
   if (field.enumValues && field.enumValues.length > 0) {
+    const optionalUnset = !field.required && defaultValue === undefined;
     return (
       <div className="form-group">
         <label htmlFor={fieldName}>{label}</label>
-        <select id={fieldName} name={fieldName} defaultValue={String(defaultValue ?? field.enumValues[0])} disabled={disabled}>
+        <select
+          id={fieldName}
+          name={fieldName}
+          defaultValue={
+            defaultValue !== undefined
+              ? String(defaultValue)
+              : optionalUnset
+                ? ''
+                : String(field.enumValues[0])
+          }
+          disabled={disabled}
+          required={field.required}
+        >
+          {optionalUnset && <option value="">{t('healthcare.form.notProvided')}</option>}
           {field.enumValues.map((option) => (
             <option key={String(option)} value={String(option)}>
               {labelResolver

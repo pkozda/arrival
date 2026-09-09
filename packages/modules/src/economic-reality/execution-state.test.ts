@@ -58,15 +58,15 @@ describe('buildExecutionState EP-3 graph execution', () => {
     });
   }
 
-  it('EF03 → G2 registration path with active onboarding nodes', () => {
+  it('EF03 → G2 registration stays active until explicit Anmeldung confirmation (PD-001)', () => {
     const { execution } = buildForFixture('EF03');
 
     expect(execution.graphId).toBe('G2');
-    expect(execution.nodes['g2-registration']?.status).toBe('completed');
-    expect(execution.completedNodeIds).toContain('g2-registration');
+    expect(execution.nodes['g2-registration']?.status).toBe('active');
+    expect(execution.activeNodeIds).toContain('g2-registration');
     expect(execution.completedNodeIds).toContain('g2-termination-docs');
     expect(execution.activeNodeIds).toContain('g2-bank-account');
-    expect(execution.activeNodeIds).toContain('g2-jobcenter-appointment');
+    expect(execution.nodes['g2-jobcenter-appointment']?.status).toBe('locked');
     expect(execution.derivedState.blockedNodeIds).toContain('g2-first-payment');
     expect(execution.derivedState.progressRatio).toBeGreaterThan(0);
   });
@@ -75,9 +75,11 @@ describe('buildExecutionState EP-3 graph execution', () => {
     const { execution } = buildForFixture('EF05');
 
     expect(execution.graphId).toBe('G3');
+    // g3-insurance requires registration_confirmed — address alone is insufficient (PD-001).
     expect(execution.completedNodeIds).toEqual(
-      expect.arrayContaining(['g3-reporting', 'g3-job-search', 'g3-insurance', 'g3-transition-plan'])
+      expect.arrayContaining(['g3-reporting', 'g3-job-search', 'g3-transition-plan'])
     );
+    expect(execution.completedNodeIds).not.toContain('g3-insurance');
     expect(execution.activeNodeIds).toContain('g3-income-changes');
     expect(execution.derivedState.readyNodeIds).toContain('g3-income-changes');
     expect(execution.derivedState.progressRatio).toBeGreaterThan(0);
@@ -101,14 +103,15 @@ describe('buildExecutionState EP-3 graph execution', () => {
     const { execution } = buildForFixture('EF08');
 
     expect(execution.graphId).toBe('G6');
+    // g6-arrival-proof requires registration_confirmed (PD-001).
     expect(execution.completedNodeIds).toEqual(
       expect.arrayContaining([
         'g6-status-confirm',
         'g6-sozialamt-contact',
-        'g6-arrival-proof',
         'g6-transition-awareness',
       ])
     );
+    expect(execution.completedNodeIds).not.toContain('g6-arrival-proof');
     expect(execution.activeNodeIds).toContain('g6-payment-setup');
     expect(execution.nodes['g6-payment-setup']?.satisfaction.keys).toContain('income_declared');
     expect(execution.derivedState.progressRatio).toBeGreaterThan(0.5);
@@ -121,7 +124,8 @@ describe('buildExecutionState EP-3 graph execution', () => {
     expect(execution.nodes['g3-reporting']?.satisfaction.met).toBe(true);
     expect(execution.completedNodeIds).toContain('g3-reporting');
     expect(execution.completedNodeIds).toContain('g3-income-changes');
-    expect(execution.derivedState.progressRatio).toBe(1);
+    // Insurance node remains incomplete without municipalRegistrationConfirmed.
+    expect(execution.derivedState.progressRatio).toBe(0.8);
   });
 
   it('same GraphContextV1 + UserContextV1 always yields identical state', () => {

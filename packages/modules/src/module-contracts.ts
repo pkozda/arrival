@@ -20,6 +20,13 @@ export const BENEFITS_SIMULATOR_CONTRACT: SdkModuleContractSpec = {
   requiresActionNormalizer: true,
 };
 
+export const HEALTHCARE_NAVIGATION_CONTRACT: SdkModuleContractSpec = {
+  runtimeContractVersion: '1.0',
+  capabilities: ['produces-recommendations'],
+  requiresRecommendationNormalizer: true,
+  requiresActionNormalizer: false,
+};
+
 export const DEFAULT_MODULE_CONTRACT: SdkModuleContractSpec = {
   runtimeContractVersion: '1.0',
   capabilities: [],

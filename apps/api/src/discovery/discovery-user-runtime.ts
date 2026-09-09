@@ -89,14 +89,29 @@ export function getDiscoveryPersistence(): {
 
 /**
  * Session-scoped discovery ownership key (E9.2).
- * Notification email settings (E13.3) are keyed by this userId only —
- * there is no automatic session→account claim/migration.
+ * Notification email settings (E13.3) are keyed by this userId.
+ *
+ * PD-006 ownership rule:
+ *   accountId present → account-scoped owner
+ *   else → session-scoped owner
+ *
+ * PD-011: session→account ownership transfer runs on claim (+ heal-on-list),
+ * rewriting only profiles owned by the claiming session.
  */
 export function resolveDiscoveryUserId(identity: {
   sessionId: string;
   accountId: string | null;
 }): string {
   return identity.accountId ?? identity.sessionId;
+}
+
+/** PD-006 product persistence scope derived from trusted identity (not client-supplied). */
+export type DiscoveryPersistenceScope = 'account' | 'session';
+
+export function resolveDiscoveryPersistenceScope(identity: {
+  accountId: string | null;
+}): DiscoveryPersistenceScope {
+  return identity.accountId ? 'account' : 'session';
 }
 
 /** Test-only: clear singleton so ARRIVAL_ATLAS_STATE_DIR can vary per test. */

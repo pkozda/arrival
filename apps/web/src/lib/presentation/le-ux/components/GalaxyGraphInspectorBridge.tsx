@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import type { LifeEventPlanNode } from '@/lib/product-contract';
 import { LifeEventPlanNodeActions } from '@/components/life-event/LifeEventPlanNodeActions';
+import { RegistrationInspectorStatus } from '@/components/life-event/RegistrationInspectorStatus';
 import { LifeEventInspectorCertainty } from '@/components/certainty';
 import { useApp } from '@/components/AppProvider';
 import type { ActionBreakdownSectionProps } from '@/lib/presentation/le-ux/types';
@@ -13,6 +14,8 @@ import { isGuideUseCertaintyEnabled } from '@/lib/journey-guide/guide-certainty-
 import { useJourneyGuideReporter } from '@/lib/journey-guide';
 import { collectUnlockPreview } from '@/lib/journey-guide/recommendation-engine';
 import { lifeEventNodeDescription, lifeEventNodeTitle } from '@/lib/life-event/content-labels';
+import { isRegistrationPlanNodeId } from '@/lib/life-event/anmeldung-guidance';
+import { deriveRegistrationUxState } from '@/lib/life-event/registration-ux-state';
 
 type GraphStatus = 'completed' | 'recommended' | 'blocked' | 'future' | 'core';
 
@@ -30,12 +33,20 @@ function stateDescriptor(node: LifeEventPlanNode | null, status: GraphStatus): s
   if (id.includes('tax')) return 'System entry point';
   if (id.includes('employment') || id.includes('work')) return 'Active state';
   if (id.includes('insurance') || id.includes('health')) return 'Coverage state';
-  if (id.includes('registration') || id.includes('residence')) return 'Dependency node';
+  if (id.includes('registration') || id.includes('residence') || id.includes('anmeldung')) {
+    return 'Dependency node';
+  }
   if (id.includes('language')) return 'Readiness state';
   if (id.includes('bank') || id.includes('finance')) return 'Financial state';
   if (status === 'blocked') return 'Blocked state';
   if (status === 'future') return 'Future state';
-  if (status === 'completed') return 'Verified state';
+  if (status === 'completed') {
+    // Do not overclaim "Verified" for heuristic / never-completable financial nodes.
+    if (id.includes('bank') || id.includes('banking')) {
+      return 'Informational state';
+    }
+    return 'Verified state';
+  }
   return 'Transition state';
 }
 
@@ -71,7 +82,8 @@ export function GalaxyGraphInspectorBridge({
   contextualActions,
   isNodeDisabled,
 }: Props) {
-  const { t } = useApp();
+  const { t, userContext } = useApp();
+  const registrationUx = deriveRegistrationUxState(userContext);
 
   const nodesById = useMemo(() => {
     const map = new Map<string, LifeEventPlanNode>();
@@ -259,6 +271,10 @@ export function GalaxyGraphInspectorBridge({
           </p>
         </div>
 
+        {selectedNodeRef && isRegistrationPlanNodeId(selectedNodeRef.id) && (
+          <RegistrationInspectorStatus nodeId={selectedNodeRef.id} />
+        )}
+
         <div className="le-consequence-inspector__section">
           <h4>Unlocks</h4>
           {model.inspectorSelection.unlocks.length === 0 ? (
@@ -292,7 +308,30 @@ export function GalaxyGraphInspectorBridge({
         <div className="le-consequence-inspector__section">
           <h4>Blocked</h4>
           {model.inspectorSelection.dependencies.length === 0 ? (
-            <p className="text-caption">No direct constraints.</p>
+            selectedNodeRef &&
+            isRegistrationPlanNodeId(selectedNodeRef.id) &&
+            registrationUx.state === 'blocked' ? (
+              <p className="text-caption" data-le-blocker-reason="registration-address">
+                {t('life-event.registration.inspector.blockedReason')}
+              </p>
+            ) : selectedNodeRef &&
+              isRegistrationPlanNodeId(selectedNodeRef.id) &&
+              registrationUx.state === 'actionable' ? (
+              <p className="text-caption" data-le-blocker-reason="registration-none">
+                {t('life-event.registration.inspector.noBlockersActionable')}
+              </p>
+            ) : selectedNodeRef?.blocked ? (
+              <p className="text-caption" data-le-blocker-reason="waiting">
+                {t('life-event.reasoning.blocker.waiting').replace(
+                  '{title}',
+                  lifeEventNodeTitle(t, selectedNodeRef)
+                )}
+              </p>
+            ) : (
+              <p className="text-caption" data-le-blocker-reason="none">
+                {t('life-event.inspector.noDirectConstraints')}
+              </p>
+            )
           ) : (
             <div className="le-consequence-inspector__items">
               {model.inspectorSelection.dependencies.map((edge) => (
@@ -317,7 +356,11 @@ export function GalaxyGraphInspectorBridge({
             <h4>Actions</h4>
             <LifeEventPlanNodeActions
               actions={selectedNodeRef.actions}
-              disabled={isNodeDisabled(selectedNodeRef.id, selectedNodeRef.blocked)}
+              disabled={
+                isRegistrationPlanNodeId(selectedNodeRef.id) && registrationUx.state === 'actionable'
+                  ? false
+                  : isNodeDisabled(selectedNodeRef.id, selectedNodeRef.blocked)
+              }
             />
           </div>
         )}

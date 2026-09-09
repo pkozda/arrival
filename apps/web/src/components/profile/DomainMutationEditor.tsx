@@ -1,7 +1,7 @@
 'use client';
 
 import { AtlasLink as Link } from '@/components/atlas-runtime';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AtlasSecondaryButton, PageHeader } from '@/components/atlas-runtime';
 import { LegacyFormNode } from '@/components/atlas-runtime/legacy';
 import { useApp } from '@/components/AppProvider';
@@ -29,6 +29,7 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
   const { t, userContext, submitMutation, profileHeadRevision, refreshSessionState, sessionId } =
     useApp();
   const profile = selectUserContextProfile(userContext);
+  const profileReady = profile != null;
   const section = getDomainEditSection(domainSlug);
   const sectionTitle = t(section.titleKey);
   const sectionSummary = t(section.summaryKey);
@@ -42,12 +43,28 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Sync draft when the authoritative profile revision changes (or first becomes available).
+  // Do not depend on profile object identity — that can reset mid-edit and drop field values.
+  // E14: wait until profile is ready so boolean drafts are not stuck on unchecked defaults.
+  const profileSyncKey = profileReady ? String(profileHeadRevision) : 'pending';
+  useEffect(() => {
+    if (!profileReady) {
+      return;
+    }
+    setDraft(buildInitialDraft(section, profile));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: sync on revision/slug/ready only
+  }, [section.slug, profileSyncKey, profileReady]);
+
   const handleFieldChange = (formKey: string, value: string | boolean | number | undefined) => {
     setDraft((current) => ({ ...current, [formKey]: value }));
   };
 
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!profileReady) {
+      setError(t('profile.saveError'));
+      return;
+    }
     setSaving(true);
     setError(null);
 
@@ -86,7 +103,7 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
   };
 
   return (
-    <div data-ui-surface="profile-intake">
+    <div data-ui-surface="profile-correction" data-profile-ready={profileReady ? 'true' : 'false'}>
       <PageHeader
         eyebrow={t('profile.eyebrow')}
         leading={
@@ -101,13 +118,19 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
       <LegacyFormNode onSubmit={handleSave}>
         <p className="text-meta mb-md">{t('profile.helper')}</p>
 
+        {!profileReady ? (
+          <p className="text-meta mb-md" role="status" data-profile-loading>
+            {t('profile.loading')}
+          </p>
+        ) : null}
+
         {section.fields.map((field) => (
           <DomainFieldRenderer
             key={field.formKey}
             field={field}
             value={draft[field.formKey]}
             onChange={handleFieldChange}
-            disabled={saving}
+            disabled={saving || !profileReady}
           />
         ))}
 
@@ -118,7 +141,12 @@ export function DomainMutationEditor({ domainSlug, onCancel, onSuccess }: Props)
         )}
 
         <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
-          <button type="submit" className="btn btn-primary" disabled={saving}>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={saving || !profileReady}
+            data-profile-save
+          >
             {saving ? t('profile.saving') : t('profile.save')}
           </button>
           <AtlasSecondaryButton disabled={saving} onClick={onCancel}>

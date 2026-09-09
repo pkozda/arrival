@@ -4,31 +4,22 @@ import { AtlasSecondaryButton } from '@/components/atlas-runtime';
 import { useApp } from '@/components/AppProvider';
 import {
   USER_ACTIONABLE_STATES,
-  companyFromResult,
+  buildOpportunityPresentation,
+  buildTrustPresentationFromResult,
   formatMatchPercent,
+  resolveOpportunityUrl,
   type DiscoveryResultUserView,
   type ResultState,
 } from '@/lib/discovery';
+import { DiscoveryTrustPanel } from './DiscoveryTrustPanel';
 
 type Props = {
   result: DiscoveryResultUserView | null;
+  currentRunId?: string | null;
   stateUpdateError: string | null;
   stateUpdating: boolean;
   onUserState: (userState: ResultState) => void;
 };
-
-function verificationLabel(status: string, t: (key: string) => string): string {
-  switch (status) {
-    case 'PASS':
-      return t('discovery.verification.pass');
-    case 'FAIL':
-      return t('discovery.verification.fail');
-    case 'PARTIAL':
-      return t('discovery.verification.partial');
-    default:
-      return t('discovery.verification.unknown');
-  }
-}
 
 function userStateLabel(state: ResultState, t: (key: string) => string): string {
   const key = `discovery.userState.${state.toLowerCase()}` as const;
@@ -38,6 +29,7 @@ function userStateLabel(state: ResultState, t: (key: string) => string): string 
 
 export function DiscoveryResultDetail({
   result,
+  currentRunId = null,
   stateUpdateError,
   stateUpdating,
   onUserState,
@@ -52,98 +44,119 @@ export function DiscoveryResultDetail({
     );
   }
 
-  const company = companyFromResult(result);
+  const opportunity = buildOpportunityPresentation(result, { currentRunId });
+  const trust = buildTrustPresentationFromResult(result);
   const changedFields = result.changeMetadata.changedFields;
+  const hasUrl = Boolean(resolveOpportunityUrl(result));
 
   return (
     <section
       className="discovery-panel"
-      aria-label={result.canonicalPresentation.title}
+      aria-label={opportunity.title}
       data-ui-surface="discovery-result-detail"
+      data-from-current-run={opportunity.fromCurrentRun ? 'true' : 'false'}
+      data-trust-status={trust.status}
     >
       <h2 className="text-heading" style={{ marginTop: 0 }}>
-        {result.canonicalPresentation.title}
+        {opportunity.title}
       </h2>
-      {result.canonicalPresentation.summary ? (
-        <p className="text-body">{result.canonicalPresentation.summary}</p>
+      {opportunity.fromCurrentRun ? (
+        <p className="text-body text-body--muted" data-ui-surface="discovery-result-current-run">
+          {t('discovery.results.currentRun')}
+        </p>
       ) : null}
+      {opportunity.summary ? <p className="text-body">{opportunity.summary}</p> : null}
+
+      <div style={{ marginTop: '0.75rem' }}>
+        <DiscoveryTrustPanel trust={trust} />
+      </div>
+
+      {opportunity.sourceAction ? (
+        <p style={{ marginTop: '0.75rem' }}>
+          <a
+            className="btn btn-primary"
+            href={opportunity.sourceAction.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-ui-surface="discovery-result-open-source"
+            aria-label={`${t('discovery.result.openSource')} (${t('discovery.result.externalLink')})`}
+          >
+            {t('discovery.result.openSource')}
+            <span className="visually-hidden"> {t('discovery.result.externalLink')}</span>
+          </a>
+        </p>
+      ) : (
+        <p
+          className="text-body text-body--muted"
+          data-ui-surface="discovery-result-source-unavailable"
+        >
+          {trust.status !== 'passed'
+            ? t('discovery.result.sourceNotVerified')
+            : hasUrl
+              ? t('discovery.result.sourceUnavailable')
+              : t('discovery.result.sourceMissingUrl')}
+        </p>
+      )}
 
       <dl className="discovery-detail-grid" style={{ marginTop: '1rem' }}>
-        {company ? (
+        {opportunity.organization ? (
           <div>
             <dt>{t('discovery.result.company')}</dt>
-            <dd>{company}</dd>
+            <dd>{opportunity.organization}</dd>
+          </div>
+        ) : null}
+        {opportunity.salary ? (
+          <div>
+            <dt>{t('discovery.result.salary')}</dt>
+            <dd>{opportunity.salary}</dd>
           </div>
         ) : null}
         <div>
           <dt>{t('discovery.result.matchScore')}</dt>
-          <dd>{formatMatchPercent(result.score.matchScore)}</dd>
+          <dd>
+            {formatMatchPercent(opportunity.matchScore)}
+            <span className="text-body text-body--muted">
+              {' '}
+              ({t('discovery.trust.relevanceNote')})
+            </span>
+          </dd>
         </div>
         <div>
           <dt>{t('discovery.result.confidence')}</dt>
-          <dd>{formatMatchPercent(result.score.confidenceScore)}</dd>
-        </div>
-        <div>
-          <dt>{t('discovery.result.verification')}</dt>
-          <dd>{verificationLabel(result.verification.status, t)}</dd>
+          <dd>{formatMatchPercent(opportunity.confidenceScore)}</dd>
         </div>
         <div>
           <dt>{t('discovery.result.userState')}</dt>
-          <dd>{result.userState}</dd>
-        </div>
-        <div>
-          <dt>{t('discovery.result.lifecycle')}</dt>
-          <dd>{result.lifecycle}</dd>
-        </div>
-        <div className="discovery-detail-grid__full">
-          <dt>{t('discovery.result.scoreBreakdown')}</dt>
-          <dd>
-            <ul className="discovery-criteria-list">
-              {(result.score.breakdown?.dimensions ?? []).map((dimension) => (
-                <li key={dimension.id}>
-                  {t(dimension.labelKey)}: {dimension.value} (w={dimension.weight})
-                </li>
-              ))}
-            </ul>
-          </dd>
-        </div>
-        <div className="discovery-detail-grid__full">
-          <dt>{t('discovery.result.evidence')}</dt>
-          <dd>
-            {result.evidence.length === 0 ? (
-              <span className="discovery-empty">—</span>
-            ) : (
-              <ul className="discovery-criteria-list">
-                {result.evidence.map((item) => (
-                  <li key={item.id}>
-                    {item.statement ?? item.type}
-                    {item.sourceUrl ? ` (${item.sourceUrl})` : ''}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </dd>
+          <dd>{userStateLabel(result.userState, t)}</dd>
         </div>
         <div>
           <dt>{t('discovery.result.firstSeen')}</dt>
-          <dd>{new Date(result.firstSeenAt).toLocaleString()}</dd>
+          <dd>{new Date(opportunity.discoveredAt).toLocaleString()}</dd>
         </div>
         <div>
           <dt>{t('discovery.result.lastChanged')}</dt>
-          <dd>{new Date(result.lastChangedAt).toLocaleString()}</dd>
+          <dd>{new Date(opportunity.lastChangedAt).toLocaleString()}</dd>
         </div>
-        <div>
-          <dt>{t('discovery.result.lastVerified')}</dt>
-          <dd>{new Date(result.lastVerifiedAt).toLocaleString()}</dd>
-        </div>
-        <div className="discovery-detail-grid__full">
-          <dt>{t('discovery.result.changedFields')}</dt>
-          <dd>
-            {changedFields.length === 0
-              ? t('discovery.result.changedFields.none')
-              : changedFields.join(', ')}
-          </dd>
-        </div>
+        {(result.score.breakdown?.dimensions?.length ?? 0) > 0 ? (
+          <div className="discovery-detail-grid__full">
+            <dt>{t('discovery.result.scoreBreakdown')}</dt>
+            <dd>
+              <ul className="discovery-criteria-list">
+                {(result.score.breakdown?.dimensions ?? []).map((dimension) => (
+                  <li key={dimension.id}>
+                    {t(dimension.labelKey)}: {formatMatchPercent(dimension.value)}
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        ) : null}
+        {changedFields.length > 0 ? (
+          <div className="discovery-detail-grid__full">
+            <dt>{t('discovery.result.changedFields')}</dt>
+            <dd>{changedFields.join(', ')}</dd>
+          </div>
+        ) : null}
       </dl>
 
       <div className="discovery-actions" style={{ marginTop: '1rem' }}>
@@ -161,7 +174,7 @@ export function DiscoveryResultDetail({
       </div>
 
       {stateUpdateError ? (
-        <p className="discovery-empty" role="alert" style={{ color: '#fca5a5' }}>
+        <p className="discovery-empty" role="alert">
           {t('discovery.error.stateUpdate')} {stateUpdateError}
         </p>
       ) : null}

@@ -77,6 +77,31 @@ describe('profile mutation contract', () => {
     }
   });
 
+  it('parses fact.invalidate with null clear markers (E13)', () => {
+    const parsed = MutationRequestSchema.parse({
+      id: 'req_invalidate',
+      requestId: 'req_invalidate',
+      timestamp: '2026-06-19T12:00:00.000Z',
+      type: 'fact.invalidate',
+      intent: 'correction',
+      domain: 'housing',
+      source: { kind: 'profile_ui', domain: 'housing' },
+      payload: {
+        kind: 'domain_facts',
+        domain: 'housing',
+        fields: { monthlyColdRent: null },
+      },
+      confidence: 1,
+      userConfirmationRequired: true,
+      expectedHeadRevision: 4,
+    });
+
+    expect(parsed.type).toBe('fact.invalidate');
+    if (parsed.payload.kind === 'domain_facts' && parsed.payload.domain === 'housing') {
+      expect(parsed.payload.fields.monthlyColdRent).toBeNull();
+    }
+  });
+
   it('rejects scenario fields in persistent payload validation', () => {
     const result = validatePersistentPayloadFields({
       kind: 'domain_facts',

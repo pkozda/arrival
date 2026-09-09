@@ -31,7 +31,12 @@ export function buildInputFromFormData(
     }
 
     if (field.type === 'boolean') {
-      input[field.name] = formData.get(fieldName) === 'on';
+      const checked = formData.get(fieldName) === 'on';
+      // Optional booleans: unchecked means unknown/absent, not false (PD-003).
+      if (!field.required && !checked) {
+        continue;
+      }
+      input[field.name] = checked;
       continue;
     }
 

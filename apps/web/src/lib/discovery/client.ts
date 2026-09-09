@@ -203,3 +203,44 @@ export async function updateDiscoveryNotificationEmail(
     }
   );
 }
+
+export type DiscoveryAccountClaimResult = {
+  accountId: string;
+  sessionId: string;
+  linked: true;
+  token: string;
+  authSubject: string;
+  discoveryMigration: {
+    transferredProfileIds: string[];
+    notificationEmailTransferred: boolean;
+    status: 'ok';
+  } | null;
+  discoveryMigrationError: string | null;
+};
+
+/**
+ * PD-011: reuse existing POST /api/account/claim, then persist the returned token.
+ * Does not invent auth — only stores the server-issued token for subsequent Discovery calls.
+ */
+export async function claimDiscoveryAccountContinuity(
+  sessionId: string
+): Promise<DiscoveryAccountClaimResult> {
+  const { writeStoredToken } = await import('@/lib/api');
+  const res = await fetch(`${API_URL}/api/account/claim`, {
+    method: 'POST',
+    headers: {
+      ...buildAuthHeaders({ sessionId }),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({}),
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    throw await parseError(res);
+  }
+  const body = (await res.json()) as DiscoveryAccountClaimResult;
+  if (body.token) {
+    writeStoredToken(body.token);
+  }
+  return body;
+}

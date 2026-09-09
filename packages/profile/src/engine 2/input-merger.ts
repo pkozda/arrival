@@ -58,11 +58,11 @@ const MODULE_INPUT_CONFIG: Record<string, Record<string, ModuleInputFieldConfig>
     },
     hasInsurance: {
       profile: (p) => p?.insurance?.hasCoverage,
-      defaultValue: false,
+      defaultValue: undefined,
     },
     insuranceType: {
       profile: (p) => p?.insurance?.type,
-      defaultValue: 'none',
+      defaultValue: undefined,
     },
   },
 };

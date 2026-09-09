@@ -29,6 +29,8 @@ import type {
 } from './types.js';
 import type { DiscoveryService } from '../service/discovery-service.js';
 import { executeProfileRunNow } from './profile-run.js';
+import { buildProfileRunSummaryWithAutomation } from './automation-summary.js';
+import { scheduleIdForProfile } from './profile-run.js';
 import { syncProfileOperationalSchedule } from './schedule-projection.js';
 
 export type DiscoveryUserServiceDeps = {
@@ -232,12 +234,27 @@ export function createDiscoveryUserService(
     },
 
     async getProfileRunSummary(userId, profileId) {
-      await requireOwnedProfile(userId, profileId);
+      const profile = await requireOwnedProfile(userId, profileId);
       const runs = await deps.runStore.listByProfileId(profileId, 1);
-      return {
-        profileId,
+      const results = await deps.resultStore.listByProfile(profileId);
+      let operationalNextRunAt: string | null = null;
+      if (deps.discoveryService) {
+        try {
+          await deps.discoveryService.start();
+          const schedule = await deps.discoveryService.getSchedule(
+            scheduleIdForProfile(profileId)
+          );
+          operationalNextRunAt = schedule?.nextRunAt ?? null;
+        } catch {
+          operationalNextRunAt = null;
+        }
+      }
+      return buildProfileRunSummaryWithAutomation({
+        profile,
         lastRun: runs[0] ?? null,
-      };
+        results,
+        operationalNextRunAt,
+      });
     },
 
     async runProfileNow(userId, profileId) {
@@ -251,6 +268,8 @@ export function createDiscoveryUserService(
       return executeProfileRunNow({
         discoveryService: deps.discoveryService,
         profile,
+        resultStore: deps.resultStore,
+        runStore: deps.runStore,
       });
     },
   };

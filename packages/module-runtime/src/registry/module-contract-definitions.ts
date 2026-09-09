@@ -26,6 +26,12 @@ export const MODULE_CONTRACT_SPECS: Record<string, ModuleContractSpec> = {
     requiresRecommendationNormalizer: true,
     requiresActionNormalizer: true,
   },
+  'healthcare-navigation': {
+    runtimeContractVersion: '1.0',
+    capabilities: ['produces-recommendations', 'produces-explanations'],
+    requiresRecommendationNormalizer: true,
+    requiresActionNormalizer: false,
+  },
 };
 
 export function resolveModuleContractSpec(moduleId: string): ModuleContractSpec {

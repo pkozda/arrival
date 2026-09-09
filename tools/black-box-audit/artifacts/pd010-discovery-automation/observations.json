@@ -1,0 +1,22 @@
+{
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "limitations": [
+    "ARRIVAL_ATLAS_OPS_TOKEN unset — scheduled host tick not exercised in browser probe"
+  ],
+  "observations": [
+    "=== PD-010 Discovery automation probe ===",
+    "Automation panel visible: true",
+    "Session durability warning: true",
+    "Initial status text: Вимк. — лише ручний «Запустити зараз»",
+    "After enable status: Увімкнено (щодня)",
+    "data-automatic after enable: true",
+    "After reload data-automatic=true data-cadence=daily",
+    "Next run visible: 9/9/2026, 8:00:00 AM",
+    "Manual Run Now terminal lifecycle: NO_RESULTS",
+    "After disable reload data-automatic=false data-cadence=manual",
+    "Delivery summary visible: true",
+    "Verdict: PASS_WITH_LIMITATIONS",
+    "Limitations:",
+    " - ARRIVAL_ATLAS_OPS_TOKEN unset — scheduled host tick not exercised in browser probe"
+  ]
+}
