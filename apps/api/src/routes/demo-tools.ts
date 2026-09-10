@@ -1,10 +1,5 @@
 import type { FastifyInstance, FastifyReply } from 'fastify';
-import {
-  LIFE_EVENT_DEMO_PERSONAS,
-  summarizeDemoPreset,
-} from '@arrival-atlas/life-event-demo';
 import { isDevToolsEnabled } from '../dev/is-dev-tools-enabled.js';
-import { parseDemoPersonaId, seedDemoPersonaSession } from '../demo/seed-demo-session.js';
 import { buildLifeEventPlanFromState } from '../state/life-event-plan-projection.js';
 import { systemStateCoordinator } from '../state/system-state-coordinator.js';
 import { securedRoute } from '../routing/apply-route-security.js';
@@ -14,6 +9,10 @@ function devToolsUnavailable(reply: FastifyReply) {
   return reply.status(404).send({ error: 'Not found' });
 }
 
+/**
+ * Demo preset routes. `@arrival-atlas/life-event-demo` is loaded only after the
+ * DEV_TOOLS gate passes so production (DEV_TOOLS=false) never eagerly requires it.
+ */
 export async function registerDemoToolsRoutes(app: FastifyInstance): Promise<void> {
   securedRoute(
     app,
@@ -24,6 +23,10 @@ export async function registerDemoToolsRoutes(app: FastifyInstance): Promise<voi
       if (!isDevToolsEnabled()) {
         return devToolsUnavailable(reply);
       }
+
+      const { LIFE_EVENT_DEMO_PERSONAS, summarizeDemoPreset } = await import(
+        '@arrival-atlas/life-event-demo'
+      );
 
       return {
         presets: LIFE_EVENT_DEMO_PERSONAS.map((persona) => ({
@@ -50,6 +53,11 @@ export async function registerDemoToolsRoutes(app: FastifyInstance): Promise<voi
       if (!isDevToolsEnabled()) {
         return devToolsUnavailable(reply);
       }
+
+      const { parseDemoPersonaId, seedDemoPersonaSession } = await import(
+        '../demo/seed-demo-session.js'
+      );
+      const { summarizeDemoPreset } = await import('@arrival-atlas/life-event-demo');
 
       const body = (request.body ?? {}) as { presetId?: unknown };
       const presetId = parseDemoPersonaId(body.presetId);
