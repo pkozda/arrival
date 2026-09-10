@@ -190,9 +190,8 @@ See [current-situation-resolver.md](./current-situation-resolver.md) for platfor
 |------|---------|---------|
 | `NEXT_PUBLIC_CERTAINTY_LAYER_ENABLED` | Inspector `CertaintyPanel` | `false` |
 | `NEXT_PUBLIC_GUIDE_USE_CERTAINTY` | Journey Guide consumes `CertaintyState` | `false` |
-| `NEXT_PUBLIC_CURRENT_SITUATION_ENABLED` | CSR infrastructure (E2+ consumers) | `false` |
 
-Existing behavior is unchanged when flags are off.
+Existing behavior is unchanged when flags are off. (An unused CSR scaffold flag was removed; see [current-situation-resolver.md](./current-situation-resolver.md).)
 
 ---
 
@@ -224,8 +223,9 @@ apps/web/src/lib/certainty/adapters/   — surface adapters (life-event, profile
 apps/web/src/lib/certainty/formatters/ — shared copy layer
 apps/web/src/components/certainty/   — UI primitives (Inspector)
 apps/web/src/lib/journey-guide/        — Guide presenter + guide formatters
-apps/web/src/lib/current-situation/    — Current Situation Resolver (CSR)
 ```
+
+CSR design (no production implementation checked in): [current-situation-resolver.md](./current-situation-resolver.md).
 
 ---
 

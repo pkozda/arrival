@@ -147,9 +147,7 @@ PDE does not replace existing systems. It is a separate domain capability.
 
 Determines the user’s current situation (life event, economic reality, profile situation).
 
-Implemented as pure domain infrastructure under:
-
-`apps/web/src/lib/current-situation/`
+Conceptual design: [current-situation-resolver.md](../vision/primitives/current-situation-resolver.md). No production implementation is checked in.
 
 CSR must remain independent of PDE.
 

@@ -174,9 +174,7 @@ type CurrentSituationResult = {
 
 ## Feature flag
 
-`NEXT_PUBLIC_CURRENT_SITUATION_ENABLED=false` (default)
-
-Infrastructure only in E1. No consumer wired yet. Existing application behavior unchanged.
+An unused E1 scaffold previously gated this behind `NEXT_PUBLIC_CURRENT_SITUATION_ENABLED` (default off). That scaffold and flag were removed; this document remains the conceptual design only.
 
 ---
 
@@ -196,15 +194,7 @@ Infrastructure only in E1. No consumer wired yet. Existing application behavior 
 
 ## Implementation
 
-```
-apps/web/src/lib/current-situation/
-  types.ts          — domain types
-  priority.ts       — default surface priorities
-  validation.ts     — registration guards
-  resolver.ts       — deterministic selection
-  registry.ts       — runtime registry + subscriptions
-  index.ts          — public exports
-```
+No production implementation is checked in. A prior unused scaffold under `apps/web/src/lib/current-situation/` was removed. Reintroduce only when a real consumer is wired.
 
 ---
 
