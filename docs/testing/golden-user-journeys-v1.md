@@ -79,7 +79,7 @@ This document is the authoritative reference for:
 - roadmap validation (“does this change preserve user intent?”)
 - cross-module integration contracts
 
-Supporting evidence for current implementation alignment: [E2E User Journey Tests Report](../economic-reality/e2e-user-journey-tests-report.md).
+Supporting evidence for current implementation alignment: [E2E User Journey Tests Report (historical)](../economic-reality/economic-reality-module-v1-spec.md).
 
 ---
 
@@ -483,5 +483,5 @@ Future platform modules (Benefits Simulator, Housing, Legal) will receive their 
 |----------|--------------|
 | [Platform Planning Constitution v1](../platform/platform-planning-constitution-v1.md) | Planning authority and governance kernel |
 | [Economic Reality v1 Closure Spec](../economic-reality/economic-reality-v1-closure-spec.md) | Module closure boundary referenced by GJ-01 – GJ-04 |
-| [E2E User Journey Tests Report](../economic-reality/e2e-user-journey-tests-report.md) | Current implementation evidence (not normative) |
+| [E2E User Journey Tests Report (historical)](../economic-reality/economic-reality-module-v1-spec.md) | Current implementation evidence (not normative) |
 | [UX Contract v1](../ux/ux-contract-v1.md) | Presentation and interaction boundaries |

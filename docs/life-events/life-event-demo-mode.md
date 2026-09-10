@@ -48,7 +48,7 @@ Use **Reset my data** (session) or **Clear all local state** (full wipe) in the 
 
 ## Walkthrough order
 
-Follow [life-event-guided-walkthroughs.md](./life-event-guided-walkthroughs.md):
+Follow [life-event-guided-walkthroughs.md (historical)](README.md):
 
 1. New Arrival (2–3 min)  
 2. Job Loss + scenario banner (2–3 min)  
@@ -57,25 +57,25 @@ Follow [life-event-guided-walkthroughs.md](./life-event-guided-walkthroughs.md):
 
 ## Screenshots
 
-Curated catalog: [life-event-showcase-gallery.md](./life-event-showcase-gallery.md)  
-Capture instructions: [screenshots/README.md](./screenshots/README.md)
+Curated catalog: [life-event-showcase-gallery.md (historical)](README.md)  
+Capture instructions: [screenshots/README.md (historical)](README.md)
 
 ## Presentation flow (10-minute version)
 
 | Minute | Action |
 |--------|--------|
-| 0–1 | Problem framing: bureaucracy overload for newcomers ([product story](./life-event-product-story.md)) |
+| 0–1 | Problem framing: bureaucracy overload for newcomers ([product story (historical)](README.md)) |
 | 1–4 | Load **new-arrival** → Home → module hero |
 | 4–6 | Load **job-loss** → scenario banner → explorer |
 | 6–8 | Load **benefits-discovery** → timeline + breakdown |
 | 8–9 | Load **stable-resident** → contrast stable vs crisis |
-| 9–10 | Before/after recap ([before-after doc](./life-event-before-after.md)) |
+| 9–10 | Before/after recap ([before-after doc (historical)](README.md)) |
 
 ## Localization demo
 
 1. Load `new-arrival`.
 2. Switch language to **DE** in the header drawer.
-3. Show [home-localized-de](./screenshots/home-localized-de.svg) equivalent on screen.
+3. Show [home-localized-de (historical)](README.md) equivalent on screen.
 
 ## Mobile demo
 
@@ -92,5 +92,5 @@ Resize browser to 390px width or use device mode. Capture references: `mobile-ho
 
 ## Related documents
 
-- [Executive summary](./life-event-executive-summary.md) — one-pager for investors/partners  
-- [PH-4 completion report](./ph-4-demo-showcase-completion.md) — delivery checklist
+- [Executive summary (historical)](README.md) — one-pager for investors/partners  
+- [PH-4 completion report (historical)](README.md) — delivery checklist

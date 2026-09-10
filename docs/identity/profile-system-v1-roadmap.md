@@ -682,11 +682,11 @@ This unlocks P2 form integration and all subsequent UI personalization without b
 | Document | Relevance |
 |----------|-----------|
 | [user-profile-engine-design.md](../identity/user-profile-engine-design.md) | Original UPE proposal (partially implemented) |
-| [user-profile-engine-runtime-unification-report.md](../archive/user-profile-engine/runtime-unification-report.md) | `resolveExecutionContext()` |
-| [user-profile-engine-policy-layer-report.md](../archive/user-profile-engine/policy-layer-report.md) | Module profile policies |
-| [user-profile-engine-ui-contract-report.md](../archive/user-profile-engine/ui-contract-report.md) | `UIProfileResponse` |
-| [ui-architecture-audit.md](../audits/ui-architecture-audit.md) | Web scalability; shallow merge gap |
-| [ui-ready-gate-audit.md](../audits/ui-ready-gate-audit.md) | Boundary guarantees to preserve |
+| [user-profile-engine-runtime-unification-report.md (historical)](../archive/README.md) | `resolveExecutionContext()` |
+| [user-profile-engine-policy-layer-report.md (historical)](../archive/README.md) | Module profile policies |
+| [user-profile-engine-ui-contract-report.md (historical)](../archive/README.md) | `UIProfileResponse` |
+| [ui-architecture-audit.md (historical)](../audits/README.md) | Web scalability; shallow merge gap |
+| [ui-ready-gate-audit.md (historical)](../audits/README.md) | Boundary guarantees to preserve |
 | [roadmap-vs-current-state.md](../platform/roadmap-vs-current-state.md) | Platform phase completion status |
 
 ---

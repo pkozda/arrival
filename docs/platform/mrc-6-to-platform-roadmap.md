@@ -27,13 +27,13 @@ related:
 **Version:** 1.0  
 **Date:** June 2026  
 
-**Supersedes (partially):** [Module Runtime Evolution Roadmap](../archive/module-runtime-evolution-roadmap.md) Phases MRC-6/MRC-7 naming — governance kernel (MRC-6 debt closure) is complete; this document defines the **next** tranche.
+**Supersedes (partially):** [Module Runtime Evolution Roadmap (historical)](../archive/README.md) Phases MRC-6/MRC-7 naming — governance kernel (MRC-6 debt closure) is complete; this document defines the **next** tranche.
 
 **Bound by:**
 
 - [MRC ADL v1.0](../core/mrc-adl.md)
 - [Module Runtime Contract v1.0](../core/module-runtime-contract-v1.md)
-- [P7.2 MRC-5 Gate Audit](../audits/p7-2-mrc-5-registry-hardening-gate-audit.md) (conditions closed in MRC-6)
+- [P7.2 MRC-5 Gate Audit (historical)](../audits/README.md) (conditions closed in MRC-6)
 
 ---
 
@@ -616,7 +616,7 @@ Sprint E (Phase 4 + 5)
 
 | Document | MRC-6 meaning there | Actual state |
 |----------|----------------------|--------------|
-| [module-runtime-evolution-roadmap.md](../archive/module-runtime-evolution-roadmap.md) | MRC-6 = UI Snapshot Integration | **Renamed:** UI snapshot work moves to **this roadmap Phase 5** |
+| [module-runtime-evolution-roadmap.md (historical)](../archive/README.md) | MRC-6 = UI Snapshot Integration | **Renamed:** UI snapshot work moves to **this roadmap Phase 5** |
 | Same doc | MRC-7 = Runtime Governance | **Done early** as MRC-5 debt closure + MRC-6 governance kernel |
 | [mrc-adl-architecture-decision-layer.md](../core/mrc-adl.md) | §7 UX/snapshot migration at "MRC-6" | Deferred — explicit scope of **Phase 5 here** |
 

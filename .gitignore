@@ -7,7 +7,22 @@ dist/
 *.log
 .DS_Store
 coverage/
+
+# Local API/SQLite state (runtime + probe variants)
 .arrival-atlas-state/
 .arrival-atlas-accounts/
 .arrival-atlas-entitlements/
 .arrival-atlas-sessions/
+.arrival-atlas-state-*-test/
+apps/api/.arrival-atlas-state-*-test/
+
+# Playwright / local test output
+test-results/
+playwright-report/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Generated black-box probe evidence (screenshots, JSON reports)
+# Probes and design/audit markdown under tools/black-box-audit/ remain tracked.
+tools/black-box-audit/artifacts/

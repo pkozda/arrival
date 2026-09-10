@@ -71,7 +71,7 @@ Economic Reality  →  "How do I survive financially in the system?"
 | [economic-classifier-fixtures.md](./economic-classifier-fixtures.md) | ✅ EF01–EF24 |
 | [economic-graph-catalog-v1.md](./economic-graph-catalog-v1.md) | ✅ G1–G6 |
 | [economic-reality-module-v1-spec.md](./economic-reality-module-v1-spec.md) | ✅ Draft |
-| Readiness audit | ✅ [economic-reality-module-v1-readiness-audit.md](../audits/economic-reality-module-v1-readiness-audit.md) |
+| Readiness audit | ✅ [economic-reality-module-v1-readiness-audit.md (historical)](../audits/README.md) |
 
 ### Platform (done)
 
@@ -302,4 +302,4 @@ npm run test --workspace=apps/web -- --run src/lib/economic-reality-plan
 
 - [economic-reality-module-v1-spec.md](./economic-reality-module-v1-spec.md)
 - [life-event-module-v2-roadmap.md](../life-events/life-event-module-v2-roadmap.md) — pattern reference
-- [life-event-platform-integration-audit.md](../audits/life-event-platform-integration-audit.md)
+- [life-event-platform-integration-audit.md (historical)](../audits/README.md)

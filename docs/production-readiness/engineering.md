@@ -3,7 +3,7 @@
 > **Role: IMPLEMENTATION LAYER (locked)**  
 > Flat tasks · P0/P1/P2. UX reference required per task.
 
-Tasks to match [ux.md](./ux.md). BL-* frozen: [implemented-baseline.md](./implemented-baseline.md).
+Tasks to match [ux.md](./ux.md). BL-* frozen: [implemented-baseline.md (historical)](index.md).
 
 **Effort:** S ≤ 1d · M 2–3d · L 4–6d
 

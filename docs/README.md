@@ -13,180 +13,70 @@ tags:
   - domain-index
   - knowledge-base
 created: 2026-06-19
-updated: 2026-09-07
+updated: 2026-09-10
 related:
   - taxonomy
-  - index-schema
-  - personal-discovery-engine-architecture
   - product-guide-v1
 ---
 
 # Arrival Atlas Documentation
 
-Central index for the Arrival Atlas knowledge system. Documents are organized by **domain** (what part of the newcomer integration platform they describe), not by author or date.
+Start here. This index lists **current** documentation needed to understand and work on the product.
 
-Every document includes YAML frontmatter (`id`, `type`, `domain`, `tags`, `related`) for agent indexing and search. See [meta/taxonomy.md](./meta/taxonomy.md).
+Historical audits, PR mirrors, refactor logs, completion reports, and black-box implementation notes are preserved **outside Git** for Confluence migration:
 
-## Top-level structure
+`../arrival-atlas-local-archive/documentation/`
+
+Stub pointers: [audits](./audits/README.md) · [pr](./pr/README.md) · [refactors](./refactors/README.md) · [archive (historical)](archive/README.md) · [black-box docs](../tools/black-box-audit/README.md)
+
+## Start here
+
+| Question | Document |
+|----------|----------|
+| What is Arrival Atlas (product behavior)? | [product/product-guide-v1.md](./product/product-guide-v1.md) |
+| How do I run / deploy staging? | [deployment.md](./deployment.md) |
+| Release / production constraints? | [../tools/black-box-audit/RELEASE-READINESS-CONTRACT-v1.md](../tools/black-box-audit/RELEASE-READINESS-CONTRACT-v1.md) · [production-readiness/](./production-readiness/) |
+| Where are ADRs? | [decisions/README.md](./decisions/README.md) · [adr/](./adr/) |
+| Platform / MRC contracts? | [platform/platform-planning-constitution-v1.md](./platform/platform-planning-constitution-v1.md) · [core/module-runtime-contract-v1.md](./core/module-runtime-contract-v1.md) |
+| UX contracts? | [ux/ux-contract-v1.md](./ux/ux-contract-v1.md) |
+| E2E product contracts / decisions? | [../tools/black-box-audit/E2E-PRODUCT-SPECIFICATION-v1.md](../tools/black-box-audit/E2E-PRODUCT-SPECIFICATION-v1.md) · [PRODUCT-DECISIONS-v1.md](../tools/black-box-audit/PRODUCT-DECISIONS-v1.md) |
+
+## Domain specifications
+
+| Domain | Start |
+|--------|-------|
+| Life Events | [life-events/life-state-model.md](./life-events/life-state-model.md) · [architecture freeze](./life-events/life-event-module-v2-v1.0-architecture-freeze.md) |
+| Economic Reality | [economic-reality/economic-reality-module-v1-spec.md](./economic-reality/economic-reality-module-v1-spec.md) · [economic-state-model.md](./economic-reality/economic-state-model.md) |
+| Discovery (PDE) | [discovery/README.md](./discovery/README.md) · [architecture](./discovery/personal-discovery-engine-architecture.md) |
+| Identity / profile | [identity/profile-mutation-model-v1.md](./identity/profile-mutation-model-v1.md) · [contracts/profile-mutation-contract-summary.md](./contracts/profile-mutation-contract-summary.md) |
+| Benefits / finance | [benefits/](./benefits/) · [finance/](./finance/) |
+| Vision / UX principles | [vision/README.md](./vision/README.md) |
+
+## Repository layout (docs)
 
 ```text
 docs/
-├── README.md              ← you are here
-├── core/                  MRC, governance kernel, global platform state
-├── product/               Cross-cutting product concepts
-├── onboarding/            Registration, Anmeldung, FTU flows
-├── migration/             Relocation logic, cross-country transitions
-├── identity/              Profiles, merging, verification, profile UX
-├── discovery/             Personal Discovery Engine (jobs, giveaways, …)
-├── deployment.md          Docker Compose + Caddy personal staging
-├── benefits/              Jobcenter, Bürgergeld, benefit simulations
-├── housing/               Accommodation, rent support
-├── legal/                 Legal status, compliance, official procedures
-├── finance/               Income, subsidies, financial modeling
-├── integrations/          External APIs, connectors, data sources
-├── platform/              IAM, infrastructure, platform roadmaps
-├── audits/                Gate audits, readiness reviews
-├── decisions/             Architecture Decision Records (ADRs) index
-├── adr/                   Formal ADRs (LE, PDE, …)
-├── refactors/             Completed migration and refactor logs
-├── archive/               Superseded historical documents
-└── meta/                  Taxonomy, index schema, tooling
+├── README.md                 ← you are here
+├── product/                  Product Guide and cross-cutting product docs
+├── adr/ + decisions/         Architecture Decision Records
+├── core/ + platform/         MRC / platform contracts and roadmaps
+├── life-events/              Life Event specs and models
+├── economic-reality/         Economic Reality specs and models
+├── discovery/                Personal Discovery Engine
+├── identity/ + ux/           Profile and UX contracts
+├── deployment.md             Compose / Caddy personal staging
+├── production-readiness/     Current readiness surfaces
+├── testing/                  Golden journeys
+├── meta/                     Taxonomy and indexing tooling
+├── audits|pr|refactors|archive/  → stubs; content in local archive
+└── housing|legal|…           Reserved domain stubs
 ```
 
-## Domain guide
-
-| Domain | Put documents here when they… |
-|--------|--------------------------------|
-| **core/** | Define system-wide architecture, MRC, governance kernel |
-| **product/** | Describe cross-cutting UX or product concepts |
-| **identity/** | Cover profiles, user context, profile UX, merging |
-| **discovery/** | Cover Personal Discovery Engine (external opportunity discovery) |
-| **benefits/** | Cover Jobcenter, Bürgergeld, benefit simulations |
-| **finance/** | Cover income, payroll, subsidies, financial modules |
-| **platform/** | Cover IAM, backend, shared services, platform evolution |
-| **onboarding/** | Cover registration, Anmeldung, first-time user setup |
-| **migration/** | Cover relocation assistance, cross-border transitions |
-| **audits/** | Record read-only assessments and gate verdicts |
-| **refactors/** | Document completed migrations and refactors |
-| **decisions/** / **adr/** | Short ADRs with context, decision, consequences |
-| **archive/** | Superseded docs kept for history |
-
-Reserved empty domains (`housing/`, `legal/`, `integrations/`) have stub indexes — add docs as those areas grow.
-
-## Key documents (start here)
-
-### Product
-
-| Document | Path |
-|----------|------|
-| **Product Guide v1** (canonical behavioral / UX rules) | [product/product-guide-v1.md](./product/product-guide-v1.md) |
-
-### Platform & core
-
-| Document | Path |
-|----------|------|
-| Living platform state | [core/current-state.md](./core/current-state.md) |
-| **Platform Planning Constitution v1** | [platform/platform-planning-constitution-v1.md](./platform/platform-planning-constitution-v1.md) |
-| MRC-6 → Platform roadmap | [platform/mrc-6-to-platform-roadmap.md](./platform/mrc-6-to-platform-roadmap.md) |
-| Roadmap vs current state | [platform/roadmap-vs-current-state.md](./platform/roadmap-vs-current-state.md) |
-| Module Runtime Contract v1 | [core/module-runtime-contract-v1.md](./core/module-runtime-contract-v1.md) |
-| MRC ADL | [core/mrc-adl.md](./core/mrc-adl.md) |
-| UI Ready Gate audit | [audits/ui-ready-gate-audit.md](./audits/ui-ready-gate-audit.md) |
-
-### Identity & profile
-
-| Document | Path |
-|----------|------|
-| UX Contract v1 (Home · Modules · Profile) | [ux/ux-contract-v1.md](./ux/ux-contract-v1.md) |
-| UX Contract v2 (Mutation Semantics) | [ux/ux-contract-v2.md](./ux/ux-contract-v2.md) |
-| Profile UX design prompt | [identity/profile-ux-design-prompt.md](./identity/profile-ux-design-prompt.md) |
-| Profile UX discovery | [identity/profile-ux-discovery.md](./identity/profile-ux-discovery.md) |
-| Profile UX design spec | [identity/profile-ux-spec.md](./identity/profile-ux-spec.md) |
-| Profile System v1 roadmap | [identity/profile-system-v1-roadmap.md](./identity/profile-system-v1-roadmap.md) |
-| Profile Mutation Model v1 | [identity/profile-mutation-model-v1.md](./identity/profile-mutation-model-v1.md) |
-| Profile System P3 — correction layer (UX-P3) | [identity/profile-system-p3-roadmap.md](./identity/profile-system-p3-roadmap.md) |
-| Profile System P4 — intelligence layer (UX-P4) | [identity/profile-system-p4-roadmap.md](./identity/profile-system-p4-roadmap.md) |
-| Life Event Module v2 — spec | [life-events/life-event-module-v2-spec.md](./life-events/life-event-module-v2-spec.md) |
-| Life State Model (canonical) | [life-events/life-state-model.md](./life-events/life-state-model.md) |
-| Classifier fixtures | [life-events/life-event-classifier-fixtures.md](./life-events/life-event-classifier-fixtures.md) |
-| Graph catalog v1 | [life-events/life-event-graph-catalog-v1.md](./life-events/life-event-graph-catalog-v1.md) |
-| Life Event Module v2 — roadmap | [life-events/life-event-module-v2-roadmap.md](./life-events/life-event-module-v2-roadmap.md) |
-| **Life Event v1.0 architecture freeze** | [life-events/life-event-module-v2-v1.0-architecture-freeze.md](./life-events/life-event-module-v2-v1.0-architecture-freeze.md) |
-| **PH-4 demo & showcase** | [life-events/life-event-demo-mode.md](./life-events/life-event-demo-mode.md) |
-| PH-4 executive summary | [life-events/life-event-executive-summary.md](./life-events/life-event-executive-summary.md) |
-| PH-4 showcase gallery | [life-events/life-event-showcase-gallery.md](./life-events/life-event-showcase-gallery.md) |
-| **Life Event v1.0 product acceptance review** | [life-events/life-event-v1.0-product-acceptance-review.md](./life-events/life-event-v1.0-product-acceptance-review.md) |
-| PH-5 final stabilization | [life-events/ph-5-final-stabilization-completion.md](./life-events/ph-5-final-stabilization-completion.md) |
-| Life Event ADRs (LE-1–LE-5 architecture) | [adr/adr-001-life-event-layered-architecture.md](./adr/adr-001-life-event-layered-architecture.md) |
-| LE-7 scenario overlay ADR | [adr/adr-004-le-7-scenario-overlay.md](./adr/adr-004-le-7-scenario-overlay.md) |
-| Life Event architecture checklist | [adr/life-event-architecture-consistency-checklist.md](./adr/life-event-architecture-consistency-checklist.md) |
-| Life Event Module v2 — readiness audit | [audits/life-event-module-v2-readiness-audit.md](./audits/life-event-module-v2-readiness-audit.md) |
-| **Life Event platform integration audit (ARR-018)** | [audits/life-event-platform-integration-audit.md](./audits/life-event-platform-integration-audit.md) |
-| Profile mutation contract summary | [contracts/profile-mutation-contract-summary.md](./contracts/profile-mutation-contract-summary.md) |
-| User Profile Engine design | [identity/user-profile-engine-design.md](./identity/user-profile-engine-design.md) |
-
-### Discovery (Personal Discovery Engine)
-
-| Document | Path |
-|----------|------|
-| Domain index | [discovery/README.md](./discovery/README.md) |
-| PDE architecture & product design (RFC) | [discovery/personal-discovery-engine-architecture.md](./discovery/personal-discovery-engine-architecture.md) |
-| **PDE domain model (E1 prerequisite)** | [discovery/personal-discovery-engine-domain-model.md](./discovery/personal-discovery-engine-domain-model.md) |
-| PDE pipeline contract | [discovery/personal-discovery-engine-pipeline.md](./discovery/personal-discovery-engine-pipeline.md) |
-| PDE strategy contract | [discovery/personal-discovery-engine-strategy-contract.md](./discovery/personal-discovery-engine-strategy-contract.md) |
-| PDE implementation roadmap (E1–E11) | [discovery/personal-discovery-engine-roadmap.md](./discovery/personal-discovery-engine-roadmap.md) |
-| PDE MVP scope | [discovery/personal-discovery-engine-mvp.md](./discovery/personal-discovery-engine-mvp.md) |
-| ADR-006 — PDE boundaries | [adr/adr-006-personal-discovery-engine-boundaries.md](./adr/adr-006-personal-discovery-engine-boundaries.md) |
-| ADR-006 addendum — E1 API spike | [adr/adr-006-addendum-e1-api-spike.md](./adr/adr-006-addendum-e1-api-spike.md) |
-
-### Benefits & finance
-
-| Document | Path |
-|----------|------|
-| Benefits simulator design | [benefits/benefits-simulator-design.md](./benefits/benefits-simulator-design.md) |
-| Benefits UI contract | [benefits/benefits-simulator-ui-contract.md](./benefits/benefits-simulator-ui-contract.md) |
-| Financial module v2 plan | [finance/financial-module-v2-plan.md](./finance/financial-module-v2-plan.md) |
-| **Economic Reality Module v1 — spec** | [economic-reality/economic-reality-module-v1-spec.md](./economic-reality/economic-reality-module-v1-spec.md) |
-| Economic State Model (canonical) | [economic-reality/economic-state-model.md](./economic-reality/economic-state-model.md) |
-| Economic classifier fixtures | [economic-reality/economic-classifier-fixtures.md](./economic-reality/economic-classifier-fixtures.md) |
-| Economic graph catalog v1 | [economic-reality/economic-graph-catalog-v1.md](./economic-reality/economic-graph-catalog-v1.md) |
-| Economic Reality Module v1 — roadmap | [economic-reality/economic-reality-module-v1-roadmap.md](./economic-reality/economic-reality-module-v1-roadmap.md) |
-| **Economic Rule Engine v1** | [economic-reality/economic-rule-engine-v1.md](./economic-reality/economic-rule-engine-v1.md) |
-| **Economic Reality v1 — closure spec** | [economic-reality/economic-reality-v1-closure-spec.md](./economic-reality/economic-reality-v1-closure-spec.md) |
-| Economic Reality v1 — readiness audit | [audits/economic-reality-module-v1-readiness-audit.md](./audits/economic-reality-module-v1-readiness-audit.md) |
-| Economic Reality — system audit v1 | [audits/economic-reality-system-audit-v1.md](./audits/economic-reality-system-audit-v1.md) |
-| Economic Reality — system audit v2 | [audits/economic-reality-system-audit-v2.md](./audits/economic-reality-system-audit-v2.md) |
-
-### Gate audit chain
-
-| Phase | Document |
-|-------|----------|
-| P5.0 | [audits/p5-0-full-system-architecture-audit.md](./audits/p5-0-full-system-architecture-audit.md) |
-| P7.0 | [audits/p7-0-module-runtime-architecture-audit.md](./audits/p7-0-module-runtime-architecture-audit.md) |
-| P7.1 | [audits/p7-1-mrc-3-semantic-layer-gate-audit.md](./audits/p7-1-mrc-3-semantic-layer-gate-audit.md) |
-| P7.2 | [audits/p7-2-mrc-5-registry-hardening-gate-audit.md](./audits/p7-2-mrc-5-registry-hardening-gate-audit.md) |
-| ARR-018 | [audits/life-event-platform-integration-audit.md](./audits/life-event-platform-integration-audit.md) |
-
-## Adding new documentation
-
-1. Choose the **domain folder** using the guide above.
-2. Name the file in kebab-case (no `v1`, `final`, `latest` unless meaningful).
-3. Add YAML frontmatter per [meta/taxonomy.md](./meta/taxonomy.md).
-4. Link related docs via `related:` IDs and relative paths.
-5. If superseding an existing doc, move the old version to `archive/` and cross-link both ways.
-6. Run `python3 docs/meta/index-docs.py` to refresh the search index.
-
-## Meta & tooling
+## Meta
 
 | Resource | Path |
 |----------|------|
-| Taxonomy & tag rules | [meta/taxonomy.md](./meta/taxonomy.md) |
-| RAG index schema | [meta/index-schema.md](./meta/index-schema.md) |
-| Document index (JSON) | [meta/docs-index.json](./meta/docs-index.json) |
-| Section chunks (JSONL) | [meta/docs-chunks.jsonl](./meta/docs-chunks.jsonl) |
-| Migration script | [meta/migrate-docs.py](./meta/migrate-docs.py) |
-| Link fixer | [meta/fix-links.py](./meta/fix-links.py) |
+| Taxonomy | [meta/taxonomy.md](./meta/taxonomy.md) |
+| Index schema | [meta/index-schema.md](./meta/index-schema.md) |
 
-## Archive policy
-
-Documents move to **archive/** when superseded, deprecated, or no longer active. Archived docs are never deleted. See [archive/README.md](./archive/README.md).
+After large documentation moves, refresh search indexes with `python3 docs/meta/index-docs.py` when available.

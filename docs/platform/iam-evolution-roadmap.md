@@ -28,15 +28,15 @@ related:
 
 **Related documents:**
 
-- [P6.2 — Identity & Access Architecture Audit](../audits/p6-2-identity-access-architecture-audit.md)
+- [P6.2 — Identity & Access Architecture Audit (historical)](../audits/README.md)
 - [User Profile Engine Design](../identity/user-profile-engine-design.md)
-- [P5.0 — Full System Architecture Audit](../audits/p5-0-full-system-architecture-audit.md)
+- [P5.0 — Full System Architecture Audit (historical)](../audits/README.md)
 
 ---
 
 ## 1. Executive Summary
 
-Arrival Atlas currently operates on an **Anonymous Session System** where `sessionId` is both identity and credential. This is documented in [P6.2](../audits/p6-2-identity-access-architecture-audit.md) (Identity Maturity Score: 28/100, Level 1).
+Arrival Atlas currently operates on an **Anonymous Session System** where `sessionId` is both identity and credential. This is documented in [P6.2 (historical)](../audits/README.md) (Identity Maturity Score: 28/100, Level 1).
 
 This specification defines a controlled evolution path toward a **Hybrid Account-Centric IAM architecture**, enabling:
 
@@ -655,7 +655,7 @@ IAM evolution is considered successful when:
 
 | Document | Relevance |
 |----------|-----------|
-| [P6.2 Identity & Access Architecture Audit](../audits/p6-2-identity-access-architecture-audit.md) | As-is analysis, gap matrix, migration options |
+| [P6.2 Identity & Access Architecture Audit (historical)](../audits/README.md) | As-is analysis, gap matrix, migration options |
 | [User Profile Engine Design](../identity/user-profile-engine-design.md) | Guest profile, claim flow, future PostgreSQL schema |
 | `apps/api/src/state/system-state-coordinator.ts` | Sole write path — IAM hooks attach here |
 | `apps/api/src/state/system-state-types.ts` | `SystemState` shape to augment |

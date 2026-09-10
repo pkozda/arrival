@@ -27,13 +27,13 @@ related:
 **Version:** 1.0  
 **Date:** June 2026  
 
-**Supersedes:** Ambiguities identified in [P7.1 — MRC-3 Semantic Layer Gate Audit](../audits/p7-1-mrc-3-semantic-layer-gate-audit.md) (R-01 through R-12, Priority 1 items).
+**Supersedes:** Ambiguities identified in [P7.1 — MRC-3 Semantic Layer Gate Audit (historical)](../audits/README.md) (R-01 through R-12, Priority 1 items).
 
 **Aligns with:**
 
 - [Module Runtime Contract v1.0 — Specification](../core/module-runtime-contract-v1.md)
-- [Module Runtime Evolution Roadmap](../archive/module-runtime-evolution-roadmap.md)
-- [P7.0 — Module Runtime Architecture Audit](../audits/p7-0-module-runtime-architecture-audit.md)
+- [Module Runtime Evolution Roadmap (historical)](../archive/README.md)
+- [P7.0 — Module Runtime Architecture Audit (historical)](../audits/README.md)
 - [MRC-4 — Execution Blueprint (Action Framework)](../platform/mrc-4-action-framework-blueprint.md) — derived implementation spec
 
 **Scope:** Locks semantic and runtime contracts before MRC-4 (Action Framework). No implementation in this document.

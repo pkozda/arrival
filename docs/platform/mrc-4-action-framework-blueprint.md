@@ -35,7 +35,7 @@ related:
 **Aligns with:**
 
 - [Module Runtime Contract v1.0 — Specification](../core/module-runtime-contract-v1.md) §3.5, §3.9
-- [P7.1 — MRC-3 Semantic Layer Gate Audit](../audits/p7-1-mrc-3-semantic-layer-gate-audit.md)
+- [P7.1 — MRC-3 Semantic Layer Gate Audit (historical)](../audits/README.md)
 
 ---
 

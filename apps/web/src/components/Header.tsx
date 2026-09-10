@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ComponentType } from 'react';
+import dynamic from 'next/dynamic';
 import { AtlasLink as Link } from '@/components/atlas-runtime';
 import { usePathname } from 'next/navigation';
 import { useApp } from './AppProvider';
@@ -10,8 +11,16 @@ import {
 } from '@/lib/module-catalog-utils';
 import { PRODUCT_NAME, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@/lib/product-contract';
 import { isDevToolsUiEnabled } from '@/lib/dev-tools/reset-user-data';
-import { DEMO_PERSONA_IDS, getDemoPersona, type DemoPersonaId } from '@arrival-atlas/life-event-demo/personas';
 import { EconomicRealityNavLink } from '@/app-shell/navigation/EconomicRealityNavLink';
+
+const HeaderLifeEventDemos = dynamic(
+  () =>
+    import('./HeaderLifeEventDemos').then((mod) => mod.HeaderLifeEventDemos),
+  { ssr: false }
+) as ComponentType<{
+  disabled: boolean;
+  loadDemoPreset: (presetId: string) => Promise<void>;
+}>;
 
 function ThemeIcon({ theme }: { theme: 'light' | 'dark' }) {
   if (theme === 'dark') {
@@ -110,7 +119,6 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [resetting, setResetting] = useState<'session' | 'all' | null>(null);
-  const [loadingPreset, setLoadingPreset] = useState<DemoPersonaId | null>(null);
   const groupedModules = useMemo(() => groupModulesByCategory(modules), [modules]);
   const devToolsEnabled = isDevToolsUiEnabled();
 
@@ -132,19 +140,9 @@ export function Header() {
     }
   }
 
-  async function handleLoadPreset(presetId: DemoPersonaId) {
-    const persona = getDemoPersona(presetId);
-    setLoadingPreset(presetId);
-    try {
-      await loadDemoPreset(presetId);
-      setMenuOpen(false);
-      window.alert(`Demo loaded: ${persona.title}`);
-    } catch (error) {
-      console.error(error);
-      window.alert(error instanceof Error ? error.message : 'Failed to load demo preset');
-    } finally {
-      setLoadingPreset(null);
-    }
+  async function handleLoadPreset(presetId: string) {
+    await loadDemoPreset(presetId as Parameters<typeof loadDemoPreset>[0]);
+    setMenuOpen(false);
   }
 
   useEffect(() => {
@@ -277,23 +275,10 @@ export function Header() {
                   {resetting === 'all' ? 'Clearing…' : 'Clear all local state'}
                 </button>
               </div>
-              <span className="header-drawer-label">Life Event demos</span>
-              <div className="header-dev-tools-actions header-dev-tools-actions--stack">
-                {DEMO_PERSONA_IDS.map((presetId) => {
-                  const persona = getDemoPersona(presetId);
-                  return (
-                    <button
-                      key={presetId}
-                      type="button"
-                      className="header-dev-btn"
-                      disabled={loadingPreset !== null || resetting !== null}
-                      onClick={() => void handleLoadPreset(presetId)}
-                    >
-                      {loadingPreset === presetId ? 'Loading…' : persona.title.replace('Persona ', '')}
-                    </button>
-                  );
-                })}
-              </div>
+              <HeaderLifeEventDemos
+                disabled={resetting !== null}
+                loadDemoPreset={handleLoadPreset}
+              />
             </div>
           )}
 

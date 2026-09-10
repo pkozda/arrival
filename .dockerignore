@@ -11,6 +11,8 @@
 **/coverage
 **/test-results
 **/playwright-report
+**/*.tsbuildinfo
+README.pages
 
 .env
 .env.*
@@ -21,10 +23,16 @@
 .arrival-atlas-accounts
 .arrival-atlas-entitlements
 .arrival-atlas-sessions
+.arrival-atlas-state-*-test
 apps/api/.arrival-atlas-state
 apps/api/.arrival-atlas-accounts
 apps/api/.arrival-atlas-entitlements
 apps/api/.arrival-atlas-sessions
+apps/api/.arrival-atlas-state-*-test
+
+# Black-box probe evidence is not required to build web/api images.
+# Dockerfiles only COPY package.json, lockfile, tsconfig.base.json, apps/, packages/, deploy/.
+tools/black-box-audit/artifacts
 
 **/*.log
 **/.DS_Store

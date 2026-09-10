@@ -507,7 +507,7 @@ A change that passes module-level tests but violates this contract may still bre
 
 ### 9.2 Runtime Reactivity Audit v1
 
-[Runtime Reactivity Audit v1](../audits/runtime-reactivity-audit-v1.md) documented pre-consolidation gaps: fragmented refresh graphs, stale economic state, and silent non-updates.
+[Runtime Reactivity Audit v1 (historical)](../audits/README.md) documented pre-consolidation gaps: fragmented refresh graphs, stale economic state, and silent non-updates.
 
 This contract encodes the structural remedies as enforceable rules:
 
