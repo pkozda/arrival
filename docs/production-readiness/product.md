@@ -4,7 +4,7 @@
 > Documentation is now a **static implementation contract**. All future work is **implementation-driven**, not architecture-driven.  
 > **Frozen files:** product.md · ux.md · engineering.md · verification.md · index.md · implemented-baseline.md  
 > **Allowed edits to frozen files:** bugfix-level only (typos, broken links, factual corrections). No structural changes. No new abstraction layers.  
-> **Execution entry:** [implementation-first-pass-plan.md](./implementation-first-pass-plan.md)
+> **Execution entry:** [implementation-first-pass-plan.md (historical)](index.md)
 
 UX-first product for newcomers in Germany. **Two features. Feature freeze.**
 
@@ -177,6 +177,6 @@ Phase 5  Production readiness   → soak, sustained CI, runbook
 | QA | **verification.md** only |
 | ID lookup | **index.md** |
 
-**Frozen runtime:** [implemented-baseline.md](./implemented-baseline.md) (BL-*)
+**Frozen runtime:** [implemented-baseline.md (historical)](index.md) (BL-*)
 
 **Out of scope:** OAuth · new modules · production database · benefits simulator

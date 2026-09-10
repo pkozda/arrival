@@ -177,8 +177,8 @@ Rate each screen 1–10 (10 = worst). **Ship threshold: no dimension >6; average
 
 These rules codify findings from:
 
-- [ux-cognition-audit-immigrant-persona.md](../audits/ux-cognition-audit-immigrant-persona.md)  
-- [production-readiness-ui-ux-audit.md](../audits/production-readiness-ui-ux-audit.md)  
+- [ux-cognition-audit-immigrant-persona.md (historical)](../audits/README.md)  
+- [production-readiness-ui-ux-audit.md (historical)](../audits/README.md)  
 
 Audits diagnose. These rules **prevent regression**.
 

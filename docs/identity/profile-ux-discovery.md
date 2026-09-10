@@ -26,7 +26,7 @@ related:
 **Date:** 2026-06-18  
 **Status:** Product discovery — no implementation proposed
 
-**Related:** [../identity/profile-system-v1-roadmap.md](../identity/profile-system-v1-roadmap.md) (technical architecture), [../audits/ui-architecture-audit.md](../audits/ui-architecture-audit.md) (contract-driven UI)
+**Related:** [../identity/profile-system-v1-roadmap.md](../identity/profile-system-v1-roadmap.md) (technical architecture), [../audits/ui-architecture-audit.md (historical)](../audits/README.md) (contract-driven UI)
 
 ---
 

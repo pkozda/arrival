@@ -837,7 +837,7 @@ The Profile UX v1 design is successful when:
 |----------|--------------|
 | [profile-ux-discovery-audit.md](../identity/profile-ux-discovery.md) | Discovery inputs — motivations, IA domains, hybrid model |
 | [profile-system-v1-roadmap.md](../identity/profile-system-v1-roadmap.md) | Technical roadmap — this spec defines UX requirements for that work |
-| [ui-architecture-audit.md](../audits/ui-architecture-audit.md) | Contract-driven UI constraints — Profile UI must use same patterns (no module-specific pages) |
+| [ui-architecture-audit.md (historical)](../audits/README.md) | Contract-driven UI constraints — Profile UI must use same patterns (no module-specific pages) |
 
 **Handoff:** This spec is ready for wireframes, content design, and usability testing — then technical implementation per profile-system-v1-roadmap phases P1–P4.
 

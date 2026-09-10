@@ -250,9 +250,9 @@ Meaning:
 
 | Artifact | Path |
 |----------|------|
-| System audit v1 | [economic-reality-system-audit-v1.md](../audits/economic-reality-system-audit-v1.md) |
+| System audit v1 | [economic-reality-system-audit-v1.md (historical)](../audits/README.md) |
 | EP-11.1 stabilization | arr-019 branch |
-| System audit v2 | [economic-reality-system-audit-v2.md](../audits/economic-reality-system-audit-v2.md) |
+| System audit v2 | [economic-reality-system-audit-v2.md (historical)](../audits/README.md) |
 | R-01–R-04 micro-patch | arr-019 branch |
 | This closure spec | (this document) |
 
@@ -268,4 +268,4 @@ Meaning:
 
 - [economic-reality-module-v1-spec.md](./economic-reality-module-v1-spec.md)
 - [economic-reality-module-v1-roadmap.md](./economic-reality-module-v1-roadmap.md)
-- [economic-reality-system-audit-v2.md](../audits/economic-reality-system-audit-v2.md)
+- [economic-reality-system-audit-v2.md (historical)](../audits/README.md)

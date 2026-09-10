@@ -309,7 +309,7 @@ Recent results
 | Life state model | [life-state-model.md](./life-state-model.md) |
 | Classifier fixtures | [life-event-classifier-fixtures.md](./life-event-classifier-fixtures.md) |
 | Graph catalog | [life-event-graph-catalog-v1.md](./life-event-graph-catalog-v1.md) |
-| Readiness audit | [life-event-module-v2-readiness-audit.md](../audits/life-event-module-v2-readiness-audit.md) |
+| Readiness audit | [life-event-module-v2-readiness-audit.md (historical)](../audits/README.md) |
 | ADR-001 Layered architecture | [adr-001-life-event-layered-architecture.md](../adr/adr-001-life-event-layered-architecture.md) |
 | ADR-002 Action vs execution | [adr-002-action-vs-execution-boundary.md](../adr/adr-002-action-vs-execution-boundary.md) |
 | ADR-003 LE realignment | [adr-003-le-layer-realignment.md](../adr/adr-003-le-layer-realignment.md) |

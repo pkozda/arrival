@@ -33,9 +33,9 @@ Every future screen, animation, feature, and interaction must be **evaluated aga
 
 A long-term UX philosophy package derived from:
 
-- [product-walkthrough-ux-consultant.md](../audits/product-walkthrough-ux-consultant.md) — what exists today  
-- [ux-cognition-audit-immigrant-persona.md](../audits/ux-cognition-audit-immigrant-persona.md) — how it feels under stress  
-- [production-readiness-ui-ux-audit.md](../audits/production-readiness-ui-ux-audit.md) — release gaps  
+- [product-walkthrough-ux-consultant.md (historical)](../audits/README.md) — what exists today  
+- [ux-cognition-audit-immigrant-persona.md (historical)](../audits/README.md) — how it feels under stress  
+- [production-readiness-ui-ux-audit.md (historical)](../audits/README.md) — release gaps  
 - [phase-1-release-blockers.md](../production-readiness/phase-1-release-blockers.md) — tactical fixes  
 
 **Audits diagnose. Vision prescribes.**
@@ -284,7 +284,7 @@ Vision prescribes destination. These documents define **how** to get there witho
 | Doc | Relationship |
 |-----|--------------|
 | [../production-readiness/ux.md](../production-readiness/ux.md) | Tactical UX gates |
-| [../audits/ux-cognition-audit-immigrant-persona.md](../audits/ux-cognition-audit-immigrant-persona.md) | Evidence base |
+| [../audits/ux-cognition-audit-immigrant-persona.md (historical)](../audits/README.md) | Evidence base |
 | [../production-readiness/phase-1-release-blockers.md](../production-readiness/phase-1-release-blockers.md) | v1 bridge to vision |
 
 ---

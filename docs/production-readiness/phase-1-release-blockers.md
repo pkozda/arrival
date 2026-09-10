@@ -26,7 +26,7 @@ related:
 
 **Date:** July 2026  
 **Purpose:** Single actionable checklist for **first-phase fixes** before beta or public release  
-**Source audits:** [production-readiness-ui-ux-audit.md](../audits/production-readiness-ui-ux-audit.md) · [malicious-beta-tester-ux-audit.md](../audits/malicious-beta-tester-ux-audit.md)  
+**Source audits:** [production-readiness-ui-ux-audit.md (historical)](../audits/README.md) · [malicious-beta-tester-ux-audit.md (historical)](../audits/README.md)  
 **Gate reference:** [verification.md](./verification.md) (Beta Ready + Production Ready rows)
 
 > **Rule:** Every item below is a **release blocker**. Phase 2 (polish, medium/low) is out of scope here.  
@@ -283,8 +283,8 @@ Do **not** block release on these; track separately:
 
 ## Related docs
 
-- [production-readiness-ui-ux-audit.md](../audits/production-readiness-ui-ux-audit.md)  
-- [malicious-beta-tester-ux-audit.md](../audits/malicious-beta-tester-ux-audit.md)  
+- [production-readiness-ui-ux-audit.md (historical)](../audits/README.md)  
+- [malicious-beta-tester-ux-audit.md (historical)](../audits/README.md)  
 - [verification.md](./verification.md)  
 - [ux.md](./ux.md)  
-- [implementation-first-pass-plan.md](./implementation-first-pass-plan.md)
+- [implementation-first-pass-plan.md (historical)](index.md)

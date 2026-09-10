@@ -29,11 +29,11 @@ related:
 
 **Related documents:**
 
-- [Module Runtime Contract v1.0 — Evolution Roadmap](../archive/module-runtime-evolution-roadmap.md)
+- [Module Runtime Contract v1.0 — Evolution Roadmap (historical)](../archive/README.md)
 - [IAM Evolution Roadmap](../platform/iam-evolution-roadmap.md)
 - [Financial Module v2 — Architecture Notes](../finance/financial-module-v2-notes.md)
-- [User Profile Engine Runtime Unification Report](../audits/user-profile-engine-runtime-unification-report.md)
-- [P7.0 — Module Runtime Architecture Audit](../audits/p7-0-module-runtime-architecture-audit.md)
+- [User Profile Engine Runtime Unification Report (historical)](../archive/README.md)
+- [P7.0 — Module Runtime Architecture Audit (historical)](../audits/README.md)
 
 ---
 
@@ -41,7 +41,7 @@ related:
 
 This specification defines **Module Runtime Contract v1.0** — the formal boundary between the Profile System, module execution engines, and UI Snapshot projection.
 
-The roadmap ([Module Runtime Evolution Roadmap](../archive/module-runtime-evolution-roadmap.md)) describes *what* to build and in what order. This document defines *how* the contract looks: TypeScript interfaces, pipeline invariants, and enforcement rules.
+The roadmap ([Module Runtime Evolution Roadmap (historical)](../archive/README.md)) describes *what* to build and in what order. This document defines *how* the contract looks: TypeScript interfaces, pipeline invariants, and enforcement rules.
 
 **Contract boundary:**
 

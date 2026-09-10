@@ -332,8 +332,8 @@ Profile is **optional for action** but **required for trust** at scale. Home is 
 | [ux-contract-v2.md](./ux-contract-v2.md) | Mutation semantics — extends v1 for write authority |
 | [profile-ux-design-prompt.md](../identity/profile-ux-design-prompt.md) | Product intent — subordinate to this contract for boundary disputes |
 | [profile-ux-spec.md](../identity/profile-ux-spec.md) | Screen design — must not violate §4–§5 |
-| [ui-architecture-audit.md](../audits/ui-architecture-audit.md) | Baseline audit — pre-Phase 1 state |
-| [ui-ready-gate-audit.md](../audits/ui-ready-gate-audit.md) | Platform UI gate — technical boundary sibling |
+| [ui-architecture-audit.md (historical)](../audits/README.md) | Baseline audit — pre-Phase 1 state |
+| [ui-ready-gate-audit.md (historical)](../audits/README.md) | Platform UI gate — technical boundary sibling |
 
 ### Contract change process
 

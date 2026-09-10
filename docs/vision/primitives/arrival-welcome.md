@@ -319,4 +319,4 @@ Aligned with [interaction-principles.md](../interaction-principles.md) and [emot
 - [onboarding-philosophy.md](../onboarding-philosophy.md) — ideal first session (Step 0 = language)
 - [implementation-roadmap.md](../implementation-roadmap.md) — Phase 0
 - [ux-migration-backlog.md](../ux-migration-backlog.md) — E0 epic
-- [ux-cognition-audit-immigrant-persona.md](../../audits/ux-cognition-audit-immigrant-persona.md) — P0-3 language picker evidence
+- [ux-cognition-audit-immigrant-persona.md (historical)](../../audits/README.md) — P0-3 language picker evidence

@@ -581,8 +581,8 @@ A design or implementation is **blueprint-compliant** when:
 |----------|------|
 | [life-event-module-v2-v1.0-architecture-freeze.md](./life-event-module-v2-v1.0-architecture-freeze.md) | Frozen architecture |
 | [ADR-004](../adr/adr-004-le-7-scenario-overlay.md) | Scenario overlay rules |
-| [l10-a-localization-pass.md](./l10-a-localization-pass.md) | UI chrome i18n |
-| [l10-a2-content-localization-completion.md](./l10-a2-content-localization-completion.md) | Content i18n |
+| [l10-a-localization-pass.md (historical)](README.md) | UI chrome i18n |
+| [l10-a2-content-localization-completion.md (historical)](README.md) | Content i18n |
 | [le-6-consistency-rules.md](./le-6-consistency-rules.md) | Home dedup presentation |
 
 ---

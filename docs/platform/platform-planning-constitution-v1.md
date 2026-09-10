@@ -195,6 +195,6 @@ Changes to authority split require:
 
 ## Related
 
-- [life-event-platform-integration-audit.md](../audits/life-event-platform-integration-audit.md)
+- [life-event-platform-integration-audit.md (historical)](../audits/README.md)
 - [le-6-consistency-rules.md](../life-events/le-6-consistency-rules.md)
 - [economic-reality-module-v1-spec.md](../economic-reality/economic-reality-module-v1-spec.md)

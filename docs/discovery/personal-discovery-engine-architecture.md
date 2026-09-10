@@ -1100,5 +1100,5 @@ into a ranked “worth your attention” feed — a central Arrival Atlas capabi
 | Roadmap (E1–E11) | [personal-discovery-engine-roadmap.md](./personal-discovery-engine-roadmap.md) |
 | MVP scope | [personal-discovery-engine-mvp.md](./personal-discovery-engine-mvp.md) |
 | ADR-006 | [../adr/adr-006-personal-discovery-engine-boundaries.md](../adr/adr-006-personal-discovery-engine-boundaries.md) |
-| MBDE (sibling engine) | [../pr/arr-033-pr-description.md](../pr/arr-033-pr-description.md) |
-| CSR (arr-034) | [../pr/arr-034-pr-description.md](../pr/arr-034-pr-description.md) |
+| MBDE (sibling engine) | [../pr/arr-033-pr-description.md (historical)](../pr/README.md) |
+| CSR (arr-034) | [../pr/arr-034-pr-description.md (historical)](../pr/README.md) |

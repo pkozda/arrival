@@ -197,7 +197,7 @@ Home (secondary to Life Event) + /modules/economic-reality
 | Employment transition completed | Update stability secondary |
 | Financial crisis detected | Elevate urgency in LE overlay (advisory only) |
 
-Per [platform integration audit](../audits/life-event-platform-integration-audit.md): cross-module signals must not create a second planner on Home — ER plan stays on ER surfaces unless platform authority contract is updated.
+Per [platform integration audit (historical)](../audits/README.md): cross-module signals must not create a second planner on Home — ER plan stays on ER surfaces unless platform authority contract is updated.
 
 ### 3.2 Design principles
 

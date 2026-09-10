@@ -23,7 +23,7 @@ related:
 **Date:** 2026-06-18  
 **Roadmap:** [mrc-6-to-platform-roadmap.md](../platform/mrc-6-to-platform-roadmap.md) v1.0 (Status: Proposed, June 2026)  
 **Current state:** Post Phase 5C — **UI READY**  
-**Verification sources:** [platform-readiness-audit.md](../audits/platform-readiness-audit.md), [ui-ready-gate-audit.md](../audits/ui-ready-gate-audit.md), monorepo test run 439/439 green
+**Verification sources:** [platform-readiness-audit.md (historical)](../audits/README.md), [ui-ready-gate-audit.md (historical)](../audits/README.md), monorepo test run 439/439 green
 
 ---
 
@@ -277,7 +277,7 @@ The roadmap risk register is **fully mitigated** for UI-facing concerns.
 | 2 | Explain ADL fixtures | ✅ `module-explanation-view.test.ts`, `explain-ui-boundary` |
 | 3 | SDK → bootstrap integration | ✅ module-sdk + modules catalog tests |
 | 4 | Drift golden tests | ✅ `observability-drift.test.ts` |
-| 5 | UI Ready gate audit | ✅ [ui-ready-gate-audit.md](../audits/ui-ready-gate-audit.md) |
+| 5 | UI Ready gate audit | ✅ [ui-ready-gate-audit.md (historical)](../audits/README.md) |
 
 | Package | Roadmap mention | **Tests now** |
 |---------|-----------------|---------------|

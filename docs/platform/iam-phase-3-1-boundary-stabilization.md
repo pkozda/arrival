@@ -34,7 +34,7 @@ related:
 **Related documents:**
 
 - [IAM Evolution Roadmap](../platform/iam-evolution-roadmap.md)
-- [P6.2 — Identity & Access Architecture Audit](../audits/p6-2-identity-access-architecture-audit.md)
+- [P6.2 — Identity & Access Architecture Audit (historical)](../audits/README.md)
 
 ---
 
